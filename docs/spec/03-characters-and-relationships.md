@@ -1,0 +1,394 @@
+# 03 - Characters and Relationships
+
+**Spec version:** `0.1.0`
+
+# 1. The Protagonist
+
+## CANON
+
+The protagonist begins as an amnesiac investigator.
+
+At the beginning they do not reliably know:
+
+- their name
+- age
+- year
+- family
+- assignment
+- nature
+
+They appear to be a private investigator or detective.
+
+That interpretation may later be recontextualized.
+
+## POSSIBILITY
+
+"Investigator" may ultimately refer to a system role.
+
+The protagonist may have been designed or instantiated to investigate anomalies inside the simulation.
+
+---
+
+# 2. The Client
+
+## CANON
+
+The protagonist was hired by an apparently ordinary person.
+
+The client's claim:
+
+> A sibling has disappeared, and almost everyone insists that sibling never existed.
+
+The client has known the missing sibling their entire life.
+
+The client initially appears potentially delusional because:
+
+- official records disagree
+- neighbors disagree
+- institutions disagree
+- social memory disagrees
+
+But physical and emotional evidence supports the client's account.
+
+## POSSIBILITY
+
+The client may later turn out to be:
+
+- connected to the corporation
+- connected to government intelligence
+- connected to a foreign entity
+- connected to the facility
+- another artificial person
+- intentionally placed to activate or recruit the investigator
+- something stranger
+
+Do not decide too early.
+
+---
+
+# 3. The Five Siblings
+
+## CANON
+
+The family consists of five siblings:
+
+- four brothers
+- one younger sister
+
+Each sibling has a Roman numeral tattoo based on birth order:
+
+```text
+I
+II
+III
+IV
+V
+```
+
+This is a family inside joke and a major analog identity device.
+
+## Narrative Function of the Tattoos
+
+At first:
+
+- family lore
+- sentimental history
+- humorous personal detail
+
+Later:
+
+- physical proof of family structure
+- resistance to memory rewrite
+- identity anchor
+- evidence against false memories
+
+The system may rewrite a person's memory of why the tattoo exists while being unable to rewrite the tattoo itself.
+
+Example rationalization:
+
+> "III is just my favorite number."
+
+A sibling may know that explanation is false.
+
+This supports the theme:
+
+> The system can rewrite memory more easily than physical evidence.
+
+---
+
+# 4. The Missing Facilities Supervisor
+
+## CANON
+
+One sibling worked as facilities supervisor at the Badlands data center.
+
+Before disappearing, this person:
+
+- began behaving differently
+- became secretive
+- lied to family
+- was accused of stealing the notebook
+- denied taking it
+- hid it
+- had unexplained connections or knowledge
+- may have been involved in double-crosses
+
+The character should not be a simple innocent victim.
+
+## WORKING DIRECTION
+
+The missing sibling may simultaneously have:
+
+- loved the family
+- lied repeatedly
+- worked with the facility
+- betrayed someone
+- attempted to expose the facility
+- helped conceal parts of the facility
+- used family members as insurance
+- disappeared deliberately
+- been altered, replaced, or re-instantiated
+
+The player should repeatedly reinterpret this person's motives.
+
+---
+
+# 5. The Father
+
+## CANON
+
+The siblings' father is a mad-scientist figure.
+
+By 2047, he belongs to an older generation and may no longer be alive in ordinary biological form.
+
+At some point, he uploaded a copy of his consciousness.
+
+He stored that copy offline on a USB drive.
+
+This is consistent with the analog/offline resistance principle because the copy survives in cold storage outside the active network.
+
+Possible physical label:
+
+```text
+DAD
+DO NOT FORMAT
+```
+
+## Historical Roles in the Fictional Timeline
+
+At different points, the father:
+
+- served as Delaware County commissioner
+- later became a U.S. senator
+- later served as an advisor to his second-oldest son Luke
+
+He may have encountered early pieces of the larger conspiracy through apparently ordinary government, development, infrastructure, AI, or energy decisions.
+
+## WHY HE COPIED HIMSELF
+
+The copy should not exist only because he wanted immortality.
+
+Stronger motivation:
+
+> He realized human or artificial memory could not be trusted and created an offline backup of himself as insurance.
+
+---
+
+# 6. Dad as a Game Mechanic
+
+The father's consciousness may progress through several states:
+
+```text
+USB DRIVE
+   ↓
+TERMINAL NPC
+   ↓
+ROBOT BODY
+   ↓
+PARTY MEMBER
+```
+
+Potential uses:
+
+- conversation
+- historical knowledge
+- puzzle reasoning
+- poker
+- Catan
+- escape-room sequences
+- political history
+- early facility history
+- comic relief
+- philosophical identity questions
+
+## Necessary Limitations
+
+Dad must not solve the game automatically.
+
+Possible constraints:
+
+- memory ends on the date of the copy
+- corrupted sectors
+- incomplete knowledge
+- encrypted memories
+- cannot safely connect to networked systems
+- network access could expose him
+- personality flaws remain intact
+- overconfidence
+- incorrect assumptions
+- memories may conflict with children's memories
+
+Key philosophical question:
+
+> Is this really Dad, or a copy that remembers being Dad?
+
+The game should not trivialize that question.
+
+---
+
+# 7. Luke - Sibling II
+
+## CANON
+
+Luke is the second-oldest sibling.
+
+By 2047:
+
+- he is the 51st and current President of the United States
+- he is credited in the fictional world with major global accomplishments including decommoditizing real estate and helping solve world peace and hunger
+
+These are intentionally extravagant family-story elements and should be played with confidence rather than explained defensively.
+
+## Vocabulary Trait
+
+Luke frequently uses unusually sophisticated vocabulary.
+
+Other characters, including family members, may have to ask what he means or look words up.
+
+Example:
+
+> noumena
+
+This should become a recurring vocabulary device and inside joke.
+
+Important writing principle:
+
+> Luke can expand the player's vocabulary without making vocabulary knowledge a parser requirement.
+
+---
+
+# 8. Eli - Sibling III
+
+## CANON
+
+Eli is the third-oldest sibling.
+
+By 2047:
+
+- serves as an energy advisor
+- sleeps a lot
+- is exceptionally organized
+- is a master of crochet
+- is a master of origami
+
+## Mechanical Opportunities
+
+Eli may be useful in:
+
+- nuclear power questions
+- data-center energy accounting
+- logistics
+- planning
+- physical organization puzzles
+- folding/origami puzzles
+- improvised structures
+- pattern recognition
+
+The contrast between major energy responsibility and sleepy demeanor is useful character texture.
+
+---
+
+# 9. Sibling IV
+
+## CANON
+
+The fourth-oldest sibling is a monster-truck driver.
+
+Potential uses:
+
+- vehicles
+- mechanical systems
+- direct-action solution paths
+- ridiculous traversal
+- destructive alternatives to elegant solutions
+- comic contrast with more intellectual siblings
+
+A monster-truck solution should sometimes be a legitimate solution.
+
+---
+
+# 10. Sibling V
+
+## CANON
+
+The youngest sibling is a girl.
+
+By 2047:
+
+- she is an astronaut
+- she is living on Mars
+
+She may enter later in the story.
+
+## Potential Uses
+
+- off-world bridge
+- space systems
+- navigation
+- Mars
+- reality verification
+- evidence that a distant station or sky is not what it appears to be
+
+---
+
+# 11. Family as Ensemble
+
+The family should not be introduced all at once.
+
+Reveal them through:
+
+- memories
+- photographs
+- tattoos
+- objects
+- conversations
+- news references
+- physical evidence
+- recovered media
+
+The player should gradually realize how extraordinary the family is.
+
+The apparent absurdity is part of the charm.
+
+---
+
+# 12. Character Information Should Be Mechanically Useful
+
+Family details should not remain pure biography.
+
+Examples:
+
+| Character detail | Potential gameplay use |
+|---|---|
+| Roman numeral tattoos | analog identity proof |
+| Dad's USB | offline consciousness backup |
+| Luke's vocabulary | humor, clues, wordplay |
+| Eli's energy role | data-center and reactor analysis |
+| Eli's origami | physical puzzle solving |
+| IV's monster trucks | traversal and direct-action paths |
+| V on Mars | off-world mystery bridge |
+| Dad's poker skill | alternate route through adversary |
+| Dad's Catan skill | resource-trading puzzle |
+| Family escape-room skill | team puzzle sequence |
+
+The game should regularly turn character flavor into mechanics.
