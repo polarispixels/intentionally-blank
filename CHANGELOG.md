@@ -5,12 +5,14 @@ documented here. Format: [Keep a Changelog](https://keepachangelog.com/);
 versioning: [SEMVER](https://semver.org/).
 
 Policy: **MAJOR** = breaks saved games or story canon; **MINOR** = new
-player-visible content or a milestone; **PATCH** = fixes and tuning. Every
-release bumps `GAME_VERSION` and `package.json`, adds an entry here, updates
-the `BACKLOG.md` status board, and gets a git tag `vX.Y.Z`. A test enforces
-that the version strings agree. (ADR 0005)
+player-visible content or a milestone; **PATCH** = fixes, tuning, and
+documentation. **Every merge to `main` is a release**: it bumps
+`GAME_VERSION` and `package.json`, adds an entry here, updates the
+`BACKLOG.md` status board when a milestone moves, bumps the `Spec version`
+line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
+enforces that the version strings agree. (ADR 0005)
 
-## [Unreleased]
+## [0.2.1] - 2026-08-29
 
 ### Changed
 
@@ -23,7 +25,11 @@ that the version strings agree. (ADR 0005)
   canon gains §21 *Causal Spine of Act I* (`WORKING IDEA`). Writing guide
   gains §18 *Beat Notes*. Development handoff §3 requires each milestone
   spec to state its causal link. `narrative-writer` and `game-architect`
-  agents carry the beat test.
+  agents carry the beat test. Spec docs 01, 02, 06, 08 and the spec README
+  now carry `Spec version: 0.2.1`.
+- Versioning rule tightened: every merge to `main` is a release and bumps
+  the version (docs-only changes are PATCH). There is no accumulating
+  `[Unreleased]` section. (CLAUDE.md rule 7, ADR 0005, DEVELOPMENT.md)
 
 ## [0.2.0] - 2026-08-29
 

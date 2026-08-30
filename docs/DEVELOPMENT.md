@@ -119,17 +119,21 @@ are marked rather than deleted (spec 08 §10).
 ## Versioning and releases
 
 One SEMVER version covers the spec and the game (the spec README's ladder:
-0.1.0 foundation → 0.2.0 first playable opening → … → 1.0.0). Policy:
+0.1.0 foundation → 0.2.0 prototype → 0.3.0 opening room → … → 1.0.0).
+**Every merge to `main` is a release**, because `main` deploys. Policy:
 
 - **MAJOR** — breaks saved games or story canon.
 - **MINOR** — new player-visible content, or a milestone.
-- **PATCH** — fixes and tuning.
+- **PATCH** — fixes, tuning, and documentation-only changes.
 
-Release checklist: bump `GAME_VERSION` (engine constant) and `package.json`;
-move `[Unreleased]` to `## [x.y.z] - date` in `CHANGELOG.md`; update the
-status board in `BACKLOG.md`; `git tag vX.Y.Z && git push --tags`. A Vitest
-test asserts the three version strings agree, so a forgotten bump fails CI.
-The in-game `VERSION` command prints it, which doubles as a live-deploy check.
+Release checklist, on every merge: bump `GAME_VERSION` (engine constant) and
+`package.json`; add `## [x.y.z] - date` to `CHANGELOG.md` (there is no
+`[Unreleased]` holding area); bump the `Spec version` line of any spec doc
+the change touched; update the status board in `BACKLOG.md` if a milestone
+moved; `git tag vX.Y.Z && git push --tags`. A Vitest test asserts the
+version strings agree, so a forgotten bump fails CI. The in-game `VERSION`
+command and the docs-site badge print it, which doubles as a live-deploy
+check.
 
 ## Documentation set
 
