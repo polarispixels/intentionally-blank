@@ -83,7 +83,20 @@ const description =
   'Sixty-odd and narrow, in a cardigan with the elbows gone. He has the stillness of a man who has spent thirty years awake while other people sleep, and does not fill silences.\n\nWhen he looks at you he looks at your face and not at the side of your head, and keeping it there costs him something.';
 
 // ---------------------------------------------------------------------------
-// §5.3 — greeting. See this file's header on Rule 1's reachability.
+// §13 (front-desk-prose appendix) — greeting, replacing §5.3's version
+// entirely. Rule 1 is §5.3's rule 1, unchanged (see this file's header on
+// its reachability). Rule 2 is new — the promise `topic_register` rule 1
+// makes ("that is all he says about the book tonight") kept for real; it
+// has to precede rule 3's rotation or two of rule 3's six variants (v6's
+// hands on the register) would break it within two turns. Rule 3 replaces
+// §5.3's old two-variant rule 2 with the volunteering rotation: v1-v4 the
+// house and the town, v5 the hour, v6 his hands on the book he tore a page
+// out of — order is drift, not decoration, and is preserved as authored.
+//
+// THE DESIGN RULE THIS ENFORCES: volunteering names a handle; ASK pulls it.
+// None of the six variants below answers a topic on its own — v1 names the
+// key board and does not hand over the key (still ASK MARLOW ABOUT KEY);
+// v6 puts his hands on the register and says nothing about the page.
 // ---------------------------------------------------------------------------
 
 const greeting: ProseRule[] = [
@@ -91,7 +104,23 @@ const greeting: ProseRule[] = [
     when: { not: { flag: FLAG_MET_MARLOW } },
     text: '"Evening." He has been awake for hours and does not pretend otherwise. His eyes go to the side of your head, once, and come back. He does not ask.\n\n"There\'s a towel behind the desk, if you want one."',
   },
-  { text: ['"Still up," he says, which is not a question.', 'He looks up, and waits, and is prepared to wait.'] },
+  {
+    when: { flag: FLAG_MARLOW_KNOWS_YOU_KNOW },
+    text: [
+      '"Still up," he says, and that is the whole of it tonight.',
+      'He is at the desk with both hands flat on the counter and the book squared to the edge of it. He does not start anything, and he does not object to you standing there.',
+    ],
+  },
+  {
+    text: [
+      '"Still up," he says, which is not a question.\n\nThen, because it is four in the morning and there is nobody else to say it to: "Board behind me\'s got a hook for every room in the house. Most of them have still got their spare on them. It\'s been that kind of year."',
+      'He looks up, and waits, and is prepared to wait. When you do not fill it, he does.\n\n"Eleven rooms and four let. It\'s a big quiet house to sit awake in." He turns his cup a quarter turn on the counter and does not drink out of it.',
+      '"It\'s hymns this hour, then the stock report, then hymns again." He does not turn the radio up for any of it. "Whitlock came by Tuesday about a dog that wasn\'t anybody\'s. That\'s the week\'s news in this town, near enough."',
+      '"Top floor, back. Three weeks you\'ve had it." He has the room off by heart. "No complaint out of you, and none about you. That\'s rarer in a let house than you\'d think."',
+      '"Twenty past four is the bad part of it," he says, to the counter more than to you. "Six, I\'m off. Between here and six there\'s nothing to do but be here doing it."\n\nHe checks the clock behind him, and then the one over the door, which does not agree with it, and lets them both alone.',
+      'He squares the register with two fingers while he talks, the way another man would straighten a tie.\n\n"People have been signing that book since before my time. There\'s hands in it belonging to people whose shoes I could still describe to you." He stops squaring it. "More empty weeks in it now than full ones."',
+    ],
+  },
 ];
 
 // ---------------------------------------------------------------------------

@@ -24,6 +24,7 @@ import { validate } from '../src/engine/validate';
 import {
   respondToAsk,
   respondToGreeting,
+  respondToNoTopic,
   respondToShow,
   respondToTell,
   NPC_VERB_IDS,
@@ -104,6 +105,8 @@ const WORLD: WorldDef = {
     ...FIXTURE_WORLD.responses,
     'nounMiss.seen': "The {name} isn't here.",
     'nounMiss.unseen': "You don't see that here.",
+    'conversation.noTopic': ['fixture: about the— (variant 1)', 'fixture: about what, exactly (variant 2)'],
+    'system.askSyntax': 'fixture: (ASK someone ABOUT something.)',
   },
 };
 
@@ -245,6 +248,64 @@ describe('respondToTell', () => {
     const tell = respondToTell(WORLD, baseState(), vocab, MARA, 'brother');
     expect(lineText(ask.events)).toBe('Mara: ASK response.');
     expect(lineText(tell.events)).toBe('Mara: TELL response (tellTopics overrides topics).');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// respondToNoTopic — front-desk-prose appendix §14: ASK/TELL <npc> ABOUT
+// with no topic renders the GLOBAL "conversation.noTopic" family, never
+// that NPC's own unknownTopic (the leak §14 warns against).
+// ---------------------------------------------------------------------------
+
+describe('respondToNoTopic', () => {
+  it('renders the global conversation.noTopic family, not the NPC\'s own unknownTopic', () => {
+    const result = respondToNoTopic(WORLD, baseState(), vocab, GUIDE, NPC_VERB_IDS.ask);
+    expect(lineText(result.events)).toBe('fixture: about the— (variant 1)');
+  });
+
+  it('rotates independently per call, like any other string[] family', () => {
+    const first = respondToNoTopic(WORLD, baseState(), vocab, GUIDE, NPC_VERB_IDS.ask);
+    const second = respondToNoTopic(WORLD, first.state, vocab, GUIDE, NPC_VERB_IDS.ask);
+    expect(lineText(second.events)).toBe('fixture: about what, exactly (variant 2)');
+  });
+
+  it('appends the system.askSyntax tail as a second, system-kind line, and suppresses it after three fires', () => {
+    let state = baseState();
+    for (let i = 0; i < 3; i++) {
+      const result = respondToNoTopic(WORLD, state, vocab, GUIDE, NPC_VERB_IDS.ask);
+      expect(result.events).toHaveLength(2);
+      expect(result.events[1]).toMatchObject({ type: 'line', kind: 'system', text: 'fixture: (ASK someone ABOUT something.)' });
+      state = result.state;
+    }
+    const fourth = respondToNoTopic(WORLD, state, vocab, GUIDE, NPC_VERB_IDS.ask);
+    expect(fourth.events).toHaveLength(1);
+  });
+
+  it('emits no tail at all when the world declares no system.askSyntax family', () => {
+    const worldWithoutTail: WorldDef = { ...WORLD, responses: { ...WORLD.responses, 'system.askSyntax': undefined as unknown as string } };
+    delete (worldWithoutTail.responses as Record<string, unknown>)['system.askSyntax'];
+    const result = respondToNoTopic(worldWithoutTail, baseState(), vocab, GUIDE, NPC_VERB_IDS.ask);
+    expect(result.events).toHaveLength(1);
+  });
+
+  it('tallies the invoking verb\'s own declared class (ask is social here)', () => {
+    const result = respondToNoTopic(WORLD, baseState(), vocab, GUIDE, NPC_VERB_IDS.ask);
+    expect(result.class).toBe('social');
+  });
+});
+
+describe('respond() routes a blank ASK/TELL ABOUT to respondToNoTopic, not unknownTopic', () => {
+  it('"ask guide about" (topic: \'\') never reaches the guide\'s own unknownTopic', () => {
+    const outcome: InterpretOutcome = { kind: 'actions', actions: [{ verb: NPC_VERB_IDS.ask, dobj: GUIDE, topic: '', raw: 'ask guide about' }] };
+    const result = respond(WORLD, baseState(), vocab, outcome);
+    expect(lineText(result.events)).toBe('fixture: about the— (variant 1)');
+    expect(diagCodes(result.events)).toEqual([]); // no topicMiss — this never reached respondToUnknownTopic
+  });
+
+  it('a whitespace-only topic ("ask guide about   ") is treated the same as empty', () => {
+    const outcome: InterpretOutcome = { kind: 'actions', actions: [{ verb: NPC_VERB_IDS.tell, dobj: MARA, topic: '   ', raw: 'tell mara about   ' }] };
+    const result = respond(WORLD, baseState(), vocab, outcome);
+    expect(lineText(result.events)).toBe('fixture: about the— (variant 1)');
   });
 });
 

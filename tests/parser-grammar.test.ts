@@ -213,6 +213,20 @@ describe('matchGrammar — patterns', () => {
     expect(result).toEqual({ kind: 'noPattern', verb: ASK });
   });
 
+  it('"ask guide about" (nothing after "about") still matches, with an empty topic — front-desk-prose §14', () => {
+    const result = matchGrammar(vocab, ['ask', 'guide', 'about'], 'ask guide about');
+    expect(result).toEqual({
+      kind: 'matched',
+      action: {
+        verb: ASK,
+        pattern: 'V npc about topic',
+        npc: { words: ['guide'], adjectives: [], noun: 'guide' },
+        topic: '',
+        raw: 'ask guide about',
+      },
+    });
+  });
+
   it('an entirely unknown verb word reports noVerb', () => {
     const result = matchGrammar(vocab, ['xyzzy', 'key'], 'xyzzy key');
     expect(result).toEqual({ kind: 'noVerb' });

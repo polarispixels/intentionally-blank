@@ -185,6 +185,54 @@ export function respondToTell(world: WorldDef, state: GameState, vocab: Compiled
 }
 
 // ---------------------------------------------------------------------------
+// ASK/TELL <npc> ABOUT with no topic — front-desk-prose appendix §14. A
+// half-formed question is a parser situation, not a character situation
+// (every NPC in the game meets it identically), so this renders the
+// GLOBAL `conversation.noTopic` family rather than `npc.<id>.unknownTopic`
+// — deliberately not routed through `respondToTopic`/`findTopic` at all,
+// which would (rawTopic === '' matches no TopicDef's words) collapse it
+// into that NPC's own character-specific `unknownTopic`, exactly the leak
+// §14's own note warns against.
+// ---------------------------------------------------------------------------
+
+const CONVERSATION_NO_TOPIC_FAMILY = 'conversation.noTopic';
+/** Optional chrome tail (§14: "recommended ON while Act I is the whole game") — on iff content declares this family at all. */
+const ASK_SYNTAX_FAMILY = 'system.askSyntax';
+/** `state.counters` key tracking how many times the tail has fired — reused as a plain fire-count, not a rotation index (§14: "suppress it after it has fired three times"). */
+const ASK_SYNTAX_FIRE_COUNTER = 'system.askSyntax.fires';
+const ASK_SYNTAX_SUPPRESS_AFTER = 3;
+
+/**
+ * ASK/TELL <npc> ABOUT, topic left blank. `verb` is whichever of
+ * `NPC_VERB_IDS.ask`/`.tell` reached this — used only for `{ class }`,
+ * exactly the way `respondToShow`/`respondToGreeting` key their own class
+ * off the invoking verb's `world.verbs` entry rather than hardcoding
+ * `'social'`.
+ */
+export function respondToNoTopic(world: WorldDef, state: GameState, vocab: CompiledVocabulary, npc: NpcId, verb: VerbId): NpcResult {
+  const noTopicProse = world.responses?.[CONVERSATION_NO_TOPIC_FAMILY];
+  if (noTopicProse === undefined) {
+    throw new Error(`npc: response family "${CONVERSATION_NO_TOPIC_FAMILY}" is not declared in world.responses`);
+  }
+  const name = npcDisplayName(world, vocab, npc);
+  const rendered = render(world, state, CONVERSATION_NO_TOPIC_FAMILY, noTopicProse, { name, dobj: name });
+  const events: GameEvent[] = [{ type: 'line', kind: 'prose', text: rendered.text }];
+  let nextState = rendered.state;
+
+  const askSyntaxProse = world.responses?.[ASK_SYNTAX_FAMILY];
+  if (askSyntaxProse !== undefined) {
+    const fires = nextState.counters[ASK_SYNTAX_FIRE_COUNTER] ?? 0;
+    if (fires < ASK_SYNTAX_SUPPRESS_AFTER) {
+      const tail = render(world, nextState, ASK_SYNTAX_FAMILY, askSyntaxProse);
+      events.push({ type: 'line', kind: 'system', text: tail.text });
+      nextState = { ...tail.state, counters: { ...tail.state.counters, [ASK_SYNTAX_FIRE_COUNTER]: fires + 1 } };
+    }
+  }
+
+  return { state: nextState, events, class: world.verbs?.[verb]?.class ?? null };
+}
+
+// ---------------------------------------------------------------------------
 // SHOW <object> TO <npc>
 // ---------------------------------------------------------------------------
 

@@ -8,7 +8,7 @@
 // MVP prologue's `mvp_prologue_*` ids (`src/content/scenes/mvp-prologue.ts`)
 // without collision, matching that file's own convention.
 
-import { C, F, M, N, O, R, T, V } from '../../../engine/ids';
+import { C, F, M, N, O, P, Q, R, T, V } from '../../../engine/ids';
 
 // ---------------------------------------------------------------------------
 // Rooms
@@ -228,6 +228,16 @@ export const CLUE_VISITOR_UNREMARKABLE = C('act1_clue_visitor_unremarkable');
 // ---------------------------------------------------------------------------
 
 export const MEM_HAT = M('act1_mem_hat');
+
+// ---------------------------------------------------------------------------
+// Hint ladders — front-desk-prose appendix §15. The first real puzzles/
+// questions declared in this game; ids are the spec's own literal names.
+// ---------------------------------------------------------------------------
+
+export const QUESTION_THE_RECORD = Q('act1_q_the_record');
+export const QUESTION_OUT_OF_THIS_ROOM = Q('act1_q_out_of_this_room');
+export const PUZZLE_REGISTER = P('act1_register');
+export const PUZZLE_LEAVE_YOUR_ROOM = P('act1_leave_your_room');
 
 // ---------------------------------------------------------------------------
 // Verbs the prose doc needs beyond the response-families' global set (§9's

@@ -1606,6 +1606,12 @@ about it.
 
 ### 8.10 `HELP` in this room — not authored here; engine-level. Flagged in §13.
 
+> **`HINT` in this room — authored 2026-08-30**, in
+> `docs/superpowers/specs/2026-09-01-front-desk-prose.md` **§15.2**
+> (`puzzle.act1_leave_your_room`, five rungs). Same ruling as `HELP`: it is
+> chrome, not narrator voice, and it is allowed to name verbs. Rung 1's job
+> is to state that nothing in this room is locked.
+
 ### 8.11 Touch verbs in the dark
 
 These must **not** route to `room.your_room.darkRefusal`: `pull chain`,
@@ -2315,6 +2321,19 @@ used to that. Below it is a keyhole, and in the keyhole there is no key.
 There is no key in your pocket either. Houses like this one keep the spare
 on a board behind a desk downstairs, along with everybody else's.
 ```
+
+> **SUPERSEDED 2026-08-30 — playtest repair.** The `examine` text above is
+> now **rule 3 of a three-rule `ProseRule[]`**, and rule 3 is unreachable in
+> the shipped geometry. Read
+> `docs/superpowers/specs/2026-09-01-front-desk-prose.md` **§16** before
+> wiring this object. Reason: leading with *keyhole / no key / spares
+> downstairs* reads on a dark landing as being locked out of the room the
+> player just left, and the door in fact opens from either side and never
+> blocks. Rules 1 and 2 there are gated on `door_bolt_drawn` (plus the
+> door's `open` state) and say *"Going back in costs you nothing"* before
+> they say anything about a key. The key rack setup below is unchanged and
+> still stands — it is the reason to want the door **shut**, not the reason
+> the door will not open.
 
 > **Note — the pull to M2, in one clause.** The key rack is canon
 > (architecture §3, room 2) and a lodger does not need a memory to know where

@@ -102,9 +102,16 @@ function tryPattern(verb: CompiledVerb, pattern: VerbPattern, tokens: string[], 
     return { verb: verb.id, pattern, dobj: toPhrase(dobjTokens), prep: tokens[i]!, iobj: toPhrase(iobjTokens), raw };
   }
 
-  // 'V npc about topic'
+  // 'V npc about topic'. Only the npc slot is required non-empty — "about"
+  // may legitimately be the last token ("ask marlow about", nothing after
+  // it), producing `topic: ''` rather than failing the pattern outright
+  // (front-desk-prose appendix §14: a half-formed ABOUT needs the npc
+  // resolved so `respond.ts`/`npc.ts` can answer with the dedicated
+  // "you didn't finish that thought" family instead of falling all the way
+  // to the generic bareVerb rung, which used to be the only place this
+  // input could land).
   const aboutIndex = tokens.indexOf(ABOUT);
-  if (aboutIndex <= 0 || aboutIndex === tokens.length - 1) return undefined;
+  if (aboutIndex <= 0) return undefined;
   const npcTokens = tokens.slice(0, aboutIndex);
   const topicTokens = tokens.slice(aboutIndex + 1);
   return { verb: verb.id, pattern, npc: toPhrase(npcTokens), topic: topicTokens.join(' '), raw };

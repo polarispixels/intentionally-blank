@@ -281,6 +281,27 @@ export const RESPONSES = {
   // ---------------------------------------------------------------------
   'restart.confirm': 'This ends the current playthrough and begins again from the start. Restart?',
   'restart.declined': 'Nothing has changed. The game is where you left it.',
+
+  // ---------------------------------------------------------------------
+  // Front-desk-prose appendix §14 — `ASK <npc> ABOUT` with no topic.
+  // Global, not any one NPC's: every NPC in the game meets this identically
+  // (`{name}`-templated via `npcDisplayName`, the same convention every
+  // other NPC-facing family in this file already uses). `respond.ts`
+  // renders this instead of the asked NPC's own `unknownTopic` — see
+  // `npc.ts`'s `respondToNoTopic`.
+  // ---------------------------------------------------------------------
+  'conversation.noTopic': [
+    'You get as far as "About the—" and stop, not having settled what about.\n{name} waits it out.',
+    'The question needs an object. {name} is in no hurry for one.',
+  ],
+
+  // Optional system-chrome tail after `conversation.noTopic` (§14: "the
+  // builder's and main session's call, recommended ON while Act I is the
+  // whole game"). Wired ON here — `npc.ts`'s `respondToNoTopic` only emits
+  // it because this key exists at all, and self-suppresses after three
+  // fires (a player who has read it three times has either learned it or
+  // is not going to).
+  'system.askSyntax': '(ASK <someone> ABOUT <something>. TALK TO <someone> gets them started on their own.)',
 } satisfies Record<string, Prose>;
 
 /**

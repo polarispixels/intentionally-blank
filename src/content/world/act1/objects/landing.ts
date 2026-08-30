@@ -9,10 +9,12 @@
 // rather than two copies drifting apart.
 
 import type { ObjectDefSlice } from '../../../../engine/world';
-import type { Prose } from '../../../../engine/prose';
+import type { Prose, ProseRule } from '../../../../engine/prose';
 import { CLIMB, EXAMINE, LISTEN, LOOK_UNDER, LOCK, CLOSE, OPEN, TOUCH, UNLOCK } from '../verbs';
 import { V_KNOCK, V_LEAN_OVER, V_SLIDE_DOWN } from '../ids';
 import {
+  DOOR,
+  FLAG_DOOR_BOLT_DRAWN,
   LANDING,
   LANDING_BANISTER,
   LANDING_BOUNDARY_GATE,
@@ -74,8 +76,38 @@ const landingBanister: ObjectDefSlice = {
   ],
 };
 
-const doorOutsideExamine =
-  'Your door from the outside, which is a different door: painted, numbered, and giving nothing away. The brass number is screwed on at eye height with the top screw gone, so it hangs a few degrees off true, and somebody has got used to that. Below it is a keyhole, and in the keyhole there is no key.\n\nThere is no key in your pocket either. Houses like this one keep the spare on a board behind a desk downstairs, along with everybody else’s.';
+// §16 (front-desk-prose appendix) — the lockout-reading repair. The bug was
+// prose, not code: read cold, on a dark landing, at the exact moment a
+// player is deciding whether the game has just taken his starting room
+// away from him, two hundred words of key language ahead of the one fact
+// that matters ("Going back in costs you nothing") reads as a lockout —
+// and the door in fact opens from either side, always has, and never
+// blocks. Three rules, match order as listed; the key rack stays (it is
+// what you need to leave the room *shut*, not what you need to get back
+// in).
+const doorOutsideExamine: ProseRule[] = [
+  // Rule 1 — the door standing as the player left it (ajar, never closed
+  // from either side since the bolt was first drawn).
+  {
+    when: { all: [{ flag: FLAG_DOOR_BOLT_DRAWN }, { objectState: [YOUR_DOOR_OUTSIDE, 'open', true] }] },
+    text: 'Your door from the outside, which is a different door: painted, numbered, and giving nothing away. You left it an inch off the frame and it has stayed that way.\n\nThe brass number is screwed on at eye height with the top screw gone, so it hangs a few degrees off true, and somebody has got used to that. Below it, a keyhole with nothing in it. Going back in costs you nothing. Leaving it shut behind you would cost a key, and houses like this one keep the spare on a board behind a desk downstairs, along with everybody else\'s.',
+  },
+  // Rule 2 — pulled to behind him (the bolt that would shut it is on the
+  // other side, so it still opens to a hand).
+  {
+    when: { flag: FLAG_DOOR_BOLT_DRAWN },
+    text: 'Your door from the outside, which is a different door: painted, numbered, and giving nothing away. It is pulled to rather than shut, because the bolt that would shut it is on the side you are not on, and it comes open to a hand.\n\nThe brass number is screwed on at eye height with the top screw gone, so it hangs a few degrees off true, and somebody has got used to that. Below it, a keyhole with nothing in it — and nothing in your pocket for it either. Houses like this one keep the spare on a board behind a desk downstairs, along with everybody else\'s.',
+  },
+  // Rule 3 — unconditional fallback (`validate.ts` requires one). Currently
+  // unreachable: the only route onto this landing is through the door,
+  // which sets FLAG_DOOR_BOLT_DRAWN, so rules 1/2 cover every real state.
+  // Kept for the day the game gains a second way onto this floor. Trimmed
+  // of the old text's second sentence naming the missing key twice — one
+  // statement is enough in a rule nobody will read.
+  {
+    text: 'Your door from the outside, which is a different door: painted, numbered, and giving nothing away. The brass number is screwed on at eye height with the top screw gone, so it hangs a few degrees off true, and somebody has got used to that. Below it is a keyhole that wants a key you do not have.\n\nHouses like this one keep the spare on a board behind a desk downstairs, along with everybody else\'s.',
+  },
+];
 
 const lockFromOutside =
   'You pull it to. Without a key it will not do any better than that, and the bolt — which is the only thing on this door that ever worked properly — is on the wrong side of it now.';
@@ -92,7 +124,20 @@ const yourDoorOutside: ObjectDefSlice = {
   nouns: ['door', 'keyhole', 'room'],
   handlers: [
     { verbs: [EXAMINE], effects: [{ say: doorOutsideExamine }] },
-    { verbs: [LOCK, CLOSE], effects: [{ say: lockFromOutside }] },
+    {
+      verbs: [LOCK, CLOSE],
+      effects: [
+        { say: lockFromOutside },
+        // §16 Rule 2's own reachability: pulling the door to from THIS side
+        // is the natural route to that state, so it has to flip the same
+        // overlay Rule 1/2 read — same "keep both directions in sync"
+        // convention `door.ts`'s own inside handlers already use for this
+        // pair of twin objects (see that file's header on why there are
+        // two of them).
+        { setState: [YOUR_DOOR_OUTSIDE, 'open', false] },
+        { setState: [DOOR, 'open', false] },
+      ],
+    },
   ],
 };
 

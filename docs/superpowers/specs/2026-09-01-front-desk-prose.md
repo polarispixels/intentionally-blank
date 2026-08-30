@@ -1255,3 +1255,522 @@ excision, nothing downstream reads them:
 All five is 147 and lands at 725. My recommendation is to take the first two
 (55, → 817) and stop: the last three are the ones a player will notice the
 absence of.
+
+---
+---
+
+# APPENDED 2026-08-30 — Conversation discoverability, hint ladders, and the door repair
+
+**Status:** authored prose, awaiting main-session voice review and Ryan's
+spot-check · **Author:** `narrative-writer`
+**Why:** first-playtest finding. The twelve topics in §5.3 all work and none
+of them were discoverable. `TALK TO MARLOW` returned a greeting and stopped,
+`ASK MARLOW ABOUT` with nothing after it fell off the parser, and `HINT`
+answered `(nothing to hint at right now)` because no puzzle in the build
+declares a ladder. Nothing below changes a topic, a clue, or a flag already
+specified above; §13 replaces §5.3's greeting rule 2, §14–§15 are new slots,
+§16 amends `2026-08-30-opening-room-prose.md`.
+
+**The rejected fix, recorded so it is not re-proposed.** A topic menu —
+*"You could ask him about the register, the key, or the visitor"* — is
+forbidden here. Constitution §19 wants a system being perturbed, not a
+kiosk being navigated, and Marlow is the character the whole NPC layer is
+calibrated against. The discoverability problem is solved by **giving him
+something to say**, so the nouns arrive inside speech the player would have
+read anyway.
+
+---
+
+## 13. `TALK TO MARLOW` — he volunteers
+
+**Path:** `npc.marlow.greeting` — `ProseRule[]`, match order as listed.
+**This replaces §5.3's greeting block entirely.** Rule 1 is §5.3's rule 1,
+unchanged. Rule 2 is new. Rule 3 replaces §5.3's two-variant rule 2.
+
+> **The mechanism, stated once.** Marlow is a night clerk at twenty past four
+> with one person in the room. Approached, he talks — not helpfully, not
+> about anything he is protecting, just the way a man talks when the
+> alternative is the radio. Every variant below is ordinary small talk that
+> happens to contain a noun §5.3 has a topic for: **board / hook / spare**
+> (v1), **rooms / house** (v2), **radio / Whitlock / town** (v3), **top
+> floor / room** (v4), **clock / hour** (v5), **register / book** (v6). The
+> player never sees a list and never learns that a list existed. Nothing he
+> volunteers answers a topic — v1 names the key board and does not hand over
+> the key; the handing over is still `ASK MARLOW ABOUT KEY`, and §4.3's
+> `TAKE KEY` ("Ask him for it") still does its teaching. **Volunteering
+> names the handle; asking pulls it.**
+>
+> The rotation cycles (`prose.ts` `render`: `text[n % text.length]`), so a
+> seventh `TALK TO` returns to v1. That is why v1 is the plainest: the loop
+> should read as a man coming back round to small talk, not as a script
+> restarting.
+>
+> **Order is drift.** v1–v4 are the house and the town. v5 is the hour. v6
+> is his hands on the book he tore a page out of, while he says nothing
+> whatever about the page. A player who talks to him six times has been
+> walked from the key board to the register without being told to go.
+>
+> **What no variant may do.** Reference the parser (§ constraints — hints
+> and `ASK` guidance may; Marlow may not). Say a false thing (§5.1). Name
+> the visitor, the coveralls, the word *maintenance*, or anything about the
+> torn page. Articulate what frightens him — canon 03 §10a and §5.1 above
+> confine that to one physical failure in `topic_visitor`, and adding a
+> second occurrence anywhere, in any register, spends it.
+
+---
+
+**Rule 1** — `when: { not: { flag: 'met_marlow' } }` — **first meeting.**
+Unchanged from §5.3.
+
+```text
+"Evening." He has been awake for hours and does not pretend otherwise. His
+eyes go to the side of your head, once, and come back. He does not ask.
+
+"There's a towel behind the desk, if you want one."
+```
+
+---
+
+**Rule 2** — `when: { flag: 'marlow_knows_you_know' }` — **after the register
+beat.** Rotating, 2 variants.
+
+> **Note — why this rule exists.** §5.3's `topic_register` rule 1 ends *"and
+> that is all he says about the book tonight."* Rule 3's rotation would
+> break that within two turns, because two of its six variants have his
+> hands on the register. This rule is the promise being kept. It is short on
+> purpose: the room has gone quiet and the player did that.
+
+1.
+```text
+"Still up," he says, and that is the whole of it tonight.
+```
+2.
+```text
+He is at the desk with both hands flat on the counter and the book squared to
+the edge of it. He does not start anything, and he does not object to you
+standing there.
+```
+
+---
+
+**Rule 3** — otherwise. Rotating, 6 variants, **order is not decorative.**
+
+1.
+```text
+"Still up," he says, which is not a question.
+
+Then, because it is four in the morning and there is nobody else to say it to:
+"Board behind me's got a hook for every room in the house. Most of them have
+still got their spare on them. It's been that kind of year."
+```
+
+2.
+```text
+He looks up, and waits, and is prepared to wait. When you do not fill it, he
+does.
+
+"Eleven rooms and four let. It's a big quiet house to sit awake in." He turns
+his cup a quarter turn on the counter and does not drink out of it.
+```
+
+3.
+```text
+"It's hymns this hour, then the stock report, then hymns again." He does not
+turn the radio up for any of it. "Whitlock came by Tuesday about a dog that
+wasn't anybody's. That's the week's news in this town, near enough."
+```
+
+4.
+```text
+"Top floor, back. Three weeks you've had it." He has the room off by heart.
+"No complaint out of you, and none about you. That's rarer in a let house
+than you'd think."
+```
+
+5.
+```text
+"Twenty past four is the bad part of it," he says, to the counter more than to
+you. "Six, I'm off. Between here and six there's nothing to do but be here
+doing it."
+
+He checks the clock behind him, and then the one over the door, which does not
+agree with it, and lets them both alone.
+```
+
+6.
+```text
+He squares the register with two fingers while he talks, the way another man
+would straighten a tie.
+
+"People have been signing that book since before my time. There's hands in it
+belonging to people whose shoes I could still describe to you." He stops
+squaring it. "More empty weeks in it now than full ones."
+```
+
+> **Note — the three lines to protect, and why.**
+>
+> **v3's dog.** *"A dog that wasn't anybody's."* Mundane and complete: a
+> stray, a small town, a sheriff with a slow week. It is also the first
+> unclaimed thing the player hears about in a story whose subject is
+> unclaimed things, and it costs nothing to leave standing. Recorded as a
+> **setup with no assigned payoff** (constitution §30) — if nothing ever
+> picks it up, it was a dog. **ASSUMPTION:** mine, set dressing.
+>
+> **v4's "none about you."** True, and bounded exactly the way §5.1 says his
+> answers are bounded: nobody complained about the player. Somebody still
+> came up those stairs. Marlow is not asked and does not volunteer, and the
+> narrator does not mark this one — §5.1 allows three narrowness marks in
+> this room and all three are already spent. It corroborates
+> `clue_calm_search` from upstairs without naming it.
+>
+> **v6's hands.** The only tell in the rotation, and it is entirely physical:
+> he tidies the object he damaged, while talking about how long people have
+> been signing it, and stops tidying it at the exact moment he says the
+> thing about empty weeks. Nothing in the sentence is false and nothing in
+> it is a confession. **Second reading (§31):** Act I, an old clerk fond of
+> an old book. Later, a man handling the evidence. Do not add a clause that
+> tips it, and do not let a builder gate it on `register_gap_seen` — it is
+> better when the player meets it before they know what they are looking at.
+
+---
+
+## 14. `ASK <npc> ABOUT` with no topic — global, not Marlow's
+
+**Path:** `conversation.noTopic` — `string[]`, rotating. `{name}` is filled
+by `npcDisplayName` the same way `respond.ts` fills it for NPC handlers.
+
+> **Note — why this is a global family and not `npc.marlow.*`.** A
+> half-formed question is a parser situation, not a character situation, and
+> every NPC in the game will meet it. Marlow-specific flavour here would
+> have to be rewritten for Jack, Eli and Whitlock, and would drift. It also
+> must **not** list anything: the moment this line names two topics it
+> becomes the menu §13 exists to avoid.
+
+1.
+```text
+You get as far as "About the—" and stop, not having settled what about.
+{name} waits it out.
+```
+2.
+```text
+The question needs an object. {name} is in no hurry for one.
+```
+
+> **Optional system tail — builder's and main session's call, recommended
+> ON while Act I is the whole game.** Emitted as a second line,
+> `{ kind: 'system' }`, *after* either variant. Chrome, not narrator voice,
+> for the same reason §15 and `HELP` are chrome — it is honestly about the
+> software, and it is the one place in this document allowed to say so.
+>
+> **Path:** `system.askSyntax`
+```text
+(ASK <someone> ABOUT <something>. TALK TO <someone> gets them started on
+their own.)
+```
+> Suppress it after it has fired three times; a player who has read it three
+> times has either learned it or is not going to.
+
+---
+
+## 15. Hint ladders
+
+Chrome, in the register of `HELP`, `VERSION` and §9's build boundary — **not
+narrator voice**, and they may reference the parser, because a hint that
+will not name a verb is not a hint. Plain second person is fine here; the
+dryness stays, the performance does not. Five rungs each, per spec 04 §15
+and constitution §21: nudge → clue identification → mechanic reminder →
+near-solution → explicit. The player controls how far they go, so **rung 1
+must be survivable by a player who wanted only a shove, and rung 5 must
+actually finish the job.**
+
+`PuzzleDef.hints` is `string[]`, rendered verbatim by `views.ts`
+`revealHint`. Each ladder needs its `question` anchor, because
+`availableHints` skips any puzzle whose anchor is not `'open'`.
+
+### 15.1 The register — `puzzle.act1_register`
+
+**Question:** `question.act1_q_the_record`
+
+```text
+Who wrote you into this house, and what became of the record of it?
+```
+
+| field | value |
+|---|---|
+| `question.openWhen` | `{ flag: 'met_marlow' }` |
+| `question.answerWhen` | `{ flag: 'register_impression_found' }` |
+| `puzzle.solvedWhen` | `{ flag: 'register_impression_found' }` |
+
+> **Note — the anchor opens on meeting Marlow, not on seeing the gap.** This
+> is the whole repair. A stuck player is stuck *before* they have found
+> anything, and a ladder that only unlocks once they have found the clue is
+> a ladder for people who do not need one. Rung 1 therefore has to work for
+> a player standing in the lobby having examined nothing, which is why it
+> teaches the conversation syntax rather than pointing at the book: at that
+> moment the man is the more discoverable of the two, and he will point at
+> the book himself.
+
+**`hints`**
+
+1.
+```text
+The man behind the desk is a source, not scenery, and he has been on shift
+all night. Ask him things: ASK MARLOW ABOUT KEY, ASK MARLOW ABOUT MY NAME,
+ASK MARLOW ABOUT MY ROOM. TALK TO MARLOW starts him off on his own, and he
+will mention most of what he is willing to discuss.
+```
+2.
+```text
+The tall book open on the counter is a record of everyone who has slept in
+this house, kept in one hand, in pencil. Look at it properly, and then look
+for the week you would be in.
+```
+3.
+```text
+A page is gone and the sheet under it is blank. Blank is not the same as
+empty. A pen bearing down on one sheet leaves valleys in the next, and this
+game has already worked that trick on you once tonight, upstairs, with a page
+and a lamp lying on its side. Light across paper, or a fingertip on it.
+```
+4.
+```text
+Turn the register until the desk lamp comes across the blank sheet flat, or
+put a hand on it and read it that way. Then take what you find back to the
+clerk — he is the person it is about.
+```
+5.
+```text
+EXAMINE REGISTER. Then TILT REGISTER (FEEL PAGE works too, and so does
+EXAMINE BLANK PAGE). The impression gives you a time in the small hours, your
+own room number, and a name column with one pen stroke in it that was begun
+and abandoned. Then ASK MARLOW ABOUT REGISTER, and ASK MARLOW ABOUT VISITOR.
+```
+
+> **Note — rung 3 is the one that does the teaching.** It states the physical
+> principle and the two verbs that express it without naming the object, so a
+> player who takes rung 3 and stops still gets the discovery. Rung 4 names
+> the object and the gesture; rung 5 types it for them and then hands them
+> the two questions that turn the evidence into a scene, because a player
+> who reaches rung 5 has told the game plainly that they want to move on.
+>
+> **`missedRecovery`:** none needed — no route here is clock-gated. Both
+> solution classes (sight and touch, §4.2) are available from the first turn
+> in the room and neither expires.
+
+### 15.2 Getting out of the opening room — `puzzle.act1_leave_your_room`
+
+**Question:** `question.act1_q_out_of_this_room`
+
+```text
+How do you get out of this room?
+```
+
+| field | value |
+|---|---|
+| `question.openWhen` | `{ flag: 'stood_up' }` |
+| `question.answerWhen` | `{ visited: 'act1_landing' }` |
+| `puzzle.solvedWhen` | `{ visited: 'act1_landing' }` |
+
+> **Note — this ladder is unusual and should stay unusual: the room is not
+> locked, and the ladder's real job is to say so.** Rung 1 says the quiet
+> part, because the failure mode here is a player who assumes a text
+> adventure has locked the first door and spends twenty minutes proving
+> otherwise. Everything after rung 1 is about the dark and the hat, which
+> are the two things actually worth doing before leaving.
+
+**`hints`**
+
+1.
+```text
+Nothing in this room is locked against you. The door has a bolt on your side
+of it and no one else's; the room is a place to search, not a cell. If you
+are stuck, you are stuck on seeing, not on opening.
+```
+2.
+```text
+It is dark, and the light in here is on the floor where it fell. The lamp has
+a pull chain. Almost nothing else in the room can be examined until it is
+lit.
+```
+3.
+```text
+Once there is light: LOOK, and then examine the things the description names.
+This game rewards TAKE and SEARCH on anything a person would pick up — and
+one thing on this floor is yours, was on your head, and is not empty.
+```
+4.
+```text
+Pull the chain. Stand the lamp up. Take the hat and search its band. Then
+draw the bolt and open the door.
+```
+5.
+```text
+PULL CHAIN. RIGHT LAMP. LOOK. TAKE FEDORA. SEARCH FEDORA. Then OPEN DOOR and
+OUT. (The door opens from either side afterwards. You can come back.)
+```
+
+> **Note.** Rung 5's parenthesis is doing the same job as §16's door repair
+> and is worth the duplication: a player at rung 5 is anxious, and this is
+> the cheapest possible place to remove one anxiety.
+>
+> The hat is named at rung 3 by description ("was on your head, and is not
+> empty") rather than as an instruction, so a player who takes rung 3 and
+> stops has been pointed at page 7/8 without being handed it. Leaving the
+> room without the hat is not a dead end and the ladder does not pretend it
+> is — constitution §20: memory assistance, not a quest marker.
+
+### 15.3 Getting back into your room — **no ladder. Recommendation: do not write one.**
+
+The door opens from both sides and the repair in §16 says so in the
+description. A `HINT` entry reading *"How do you get back into your room?"*
+would **create** the puzzle it was meant to relieve: a player scanning that
+list learns the game considers this a problem, and starts hunting for a key
+they do not need. The fix for "I think I am locked out" is prose that does
+not say *keyhole* first, which is §16. If playtesting still shows players
+stalling on the landing, the correct next move is a line in the landing's
+own description, not a rung.
+
+Two other Act I candidates, considered and declined for the same reason:
+**getting the spare key** (one social action, and §4.3's `TAKE KEY` already
+names the route in a sentence — a ladder would be five rungs on top of a
+one-rung problem) and **opening Marlow up** (P4 is not in this build; a
+ladder pointing at a payoff that is not implemented is worse than silence).
+
+---
+
+## 16. Repair — the landing side of your own door
+
+**Amends `docs/superpowers/specs/2026-08-30-opening-room-prose.md`**,
+`your_door_outside.examine`. **That document's version should carry a
+pointer to this section.**
+
+**The bug is prose, not code.** The existing text opens *"Below it is a
+keyhole, and in the keyhole there is no key. There is no key in your pocket
+either"* and closes on a board of spares downstairs. Read cold, on a dark
+landing, at the exact moment a player is deciding whether the game has just
+taken his starting room away from him, that is a lockout — and the door in
+fact opens from either side, always has, and never blocks. Two hundred words
+of key language ahead of the one fact that matters.
+
+The key rack **stays**. It is a good setup and it pays off inside one room
+(§4.3). What changes is that it stops being the first thing said and stops
+being framed as an obstacle: the key is what you need to leave the room
+*shut*, not what you need to get back in.
+
+**Path:** `object.your_door_outside.examine` — now `ProseRule[]`, three
+rules, match order as listed.
+
+---
+
+**Rule 1** — `when: { all: [{ flag: 'door_bolt_drawn' }, { objectState: ['act1_your_door_outside', 'open', true] }] }` — **the door standing as the player left it**
+
+```text
+Your door from the outside, which is a different door: painted, numbered, and
+giving nothing away. You left it an inch off the frame and it has stayed
+that way.
+
+The brass number is screwed on at eye height with the top screw gone, so it
+hangs a few degrees off true, and somebody has got used to that. Below it,
+a keyhole with nothing in it. Going back in costs you nothing. Leaving it
+shut behind you would cost a key, and houses like this one keep the spare on
+a board behind a desk downstairs, along with everybody else's.
+```
+
+---
+
+**Rule 2** — `when: { flag: 'door_bolt_drawn' }` — **pulled to behind him**
+
+```text
+Your door from the outside, which is a different door: painted, numbered, and
+giving nothing away. It is pulled to rather than shut, because the bolt that
+would shut it is on the side you are not on, and it comes open to a hand.
+
+The brass number is screwed on at eye height with the top screw gone, so it
+hangs a few degrees off true, and somebody has got used to that. Below it,
+a keyhole with nothing in it — and nothing in your pocket for it either.
+Houses like this one keep the spare on a board behind a desk downstairs,
+along with everybody else's.
+```
+
+---
+
+**Rule 3** — otherwise — **unchanged, §2298 of the opening-room document**
+
+```text
+Your door from the outside, which is a different door: painted, numbered,
+and giving nothing away. The brass number is screwed on at eye height with
+the top screw gone, so it hangs a few degrees off true, and somebody has got
+used to that. Below it is a keyhole that wants a key you do not have.
+
+Houses like this one keep the spare on a board behind a desk downstairs,
+along with everybody else's.
+```
+
+> **Note — rule 3 is currently unreachable and should be kept anyway.** The
+> only route to the landing is through the door, and taking it sets
+> `door_bolt_drawn`, so rules 1 and 2 cover every real state. Rule 3 is the
+> unconditional last rule `validate.ts` requires, and it is the right text
+> if the game ever gains a second way onto that floor. Its final clause is
+> trimmed of *"and in the keyhole there is no key. There is no key in your
+> pocket either"* — one statement of the missing key is enough in a rule
+> nobody will read.
+>
+> **`lock door` / `close door` from this side** (opening-room doc, same
+> section) needs no change: *"You pull it to. Without a key it will not do
+> any better than that"* is already consistent with all three rules above
+> and is the line that makes the key rack a real motive rather than a
+> pretend one.
+>
+> **The clause carrying the repair is "Going back in costs you nothing."**
+> Flat, five words, no joke on top of it. It is the sentence the playtest
+> needed and it should not be improved.
+
+---
+
+## 17. Beat test, setups, and second readings for this appendix
+
+**Beat test (constitution §29, guide §18).** None of §13–§16 advances major
+progression; they are affordances on beats §3 already tests. The honest
+statement is that they *enable* §3's existing `BUT` — the room's causal work
+is done by a conversation, and a conversation the player cannot start does
+not do causal work. No `AND THEN` is being smuggled in.
+
+**Setups planted (constitution §30).**
+
+| Setup | Pays off |
+|---|---|
+| v3's dog that wasn't anybody's (§13) | **Unassigned.** Set dressing with a second reading available. If nothing takes it up, it was a stray. |
+| v6's hands on the register (§13) | `topic_register` rule 1, in the same session — the player who noticed the tidying meets the man who tore the page |
+
+**Second readings (constitution §31).**
+
+| Line | Act I | Later |
+|---|---|---|
+| v6: *"More empty weeks in it now than full ones"* | A boarding house in a town that is emptying | A record with more gaps in it than anyone has counted |
+| v3: *"a dog that wasn't anybody's"* | A stray, and a slow week for the sheriff | A thing with no one to claim it, in the first conversation of the game |
+
+**Assumptions (`ASSUMPTION` — none of these is canon).**
+
+- Whitlock came by Tuesday about a stray. Mine; invented to seat the
+  sheriff's name in ordinary speech without giving the player a task (§5.3's
+  `topic_sheriff` note). Cheap to replace with any other slow-week errand.
+- The radio's hymns and stock report at four in the morning. Mine; period
+  and region plausible, and consistent with §4.4's radio.
+- "Eleven rooms and four let" in v2 restates §4.3's and `topic_house`'s
+  numbers. **Keep all three in sync or change all three.**
+- `system.askSyntax`'s three-firing suppression is a suggested policy, not a
+  measured one.
+
+**Canon questions.**
+
+1. Should `conversation.noTopic` (§14) live in the global response families
+   document (`2026-08-30-response-families.md`) rather than here? It is not
+   Marlow's and it will be needed by every NPC. My recommendation: move it
+   there on the next pass and leave a pointer here.
+2. §15.2's ladder assumes `stood_up` and `{ visited: act1_landing }` are the
+   right anchors. If the builder finds a cleaner pair, the prose does not
+   change.
+3. `HINT`'s listing renders `questionText` verbatim into a numbered line.
+   Both question texts above are written to survive that. If the main
+   session wants them shorter, they can be cut to *"What became of the
+   record?"* and *"How do you get out of this room?"* without loss.

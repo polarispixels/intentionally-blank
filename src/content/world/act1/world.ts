@@ -5,7 +5,7 @@
 import type { WorldDef } from '../../../engine/world';
 import { RESPONSES } from '../../responses';
 import { RESTART_SCRIPTS } from '../../scripts';
-import { ACT1_CLUES, ACT1_FLAGS, ACT1_MEMORIES } from './knowledge';
+import { ACT1_CLUES, ACT1_FLAGS, ACT1_MEMORIES, ACT1_PUZZLES, ACT1_QUESTIONS } from './knowledge';
 import { landingRoom } from './landing';
 import { frontDeskRoom } from './frontDesk';
 import { marlow } from './marlow';
@@ -32,6 +32,8 @@ export const WORLD: WorldDef = {
   verbs: ACT1_VERBS,
   clues: ACT1_CLUES,
   memories: ACT1_MEMORIES,
+  questions: ACT1_QUESTIONS,
+  puzzles: ACT1_PUZZLES,
   responses: { ...RESPONSES, ...ACT1_RESPONSES },
   scripts: RESTART_SCRIPTS,
 };

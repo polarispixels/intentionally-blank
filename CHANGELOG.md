@@ -12,6 +12,65 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.4.1] - 2026-09-01
+
+Ryan got stuck talking to Marlow. Nothing was broken — twelve good topics
+existed and he had no way to find any of them. That is a design failure,
+not a player one.
+
+### Added
+
+- **`TALK TO` now makes a character volunteer.** Marlow's greeting became a
+  six-variant rotation that drifts as you keep talking: the key board, then
+  eleven rooms and four let, the radio and Whitlock and a dog that wasn't
+  anybody's, the top floor, the two clocks that disagree, and finally his
+  hands squaring the register while he talks about how long people have
+  been signing it.
+
+  The rule that keeps it a conversation instead of a menu: **volunteering
+  names the handle, `ASK` pulls it.** He mentions the key board; he does not
+  hand over the key. You learn the noun without being given the answer, and
+  you never see a list — a character reciting his own topics would be a
+  dialogue kiosk, which is the one thing constitution §19 forbids.
+
+- **`HINT` works, for the first time in the project.** The machinery has
+  existed since the engine was built and no puzzle had ever declared a
+  ladder, so it always answered "nothing to hint at". Two ladders now: the
+  register, and getting out of the opening room. Five rungs each, one at a
+  time, on explicit request only, saved in state.
+
+  Rung 1 of the opening-room ladder is reassurance rather than information:
+  *"Nothing in this room is locked against you... If you are stuck, you are
+  stuck on seeing, not on opening."*
+
+  The register's ladder hangs on having **met Marlow**, not on having seen
+  the torn page — a ladder that unlocks after the clue is a ladder for
+  people who don't need one.
+
+- `ASK <someone> ABOUT` with nothing after it now answers, with a system
+  tail naming the syntax that **suppresses itself after three fires**. A
+  teaching aid that never stops teaching becomes noise.
+
+### Fixed
+
+- The landing door's description led with a keyhole, no key, and spares on a
+  board downstairs — which read as being locked out of a room the player
+  needs. It now leads with the door's actual state and carries *"Going back
+  in costs you nothing"* before any key language. The rack survives as a
+  reason to want the door **shut**, not as a lock.
+- `ASK <npc> ABOUT` with an empty topic didn't parse at all — the grammar
+  refused to match with nothing after "about", so it fell through to the
+  bare-verb family.
+
+### Notes
+
+Declined deliberately: a hint for *getting back into your room*. Listing
+that question in `HINT` manufactures the puzzle it was meant to relieve.
+
+`TALK TO` plus a syntax-teaching first hint rung is the pattern; a third
+mechanism waits until an NPC exists that the pair fails. Whitlock, who is
+guarded by design, will be the test.
+
 ## [0.4.0] - 2026-09-01
 
 **The Front Desk, and the first person in the game.** Act I begins.

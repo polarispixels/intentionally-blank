@@ -83,7 +83,7 @@ import { GO_TO_VERB_ID } from './interpreter';
 import { DIRECTION_VERB_IDS, directionForVerb, executeGoTo, look, LOOK_VERB_ID, traverseDirection, traverseDoor, USE_VERB_ID } from './move';
 import type { CompiledVocabulary } from './parser';
 import { allEmptyFamilyKey, candidateName, isNpcId } from './parser';
-import { NPC_VERB_IDS, npcDisplayName, respondToAsk, respondToGreeting, respondToShow, respondToTell } from './npc';
+import { NPC_VERB_IDS, npcDisplayName, respondToAsk, respondToGreeting, respondToNoTopic, respondToShow, respondToTell } from './npc';
 import { inventoryView } from './views';
 
 /**
@@ -198,7 +198,13 @@ function respondToActions(world: WorldDef, state: GameState, vocab: CompiledVoca
  *
  * ASK/TELL: `action.topic` (§3.1, never resolved by the parser) is required
  * for the pattern to have matched at all (`'V npc about topic'`) — the
- * `!== undefined` checks below are total, not a guess.
+ * `!== undefined` checks below are total, not a guess. A blank topic
+ * (`ASK <npc> ABOUT` with nothing after it — `grammar.ts`'s `tryPattern`
+ * matches that as `topic: ''`, not a failed pattern) is trapped here before
+ * reaching `respondToAsk`/`respondToTell`: it renders the global
+ * `conversation.noTopic` family via `respondToNoTopic` instead of falling
+ * into that NPC's own `unknownTopic` (front-desk-prose appendix §14 — a
+ * half-formed question is a parser situation, not a character one).
  *
  * TALK TO/HELLO: `respondToGreeting` returns `undefined` when the NPC has
  * no `greeting` authored; this function falls through to the ordinary
@@ -255,9 +261,11 @@ function respondToAction(world: WorldDef, state: GameState, vocab: CompiledVocab
   }
 
   if (action.verb === NPC_VERB_IDS.ask && dobj !== undefined && isNpcId(vocab, dobj) && action.topic !== undefined) {
+    if (action.topic.trim() === '') return respondToNoTopic(world, state, vocab, dobj, action.verb);
     return respondToAsk(world, state, vocab, dobj, action.topic);
   }
   if (action.verb === NPC_VERB_IDS.tell && dobj !== undefined && isNpcId(vocab, dobj) && action.topic !== undefined) {
+    if (action.topic.trim() === '') return respondToNoTopic(world, state, vocab, dobj, action.verb);
     return respondToTell(world, state, vocab, dobj, action.topic);
   }
   if (action.verb === NPC_VERB_IDS.talk && dobj !== undefined && isNpcId(vocab, dobj)) {

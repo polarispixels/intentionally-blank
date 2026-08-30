@@ -171,12 +171,21 @@ const description: ProseRule[] = [
 // content-free stub.
 // ---------------------------------------------------------------------------
 
+/**
+ * Exported (not just the `EXIT_TRAVEL_TEXT` rule it lives in) so
+ * `knowledge.ts` can reuse this exact, already-approved line verbatim
+ * (hard rule 5) as `question.act1_q_out_of_this_room`'s settled-answer
+ * recap (§8's own `checkQuestionAnswers` rule requires one once
+ * `answerWhen` is declared) — it is, literally, how the player got out.
+ */
+export const EXIT_TRAVEL_TEXT_LIT = 'You step out onto the landing and pull the door to behind you. It does not latch. You leave it not latching.';
+
 const EXIT_TRAVEL_TEXT: ProseRule[] = [
   {
     when: ROOM_DARK,
     text: 'You find the door by touch, get it open, and step out into a stairwell that is only slightly better lit than the room you are leaving. Behind you the room stays dark and keeps whatever it was going to tell you.',
   },
-  { text: 'You step out onto the landing and pull the door to behind you. It does not latch. You leave it not latching.' },
+  { text: EXIT_TRAVEL_TEXT_LIT },
 ];
 
 // ---------------------------------------------------------------------------

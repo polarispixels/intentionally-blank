@@ -8,6 +8,7 @@
 // and must be replaced by the narrative-writer before this ships.
 
 import type { WorldDef } from '../../../engine/world';
+import { EXIT_TRAVEL_TEXT_LIT } from './room';
 import {
   CLUE_BOLT_THROWN,
   CLUE_CALM_SEARCH,
@@ -39,8 +40,23 @@ import {
   FLAG_TOWEL_TAKEN,
   FLAG_WINDOW_OPEN,
   FLAG_WOUND_EXAMINED,
+  LANDING,
   MEM_HAT,
+  PUZZLE_LEAVE_YOUR_ROOM,
+  PUZZLE_REGISTER,
+  QUESTION_OUT_OF_THIS_ROOM,
+  QUESTION_THE_RECORD,
 } from './ids';
+
+/**
+ * Shared verbatim (hard rule 5) between `CLUE_REGISTER_IMPRESSION`'s
+ * `detail` below and `question.act1_q_the_record`'s settled-answer recap
+ * (§15.1) — one string, not two copies that could drift, the same
+ * "reuse, don't duplicate" convention `room.ts`'s `EXIT_TRAVEL_TEXT_LIT`
+ * uses for the other question's own recap.
+ */
+const REGISTER_IMPRESSION_DETAIL =
+  'Under where the page was: a time in the small hours, your room number, and a name column with one begun-and-abandoned pen stroke in it. Somebody called on your room that night and nobody wrote down who.';
 
 export const ACT1_FLAGS: WorldDef['flags'] = {
   [FLAG_STOOD_UP]: { default: false, doc: 'set by the first STAND/GET UP, or implicitly by the first movement action' },
@@ -108,8 +124,7 @@ export const ACT1_CLUES: NonNullable<WorldDef['clues']> = {
   },
   [CLUE_REGISTER_IMPRESSION]: {
     title: 'The missing page pressed through',
-    detail:
-      'Under where the page was: a time in the small hours, your room number, and a name column with one begun-and-abandoned pen stroke in it. Somebody called on your room that night and nobody wrote down who.',
+    detail: REGISTER_IMPRESSION_DETAIL,
   },
   [CLUE_NO_NAME_RECALLED]: {
     title: "The clerk can't produce your name",
@@ -140,6 +155,76 @@ export const ACT1_MEMORIES: NonNullable<WorldDef['memories']> = {
     lines: [
       'Rain — and the sound of rain on a hat is not the sound of rain on your head. It is closer, and drier, and oddly private, like being told something. There is somebody two steps ahead of you on a wet sidewalk, talking, and you are not listening, because you are thinking about how the brim keeps the water off the back of your neck, and about how you have never in your life owned anything that did that.',
       'Then it is gone, in the way a smell is gone, and you are standing in a cold room in a borrowed-feeling hat.\n\nThe hat fits. You have no idea whether that is good news.',
+    ],
+  },
+};
+
+// ---------------------------------------------------------------------------
+// Hint ladders — front-desk-prose appendix §15. The first real
+// questions/puzzles in this game; `hints` are transcribed verbatim
+// (hard rule 5). `answer` recap text is not supplied anywhere in the
+// prose document (flagged in this task's report as a narrative-writer
+// gap) — `checkQuestionAnswers` (`validate.ts`) requires one once
+// `answerWhen` is declared, so each recap below reuses an exact,
+// already-approved line from elsewhere in this content rather than
+// inventing new prose (hard rule 5): `question.act1_q_the_record`'s recap
+// is `CLUE_REGISTER_IMPRESSION`'s own detail (what the player actually
+// learned); `question.act1_q_out_of_this_room`'s is the lit exit's own
+// travelText (literally how they left). Both are builder decisions, not
+// narrative-writer-authored recaps — flagged for confirmation.
+// ---------------------------------------------------------------------------
+
+export const ACT1_QUESTIONS: NonNullable<WorldDef['questions']> = {
+  [QUESTION_THE_RECORD]: {
+    text: 'Who wrote you into this house, and what became of the record of it?',
+    openWhen: { flag: FLAG_MET_MARLOW },
+    answerWhen: { flag: FLAG_REGISTER_IMPRESSION_FOUND },
+    answer: REGISTER_IMPRESSION_DETAIL,
+  },
+  [QUESTION_OUT_OF_THIS_ROOM]: {
+    text: 'How do you get out of this room?',
+    openWhen: { flag: FLAG_STOOD_UP },
+    answerWhen: { visited: LANDING },
+    answer: EXIT_TRAVEL_TEXT_LIT,
+  },
+};
+
+export const ACT1_PUZZLES: NonNullable<WorldDef['puzzles']> = {
+  [PUZZLE_REGISTER]: {
+    id: PUZZLE_REGISTER,
+    name: 'The register',
+    question: QUESTION_THE_RECORD,
+    solvedWhen: { flag: FLAG_REGISTER_IMPRESSION_FOUND },
+    // Two solution classes, deliberately (§4.2's own note): sight (raking
+    // light off the desk lamp) and touch (a fingertip on the ridges) both
+    // set the same flag, so neither `solutions` entry needs its own
+    // `route` — omitted, which `validate.ts` reads as trivially clock-free
+    // (§4.3.4) — and no `missedRecovery` is needed either (neither route
+    // is clock-gated; both are open from the first turn in the room).
+    solutions: [
+      { id: 'light', class: 'analytical', note: "Rake the desk lamp's light across the blank page (TILT REGISTER / EXAMINE BLANK PAGE / HOLD TO LAMP, etc.)." },
+      { id: 'touch', class: 'analytical', note: "Feel the blank page's pressed ridges (FEEL PAGE / RUB PAGE / TOUCH PAGE, etc.)." },
+    ],
+    hints: [
+      'The man behind the desk is a source, not scenery, and he has been on shift all night. Ask him things: ASK MARLOW ABOUT KEY, ASK MARLOW ABOUT MY NAME, ASK MARLOW ABOUT MY ROOM. TALK TO MARLOW starts him off on his own, and he will mention most of what he is willing to discuss.',
+      'The tall book open on the counter is a record of everyone who has slept in this house, kept in one hand, in pencil. Look at it properly, and then look for the week you would be in.',
+      'A page is gone and the sheet under it is blank. Blank is not the same as empty. A pen bearing down on one sheet leaves valleys in the next, and this game has already worked that trick on you once tonight, upstairs, with a page and a lamp lying on its side. Light across paper, or a fingertip on it.',
+      'Turn the register until the desk lamp comes across the blank sheet flat, or put a hand on it and read it that way. Then take what you find back to the clerk — he is the person it is about.',
+      'EXAMINE REGISTER. Then TILT REGISTER (FEEL PAGE works too, and so does EXAMINE BLANK PAGE). The impression gives you a time in the small hours, your own room number, and a name column with one pen stroke in it that was begun and abandoned. Then ASK MARLOW ABOUT REGISTER, and ASK MARLOW ABOUT VISITOR.',
+    ],
+  },
+  [PUZZLE_LEAVE_YOUR_ROOM]: {
+    id: PUZZLE_LEAVE_YOUR_ROOM,
+    name: 'Getting out of the room',
+    question: QUESTION_OUT_OF_THIS_ROOM,
+    solvedWhen: { visited: LANDING },
+    solutions: [{ id: 'light_and_leave', class: 'direct', note: 'Pull the chain, take the fedora, search it, draw the bolt, and go out.' }],
+    hints: [
+      'Nothing in this room is locked against you. The door has a bolt on your side of it and no one else\'s; the room is a place to search, not a cell. If you are stuck, you are stuck on seeing, not on opening.',
+      'It is dark, and the light in here is on the floor where it fell. The lamp has a pull chain. Almost nothing else in the room can be examined until it is lit.',
+      'Once there is light: LOOK, and then examine the things the description names. This game rewards TAKE and SEARCH on anything a person would pick up — and one thing on this floor is yours, was on your head, and is not empty.',
+      'Pull the chain. Stand the lamp up. Take the hat and search its band. Then draw the bolt and open the door.',
+      'PULL CHAIN. RIGHT LAMP. LOOK. TAKE FEDORA. SEARCH FEDORA. Then OPEN DOOR and OUT. (The door opens from either side afterwards. You can come back.)',
     ],
   },
 };
