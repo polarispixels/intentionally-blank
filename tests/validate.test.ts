@@ -528,3 +528,26 @@ describe('validate — knowledge referential integrity (§2.7, §8 task 15)', ()
     expect(validate(FIXTURE_WORLD)).toEqual([]);
   });
 });
+
+describe('validate — answerable questions carry their recap (§6.2)', () => {
+  it('flags a question with answerWhen and no answer', () => {
+    const world = {
+      ...FIXTURE_WORLD,
+      questions: {
+        ...FIXTURE_WORLD.questions,
+        blank_settle: { text: 'Why is the room like this?', answerWhen: { flag: F('fixture_flag_bool') } },
+      },
+    } as unknown as WorldDef;
+    const findings = validate(world).filter((f) => f.code === 'question-answerable-without-recap');
+    expect(findings.length).toBe(1);
+    expect(findings[0]!.message).toContain('blank_settle');
+  });
+
+  it('accepts a question that opens but is never answerable', () => {
+    const world = {
+      ...FIXTURE_WORLD,
+      questions: { ...FIXTURE_WORLD.questions, hanging: { text: 'Who am I?' } },
+    } as unknown as WorldDef;
+    expect(validate(world).some((f) => f.code === 'question-answerable-without-recap')).toBe(false);
+  });
+});

@@ -250,9 +250,9 @@ export const FIXTURE_WORLD: WorldDef = {
     // Task 11 `exits`: A <-> B always passable; B <-> C gated by DOOR
     // (closed by default, so that edge starts blocked — GO TO's BFS only
     // ever uses currently-passable edges).
-    [ROOM_A]: { name: 'Fixture Room Alpha', aliases: ['room alpha'], dark: true, exits: [{ to: ROOM_B }] }, // baseline dark
-    [ROOM_B]: { name: 'Fixture Room B', aliases: ['room b'], exits: [{ to: ROOM_A }, { to: ROOM_C, door: DOOR }] }, // baseline lit (no `dark` entry)
-    [ROOM_C]: { name: 'Fixture Room C', aliases: ['room c'], dark: { flag: FLAG_BOOL }, exits: [{ to: ROOM_B, door: DOOR }] }, // baseline dark only while FLAG_BOOL holds
+    [ROOM_A]: { name: 'Fixture Room Alpha', aliases: ['room alpha'], area: 'fixture-wing', map: { x: 0, y: 0 }, dark: true, exits: [{ to: ROOM_B }] }, // baseline dark
+    [ROOM_B]: { name: 'Fixture Room B', aliases: ['room b'], area: 'fixture-wing', map: { x: 1, y: 0 }, exits: [{ to: ROOM_A }, { to: ROOM_C, door: DOOR }] }, // baseline lit (no `dark` entry)
+    [ROOM_C]: { name: 'Fixture Room C', aliases: ['room c'], area: 'fixture-annex', map: { x: 2, y: 0 }, dark: { flag: FLAG_BOOL }, exits: [{ to: ROOM_B, door: DOOR }] }, // baseline dark only while FLAG_BOOL holds
   },
   objects: {
     [KEY]: {
@@ -482,20 +482,38 @@ export const FIXTURE_WORLD: WorldDef = {
     'turnOff.notSwitchable': "The {name} doesn't switch on.",
     'turnOff.alreadyOff': 'The {name} is already off.',
   },
+  // Task 17 (`tests/views.test.ts`) additions: `title` on both memories,
+  // `detail` on CLUE_1, and `answer` on QUESTION_2 — the fields
+  // `memoriesView`/`notebookView`/`questionsView` (§6.4/§6.3/§6.2) render
+  // that no earlier task's tick logic needed. QUESTION_1/QUESTION_3/
+  // QUESTION_PUZZLE stay without an `answer` — `answer` is optional (see
+  // `world.ts`'s doc comment), and the spoiler-boundary tests only ever
+  // move QUESTION_1/QUESTION_3 through 'open', never 'answered'.
   memories: {
-    [MEMORY_1]: { lines: ['You remember the fixture.', 'It was, in fact, a fixture.'] },
+    [MEMORY_1]: { title: 'Fixture Memory One', lines: ['You remember the fixture.', 'It was, in fact, a fixture.'] },
     [MEMORY_2]: {
+      title: 'Fixture Memory Two',
       lines: ['You remember a second fixture, ambiently.'],
       trigger: { when: { flag: FLAG_EVENT_FIRED } },
     },
   },
   clues: {
-    [CLUE_1]: { title: 'fixture clue title', questions: [QUESTION_1] },
+    [CLUE_1]: { title: 'fixture clue title', detail: 'fixture clue detail — recap of the fixture scene that revealed it', questions: [QUESTION_1] },
   },
   questions: {
     [QUESTION_1]: { text: 'Is this a fixture question?' },
-    [QUESTION_2]: { text: 'Does this fixture open and answer ambiently?', openWhen: { flag: FLAG_QUESTION_OPEN }, answerWhen: { flag: FLAG_QUESTION_ANSWER } },
-    [QUESTION_3]: { text: 'Does a granted memory answer this fixture question?', openWhen: { flag: FLAG_QUESTION_OPEN }, answerWhen: { memory: MEMORY_2 } },
+    [QUESTION_2]: {
+      text: 'Does this fixture open and answer ambiently?',
+      openWhen: { flag: FLAG_QUESTION_OPEN },
+      answerWhen: { flag: FLAG_QUESTION_ANSWER },
+      answer: 'Yes — ambiently, once both fixture flags were set.',
+    },
+    [QUESTION_3]: {
+      text: 'Does a granted memory answer this fixture question?',
+      openWhen: { flag: FLAG_QUESTION_OPEN },
+      answerWhen: { memory: MEMORY_2 },
+      answer: 'Yes — the second fixture memory settled it.',
+    },
     [QUESTION_PUZZLE]: { text: 'How do you get through the fixture door?' },
   },
   /**

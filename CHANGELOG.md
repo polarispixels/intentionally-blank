@@ -12,6 +12,31 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.2.26] - 2026-08-30
+
+### Added
+
+- **Architecture task 17: the player-facing views.** `mapView`,
+  `questionsView`, `notebookView`, `memoriesView` — pure selectors over
+  `(world, state)`, each reachable as a CLI command and therefore testable
+  with no browser. 18 new tests; 627 green.
+- All four hold a spoiler boundary, tested directly by constructing states
+  where content exists but has not been encountered and asserting it does
+  not appear. The map is the sharpest case: a room behind an exit you have
+  seen but not walked through renders as unknown, and **two exits leading
+  to two different unvisited rooms render identically** — so the player
+  cannot infer that two doors are related, or that they are the same place.
+- `memoriesView` deliberately exposes no total count. "7 of 24" would turn
+  recovered memory into a completion meter, and the internal mystery is not
+  a collectible (constitution §20).
+- `QuestionDef.answer` — the authored recap a settled question shows.
+  §6.2 required it and §2.7's shape had no field for it.
+- `validate` rejects a question that declares `answerWhen` but no `answer`
+  (`question-answerable-without-recap`). A settled question with a blank
+  recap is worse than an unlisted one: the player remembers asking and is
+  told nothing. The rule immediately caught a real instance in the shared
+  test fixture, which is the sort of endorsement a validator rule wants.
+
 ## [0.2.25] - 2026-08-30
 
 Both outstanding debts from earlier tasks are paid.

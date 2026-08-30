@@ -649,6 +649,8 @@ export interface ClueDef {
 export interface QuestionDef {
   id: QuestionId;
   text: string;                 // phrased as a question, never as a task
+  answer?: string;              // authored recap shown once settled (§6.2);
+                                // required by `validate` when answerWhen exists
   openWhen?: Cond;              // or opened by effects
   answerWhen?: Cond;            // or answered by effects
 }

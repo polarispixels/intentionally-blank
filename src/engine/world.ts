@@ -175,14 +175,18 @@ export interface VerbDef {
  * `isDark` reads, plus (task 9) `name`/`aliases` (§2.4), what the
  * vocabulary compiler indexes a room under for `GO TO`/bare-room-word
  * resolution (task 11), and (task 11) `exits` — the graph `GO TO`'s BFS
- * walks (§3.5). Still not `description`/etc. — those are later tasks' to
- * add. `name`/`aliases`/`dark`/`exits` are all optional, like
- * `ObjectDefSlice`'s `nouns`/`adjectives`, so existing fixture rooms that
- * predate these fields keep compiling.
+ * walks (§3.5). (Task 17) `area`/`map` — §2.4's map-grouping label and
+ * authored `{x,y,z}` coordinates, read only by `views.ts`'s `mapView`
+ * (§6.1); nothing else in the engine touches either field. Still not
+ * `description`/etc. — those are later tasks' to add. Every field here is
+ * optional, like `ObjectDefSlice`'s `nouns`/`adjectives`, so existing
+ * fixture rooms that predate these fields keep compiling.
  */
 export interface RoomDefSlice {
   name?: string;
   aliases?: string[];
+  area?: string;
+  map?: { x: number; y: number; z?: number };
   dark?: true | Cond;
   exits?: ExitDefSlice[];
 }
@@ -411,26 +415,38 @@ export interface WorldDef {
    * the ambient acquisition path — `knowledge.ts`'s tick step grants the
    * memory the first turn `trigger.when` holds, provided it isn't already
    * in `state.memories` (§4.2 step 4). Absent ⇒ this memory is only ever
-   * granted by an explicit `{ grantMemory }` effect. Not yet `title`/`class`
-   * (§2.7's full shape) — those are task 16/17's (profile tally, memory
-   * list view) to add; this task's tick logic needs neither.
+   * granted by an explicit `{ grantMemory }` effect. `title` (task 17
+   * addition) is the memory-list entry `views.ts`'s `memoriesView` (§6.4)
+   * renders; not yet `class` (§2.7's full shape, the profile-flavored-recall
+   * advisory tag) — that field has no reader anywhere in the engine yet, so
+   * it stays out of this slice until something actually consumes it.
    */
-  memories?: Record<MemoryId, { lines: string[]; trigger?: { when: Cond } }>;
+  memories?: Record<MemoryId, { title: string; lines: string[]; trigger?: { when: Cond } }>;
   /**
    * Minimal slice of §2.7's `ClueDef`. `questions` (§8 task 15 addition) is
    * "which open questions it bears on" — declared here for §6.3's future
    * notebook view and referential-integrity checking (`validate.ts`); this
-   * task's own tick logic never reads it. Not yet `detail` (task 17's).
+   * task's own tick logic never reads it. `detail` (task 17 addition) is
+   * the notebook expansion `views.ts`'s `notebookView` (§6.3) renders —
+   * strictly recap of the clue's own discovery scene, never new
+   * information (an authoring rule, unenforceable mechanically; see that
+   * function's doc comment).
    */
-  clues?: Record<ClueId, { title: string; questions?: QuestionId[] }>;
+  clues?: Record<ClueId, { title: string; detail: string; questions?: QuestionId[] }>;
   /**
    * Minimal slice of §2.7's `QuestionDef`. `openWhen`/`answerWhen` (§8 task
    * 15 addition) are the ambient conditions `knowledge.ts`'s tick step
    * recomputes every turn (§4.2 step 5) — absent ⇒ that transition only
    * ever happens via an explicit `{ openQuestion }` / `{ answerQuestion }`
-   * effect.
+   * effect. `answer` (task 17 addition, not in the spec's §2.7 literal —
+   * see `views.ts`'s `questionsView` doc comment) is the authored recap
+   * text §6.2 requires once a question moves to the settled list. Optional
+   * so content can open/answer a question ambiently before its recap is
+   * written; a question answered with no `answer` authored surfaces as an
+   * empty recap rather than throwing (a content gap to catch by review, not
+   * a crash).
    */
-  questions?: Record<QuestionId, { text: string; openWhen?: Cond; answerWhen?: Cond }>;
+  questions?: Record<QuestionId, { text: string; openWhen?: Cond; answerWhen?: Cond; answer?: string }>;
   /** §2.7's `PuzzleDef`s (§8 task 16). Content is not required to declare any. */
   puzzles?: Record<PuzzleId, PuzzleDef>;
   /** The `script` effect's escape hatch (ADR 0008): pure functions registered by id. */

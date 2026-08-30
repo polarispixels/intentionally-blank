@@ -50,6 +50,7 @@ export function validate(world: WorldDef): Finding[] {
   checkRoomExits(world, findings);
   checkNoiseWordVocabulary(world, findings);
   checkWitnessedEvents(world, findings);
+  checkQuestionAnswers(world, findings);
   checkKnowledgeConds(world, findings);
   checkClueQuestionRefs(world, findings);
   checkPuzzles(world, findings);
@@ -809,6 +810,26 @@ function checkPuzzles(world: WorldDef, findings: Finding[]): void {
         error(
           'puzzle-no-clock-free-solution',
           `${path} has no "solutions" entry whose route is free of clock/clockPhase/weekday terms, and declares no missedRecovery — a missed timed window would silently doom the player (§4.3.4/constitution §10)`,
+        ),
+      );
+    }
+  }
+}
+
+/**
+ * A question that can reach `'answered'` needs its authored recap (§6.2).
+ * Without one the settled list shows a question with a blank answer, which
+ * is worse than not listing it — the player remembers asking and is told
+ * nothing. Only questions that can actually be answered are required to
+ * carry it; a question opened and left hanging is legitimate.
+ */
+function checkQuestionAnswers(world: WorldDef, findings: Finding[]): void {
+  for (const [id, def] of Object.entries(world.questions ?? {})) {
+    if (def!.answerWhen !== undefined && def!.answer === undefined) {
+      findings.push(
+        error(
+          'question-answerable-without-recap',
+          `question.${id} declares answerWhen but no answer recap — it would settle into the notebook blank`,
         ),
       );
     }
