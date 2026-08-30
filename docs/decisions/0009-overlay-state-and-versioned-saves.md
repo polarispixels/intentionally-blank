@@ -12,17 +12,23 @@ The MVP demonstrated the hazard class: `revealHint` derived UI-side from
 ## Decision
 
 - **`GameState` stores only overlays and inherently dynamic data** (clock,
-  flags, discovered sets, counters, parser context). Object locations and
-  NPC positions resolve through content defaults; NPC positions derive from
-  schedules unless explicitly pinned. Content growth therefore usually
-  requires **no save migration**.
+  discovered sets, counters, parser context). Object locations and NPC
+  positions resolve through content defaults; NPC positions derive from
+  schedules unless pinned or following. **Flags and question statuses are
+  sparse overlays too**: an absent flag reads as its declared content
+  default, an absent question as `'unopened'`, always through resolvers —
+  so a flag first declared in a later stage reads correctly from an old
+  save. Content growth therefore usually requires **no save migration**.
 - **Nothing derivable is ever stored.** Derived values are selectors,
   recomputed on render; correct after any load by construction.
 - The transcript is **not** part of `GameState`; it belongs to the
   session/shell (bounded, persisted separately for scrollback).
 - Save envelope: `{ saveVersion, gameVersion, slot, label?, savedAt?,
-  state, history }` where `history` is the structured action record
-  (`{ turn, input }[]`).
+  state, history, historyTruncated? }` where `history` is the structured
+  action record (`{ turn, input }[]`), kept in full up to a 20,000-entry
+  ceiling (≈ 800 KB worst case; oldest dropped past it, flagged via
+  `historyTruncated`). `saveVersion` is the **only** version number for the
+  state shape — `GameState` carries none of its own.
 - **Migration discipline:** `saveVersion` bumps only on shape changes; an
   ordered migration chain lives in `src/session/migrate.ts`; a fixture save
   from every released `saveVersion` lives in `tests/fixtures/saves/` and a
@@ -31,7 +37,8 @@ The MVP demonstrated the hazard class: `revealHint` derived UI-side from
   fixture is a blocking review finding.
 - **Replay invariant:** on unchanged content, replaying `history` from
   `initialState` reproduces `state` exactly — asserted by a release test
-  and available as a last-resort recovery path.
+  and available as a last-resort recovery path (void on the rare
+  `historyTruncated` save, which is why truncation is flagged).
 
 ## Consequences
 

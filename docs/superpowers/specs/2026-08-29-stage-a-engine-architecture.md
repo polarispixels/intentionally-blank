@@ -151,6 +151,8 @@ export interface ObjectOverlay {
 export interface NpcOverlay {
   /** Pinned position (scripted). Absent ⇒ position derives from schedule. */
   room?: RoomId | 'offstage';
+  /** Position is the player's room. Precedence: following > pin > schedule. */
+  following?: boolean;
   met?: boolean;
   props?: Record<string, FlagValue>;
 }
@@ -215,9 +217,6 @@ resolvers; direct indexing into `state.flags` / `state.questions` is a
 review-blocking defect. This is what makes the §5.2 durability claim hold
 for flags: a flag first declared in Stage D reads as its default from a
 Stage B save, with no migration.
-
-```ts
-```
 
 What is deliberately **not** in state: the transcript (moved to the session;
 see §5.4), anything derivable (a `puzzleSolved` boolean, a `revealHint`
@@ -335,7 +334,7 @@ export type Cond =
   | { prop: [ObjectId | NpcId, string, FlagValue] }
   | { visited: RoomId }
   | { memory: MemoryId } | { clue: ClueId }
-  | { question: [QuestionId, 'open' | 'answered'] }
+  | { question: [QuestionId, 'unopened' | 'open' | 'answered'] }
   | { npcAt: [NpcId, RoomId] } | { met: NpcId }
   | { clock: { day?: number; after?: number; before?: number } } // minutes of day
   | { profileLeader: ActionClass }
@@ -350,6 +349,7 @@ export type Effect =
   | { reveal: ObjectId }                 // hidden:false
   | { setState: [ObjectId, 'open' | 'locked' | 'on', boolean] }
   | { moveNpc: [NpcId, RoomId | 'offstage' | 'schedule'] }  // 'schedule' unpins
+  | { setFollowing: [NpcId, boolean] }   // follower on/off (precedence: following > pin > schedule)
   | { grantMemory: MemoryId } | { grantClue: ClueId }
   | { openQuestion: QuestionId } | { answerQuestion: QuestionId }
   | { goto: RoomId }                     // relocate player (with look)
@@ -389,7 +389,7 @@ export interface RoomDef {
   aliases: string[];        // "hotel room", "my room", "204"
   area: string;             // map grouping: 'hotel', 'town', 'facility'…
   map: { x: number; y: number; z?: number };  // authored coordinates (§6.1)
-  dark?: Cond;              // room is dark when true
+  dark?: true | Cond;       // BASELINE darkness only — see below
   description: Prose;       // full LOOK text (state-dependent rules)
   firstVisit?: Prose;       // prepended once
   exits: ExitDef[];
@@ -400,6 +400,23 @@ export interface RoomDef {
 
 Objects declare their own initial `location`, so a room file is just the
 room plus the objects it introduces; the registry assembles both.
+
+**Darkness semantics.** `dark` is the room's *baseline*: "this room has no
+ambient light of its own" (`true` for a windowless room; a `Cond` for rooms
+dark only sometimes, e.g. at night). Whether the player can currently see is
+always the derived question:
+
+```ts
+// world.ts export — the only darkness authority in the engine
+export function isDark(world: WorldDef, state: GameState, room: RoomId): boolean;
+  // baseline holds  AND  no lightSource object that is `on` is in scope
+  // (in the room, held, or worn — containers must be open or transparent)
+```
+
+The baseline cond must therefore **never** mention light sources — a lit
+lamp or a carried lit torch defeats baseline darkness through `isDark`, not
+through the room's cond. Validation warns when a `dark` cond references a
+`lightSource` object.
 
 ### 2.5 Objects
 
@@ -425,7 +442,7 @@ export interface ObjectDef {
   container?: { open?: boolean; locked?: boolean; key?: ObjectId; transparent?: boolean };
   supporter?: boolean;
   switchable?: boolean;         // TURN ON/OFF
-  lightSource?: boolean;        // lights a dark room while on
+  lightSource?: boolean;        // while `on` and in scope, defeats baseline darkness (isDark, §2.4)
   tags?: string[];              // 'analog', 'evidence', 'notebook-page'…
   description: Prose;           // EXAMINE
   text?: Prose;                 // READ (falls back to description)
@@ -476,8 +493,11 @@ export interface NpcDef {
 ```
 
 NPC position is **derived from the schedule** each turn unless an overlay
-pins it (`moveNpc`), and `{ moveNpc: [id, 'schedule'] }` unpins. Schedules
-are soft by construction — see §4.
+pins it (`moveNpc`), and `{ moveNpc: [id, 'schedule'] }` unpins. A
+**follower** (`{ setFollowing: [id, true] }`) is simply wherever the player
+is, overriding both pin and schedule — the mechanic behind FOLLOW handlers
+and Dad's later party-member stages (spec 03 §6). Precedence:
+**following > pin > schedule**. Schedules are soft by construction — see §4.
 
 ### 2.7 Memories, clues, questions, puzzles
 
@@ -568,7 +588,7 @@ export const hotel204: RoomDef = {
   aliases: ['room 204', 'my room', 'hotel room'],
   area: 'hotel',
   map: { x: 0, y: 0, z: 1 },
-  dark: { objectState: [O('floor_lamp'), 'on', false] },
+  dark: true,   // baseline: unlit room. The lamp lighting it is isDark's job, not this cond's.
   firstVisit: 'You are lying on a floor. The floor votes for staying down. Your head votes twice.',
   description: [
     { when: { objectState: [O('floor_lamp'), 'on', false] },
@@ -786,8 +806,8 @@ coverage mechanism (ADR 0004's consequence).
 ### 4.2 Tick order
 
 After each turn-consuming action: advance clock → evaluate `EventDef`s
-(fire matching, record `once` in `firedEvents`) → derive NPC positions from
-schedules → evaluate memory triggers → recompute question open/answer conds
+(fire matching, record `once` in `firedEvents`) → derive NPC positions
+(following > pin > schedule) → evaluate memory triggers → recompute question open/answer conds
 → check `PuzzleDef.solvedWhen` for first-time `onSolved` → tally profile for
 the action's class. All pure, all inside `step`.
 
@@ -818,8 +838,9 @@ Rules that keep Deadline's life without its cruelty:
 ### 4.4 What NPCs do *not* do (yet)
 
 No pathfinding, no autonomous goal simulation, no NPC inventory-planning.
-NPCs are where their schedule says, know what their topics say, and act
-through authored events and scripts. This is deliberate (§9).
+NPCs are where their schedule says (or at the player's side while
+`following`), know what their topics say, and act through authored events
+and scripts. This is deliberate (§9).
 
 ---
 
@@ -835,9 +856,21 @@ export interface SaveFile {
   label?: string;               // player-visible name
   savedAt?: string;             // ISO; supplied by the shell via now()
   state: GameState;             // §1.2 — the overlay keeps this small
-  history: { turn: number; input: string }[];  // structured action history
+  history: { turn: number; input: string }[];  // structured action history (see below)
+  historyTruncated?: true;      // set iff the ceiling below ever dropped entries
 }
 ```
+
+**History is unbounded up to a hard ceiling, and the choice is deliberate.**
+Size math: an entry is `{turn, input}` ≈ 40 bytes of JSON; a long
+playthrough of ~5,000 turns is ≈ 200 KB, and a pathological 20,000-turn
+session is ≈ 800 KB — comfortably inside the localStorage budget, and
+re-serializing it each autosave is well under a millisecond. So the full
+record is kept (it is what makes the replay invariant and second-playthrough
+tricks possible) with one safety valve: past **20,000 entries** the session
+drops the oldest and sets `historyTruncated`. Builders implement the
+ceiling; they do not invent a smaller cap.
+
 
 ### 5.2 Durability contract — a save taken today survives the build
 
@@ -853,7 +886,8 @@ export interface SaveFile {
    replaying inputs from `initialState` — a test invariant on every release
    (same content ⇒ identical state), and the manual recovery path if a
    migration is ever wrong. Not automatic (content changes legitimately
-   change replay outcomes).
+   change replay outcomes), and void on the rare `historyTruncated` save
+   (§5.1), which is why truncation is flagged rather than silent.
 4. **Renames are migrations.** Renaming an id in content requires a
    migration entry mapping old id → new (a validated `renames` table), which
    is why ids are chosen carefully and never reused.
@@ -952,13 +986,13 @@ ever appear on explicit request.
 Every step merges to `main` green and playable; the deployed MVP stays the
 live game until the final switch.
 
-1. **Patch: purity tokenizer + CLI hardening.** Replace
-   `tests/purity.test.ts`'s string-strip regex with a small character
-   scanner that tracks string/template/regex-literal/comment context (the
-   current regex is blinded by quote characters inside regex literals —
-   BACKLOG defect). Extend coverage to `src/session/` (once it exists). CLI:
-   a bad `--script` path prints a one-line error, not a stack trace; input
-   typed during beat delays is buffered and run after the flush.
+1. **Patch: purity tokenizer + CLI hardening.** ✅ **complete.** The
+   tokenizer shipped in v0.2.6 (`tests/helpers/source-scan.ts`: comments,
+   all three string forms, `${}` interpolation, regex literals including
+   regex-vs-division, plus a separate import-specifier check, with unit and
+   mutation tests). CLI and shell hardening shipped in v0.2.7. Only residual:
+   add `src/session/` to the scanned directories when that module lands
+   (folded into task 18).
 2. **Engine v2 core lands beside the MVP.** New modules
    (`ids/cond/effects/prose/world/actions/parser/…`) ship with fixture-world
    tests only; nothing imports them yet; the deployed game is untouched.
@@ -990,13 +1024,16 @@ world in `tests/fixtures/world.ts`, not game content. This section becomes
 `docs/superpowers/plans/` material for Stage B; acceptance = named tests
 green + `npm test` green.
 
-1. **Purity tokenizer.** `tests/purity.test.ts`: add failing cases first —
-   regex literal containing a quote, template literal with `${}` holding a
-   forbidden word in a string, comment containing `window`, string
-   containing every forbidden word; implement the context-tracking scanner.
-2. **CLI hardening.** `src/cli/play.ts` + new `tests/cli.test.ts` (spawn
-   with `--script`): missing script file → clean error, exit 1; queued
-   input during beats not lost.
+1. **Purity tokenizer.** ✅ shipped v0.2.6 — `tests/helpers/source-scan.ts`
+   (comment/string/template/regex-aware scanner, separate import-specifier
+   check, 12 unit tests plus mutation tests). Residual work: add
+   `src/session/` to the scanned directories — folded into task 18.
+2. **CLI hardening.** ✅ shipped v0.2.7 — `src/cli/play.ts` plus
+   `tests/cli.test.ts` (spawns the CLI): `--script` argument errors print
+   one line on stderr and exit 1; commands queue behind the beat flush
+   instead of interleaving. The matching Vue-shell defect (a command typed
+   during the beat sequence was discarded) shipped in the same release.
+   Task 20 rebuilds this CLI on `Session`; these tests carry forward.
 3. **Ids + conditions.** `src/engine/ids.ts`, `src/engine/cond.ts`;
    `tests/cond.test.ts`: every `Cond` arm, `all/any/not` nesting, unknown
    flag read = declared default.
@@ -1008,8 +1045,10 @@ green + `npm test` green.
    immutability (deep-freeze input).
 6. **State + world resolution.** `src/engine/state.ts`,
    `src/engine/world.ts`; `tests/world.test.ts`: overlay fallback for
-   object/NPC lookups, scope and visibility (containers, hidden, darkness,
-   light sources), `initialState(world)`.
+   object/NPC/flag/question lookups (`flag`, `questionStatus` resolvers,
+   §1.2.1), scope and visibility (containers, hidden), `isDark` as its own
+   matrix — baseline `true`/cond × light source in room / held / inside
+   closed vs. open container — and `initialState(world)`.
 7. **Validation.** `src/engine/validate.ts`; `tests/validate.test.ts`:
    each rule from §2.1 rejects a deliberately broken fixture; plus
    clock-free-solution rule (§4.3.4) and question-phrasing rule (§6.2).
@@ -1032,7 +1071,9 @@ green + `npm test` green.
     noun-miss, diag events emitted with correct codes.
 13. **Tick: clock, events, schedules.** `src/engine/tick.ts`;
     `tests/tick.test.ts`: minutes advance, meta verbs free, EventDef
-    once/witnessed semantics, schedule-derived NPC position, pin/unpin.
+    once/witnessed semantics, schedule-derived NPC position, pin/unpin,
+    follower precedence (following > pin > schedule; setFollowing on/off;
+    follower moves with GO TO multi-room travel).
 14. **NPC conversation.** `src/engine/npc.ts`; `tests/npc.test.ts`:
     ASK/TELL topic matching by words, knowledge gating, unknownTopic,
     SHOW, greeting.
@@ -1049,7 +1090,8 @@ green + `npm test` green.
 18. **Session + saves.** `src/session/`; `tests/session.test.ts` (with
     `MemoryStore`): save/load round-trip, autosave cadence, undo ring +
     post-reload single undo, checkpoints/restart-encounter, export/import,
-    death menu flow.
+    history ceiling + `historyTruncated`, death menu flow. Also adds
+    `src/session/` to the purity scan (task 1 residual).
 19. **Migrations + durability.** `src/session/migrate.ts`;
     `tests/migrate.test.ts`: fixture-save chain, renames table, replay
     invariant (history replay reproduces state bit-for-bit on same
@@ -1063,7 +1105,7 @@ green + `npm test` green.
     MVP `step/state/parser/types`; full playthrough test via CLI. (Merges
     with M1 content in Stage B; version 0.3.0.)
 
-Sequencing: 1–2 immediately (patch releases); 3→8 in order (each depends on
+Sequencing: 1–2 are shipped (v0.2.6, v0.2.7); Stage B opens at task 3. 3→8 in order (each depends on
 the previous); 9–11 after 6; 12 after 9–11; 13–17 after 8 (13 before 14);
 18 after 12; 19–20 after 18; 21 after 20; 22 last. Tasks 9–11 and 13–17
 have internal parallelism if two builders run at once.

@@ -12,6 +12,39 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.2.8] - 2026-08-29
+
+Stage A, first half: the engine architecture the rest of the game is built
+against. Docs-only — no engine code has changed yet.
+
+### Added
+
+- `docs/superpowers/specs/2026-08-29-stage-a-engine-architecture.md` — the
+  world model, content schemas, parser v2, clock and soft NPC schedules,
+  save/undo/autosave, UI surfaces, migration plan, and a 22-task build
+  breakdown. Written by `game-architect`, revised once against main-session
+  review. Design targets: 40–60 rooms, 20–30k authored words, five acts,
+  one deterministic engine identical in Vitest, the CLI, and the browser.
+- ADR 0008 — content is declarative data (`Cond`/`Effect`/`Prose`) with a
+  registered pure-script escape hatch; the engine never imports content.
+- ADR 0009 — runtime state is a sparse overlay on authored content, nothing
+  derivable is ever stored, saves are versioned with per-release fixtures.
+- ADR 0010 — a pure `src/session/` layer owns persistence, undo, and
+  checkpoints behind a `SaveStore` interface, keeping ADR 0003 intact.
+
+### Notes
+
+Six revisions were required before acceptance. The two that mattered:
+`flags` and `questions` were declared as total records, which contradicted
+the overlay rule the entire save-durability contract rests on; and the
+`RoomDef.dark` / `ObjectDef.lightSource` overlap left darkness ambiguous —
+the worked example would have kept a room dark for a player carrying a lit
+lamp. Also added `NpcOverlay.following`, without which Dad could not become
+the party member spec 03 §6 requires.
+
+Tasks 1 and 2 of the breakdown shipped ahead of the document, in v0.2.6 and
+v0.2.7. Stage B opens at task 3.
+
 ## [0.2.7] - 2026-08-29
 
 ### Fixed

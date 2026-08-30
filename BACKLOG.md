@@ -17,7 +17,7 @@ Maintenance rules:
 
 | Stage | Scope | Deploy | Status |
 |---|---|---|---|
-| A | Story + engine architecture: five-act causal spine, puzzle network, room list, NPC agendas, memory system, save/undo design; canon decisions registered in `docs/spec/09` | docs site | 🎯 next up |
+| A | Story + engine architecture: five-act causal spine, puzzle network, room list, NPC agendas, memory system, save/undo design; canon decisions registered in `docs/spec/09` | docs site | 🚧 in progress — **engine architecture deployed v0.2.8** (`docs/superpowers/specs/2026-08-29-stage-a-engine-architecture.md` + ADRs 0008–0010); story architecture in review |
 | B | Engine v2 (world model, parser v2, save/undo/autosave, map + open-questions UI) + the opening room (M1) | 0.3.0 | queued |
 | C | Act I: town, client, missing sibling, notebook trail (M2–M4) | 0.4–0.6 | queued |
 | D | Acts II–III: data center, underground, Dad on the USB, contradictions | 0.7–0.8 | queued |
