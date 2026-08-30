@@ -12,6 +12,43 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.2.23] - 2026-08-30
+
+### Added
+
+- **Architecture task 14: NPC conversation.** `src/engine/npc.ts` —
+  `ASK`/`TELL <npc> ABOUT <topic>` matched by authored words rather than
+  ids, knowledge gating, per-NPC `unknownTopic`, `SHOW <object> TO <npc>`,
+  and greetings. 35 new tests; 547 green.
+- **A gated topic is indistinguishable from a topic that never existed.**
+  Both fall out of the same lookup and render byte-identical text and
+  diagnostics, verified by test. In a story where people lie to the player,
+  a refusal that leaks "there is something here you haven't earned" would
+  hand out the reveal for free — and `unknownTopic` is authored per NPC
+  precisely because the difference between a character who doesn't know and
+  one who won't say is the character.
+- A topic miss emits a `topicMiss` diagnostic, so conversations a player
+  reasonably tried and no author anticipated are findable mechanically.
+- The vocabulary compiler's `topicWords` seam is filled, and `validate`
+  now requires an `unknownTopic` on any NPC that declares topics — an NPC
+  with conversations and no fallback would otherwise be silent when asked
+  about anything unexpected.
+- The plot-critical strand guard was extracted so it now covers topic and
+  show effects too, not only object handlers.
+
+### Notes
+
+The builder disclosed writing implementation before tests on this task
+given the cross-module convention matching involved, then deliberately
+broke the gating logic to confirm the relevant tests failed for the right
+reason before restoring. Recorded as-is rather than as clean TDD.
+
+Task 16 now owes the action-class plumbing: `respond.ts` discards the
+`ActionClass` before anything can tally it, so the behavioral profile has
+nothing to count. Pinned as an explicit acceptance criterion, since the
+BACKLOG note is emphatic that this is nearly free from the start and
+expensive to retrofit.
+
 ## [0.2.22] - 2026-08-30
 
 ### Added

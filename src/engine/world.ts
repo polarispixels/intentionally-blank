@@ -33,7 +33,7 @@
 
 import type { Cond } from './cond';
 import { evaluate } from './cond';
-import type { ActionClass, DayPhase, FlagId, FlagValue, MemoryId, ClueId, NpcId, ObjectId, PlaceId, QuestionId, RoomId, ScriptId, VerbId } from './ids';
+import type { ActionClass, DayPhase, FlagId, FlagValue, MemoryId, ClueId, NpcId, ObjectId, PlaceId, QuestionId, RoomId, ScriptId, TopicId, VerbId } from './ids';
 // Type-only: `Effect` is only referenced in `HandlerDef`'s type signature
 // below, never called at runtime from this module, so this stays a
 // compile-time-only edge even though `effects.ts` itself imports `WorldDef`
@@ -219,14 +219,51 @@ export interface ScheduleRule {
 }
 
 /**
+ * §2.6's `TopicDef` — one ASK/TELL topic. `words` are the phrasings that
+ * reach it ("sibling", "brother", "jules"), matched against the parser's
+ * raw `StructuredAction.topic` string by `npc.ts` (§8 task 14) — never
+ * resolved by the parser itself (§3.1: "ASK/TELL, raw topic words — never
+ * resolved"). `when` is knowledge gating: a topic whose `when` doesn't hold
+ * is treated by `npc.ts` as though it doesn't exist at all (falls to the
+ * NPC's own `unknownTopic`, indistinguishable from a topic nobody authored
+ * — see `npc.ts`'s header for why that's structural, not a special case).
+ * `class` defaults to `'social'` when omitted (§2.6).
+ */
+export interface TopicDef {
+  id: TopicId;
+  words: string[];
+  when?: Cond;
+  response: Prose;
+  effects?: Effect[];
+  class?: ActionClass;
+}
+
+/**
+ * §2.6's `NpcDef.showResponses` entry — SHOW <object> TO <npc>. `objects`
+ * is either an explicit list or `'any'`; `when` gates it the same way a
+ * topic's `when` does.
+ */
+export interface ShowResponseDef {
+  objects: ObjectId[] | 'any';
+  when?: Cond;
+  response: Prose;
+  effects?: Effect[];
+}
+
+/**
  * Minimal npc-authoring slice of §2.6 — `schedule`, which `npcRoom`'s
  * fallback reads, `nouns`/`adjectives` (task 9), what the vocabulary
  * compiler indexes an NPC under, and (task 10) `pronoun` — §2.6's `NpcDef`
  * already specifies it; it was simply unplumbed until the parser's
  * `him`/`her`/`them` resolution (§3.4) needed a real data source instead of
- * guessing. Not yet `topics`/`handlers`/etc. — those are tasks 13–14's (see
- * `vocabulary.ts`'s `topicWords` doc comment: topic vocabulary has no data
- * source until `NpcDef.topics` lands).
+ * guessing. Task 14 adds `topics`/`tellTopics`/`showResponses`/
+ * `unknownTopic`/`greeting` — see `npc.ts` for the logic that reads them.
+ * All optional, like every other field here, so existing fixture NPCs that
+ * predate conversation keep compiling unchanged; `npc.ts` throws at runtime
+ * if a topic/show match is reached with no `unknownTopic` authored to fall
+ * back to (a content bug, same convention as this codebase's other
+ * `family()`-style throws) — not yet `validate`-enforced (see that file's
+ * SCOPE NOTE on extending it alongside a new schema field).
  */
 export interface NpcDefSlice {
   schedule?: ScheduleRule[];
@@ -234,6 +271,28 @@ export interface NpcDefSlice {
   adjectives?: string[];
   /** §3.4's `him`/`her`/`them` resolution reads this — see `parser/vocabulary.ts`'s `npcPronouns`. Absent ⇒ this NPC never participates in pronoun fallback/antecedent-tracking (no guessing a gender the content never declared). */
   pronoun?: 'he' | 'she' | 'they';
+  /** ASK <npc> ABOUT <topic>. */
+  topics?: TopicDef[];
+  /**
+   * TELL <npc> ABOUT <topic>. Absent ⇒ `npc.ts` reuses `topics` for TELL
+   * too (most NPCs don't need ASK and TELL to diverge) — see `npc.ts`'s
+   * header for this default, called out as a task-14 assumption in its
+   * report rather than left implicit.
+   */
+  tellTopics?: TopicDef[];
+  /** SHOW <object> TO <npc>. */
+  showResponses?: ShowResponseDef[];
+  /**
+   * Authored per NPC (§2.6: "the personality lives here") — what this NPC
+   * says to a topic none of `topics`/`tellTopics` matched (word mismatch
+   * or a real topic gated off by an unmet `when`; both look identical from
+   * here, which is exactly what keeps a gated topic from leaking its own
+   * existence). Required, in practice, by any NPC that declares `topics`
+   * or `tellTopics` — see this field's optionality note above.
+   */
+  unknownTopic?: Prose;
+  /** TALK TO / HELLO. Absent ⇒ falls through to the verb's own rung-2 `default` family, same as any other unhandled npc-targeted verb. */
+  greeting?: Prose;
 }
 
 /**

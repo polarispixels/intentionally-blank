@@ -43,10 +43,16 @@ export interface CompiledVocabulary {
   /** Full normalized alias phrase (e.g. "hotel room") → room id. Consumed by task 11's GO TO. */
   roomAliases: Map<string, RoomId>;
   /**
-   * Reserved seam: `WorldDef` has no `NpcDef.topics`/`TopicDef` yet (spec
-   * §2.6 lands them in tasks 13-14 — see `world.ts`'s `NpcDefSlice` doc
-   * comment). Always empty until that data exists; `compileVocabulary`
-   * has nothing to read topic words from today.
+   * Every word any NPC's `topics` or `tellTopics` declares (§2.6, §8 task
+   * 14), indexed to the `TopicId`(s) it reaches — mirrors `objectNouns`'s
+   * shape (`addTo`, many-to-many). Not consulted by grammar/resolution:
+   * `StructuredAction.topic` stays raw, unresolved text all the way through
+   * `interpret()` (§3.1) — `npc.ts` is what actually matches a topic's
+   * words against that raw string. This map exists for the same reason
+   * `roomAliases`/the noun maps do beyond grammar matching itself: a
+   * compiled, queryable index of authored vocabulary for validation
+   * (`validate.ts`'s collision checks) and any future "what can I ask
+   * about" affordance, built once at load rather than re-derived ad hoc.
    */
   topicWords: Map<string, TopicId[]>;
 }
@@ -101,6 +107,17 @@ function compileNpcVocabulary(world: WorldDef): Pick<CompiledVocabulary, 'npcNou
   return { npcNouns, npcAdjectives, npcPronouns };
 }
 
+/** §8 task 14: indexes every `topics`/`tellTopics` word, across every NPC, to the `TopicId`(s) it reaches. */
+function compileTopicVocabulary(world: WorldDef): Map<string, TopicId[]> {
+  const topicWords = new Map<string, TopicId[]>();
+  for (const def of Object.values(world.npcs ?? {})) {
+    for (const topic of [...(def!.topics ?? []), ...(def!.tellTopics ?? [])]) {
+      for (const word of topic.words) addTo(topicWords, word, topic.id);
+    }
+  }
+  return topicWords;
+}
+
 function compileRoomAliases(world: WorldDef): Map<string, RoomId> {
   const roomAliases = new Map<string, RoomId>();
   for (const [id, def] of Object.entries(world.rooms ?? {})) {
@@ -118,6 +135,6 @@ export function compileVocabulary(world: WorldDef): CompiledVocabulary {
     ...compileObjectVocabulary(world),
     ...compileNpcVocabulary(world),
     roomAliases: compileRoomAliases(world),
-    topicWords: new Map(),
+    topicWords: compileTopicVocabulary(world),
   };
 }

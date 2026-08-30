@@ -25,7 +25,7 @@ import type { ClueId, DayPhase, FlagId, MemoryId, NpcId, ObjectId, PlaceId, Ques
 import { compileVocabulary } from './parser/vocabulary';
 import { NOISE_WORDS } from './parser/tokenize';
 import type { Prose, ProseRef, ProseRule } from './prose';
-import type { VerbDef, WorldDef } from './world';
+import type { TopicDef, VerbDef, WorldDef } from './world';
 
 export interface Finding {
   /** Stable short id, e.g. `'unknown-room-ref'` — never renamed once shipped (content tests key off it). */
@@ -42,6 +42,7 @@ export function validate(world: WorldDef): Finding[] {
   checkObjects(world, findings);
   checkRoomDarkConds(world, findings);
   checkSchedules(world, findings);
+  checkNpcConversation(world, findings);
   checkResponseFamilies(world, findings);
   checkQuestionPhrasing(world, findings);
   checkPhaseTable(world, findings);
@@ -281,6 +282,58 @@ function checkNoNpcAt(cond: Cond, path: string, findings: Finding[]): void {
 }
 
 // ---------------------------------------------------------------------------
+// NPC conversation (§2.6, §8 task 14): `when` referential integrity for
+// every topic/tellTopic/showResponses entry, `showResponses.objects`
+// referential integrity, prose rotation/fallback completeness for every
+// topic/unknownTopic/greeting node, the plot-critical strand guard
+// extended to topic/show effects (§2.5, alongside the same rule for
+// handler effects above — this file's own SCOPE NOTE asks a later task to
+// extend it exactly this way when it adds a new authored-effects field),
+// and the completeness rule §14's task brief calls out as load-bearing:
+// `unknownTopic` is required by any NPC that declares `topics`/
+// `tellTopics`/`showResponses` at all — `npc.ts` throws at runtime
+// otherwise; this turns that into a build-time finding.
+// ---------------------------------------------------------------------------
+
+function checkTopicList(world: WorldDef, npcId: string, topics: TopicDef[] | undefined, label: string, findings: Finding[]): void {
+  (topics ?? []).forEach((topic, i) => {
+    const path = `npc.${npcId}.${label}[${i}]`;
+    checkRotationsAndFallback(topic.response, `${path}.response`, findings);
+    if (topic.when !== undefined) checkCondRefs(world, topic.when, `${path}.when`, findings);
+    checkPlotCriticalStrand(world, topic.effects ?? [], `${path}.effects`, findings);
+  });
+}
+
+function checkNpcConversation(world: WorldDef, findings: Finding[]): void {
+  for (const [id, def] of Object.entries(world.npcs ?? {})) {
+    const hasConversation = (def!.topics?.length ?? 0) > 0 || (def!.tellTopics?.length ?? 0) > 0 || (def!.showResponses?.length ?? 0) > 0;
+    if (hasConversation && def!.unknownTopic === undefined) {
+      findings.push(
+        error(
+          'npc-missing-unknown-topic',
+          `npc.${id} declares topics/tellTopics/showResponses but no unknownTopic — a topic that doesn't match falls through to it at runtime, and there is nothing authored to fall to (§2.6)`,
+        ),
+      );
+    }
+    if (def!.unknownTopic !== undefined) checkRotationsAndFallback(def!.unknownTopic, `npc.${id}.unknownTopic`, findings);
+    if (def!.greeting !== undefined) checkRotationsAndFallback(def!.greeting, `npc.${id}.greeting`, findings);
+
+    checkTopicList(world, id, def!.topics, 'topics', findings);
+    checkTopicList(world, id, def!.tellTopics, 'tellTopics', findings);
+
+    (def!.showResponses ?? []).forEach((entry, i) => {
+      const path = `npc.${id}.showResponses[${i}]`;
+      checkRotationsAndFallback(entry.response, `${path}.response`, findings);
+      if (entry.when !== undefined) checkCondRefs(world, entry.when, `${path}.when`, findings);
+      checkPlotCriticalStrand(world, entry.effects ?? [], `${path}.effects`, findings);
+      if (entry.objects !== 'any') {
+        entry.objects.forEach((objId, oi) => checkObjectRef(world, objId, `${path}.objects[${oi}]`, findings));
+      }
+    });
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Response families: ProseRef existence/cycles + rotation/fallback completeness
 // ---------------------------------------------------------------------------
 
@@ -457,25 +510,30 @@ function walkEffects(effects: readonly Effect[], visit: (effect: Effect) => void
   }
 }
 
+/** Shared by every authored-`Effect[]` site (rung-1 handlers, §8 task 14's npc topics/showResponses) — §2.5's runtime guard, made a build-time finding. */
+function checkPlotCriticalStrand(world: WorldDef, effects: readonly Effect[], path: string, findings: Finding[]): void {
+  walkEffects(effects, (effect) => {
+    if (!('move' in effect)) return;
+    const [targetId, place] = effect.move;
+    if (world.objects?.[targetId]?.plotCritical !== true) return;
+    const strandsToNowhere = place === 'nowhere';
+    const strandsToNpc = typeof place === 'object' && place !== null && 'npc' in place;
+    if (strandsToNowhere || strandsToNpc) {
+      findings.push(
+        error(
+          'effect-strands-plot-critical',
+          `${path} moves plot-critical object "${targetId}" to ${JSON.stringify(place)} — plot-critical objects may never leave the reachable world (§2.5)`,
+        ),
+      );
+    }
+  });
+}
+
 function checkPlotCriticalStrandEffects(world: WorldDef, findings: Finding[]): void {
   for (const [objId, def] of Object.entries(world.objects ?? {})) {
     const handlers = def!.handlers ?? [];
     handlers.forEach((handler, hi) => {
-      walkEffects(handler.effects, (effect) => {
-        if (!('move' in effect)) return;
-        const [targetId, place] = effect.move;
-        if (world.objects?.[targetId]?.plotCritical !== true) return;
-        const strandsToNowhere = place === 'nowhere';
-        const strandsToNpc = typeof place === 'object' && place !== null && 'npc' in place;
-        if (strandsToNowhere || strandsToNpc) {
-          findings.push(
-            error(
-              'effect-strands-plot-critical',
-              `object.${objId}.handlers[${hi}].effects moves plot-critical object "${targetId}" to ${JSON.stringify(place)} — plot-critical objects may never leave the reachable world (§2.5)`,
-            ),
-          );
-        }
-      });
+      checkPlotCriticalStrand(world, handler.effects, `object.${objId}.handlers[${hi}].effects`, findings);
     });
   }
 }

@@ -72,6 +72,7 @@ import type { InterpretOutcome, StructuredAction } from './interpreter';
 import type { CompiledVocabulary } from './parser/vocabulary';
 import { candidateName, isNpcId } from './parser/resolver';
 import { allEmptyFamilyKey } from './parser/multi';
+import { NPC_VERB_IDS, respondToAsk, respondToGreeting, respondToShow, respondToTell } from './npc';
 
 export interface RespondResult {
   state: GameState;
@@ -109,12 +110,61 @@ function respondToActions(world: WorldDef, state: GameState, vocab: CompiledVoca
   return { state: current, events };
 }
 
+/**
+ * NPC CONVERSATION (§8 task 14): ASK/TELL/SHOW/TALK are ordinary verbs —
+ * content authors them in `world.verbs` under `npc.ts`'s reserved
+ * `NPC_VERB_IDS`, the same convention `actions.ts`'s `BUILTIN_VERB_IDS`
+ * sets for TAKE/DROP/etc. — so they're recognized here by id, exactly the
+ * way `hasBuiltinSemantics` lets rung 2 tell a built-in physical verb apart
+ * from an ordinary one, before this function ever falls to the generic
+ * `respondToNpcTarget`/`performAction` paths below. A verb authored under a
+ * *different* id, even with an identical grammar pattern, gets none of
+ * this — it's an ordinary unhandled npc-targeted verb, unchanged.
+ *
+ * ASK/TELL: `action.topic` (§3.1, never resolved by the parser) is required
+ * for the pattern to have matched at all (`'V npc about topic'`) — the
+ * `!== undefined` checks below are total, not a guess.
+ *
+ * TALK TO/HELLO: `respondToGreeting` returns `undefined` when the NPC has
+ * no `greeting` authored; this function falls through to the ordinary
+ * rung-2 default in that case (documented at `respondToGreeting`'s own
+ * definition), rather than inventing a second fallback family.
+ *
+ * SHOW: unlike ASK/TELL, the *object* being shown is `dobj`
+ * (`'V dobj prep iobj'`, prep "to") and the npc is `iobj` — the inverse of
+ * every other npc-targeting shape here, so it needs its own guard rather
+ * than reusing the `dobj`-is-npc check below. A miss (`respondToShow`
+ * returns `undefined` — nothing in `showResponses` matched) falls to
+ * `respondToShowDefault`, a SHOW-specific rung-2 default rather than
+ * `respondToNpcTarget`: `performAction`'s ordinary rung-2 path would
+ * template `{name}`/`{iobj}` from an object-only naming table, and it is
+ * the *object*'s name that belongs in `{name}` here, the npc's in `{iobj}`
+ * (response-families doc §0 note 3: SHOW is inherently person-facing).
+ */
 function respondToAction(world: WorldDef, state: GameState, vocab: CompiledVocabulary, action: StructuredAction): RespondResult {
   const dobj = action.dobj;
+  const iobj = action.iobj;
+
+  if (action.verb === NPC_VERB_IDS.ask && dobj !== undefined && isNpcId(vocab, dobj) && action.topic !== undefined) {
+    return respondToAsk(world, state, vocab, dobj, action.topic);
+  }
+  if (action.verb === NPC_VERB_IDS.tell && dobj !== undefined && isNpcId(vocab, dobj) && action.topic !== undefined) {
+    return respondToTell(world, state, vocab, dobj, action.topic);
+  }
+  if (action.verb === NPC_VERB_IDS.talk && dobj !== undefined && isNpcId(vocab, dobj)) {
+    const greeting = respondToGreeting(world, state, vocab, dobj);
+    if (greeting !== undefined) return greeting;
+    // No greeting authored: fall through to the ordinary rung-2 default below.
+  }
+  if (action.verb === NPC_VERB_IDS.show && dobj !== undefined && !isNpcId(vocab, dobj) && iobj !== undefined && isNpcId(vocab, iobj)) {
+    const shown = respondToShow(world, state, vocab, dobj as ObjectId, iobj);
+    if (shown !== undefined) return shown;
+    return respondToShowDefault(world, state, vocab, action.verb, dobj as ObjectId, iobj);
+  }
+
   if (dobj !== undefined && isNpcId(vocab, dobj)) {
     return respondToNpcTarget(world, state, vocab, action.verb, dobj);
   }
-  const iobj = action.iobj;
   const result = performAction(world, state, {
     verb: action.verb,
     ...(dobj !== undefined ? { dobj: dobj as ObjectId } : {}),
@@ -135,6 +185,23 @@ function respondToNpcTarget(world: WorldDef, state: GameState, vocab: CompiledVo
     events: [
       { type: 'line', kind: 'prose', text: rendered.text },
       { type: 'diag', code: 'defaultResponse', detail: `verb "${verb}" on npc "${npc}" fell to its default family` },
+    ],
+  };
+}
+
+/** SHOW's own rung-2 default (see `respondToAction`'s SHOW note): `{name}`/`{dobj}` is the shown object, `{iobj}` the npc. */
+function respondToShowDefault(world: WorldDef, state: GameState, vocab: CompiledVocabulary, verb: VerbId, dobj: ObjectId, npc: NpcId): RespondResult {
+  const verbDef = world.verbs?.[verb];
+  if (verbDef === undefined) throw new Error(`respond: verb "${verb}" is not declared in world.verbs`);
+  if (verbDef.default === null) throw new Error(`respond: verb "${verb}" has no default family`);
+  const dobjName = world.objects?.[dobj]?.name ?? dobj;
+  const npcName = candidateName(vocab, npc);
+  const rendered = render(world, state, verbDefaultPath(verb), verbDef.default, { name: dobjName, dobj: dobjName, iobj: npcName });
+  return {
+    state: rendered.state,
+    events: [
+      { type: 'line', kind: 'prose', text: rendered.text },
+      { type: 'diag', code: 'defaultResponse', detail: `verb "${verb}" (show) of "${dobj}" to npc "${npc}" fell to its default family` },
     ],
   };
 }

@@ -1310,6 +1310,18 @@ green + `npm test` green.
     solvedWhen edge-trigger, multi-route convergence, class tallies,
     hint-ladder consumption.
 
+    **Also owes the action-class plumbing.** `respond.ts`'s `RespondResult`
+    currently discards the `ActionClass` before anything can tally it, so
+    the behavioral profile — canon (spec 04 §3; the Act IV reveal R13 where
+    a terminal prints the player's own profile back at them) — has nothing
+    to count. Every structured action already carries a class tag; this
+    task threads it from `respond`/`npc`/`actions` through `step` into
+    `state.profile`. The BACKLOG M1 note is explicit that this is nearly
+    free if done from the start and expensive to retrofit, so do not close
+    task 16 with the tag still being dropped on the floor. Topic responses
+    default to `'social'` (§2.6), which is what makes talking to people
+    register as a distinct play style at all.
+
     **Also owes the clock-free-solution `validate` rule** (§4.3.4), which
     task 7 could not write because `WorldDef.puzzles` did not exist. This
     task introduces it, so it adds the rule in the same change: every
