@@ -12,6 +12,46 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.2.21] - 2026-08-30
+
+### Added
+
+- **Architecture task 12: the response ladder.** `src/engine/respond.ts`
+  implementing all five rungs of §3.6, and `src/content/response-families.ts`
+  carrying the approved prose as typed data — the first real content file.
+  19 new tests; 493 green.
+- Every string was verified to appear verbatim in the approved prose
+  document before release. 204 of 204, nothing invented (hard rule 5).
+- Rung 3's spoiler boundary — `nounMiss.seen` versus `nounMiss.unseen` — is
+  derived from `visited` rather than a new stored flag, so it cannot drift
+  out of sync with where the player has actually been.
+- Every rung at or above 2 emits a `diag` event. Those are never rendered
+  to players; they are how the `playtester` agent will audit constitution
+  §14 mechanically instead of by impression.
+
+### Fixed
+
+- **A bare verb produced a response about a noun the player never typed.**
+  `TAKE` alone landed on rung 3 — "Nothing in the room admits to being it"
+  — because the interpreter produced "no object was named" and "that object
+  isn't here" as the same indistinguishable outcome. The `miss` outcome now
+  carries a reason, and a bare built-in verb gets its bare prompt instead.
+  Verified end-to-end through the real parser, not just at the seam.
+- Rotation for verb defaults and refusal families now keys on the family,
+  so three TAKE refusals on three different immovable objects walk variants
+  1, 2, and 3 rather than repeating the first. Per-object keying is kept
+  for handler prose and READ text, which genuinely belong to one object.
+
+### Notes
+
+`src/content/response-families.ts` is deliberately not the spec's
+`responses.ts` — that path still holds the live MVP prologue's own table.
+Task 22 renames it when the MVP content retires.
+
+A residual prose gap is recorded in `BACKLOG.md`: bare *non*-built-in verbs
+still fall to `nounMiss`, fixable with one `bareVerb` family, batched into
+the next writer pass rather than spent as its own round trip.
+
 ## [0.2.20] - 2026-08-30
 
 **The first authored prose in the project.**

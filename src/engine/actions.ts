@@ -142,7 +142,7 @@ function fallbackToVerbDefault(world: WorldDef, state: GameState, input: ActionI
   if (verbDef.default === null) {
     throw new Error(`performAction: verb "${input.verb}" has no default family, and no handler or built-in matched`);
   }
-  const ctx = contextFor(world, input);
+  const ctx = contextFor(world, input, verbDefaultPath(input.verb));
   const rendered = render(world, state, ctx.path!, verbDef.default, ctx);
   const events: GameEvent[] = [
     { type: 'line', kind: 'prose', text: rendered.text },
@@ -159,18 +159,46 @@ function fallbackToVerbDefault(world: WorldDef, state: GameState, input: ActionI
 // Shared plumbing for built-ins
 // ---------------------------------------------------------------------------
 
-function contextFor(world: WorldDef, input: ActionInput): EffectContext {
+/**
+ * `pathBase`, when supplied, overrides the default per-object rotation path
+ * (§2.2/§8 task 12's rotation-key fix). Global families — verb defaults and
+ * built-in refusal/success families — key their rotation on the **family**,
+ * not the object (`refuse`/`succeed`/`fallbackToVerbDefault` below all pass
+ * one), so a player who triggers `take.notPortable` on forty different
+ * objects walks the family's own variants instead of replaying variant 1
+ * forty times. Rung-1 authored handlers and READ's own object text/
+ * description are prose that genuinely belongs to one object, so they omit
+ * `pathBase` and keep the per-object `action.<verb>.<dobj>` default — "the
+ * node is the object" (§8 task 12).
+ */
+function contextFor(world: WorldDef, input: ActionInput, pathBase?: string): EffectContext {
   const dobjName = input.dobj !== undefined ? objectName(world, input.dobj) : undefined;
   const iobjName = input.iobj !== undefined ? objectName(world, input.iobj) : undefined;
   return {
     ...(dobjName !== undefined ? { name: dobjName, dobj: dobjName } : {}),
     ...(iobjName !== undefined ? { iobj: iobjName } : {}),
-    path: input.path ?? `action.${input.verb}.${input.dobj ?? 'none'}`,
+    path: input.path ?? pathBase ?? `action.${input.verb}.${input.dobj ?? 'none'}`,
   };
 }
 
 function objectName(world: WorldDef, id: ObjectId): string {
   return world.objects?.[id]?.name ?? id;
+}
+
+/**
+ * Rotation path base for a verb's own `default` family (rung 2b) — a global
+ * family the same way a refusal/success family key is, so it needs the same
+ * fix (§8 task 12). Not itself a `world.responses` key (`VerbDef.default`
+ * is inline Prose, not a `responses` lookup), so it can't reuse a family
+ * string the way `refuse`/`succeed` do; `verb.<id>.default` mirrors
+ * `validate.ts`'s own naming for this exact slot (`checkVerbDefaults`'s
+ * finding messages already say `verb.${id}.default`). Exported so
+ * `respond.ts`'s NPC-target rung-2 path (no built-in `ActionInput.dobj`
+ * accepts an `NpcId`, so it renders `VerbDef.default` itself rather than
+ * going through this module's dispatch) rotates under the same key.
+ */
+export function verbDefaultPath(verb: VerbId): string {
+  return `verb.${verb}.default`;
 }
 
 /** The declared global family for a built-in outcome — a data bug (author forgot to author it) throws, per this codebase's convention (e.g. `effects.ts`'s `grantMemory`). */
@@ -183,7 +211,7 @@ function family(world: WorldDef, key: string): Prose {
 }
 
 function refuse(world: WorldDef, state: GameState, input: ActionInput, verbDef: VerbDef | undefined, familyKey: string): ActionResult {
-  const ctx = contextFor(world, input);
+  const ctx = contextFor(world, input, familyKey);
   const rendered = render(world, state, ctx.path!, family(world, familyKey), ctx);
   return {
     state: rendered.state,
@@ -202,7 +230,7 @@ function succeed(
   effects: Effect[],
   familyKey: string,
 ): ActionResult {
-  const ctx = contextFor(world, input);
+  const ctx = contextFor(world, input, familyKey);
   const { state: newState, events } = apply(world, state, [{ say: family(world, familyKey) }, ...effects], ctx);
   return { state: newState, events, consumesTurn: true, class: verbDef?.class ?? null, ok: true };
 }
@@ -423,3 +451,20 @@ const BUILTINS: Partial<Record<VerbId, Builtin>> = {
   [BUILTIN_VERB_IDS.turnOn]: builtinTurnOn,
   [BUILTIN_VERB_IDS.turnOff]: builtinTurnOff,
 };
+
+/**
+ * Whether `verb` has a `BUILTINS` entry — the signal `respond.ts` needs
+ * (task 12 fix-2) to tell a genuinely bare-verb-safe `default` family apart
+ * from a `{name}`-templated one. Only a built-in verb's `default` is ever
+ * reached with `dobj` absent (a resolved dobj always goes through this
+ * table's own success/refusal families instead, never `fallbackToVerbDefault`
+ * — see that function's own doc comment) — that's what makes it safe to
+ * author the thirteen built-in defaults as object-free prompts ("Take
+ * what?") per §0 note 5 of the response-families doc. A non-built-in verb's
+ * `default` is reached whenever no handler matches, resolved dobj or not,
+ * so it's always written `{name}`-templated and would render broken
+ * ("...the {name}...", literally) if forced bare.
+ */
+export function hasBuiltinSemantics(verb: VerbId): boolean {
+  return verb in BUILTINS;
+}

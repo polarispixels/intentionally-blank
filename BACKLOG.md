@@ -72,6 +72,19 @@ Version targets follow the ladder in `docs/spec/README.md` and may shift.
   separate import-specifier check. Mutation-tested against an injected
   `window.location` and an injected `vue` import.
 
+## Prose gaps to batch into the next `narrative-writer` pass
+
+- **Bare non-built-in verbs land on `nounMiss`.** A player typing a bare
+  `SEARCH` or `EXAMINE` gets "Nothing in the room admits to being it" — a
+  response about a noun they never typed. The 13 built-in verbs are covered
+  (their `default` is structurally only reachable with no object, so it is
+  authored as a bare prompt); the other 47 are `{name}`-templated and
+  cannot render bare. Fix is one family, not 47: a `bareVerb` family
+  templated on the verb word ("Search what?"). Needs authored prose, so it
+  batches with the M1 room and object prose rather than costing its own
+  round trip. Discoverable mechanically in the meantime — it emits a
+  `nounMiss` diag, which is exactly what the `playtester` agent greps for.
+
 ## Notes carried into the M1 design
 
 - The opening-room schema cannot be "minimal, refactor later": it must

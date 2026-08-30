@@ -146,7 +146,21 @@ export interface ScopeView {
 export type InterpretOutcome =
   | { kind: 'actions'; actions: StructuredAction[] } // TAKE ALL → many (task 11)
   | { kind: 'clarify'; question: string; options: string[]; pending: ParserContext['pending'] }
-  | { kind: 'miss'; raw: string; verb?: VerbId; knownNouns: string[] }
+  /**
+   * `reason` distinguishes the two genuinely different situations that both
+   * produce this shape (task 12 fix-2, coordinator review): `'noPattern'` —
+   * `matchGrammar` recognized the verb but the remaining tokens (often zero
+   * of them — a bare `TAKE`) fit none of its declared patterns, so no noun
+   * phrase was even attempted; `'nounUnresolved'` — a pattern DID match and
+   * a real noun phrase was given (`resolveAction`/`resolveIobj`), but it
+   * resolved to nothing in scope. Only set when `verb` is (both miss sites
+   * that leave `verb` undefined — `tokens.length === 0` and `noVerb` — have
+   * no verb-known distinction to make). `respond.ts`'s rung 3/4/5 ladder
+   * reads this to tell "Take what?" apart from "The brass key isn't here" —
+   * before this field existed the two were indistinguishable from the
+   * outcome shape alone, and every bare verb rendered as a noun miss.
+   */
+  | { kind: 'miss'; raw: string; verb?: VerbId; knownNouns: string[]; reason?: 'noPattern' | 'nounUnresolved' }
   /**
    * `GO TO` a room that isn't currently reachable through the visited
    * graph — either it was never visited at all, or it was visited but no
@@ -437,7 +451,7 @@ export class DeterministicParser implements IntentInterpreter {
       return { kind: 'miss', raw: input, knownNouns: knownNounsIn(view.vocabulary, tokens) };
     }
     if (result.kind === 'noPattern') {
-      return { kind: 'miss', raw: input, verb: result.verb, knownNouns: knownNounsIn(view.vocabulary, tokens) };
+      return { kind: 'miss', raw: input, verb: result.verb, knownNouns: knownNounsIn(view.vocabulary, tokens), reason: 'noPattern' };
     }
 
     const { action } = result;
@@ -527,6 +541,7 @@ export class DeterministicParser implements IntentInterpreter {
       raw: action.raw,
       verb,
       knownNouns: knownNounsIn(view.vocabulary, allTokens),
+      reason: 'nounUnresolved',
     });
 
     if (action.npc !== undefined) {
@@ -584,7 +599,7 @@ export class DeterministicParser implements IntentInterpreter {
   private resolveIobj(view: ScopeView, verb: VerbId, iobjPhrase: UnresolvedNounPhrase, settled: Partial<StructuredAction>): InterpretOutcome {
     const iobjResult = this.resolvePhrase(view, iobjPhrase, 'either');
     if (iobjResult.kind === 'none') {
-      return { kind: 'miss', raw: settled.raw ?? '', verb, knownNouns: knownNounsIn(view.vocabulary, iobjPhrase.words) };
+      return { kind: 'miss', raw: settled.raw ?? '', verb, knownNouns: knownNounsIn(view.vocabulary, iobjPhrase.words), reason: 'nounUnresolved' };
     }
     if (iobjResult.kind === 'ambiguous') {
       return buildClarify(view.vocabulary, verb, 'iobj', iobjResult.candidates, settled, false);
