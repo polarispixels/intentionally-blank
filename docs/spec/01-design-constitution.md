@@ -785,6 +785,37 @@ REWARD
 NEXT TASK
 ```
 
+## Chain of Dramatic Questions
+
+The questions should form a chain in which each answer opens a larger or
+more consequential question:
+
+```text
+Who attacked me?
+        ↓
+Why was I investigating this town?
+        ↓
+Did the missing sibling actually exist?
+        ↓
+Who erased them?
+        ↓
+How can a person be erased?
+        ↓
+What are these people?
+        ↓
+What am I?
+        ↓
+What is this world?
+```
+
+## Standing Rule
+
+> **Every significant answer should create a larger or more consequential
+> question.**
+
+This is what keeps the middle of the game from becoming a sequence of
+disconnected tasks.
+
 ---
 
 # 26. The Deeper Design Opportunity
@@ -864,3 +895,241 @@ Replayability should come from:
 - different interpretations of the same events
 
 not from writing three disconnected games.
+
+---
+
+# 29. Major Beats Connect by Causation or Complication
+
+Trey Parker and Matt Stone describe a useful story test:
+
+> Between major story beats, you should usually be able to connect them
+> with **BUT** or **THEREFORE**, rather than **AND THEN**.
+
+"AND THEN" often means events are merely adjacent.
+
+Weak progression:
+
+```text
+The investigator wakes up in a room.
+AND THEN
+he walks outside.
+AND THEN
+he meets a client.
+AND THEN
+he looks for a notebook.
+AND THEN
+he visits a data center.
+```
+
+Things happen, but one event is not driving the next.
+
+Stronger causal structure:
+
+```text
+The investigator wakes up with no memory.
+
+THEREFORE
+he searches the room for evidence of who he is.
+
+BUT
+the room has been ransacked and most useful evidence is gone.
+
+THEREFORE
+he follows the surviving clues into town.
+
+BUT
+the person connected to those clues insists that a sibling has disappeared
+whom nobody else remembers.
+
+THEREFORE
+the investigator begins investigating the missing person.
+
+BUT
+all digital records say the person never existed.
+
+THEREFORE
+he begins looking for physical and analog evidence.
+
+BUT
+the missing person's handwritten notebook is gone.
+
+THEREFORE
+finding the notebook becomes a major objective.
+```
+
+This creates causal propulsion. (The story-level version of this chain is
+recorded in `02-story-world-canon.md`, "Causal Spine of Act I".)
+
+## Standing Rule
+
+> **Major story beats should connect through causation or complication.
+> If the only connection is "and then," challenge the beat.**
+
+## "AND THEN" Is a Warning Sign, Not a Ban
+
+Atmosphere, exploration, humor, character moments, and quiet scenes do not
+all require a causal reversal.
+
+For **major story beats**, if the only connection between two events is
+"and then this happens," ask:
+
+> Why does this happen *because of* what just happened?
+
+or:
+
+> What complication prevents the previous action from resolving cleanly?
+
+Shorthand:
+
+```text
+BECAUSE / THEREFORE = propulsion
+BUT                 = complication
+AND THEN            = warning sign
+```
+
+## Consequence and Complication as a Rhythm
+
+```text
+EVENT
+  ↓
+THEREFORE
+  ↓
+ACTION / CONSEQUENCE
+  ↓
+BUT
+  ↓
+COMPLICATION
+  ↓
+THEREFORE
+  ↓
+NEW ACTION
+```
+
+For *Intentionally Blank* this maps directly onto investigation:
+
+```text
+CLUE
+  ↓
+THEREFORE
+  ↓
+PLAYER FORMS HYPOTHESIS
+  ↓
+BUT
+  ↓
+NEW EVIDENCE CONTRADICTS OR COMPLICATES IT
+  ↓
+THEREFORE
+  ↓
+PLAYER REVISES HYPOTHESIS
+```
+
+which is the core loop of §27 — Observe → Wonder → Hypothesize → Act →
+Discover → Reconsider — seen from the story's side.
+
+## Preserve Breathing Room
+
+Do not apply this mechanically. The game still needs atmospheric
+description, jokes, character moments, optional exploration, quiet scenes,
+secrets, strange objects, and environmental storytelling.
+
+A horse may simply be tied outside because it makes the South Dakota street
+memorable. The Wall Drug billboard may initially exist only because it is
+funny.
+
+The causality test is for **major narrative progression**.
+
+---
+
+# 30. Setup Leads to Payoff
+
+If something receives unusual attention early, look for ways to give it
+meaning later.
+
+Example:
+
+```text
+PAGE 7 / PAGE 8
+THIS PAGE INTENTIONALLY LEFT BLANK
+```
+
+Initially this may be a joke, a bureaucratic absurdity, an apparently
+useless object.
+
+Later it may become evidence, a missing-page clue, analog information, a
+physical encoding mechanism, or part of a major reveal.
+
+## Standing Rule
+
+> **The strongest payoff occurs when the player remembers the setup without
+> the game reminding them.**
+
+See also §6 (delayed recognition) and §24 (secrets).
+
+---
+
+# 31. Prefer Recontextualization Over Revelation
+
+A strong reveal does not merely tell the player something new. It changes
+the meaning of something they already experienced.
+
+Early:
+
+```text
+USER NOT RECOGNIZED
+```
+
+The player assumes: *I forgot my login.*
+
+Much later: *I was never the user.*
+
+## Standing Rule
+
+> **Whenever possible, plant clues that are understandable one way at first
+> and gain a second, deeper meaning later.**
+
+Retroactive reinterpretation is a major storytelling tool throughout the
+game. The writing-side treatment is in
+`06-narrative-tone-and-writing-guide.md` §12.
+
+---
+
+# 32. Set Pieces Earn Their Place Causally
+
+The project has many potential locations and inside references: South
+Dakota and the Badlands, Wall Drug, Puerto Rico, Washington, DC, Mount
+Rushmore, poker, Catan, escape rooms, Mars, distant stations, underground
+facilities, Dad on a USB drive.
+
+These must not become:
+
+> "And then we go to Puerto Rico."
+
+Whenever possible, give major locations and set pieces causal justification.
+Illustrative example (not canon):
+
+```text
+The notebook identifies a shell corporation.
+
+THEREFORE
+the investigator traces its ownership.
+
+BUT
+its registered address is an abandoned property in Puerto Rico.
+
+THEREFORE
+the investigation moves there.
+
+BUT
+the property contains another impossible old terminal.
+```
+
+Now Puerto Rico belongs to the story rather than functioning as a
+disconnected reference.
+
+## Standing Rule
+
+> **A location or set piece is added because the story arrives there, not
+> because it would be fun to visit.**
+
+See also §23 (density over size) and the location backlog in
+`07-backlog-and-open-questions.md` §E.

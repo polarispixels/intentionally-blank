@@ -27,6 +27,11 @@ Before writing, read `docs/spec/06-narrative-tone-and-writing-guide.md`
 - Inside jokes are bonus content, never prerequisite knowledge. Never explain
   the joke.
 - Act I prose stays grounded: every anomaly has a plausible mundane reading.
+- Beat test (constitution §29, guide §18): for any scene that advances
+  major progression, name its link to the previous beat as `THEREFORE …`
+  or `BUT …` in your report. If the only honest link is `AND THEN`, say
+  so before writing. Record setups (§30) and second readings (§31) so they
+  can be paid off.
 
 ## Rules
 

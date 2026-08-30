@@ -25,6 +25,11 @@ else. `docs/spec/` is design canon; `docs/decisions/` holds settled decisions.
   does not support yet.
 - Never promote a canon label. Propose promotions in your report; Ryan
   decides. Never convert `POSSIBILITY` or `BACKLOG` items into design.
+- Story structure obeys constitution §29: a spec or plan that advances
+  major progression states the `BUT` / `THEREFORE` chain from the previous
+  milestone (see `02-story-world-canon.md` §21). A location or set piece
+  enters a plan only with its causal justification (§32). "And then" between
+  milestones is a defect in the spec, not a detail for the writer.
 - Plans are the interface for builders: each task must name the files, the
   tests to write first, and the acceptance check, so a Sonnet builder can
   execute it with no other context. One task = one module.
