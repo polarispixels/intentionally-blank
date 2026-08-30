@@ -12,6 +12,31 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.2.24] - 2026-08-30
+
+### Added
+
+- **Architecture task 15: memories, clues, and questions.**
+  `src/engine/knowledge.ts`, filling two of the tick pipeline's stubs. 22
+  new tests; 569 green.
+- Ambient memory triggers fire exactly once, guarded by `state.memories`
+  itself rather than a parallel "already fired" flag — so a save round-trip
+  cannot desync the guard from the thing it guards. There is no second
+  source of truth to drift.
+- Question recompute is two passes within a single tick: open everything
+  eligible, then answer everything eligible including a question opened by
+  the first pass. So an answer can open a larger question in the same turn
+  regardless of declaration order, which is constitution §25's chain —
+  every significant answer creating a more consequential question — working
+  as ordinary content rather than a special case.
+- Verified end to end in one tick: a world event sets a flag, an ambient
+  trigger reads it and grants a memory, and a question opens and then
+  answers off that memory — the ordering §4.2 fixes, tested rather than
+  assumed.
+- Two more referential-integrity rules in `validate`: conditions inside
+  memory triggers and question open/answer clauses, and a clue naming the
+  questions it bears on.
+
 ## [0.2.23] - 2026-08-30
 
 ### Added

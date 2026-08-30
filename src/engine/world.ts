@@ -350,12 +350,31 @@ export interface WorldDef {
   events?: Record<string, EventDef>;
   /** §2.9's verb table (§8 task 8). Content seeds this; the engine ships none. */
   verbs?: Record<VerbId, VerbDef>;
-  /** Minimal slice of §2.7's `MemoryDef` — just what a `grantMemory` event needs. */
-  memories?: Record<MemoryId, { lines: string[] }>;
-  /** Minimal slice of §2.7's `ClueDef` — just what a `grantClue` event needs. */
-  clues?: Record<ClueId, { title: string }>;
-  /** Minimal slice of §2.7's `QuestionDef` — just what an open/answer event needs. */
-  questions?: Record<QuestionId, { text: string }>;
+  /**
+   * Minimal slice of §2.7's `MemoryDef`. `trigger` (§8 task 15 addition) is
+   * the ambient acquisition path — `knowledge.ts`'s tick step grants the
+   * memory the first turn `trigger.when` holds, provided it isn't already
+   * in `state.memories` (§4.2 step 4). Absent ⇒ this memory is only ever
+   * granted by an explicit `{ grantMemory }` effect. Not yet `title`/`class`
+   * (§2.7's full shape) — those are task 16/17's (profile tally, memory
+   * list view) to add; this task's tick logic needs neither.
+   */
+  memories?: Record<MemoryId, { lines: string[]; trigger?: { when: Cond } }>;
+  /**
+   * Minimal slice of §2.7's `ClueDef`. `questions` (§8 task 15 addition) is
+   * "which open questions it bears on" — declared here for §6.3's future
+   * notebook view and referential-integrity checking (`validate.ts`); this
+   * task's own tick logic never reads it. Not yet `detail` (task 17's).
+   */
+  clues?: Record<ClueId, { title: string; questions?: QuestionId[] }>;
+  /**
+   * Minimal slice of §2.7's `QuestionDef`. `openWhen`/`answerWhen` (§8 task
+   * 15 addition) are the ambient conditions `knowledge.ts`'s tick step
+   * recomputes every turn (§4.2 step 5) — absent ⇒ that transition only
+   * ever happens via an explicit `{ openQuestion }` / `{ answerQuestion }`
+   * effect.
+   */
+  questions?: Record<QuestionId, { text: string; openWhen?: Cond; answerWhen?: Cond }>;
   /** The `script` effect's escape hatch (ADR 0008): pure functions registered by id. */
   scripts?: Record<ScriptId, ScriptFn>;
   /**

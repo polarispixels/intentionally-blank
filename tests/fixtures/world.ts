@@ -65,6 +65,18 @@
 // `fixture_event_witnessed` (`onlyIfWitnessed: true`, `witnessedWhen: {
 // at: ROOM_B }`) — real data for `tick.ts`'s `EventDef` evaluation.
 
+// Task 15 (`tests/knowledge.test.ts`) additions: `MEMORY_2` (an ambient
+// `trigger` keyed on task 13's `FLAG_EVENT_FIRED`, deliberately reusing that
+// flag rather than adding a new one, so a test can chain event → memory
+// trigger → question recompute in one `tick()` call), `QUESTION_2` (ambient
+// open/answer, both flag-gated) and `QUESTION_3` (ambient open by flag,
+// ambient answer by `{ memory: MEMORY_2 }` — the memory-satisfies-a-
+// question case). `FLAG_QUESTION_OPEN`/`FLAG_QUESTION_ANSWER` gate those.
+// `CLUE_1` gains `questions: [QUESTION_1]` (§2.7's "which questions it
+// bears on") for the referential-integrity rule this task adds to
+// `validate.ts`. `MEMORY_1`/`QUESTION_1` stay untouched — the existing
+// explicit-effect-only fixtures other tasks' tests already depend on.
+
 import { C, F, M, N, O, Q, R, S, V } from '../../src/engine/ids';
 import { BUILTIN_VERB_IDS } from '../../src/engine/actions';
 import { AGAIN_VERB_ID } from '../../src/engine/interpreter';
@@ -138,6 +150,21 @@ export const MEMORY_1 = M('fixture_memory_1');
 export const CLUE_1 = C('fixture_clue_1');
 export const QUESTION_1 = Q('fixture_question_1');
 
+/**
+ * Task 15 (`tests/knowledge.test.ts`) additions: a second memory with an
+ * ambient `trigger` — reuses task 13's `FLAG_EVENT_FIRED` (set by
+ * `fixture_event_once`) as its condition rather than adding a third
+ * trigger/fired flag pair, so a test can chain event → memory-trigger →
+ * question-recompute across all of §4.2's stages inside one `tick()` call.
+ * `MEMORY_1` stays untouched (no `trigger`) — it's the existing
+ * explicit-`grantMemory`-only fixture other tasks' tests already depend on.
+ */
+export const MEMORY_2 = M('fixture_memory_2');
+/** Ambient open/answer via flags — QUESTION_1 stays explicit-effect-only. */
+export const QUESTION_2 = Q('fixture_question_2');
+/** Ambient open via flag, ambient answer via MEMORY_2 — the cross-stage chaining case. */
+export const QUESTION_3 = Q('fixture_question_3');
+
 export const FLAG_BOOL = F('fixture_flag_bool');
 export const FLAG_NUM = F('fixture_flag_num');
 
@@ -154,6 +181,10 @@ export const FLAG_EVENT_TRIGGER = F('fixture_flag_event_trigger');
 export const FLAG_EVENT_FIRED = F('fixture_flag_event_fired');
 export const FLAG_WITNESS_TRIGGER = F('fixture_flag_witness_trigger');
 export const FLAG_WITNESSED_FIRED = F('fixture_flag_witnessed_fired');
+
+/** Task 15 additions: gate QUESTION_2/QUESTION_3's ambient openWhen/answerWhen. */
+export const FLAG_QUESTION_OPEN = F('fixture_flag_question_open');
+export const FLAG_QUESTION_ANSWER = F('fixture_flag_question_answer');
 
 export const SCRIPT_1 = S('fixture_script_1');
 
@@ -184,6 +215,8 @@ export const FIXTURE_WORLD: WorldDef = {
     [FLAG_EVENT_FIRED]: { default: false, doc: 'task 13: set by fixture_event_once when it fires' },
     [FLAG_WITNESS_TRIGGER]: { default: false, doc: 'task 13: gates fixture_event_witnessed' },
     [FLAG_WITNESSED_FIRED]: { default: false, doc: 'task 13: set by fixture_event_witnessed when it fires' },
+    [FLAG_QUESTION_OPEN]: { default: false, doc: 'task 15: gates QUESTION_2/QUESTION_3 openWhen' },
+    [FLAG_QUESTION_ANSWER]: { default: false, doc: 'task 15: gates QUESTION_2 answerWhen' },
   },
   // Task 9 (`parser/vocabulary.ts`) additions below: `name`/`aliases` on
   // every room, `nouns`/`adjectives` on every object and on `GUIDE` — the
@@ -428,12 +461,18 @@ export const FIXTURE_WORLD: WorldDef = {
   },
   memories: {
     [MEMORY_1]: { lines: ['You remember the fixture.', 'It was, in fact, a fixture.'] },
+    [MEMORY_2]: {
+      lines: ['You remember a second fixture, ambiently.'],
+      trigger: { when: { flag: FLAG_EVENT_FIRED } },
+    },
   },
   clues: {
-    [CLUE_1]: { title: 'fixture clue title' },
+    [CLUE_1]: { title: 'fixture clue title', questions: [QUESTION_1] },
   },
   questions: {
     [QUESTION_1]: { text: 'Is this a fixture question?' },
+    [QUESTION_2]: { text: 'Does this fixture open and answer ambiently?', openWhen: { flag: FLAG_QUESTION_OPEN }, answerWhen: { flag: FLAG_QUESTION_ANSWER } },
+    [QUESTION_3]: { text: 'Does a granted memory answer this fixture question?', openWhen: { flag: FLAG_QUESTION_OPEN }, answerWhen: { memory: MEMORY_2 } },
   },
   scripts: {
     [SCRIPT_1]: fixtureScript,

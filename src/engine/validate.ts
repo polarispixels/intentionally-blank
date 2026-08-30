@@ -52,6 +52,8 @@ export function validate(world: WorldDef): Finding[] {
   checkRoomExits(world, findings);
   checkNoiseWordVocabulary(world, findings);
   checkWitnessedEvents(world, findings);
+  checkKnowledgeConds(world, findings);
+  checkClueQuestionRefs(world, findings);
 
   return findings;
 }
@@ -733,5 +735,34 @@ function checkWitnessedEvents(world: WorldDef, findings: Finding[]): void {
         ),
       );
     }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Knowledge (§2.7, §8 task 15): referential integrity for the Cond-bearing
+// fields `knowledge.ts`'s tick step reads (`MemoryDef.trigger.when`,
+// `QuestionDef.openWhen`/`answerWhen`) plus `ClueDef.questions` — the same
+// "walk every Cond leaf" convention `checkRoomDarkConds`/`checkSchedules`
+// already use for their own Cond-bearing fields above.
+// ---------------------------------------------------------------------------
+
+function checkKnowledgeConds(world: WorldDef, findings: Finding[]): void {
+  for (const [id, def] of Object.entries(world.memories ?? {})) {
+    if (def!.trigger === undefined) continue;
+    checkCondRefs(world, def!.trigger.when, `memory.${id}.trigger.when`, findings);
+  }
+
+  for (const [id, def] of Object.entries(world.questions ?? {})) {
+    if (def!.openWhen !== undefined) checkCondRefs(world, def!.openWhen, `question.${id}.openWhen`, findings);
+    if (def!.answerWhen !== undefined) checkCondRefs(world, def!.answerWhen, `question.${id}.answerWhen`, findings);
+  }
+}
+
+/** `ClueDef.questions` — "which open questions it bears on" (§2.7) — must name real questions. */
+function checkClueQuestionRefs(world: WorldDef, findings: Finding[]): void {
+  for (const [id, def] of Object.entries(world.clues ?? {})) {
+    (def!.questions ?? []).forEach((qid, i) => {
+      checkQuestionRef(world, qid, `clue.${id}.questions[${i}]`, findings);
+    });
   }
 }

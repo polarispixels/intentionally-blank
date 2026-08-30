@@ -20,7 +20,7 @@ import type { WorldDef } from '../src/engine/world';
 import type { Prose } from '../src/engine/prose';
 import { BUILTIN_VERB_IDS } from '../src/engine/actions';
 import { validate } from '../src/engine/validate';
-import { CLUE_1, FIXTURE_WORLD, GUIDE, KEY, LAMP, MEMORY_1, NOTEBOOK, QUESTION_1, ROOM_A, ROOM_B, ROOM_C } from './fixtures/world';
+import { CLUE_1, FIXTURE_WORLD, GUIDE, KEY, LAMP, MEMORY_1, NOTEBOOK, QUESTION_1, QUESTION_2, ROOM_A, ROOM_B, ROOM_C } from './fixtures/world';
 
 function findingsOf(world: WorldDef, code: string) {
   return validate(world).filter((f) => f.code === code);
@@ -475,5 +475,56 @@ describe('validate — witnessed events (§4.3.3)', () => {
       },
     } as unknown as WorldDef;
     expect(validate(world).some((f) => f.code === 'event-witnessed-without-condition')).toBe(false);
+  });
+});
+
+describe('validate — knowledge referential integrity (§2.7, §8 task 15)', () => {
+  it('flags a memory trigger.when referencing an undeclared flag', () => {
+    const world: WorldDef = {
+      ...FIXTURE_WORLD,
+      memories: {
+        ...FIXTURE_WORLD.memories,
+        [M('ghost_trigger_memory')]: { lines: ['n/a'], trigger: { when: { flag: F('nonexistent_flag') } } },
+      },
+    };
+    const findings = findingsOf(world, 'unknown-flag-ref');
+    expect(findings.length).toBeGreaterThan(0);
+    expect(findings[0]!.message).toContain('ghost_trigger_memory');
+    expect(findings[0]!.message).toContain('nonexistent_flag');
+  });
+
+  it('flags a question openWhen/answerWhen referencing an undeclared flag', () => {
+    const openWorld: WorldDef = {
+      ...FIXTURE_WORLD,
+      questions: { ...FIXTURE_WORLD.questions, [Q('ghost_open_question')]: { text: 'Is this open?', openWhen: { flag: F('nonexistent_flag') } } },
+    };
+    const openFindings = findingsOf(openWorld, 'unknown-flag-ref');
+    expect(openFindings.length).toBeGreaterThan(0);
+    expect(openFindings[0]!.message).toContain('ghost_open_question');
+
+    const answerWorld: WorldDef = {
+      ...FIXTURE_WORLD,
+      questions: { ...FIXTURE_WORLD.questions, [Q('ghost_answer_question')]: { text: 'Is this answered?', answerWhen: { flag: F('nonexistent_flag') } } },
+    };
+    const answerFindings = findingsOf(answerWorld, 'unknown-flag-ref');
+    expect(answerFindings.length).toBeGreaterThan(0);
+    expect(answerFindings[0]!.message).toContain('ghost_answer_question');
+  });
+
+  it('flags a clue naming an undeclared question in questions[]', () => {
+    const world: WorldDef = {
+      ...FIXTURE_WORLD,
+      clues: { ...FIXTURE_WORLD.clues, [CLUE_1]: { ...FIXTURE_WORLD.clues![CLUE_1]!, questions: [Q('ghost_question_for_clue')] } },
+    };
+    const findings = findingsOf(world, 'unknown-question-ref');
+    expect(findings.length).toBeGreaterThan(0);
+    expect(findings[0]!.message).toContain(CLUE_1);
+    expect(findings[0]!.message).toContain('ghost_question_for_clue');
+  });
+
+  it('accepts real refs: fixture clue.questions -> QUESTION_1 (also covered by the whole-fixture-is-clean test, asserted directly here too)', () => {
+    expect(FIXTURE_WORLD.clues![CLUE_1]!.questions).toContain(QUESTION_1);
+    expect(FIXTURE_WORLD.questions![QUESTION_2]!.openWhen).toBeDefined();
+    expect(validate(FIXTURE_WORLD)).toEqual([]);
   });
 });

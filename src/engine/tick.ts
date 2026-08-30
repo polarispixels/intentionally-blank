@@ -8,13 +8,15 @@
 //   action's class into the profile.
 //
 // This module owns and fully implements the first three steps (the clock,
-// `EventDef`s, and NPC position derivation) plus the pipeline itself. The
-// last four steps belong to tasks 14–16 (`npc.ts`/`knowledge.ts`/
-// `puzzles.ts` — memory triggers and question conds are task 15's,
-// `solvedWhen`/profile tallying task 16's); `tick()` below calls a
-// documented no-op stub for each so the ordering is real and load-bearing
-// today, not a comment promising it later. A later task replaces exactly
-// one stub function each, never touching the pipeline's shape.
+// `EventDef`s, and NPC position derivation) and, as of task 15, the memory-
+// trigger and question-recompute steps too, by calling straight through to
+// `knowledge.ts`'s `evaluateMemoryTriggers`/`recomputeQuestions` — this file
+// owns *when* they run in the pipeline, `knowledge.ts` owns *what* they do.
+// The last two steps still belong to task 16 (`puzzles.ts` — `solvedWhen`
+// and profile tallying); `tick()` below still calls a documented no-op stub
+// for each so the ordering is real and load-bearing today, not a comment
+// promising it later. Task 16 replaces exactly those two stubs, never
+// touching the pipeline's shape.
 //
 // Meta verbs (SAVE, MAP, HINT, VERSION, …) "cost nothing" (§4.1): they
 // don't advance the clock, and — just as important, per §4.3.4's no-silent-
@@ -29,6 +31,7 @@
 import type { ActionClass, NpcId, RoomId } from './ids';
 import { evaluate, npcRoom } from './cond';
 import { addMinutes, apply } from './effects';
+import { evaluateMemoryTriggers, recomputeQuestions } from './knowledge';
 import type { GameEvent, GameState, WorldDef } from './world';
 
 const DEFAULT_MINUTES_PER_TURN = 1;
@@ -82,10 +85,20 @@ export function tick(world: WorldDef, state: GameState, input: TickInput): TickR
   //    trigger check that wants "where is everyone right now") rather than
   //    a pipeline step that mutates anything.
 
-  // 4. STUB (task 15, knowledge.ts): evaluate ambient memory triggers
-  //    (`MemoryDef.trigger`) and grant any that newly hold.
-  // 5. STUB (task 15, knowledge.ts): recompute `QuestionDef.openWhen`/
-  //    `answerWhen` conds that aren't only driven by explicit effects.
+  // 4. Evaluate ambient memory triggers (`MemoryDef.trigger`) and grant any
+  //    that newly hold (`knowledge.ts`, task 15).
+  const memoryTriggers = evaluateMemoryTriggers(world, current);
+  current = memoryTriggers.state;
+  events.push(...memoryTriggers.events);
+
+  // 5. Recompute `QuestionDef.openWhen`/`answerWhen` conds that aren't only
+  //    driven by explicit effects (`knowledge.ts`, task 15). Runs after step
+  //    4 so a memory granted this same tick can already satisfy a
+  //    question's `answerWhen` (§4.2's own ordering note).
+  const questions = recomputeQuestions(world, current);
+  current = questions.state;
+  events.push(...questions.events);
+
   // 6. STUB (task 16, puzzles.ts): check every `PuzzleDef.solvedWhen` for a
   //    first-time (edge) transition to true and run its `onSolved` once.
   // 7. STUB (task 16, puzzles.ts): tally `input.class` into `state.profile`.
