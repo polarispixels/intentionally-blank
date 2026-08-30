@@ -12,6 +12,31 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.2.6] - 2026-08-29
+
+### Added
+
+- `tools/screenshot.mjs` — the WSL browser-verification recipe from
+  `docs/DEVELOPMENT.md`, packaged. Builds, boots `vite preview`, generates
+  a same-origin iframe harness, replays a command script one command at a
+  time, and writes a numbered PNG per stage to `shots/` (gitignored).
+  Rebuilds by default so it can never report on a stale `dist/`; `--no-build`,
+  `--url`, `--only`, `--size`, and `--keep-harness` are available.
+
+### Fixed
+
+- **Engine-purity check was partially blind.** `tests/purity.test.ts`
+  stripped string literals with a context-free regex, so a regex literal
+  containing a quote (`/['"]/` in `parser.ts`) made it swallow everything up
+  to the next matching quote. Replaced with a real scanner in
+  `tests/helpers/source-scan.ts` that tracks comments, all three string
+  forms, `${...}` interpolation, regex literals, and regex-vs-division, plus
+  a separate module-specifier check (strings are now stripped, so import
+  detection could no longer ride on them). Forbidden list gains `navigator`,
+  `requestAnimationFrame`, and `performance.now`. 12 unit tests cover the
+  scanner; mutation-tested against an injected `window.location` and an
+  injected `vue` import, both of which the old check would have missed.
+
 ## [0.2.5] - 2026-08-29
 
 ### Changed

@@ -263,7 +263,24 @@ before the capture. For interaction, drop a throwaway harness page into
 it with synthetic `input`/`submit` events, then screenshot the harness URL.
 Windows Edge reaches Vite's preview server on `localhost` directly; its
 remote-debugging port does not reach back into WSL. Read the PNG from
-`/mnt/c/...`. Making this a `tools/screenshot.mjs` is on the backlog.
+`/mnt/c/...`.
+
+**This is packaged as `tools/screenshot.mjs`** (v0.2.6) — use the tool, not
+the raw recipe:
+
+```sh
+node tools/screenshot.mjs                                  # opening screen
+node tools/screenshot.mjs --script tests/fixtures/playthrough.txt
+node tools/screenshot.mjs --script s.txt --only 0,4 --out shots
+```
+
+It builds, boots `vite preview`, generates the harness, replays the script
+one command at a time, and writes a numbered PNG per stage into `shots/`
+(gitignored). It **rebuilds by default**: a verification tool that
+screenshots a stale `dist/` reports on code that is no longer there, which
+is worse than having no tool. `--no-build` opts out when `dist/` is known
+fresh; `--url` points at an already-running server; `--keep-harness` leaves
+the generated page in `dist/` for debugging.
 
 ## Adding an agent
 

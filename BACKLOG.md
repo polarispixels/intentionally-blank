@@ -63,13 +63,12 @@ Version targets follow the ladder in `docs/spec/README.md` and may shift.
 - A command typed during the paced beat sequence is discarded after
   flushing (the input clears before the flush check). Either run it after
   the flush or keep the text.
-- Make the WSL browser-verification recipe (DEVELOPMENT.md) a
-  `tools/screenshot.mjs` that takes a stage script and writes PNGs.
-- `tests/purity.test.ts` strips string literals with a regex that has no
-  token context, so a regex literal containing a quote character (e.g.
-  `QUOTES` in `parser.ts`) blinds it to the span up to the next matching
-  quote. It still catches imports at file top. Replace with a tokenizer
-  (or strip `/regex/` literals first) before relying on it for M1.
+- ~~`tests/purity.test.ts` regex-strips string literals without token
+  context.~~ **Fixed in v0.2.6**: replaced with a real scanner in
+  `tests/helpers/source-scan.ts` (comments, all three string forms,
+  template interpolation, regex literals, regex-vs-division), plus a
+  separate import-specifier check. Mutation-tested against an injected
+  `window.location` and an injected `vue` import.
 
 ## Notes carried into the M1 design
 
