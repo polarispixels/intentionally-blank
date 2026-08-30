@@ -7,3 +7,4 @@ export type { ResolveResult, ResolveRole } from './resolver';
 export { candidateName, isNpcId, joinWithOr, knownWordsFor, resolveNounPhrase } from './resolver';
 export type { PronounState } from './pronouns';
 export { introduceIt, resolvePronoun } from './pronouns';
+export { allEmptyFamilyKey, tryMultiObject } from './multi';

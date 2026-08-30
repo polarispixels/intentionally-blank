@@ -3,13 +3,13 @@
 // slice (task 6's), run from a content test so a bad authoring choice fails
 // `npm test`, not a play session hours in (§2.1's own framing).
 //
-// SCOPE NOTE: `WorldDef` does not yet declare `exits`, `handlers`,
-// `verbs`, `puzzles`, `events`, `topics`, `deaths`, or `endings` — those
-// land in tasks 8, 9-11, and 13-17. Rules that need those fields (every
-// non-meta verb has a `default` family; every `PuzzleDef` has a
-// clock-free solution or `missedRecovery`; no authored `Effect` strands a
-// plot-critical object) have no data surface to check yet and are not
-// implemented here. See this task's report for the full list — when a
+// SCOPE NOTE: `WorldDef` does not yet declare `puzzles`, `events`,
+// `topics`, `deaths`, or `endings` — those land in tasks 13-17. Rules that
+// need those fields (every `PuzzleDef` has a clock-free solution or
+// `missedRecovery`; no authored `Effect` strands a plot-critical object)
+// have no data surface to check yet and are not implemented here. `exits`
+// (task 11, §3.5's `GO TO`) is now declared and checked below
+// (`checkRoomExits`). See this task's report for the full list — when a
 // later task adds one of those fields to `WorldDef`, it must extend this
 // file with the matching rule at the same time, the same way this file's
 // own rules were added alongside task 6's schema slice.
@@ -23,6 +23,7 @@ import type { Cond } from './cond';
 import type { Effect } from './effects';
 import type { ClueId, DayPhase, FlagId, MemoryId, NpcId, ObjectId, PlaceId, QuestionId, RoomId, VerbId } from './ids';
 import { compileVocabulary } from './parser/vocabulary';
+import { NOISE_WORDS } from './parser/tokenize';
 import type { Prose, ProseRef, ProseRule } from './prose';
 import type { VerbDef, WorldDef } from './world';
 
@@ -47,6 +48,8 @@ export function validate(world: WorldDef): Finding[] {
   checkVerbDefaults(world, findings);
   checkPlotCriticalStrandEffects(world, findings);
   checkVocabularyCollisions(world, findings);
+  checkRoomExits(world, findings);
+  checkNoiseWordVocabulary(world, findings);
 
   return findings;
 }
@@ -477,6 +480,24 @@ function checkPlotCriticalStrandEffects(world: WorldDef, findings: Finding[]): v
 }
 
 // ---------------------------------------------------------------------------
+// Room exits: referential integrity (§2.4, §8 task 11's `GO TO`). Every
+// `exits[].to` must name a declared room; `door` (if any) a declared
+// object; `when` (if any) walks the same `Cond`-referential-integrity check
+// every other `Cond`-bearing field in this file uses.
+// ---------------------------------------------------------------------------
+
+function checkRoomExits(world: WorldDef, findings: Finding[]): void {
+  for (const [id, def] of Object.entries(world.rooms ?? {})) {
+    const exits = def!.exits ?? [];
+    exits.forEach((exit, i) => {
+      checkRoomRef(world, exit.to, `room.${id}.exits[${i}].to`, findings);
+      if (exit.door !== undefined) checkObjectRef(world, exit.door, `room.${id}.exits[${i}].door`, findings);
+      if (exit.when !== undefined) checkCondRefs(world, exit.when, `room.${id}.exits[${i}].when`, findings);
+    });
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Vocabulary collision report (§3.2, §8 task 9). Two kinds of collision,
 // deliberately treated differently:
 //
@@ -578,5 +599,60 @@ function checkVocabularyCollisions(world: WorldDef, findings: Finding[]): void {
         ),
       );
     }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Noise-word vocabulary (§3.2, Stage B task 11 follow-up). `dropBaseNoise`
+// (`parser/tokenize.ts`) strips any token matching `NOISE_WORDS` from
+// *every* position in the input line, not just the end — before any
+// grammar or GO TO logic ever sees the tokens (`interpreter.ts`'s
+// `interpret()` runs it on the whole line up front). Room aliases/names,
+// object nouns/adjectives, and NPC nouns are matched against the
+// *unstripped* compiled vocabulary keys (`vocabulary.ts`'s
+// `compileRoomAliases`/`compileObjectVocabulary`/`compileNpcVocabulary`
+// lowercase and store the authored strings verbatim, no noise-stripping).
+// So an authored phrase containing a noise word anywhere — not only at the
+// end — can never be typed back in and matched: e.g. a room named "Fixture
+// Room A" or aliased "room a" is stripped to "room" by `dropBaseNoise`
+// before lookup against the stored key "fixture room a" / "room a", which
+// never matches. This is a strict superset of "the phrase ends with a
+// noise word" — the mechanism strips a leading noise word ("the lobby" ->
+// "lobby") exactly the same way it strips a trailing one ("room a" ->
+// "room"), so this rule checks every whitespace-delimited word of the
+// phrase, not just the first/last. See this task's report for the
+// deliberate broadening beyond the literal ask.
+//
+// Deliberately NOT covering NPC `adjectives` — same-shaped gap, left for a
+// human call rather than expanded here without being asked.
+// ---------------------------------------------------------------------------
+
+function checkPhraseForNoiseWords(path: string, phrase: string, findings: Finding[]): void {
+  for (const word of phrase.split(/\s+/).filter((w) => w.length > 0)) {
+    if (NOISE_WORDS.has(word.toLowerCase())) {
+      findings.push(
+        error(
+          'noise-word-vocabulary',
+          `${path} "${phrase}" contains noise word "${word}" — dropBaseNoise strips it from any position in the input before lookup, so this phrase can never be typed back in and matched`,
+        ),
+      );
+    }
+  }
+}
+
+function checkNoiseWordVocabulary(world: WorldDef, findings: Finding[]): void {
+  for (const [id, def] of Object.entries(world.rooms ?? {})) {
+    if (def!.name !== undefined) checkPhraseForNoiseWords(`room.${id}.name`, def!.name, findings);
+    for (const alias of def!.aliases ?? []) checkPhraseForNoiseWords(`room.${id}.aliases`, alias, findings);
+  }
+  for (const [id, def] of Object.entries(world.objects ?? {})) {
+    for (const noun of def!.nouns ?? []) checkPhraseForNoiseWords(`object.${id}.nouns`, noun, findings);
+    for (const adj of def!.adjectives ?? []) checkPhraseForNoiseWords(`object.${id}.adjectives`, adj, findings);
+  }
+  for (const [id, def] of Object.entries(world.npcs ?? {})) {
+    for (const noun of def!.nouns ?? []) checkPhraseForNoiseWords(`npc.${id}.nouns`, noun, findings);
+    // NPC adjectives are checked for the same reason object adjectives are:
+    // an adjective the tokenizer strips can never narrow a disambiguation.
+    for (const adj of def!.adjectives ?? []) checkPhraseForNoiseWords(`npc.${id}.adjectives`, adj, findings);
   }
 }

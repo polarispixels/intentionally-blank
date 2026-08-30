@@ -43,9 +43,24 @@
 // a second `box` for simultaneous dobj+iobj ambiguity; `JACK`/`MARA`/`RIVER`,
 // NPCs with a declared `pronoun` (§2.6/§3.4) for real gender-aware `him`/
 // `her`/`them` resolution — see their own doc comments below for why.
+//
+// Task 11 (`tests/parser-multi.test.ts`) additions: `exits` on every room
+// (§3.5's `GO TO` BFS graph) — ROOM_A <-> ROOM_B always passable, ROOM_B <->
+// ROOM_C gated by `DOOR` (closed by default, so blocked until a test opens
+// it via a state overlay) — exercising both the plain-edge and
+// door-gated-edge cases `ExitDefSlice` supports. `DOOR` itself: a
+// non-portable object whose `container.open` field `objectState` reads for
+// the exit gate (doors reuse the same open/closed state model as
+// containers; nothing about `ExitDefSlice.door` requires the object to
+// actually BE a container). `AGAIN_VERB_ID` (imported from
+// `interpreter.ts`, not redeclared here — task 11's own reserved id) and
+// `WAIT`: two more `'V'`-pattern, non-meta verbs with authored `default`
+// families, for AGAIN's fallback-with-nothing-to-repeat case and WAIT's
+// ordinary-turn-pass case (§3.5).
 
 import { C, F, M, N, O, Q, R, S, V } from '../../src/engine/ids';
 import { BUILTIN_VERB_IDS } from '../../src/engine/actions';
+import { AGAIN_VERB_ID } from '../../src/engine/interpreter';
 import type { GameEvent, ScriptFn, WorldDef } from '../../src/engine/world';
 
 export const ROOM_A = R('fixture_room_a');
@@ -84,6 +99,9 @@ export const SPARE_KEY = O('fixture_spare_key'); // nouns: ['key'], no adjective
 /** A second "box" (nouns: ['box'], adjectives: ['metal']) — with BOX, exercises simultaneous dobj+iobj ambiguity ("put key in box": both slots have >1 candidate). */
 export const METAL_BOX = O('fixture_metal_box');
 
+/** Task 11 addition: gates the ROOM_B <-> ROOM_C exit (closed by default — that edge starts blocked). Not portable; not a real "container", just reusing `objectState`'s `container.open` field for door state. */
+export const DOOR = O('fixture_door');
+
 export const GUIDE = N('fixture_guide');
 /**
  * Task 10 fix-2 additions (coordinator review): NPCs with a declared
@@ -105,6 +123,9 @@ export const BREAK = V('fixture_break'); // 'V dobj prep iobj', preps: ['with'] 
 export const THROW = V('fixture_throw'); // 'V dobj prep iobj', preps: ['at'] — "at" as a real preposition, not noise
 export const LOOK = V('fixture_look'); // 'V'/'V dobj', no preps — "look at lamp": "at" must be dropped as noise
 export const ASK = V('fixture_ask'); // 'V npc about topic' — the only pattern needing the literal "about" separator
+
+/** Task 11 (`tests/parser-multi.test.ts`) addition: WAIT/Z, an ordinary 'V'-pattern, non-meta verb with an authored default family — needs no parser code of its own (§3.5). */
+export const WAIT = V('fixture_wait');
 
 export const MEMORY_1 = M('fixture_memory_1');
 export const CLUE_1 = C('fixture_clue_1');
@@ -145,9 +166,12 @@ export const FIXTURE_WORLD: WorldDef = {
   // collides with any fixture verb word (`checkVocabularyCollisions`
   // would flag it if one did).
   rooms: {
-    [ROOM_A]: { name: 'Fixture Room A', aliases: ['room a'], dark: true }, // baseline dark
-    [ROOM_B]: { name: 'Fixture Room B', aliases: ['room b'] }, // baseline lit (no `dark` entry)
-    [ROOM_C]: { name: 'Fixture Room C', aliases: ['room c'], dark: { flag: FLAG_BOOL } }, // baseline dark only while FLAG_BOOL holds
+    // Task 11 `exits`: A <-> B always passable; B <-> C gated by DOOR
+    // (closed by default, so that edge starts blocked — GO TO's BFS only
+    // ever uses currently-passable edges).
+    [ROOM_A]: { name: 'Fixture Room Alpha', aliases: ['room alpha'], dark: true, exits: [{ to: ROOM_B }] }, // baseline dark
+    [ROOM_B]: { name: 'Fixture Room B', aliases: ['room b'], exits: [{ to: ROOM_A }, { to: ROOM_C, door: DOOR }] }, // baseline lit (no `dark` entry)
+    [ROOM_C]: { name: 'Fixture Room C', aliases: ['room c'], dark: { flag: FLAG_BOOL }, exits: [{ to: ROOM_B, door: DOOR }] }, // baseline dark only while FLAG_BOOL holds
   },
   objects: {
     [KEY]: {
@@ -225,6 +249,7 @@ export const FIXTURE_WORLD: WorldDef = {
     [DOOR_KEY]: { location: ROOM_A, name: 'door key', nouns: ['key'], adjectives: ['door'], portable: true },
     [SPARE_KEY]: { location: ROOM_A, name: 'spare key', nouns: ['key'], portable: true },
     [METAL_BOX]: { location: ROOM_A, name: 'metal box', nouns: ['box'], adjectives: ['metal'] },
+    [DOOR]: { location: ROOM_B, name: 'oak door', nouns: ['door'], adjectives: ['oak'], container: { open: false } },
   },
   npcs: {
     [GUIDE]: {
@@ -324,6 +349,13 @@ export const FIXTURE_WORLD: WorldDef = {
     },
     [LOOK]: { id: LOOK, words: ['look', 'examine', 'x'], patterns: ['V', 'V dobj'], class: null, default: 'You see nothing special.' },
     [ASK]: { id: ASK, words: ['ask'], patterns: ['V npc about topic'], class: 'social', default: "They don't know anything about that." },
+    // Task 11 additions: AGAIN_VERB_ID (imported from interpreter.ts — the
+    // reserved id `DeterministicParser` special-cases) and WAIT both need
+    // an ordinary 'V'-pattern, non-meta world.verbs entry with their own
+    // authored default family (§3.5) — AGAIN's for "nothing to repeat yet",
+    // WAIT's for the ordinary turn-pass case.
+    [AGAIN_VERB_ID]: { id: AGAIN_VERB_ID, words: ['again', 'g'], patterns: ['V'], class: null, default: "There's nothing to repeat." },
+    [WAIT]: { id: WAIT, words: ['wait', 'z'], patterns: ['V'], class: null, default: 'Time passes.' },
   },
   responses: {
     'take.success': 'You take the {name}.',

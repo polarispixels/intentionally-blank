@@ -1257,6 +1257,15 @@ green + `npm test` green.
 12. **Response ladder.** `src/engine/respond.ts`;
     `tests/respond.test.ts`: one test per rung of §3.6, seen-vs-unseen
     noun-miss, diag events emitted with correct codes.
+
+    **Carries a prose dependency.** Task 11 reserved `${verb}.allEmpty`
+    response families for the "TAKE ALL when there is nothing to take"
+    case, referenced by `allEmptyFamilyKey()` in `parser/multi.ts` but not
+    yet authored. These, and the ladder's own global families (`unknown`,
+    `nounMiss`, `unknownVerbKnownNoun`), are **authored prose** —
+    `narrative-writer` writes them against `docs/spec/06`, the main session
+    reviews for voice, and placeholder text does not reach `main` (hard
+    rule 5). A builder must not invent them.
 13. **Tick: clock, events, schedules.** `src/engine/tick.ts`;
     `tests/tick.test.ts`: minutes advance, meta verbs free, `phase()` /
     `weekday()` boundary cases (first/last minute of each phase, week

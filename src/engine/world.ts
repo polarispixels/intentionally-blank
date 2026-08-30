@@ -165,15 +165,33 @@ export interface VerbDef {
  * Minimal room-authoring slice of §2.4's `RoomDef` — `dark`, the baseline
  * `isDark` reads, plus (task 9) `name`/`aliases` (§2.4), what the
  * vocabulary compiler indexes a room under for `GO TO`/bare-room-word
- * resolution (task 11). Both optional, like `ObjectDefSlice`'s `nouns`/
- * `adjectives`, so existing fixture rooms that predate the parser tasks
- * keep compiling. Not yet `exits`/`description`/etc. — those are later
- * tasks' to add.
+ * resolution (task 11), and (task 11) `exits` — the graph `GO TO`'s BFS
+ * walks (§3.5). Still not `description`/etc. — those are later tasks' to
+ * add. `name`/`aliases`/`dark`/`exits` are all optional, like
+ * `ObjectDefSlice`'s `nouns`/`adjectives`, so existing fixture rooms that
+ * predate these fields keep compiling.
  */
 export interface RoomDefSlice {
   name?: string;
   aliases?: string[];
   dark?: true | Cond;
+  exits?: ExitDefSlice[];
+}
+
+/**
+ * Minimal exit-authoring slice of §2.4's full `ExitDef` (task 11, §3.5's
+ * `GO TO`). The full spec shape also has `dir`, `blockedText`, `travelText`,
+ * `minutes` — content-authoring/room-description fields a later task adds;
+ * this is a minimal slice, like every other `*DefSlice` in this file, of
+ * just what `GO TO`'s BFS needs to know an exit exists and is currently
+ * passable: `to` (always), and optionally a `door` that must be open
+ * (`objectState(world, state, door, 'open')`) or a `when` `Cond` that must
+ * hold for the exit to be passable right now.
+ */
+export interface ExitDefSlice {
+  to: RoomId;
+  door?: ObjectId;
+  when?: Cond;
 }
 
 /**

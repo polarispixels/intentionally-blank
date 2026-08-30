@@ -35,6 +35,7 @@ import {
   MARA,
   METAL_BOX,
   RIVER,
+  ROOM_A,
   SHELF,
   SPARE_KEY,
 } from './fixtures/world';
@@ -49,8 +50,21 @@ function phrase(words: string[]): UnresolvedNounPhrase {
   return { words, adjectives: words.slice(0, -1), noun: words[words.length - 1]! };
 }
 
+// task 11 added `portable`/`location`/`travel` to `ScopeView` (ALL/GO TO,
+// §3.5) — unused by this file's resolution/disambiguation/pronoun tests, so
+// empty defaults keep this helper compiling without pulling multi-object/GO
+// TO concerns into a file that deliberately doesn't exercise them (see
+// `tests/parser-multi.test.ts` for those).
 function view(overrides: Partial<ScopeView> = {}): ScopeView {
-  return { vocabulary: vocab, visible: ALL_VISIBLE, parser: {}, ...overrides };
+  return {
+    vocabulary: vocab,
+    visible: ALL_VISIBLE,
+    parser: {},
+    portable: new Set(),
+    location: new Map(),
+    travel: { current: ROOM_A, passable: new Map() },
+    ...overrides,
+  };
 }
 
 // ---------------------------------------------------------------------------

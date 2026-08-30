@@ -19,12 +19,14 @@
 //             `GameState` (`gamestate.ts`) here too — task 9's header named
 //             this as the first task that needs `pending`/`last` to
 //             persist turn-to-turn.
-//   task 11 — `ALL`/`AND`/`BUT`/`GO TO`/`AGAIN` and implicit-take
-//             (§3.5) — still not this module's job; every pattern below
-//             resolves exactly one dobj/iobj/npc, never a multi-object
-//             expansion.
+//   task 11 (this one) — `ALL`/`AND`/`BUT` (`./parser/multi.ts`), `GO TO`
+//             (BFS over `ScopeView.travel`, this module's `tryGoTo`), and
+//             `AGAIN` (this module's `resolveAgain`) — §3.5. Implicit take
+//             is a narrowly-authorized `actions.ts` change (see that
+//             module), not this one's.
 
-import type { NpcId, ObjectId, VerbId } from './ids';
+import type { NpcId, ObjectId, PlaceId, RoomId, VerbId } from './ids';
+import { V } from './ids';
 import type { CompiledVocabulary } from './parser/vocabulary';
 import { dropBaseNoise, tokenize } from './parser/tokenize';
 import { knownNounsIn, matchGrammar } from './parser/grammar';
@@ -32,6 +34,27 @@ import type { UnresolvedAction, UnresolvedNounPhrase } from './parser/grammar';
 import type { ResolveResult } from './parser/resolver';
 import { candidateName, isNpcId, joinWithOr, knownWordsFor, resolveNounPhrase } from './parser/resolver';
 import { resolvePronoun } from './parser/pronouns';
+import { tryMultiObject } from './parser/multi';
+
+/**
+ * Reserved verb id for `GO TO` (task 11, §3.5). Never added to `world.verbs`
+ * — `GO TO`'s recognition happens in `DeterministicParser.tryGoTo`, entirely
+ * before `matchGrammar`'s normal per-verb dispatch (neither "go" nor a bare
+ * room alias is ever a declared verb word), so there is no grammar-table
+ * entry for content to author.
+ */
+export const GO_TO_VERB_ID = V('go_to');
+
+/**
+ * Reserved verb id for `AGAIN`/`G` (task 11, §3.5). Unlike `GO_TO_VERB_ID`,
+ * this one DOES need a normal `world.verbs` entry — a plain `'V'`-pattern
+ * verb (words `['again', 'g']`) with its own authored `default` family, so
+ * ordinary `matchGrammar` recognizes it and rung-2b renders that family
+ * whenever `AGAIN` has nothing to repeat. `DeterministicParser.resolveAgain`
+ * special-cases the *resolved* match (see that method) to replay
+ * `parser.last` when one exists, rather than ever reaching rung 2b itself.
+ */
+export const AGAIN_VERB_ID = V('again');
 
 /** §3.1's `StructuredAction` — the only shape the engine sees past this seam. */
 export interface StructuredAction {
@@ -45,6 +68,16 @@ export interface StructuredAction {
   text?: string;
   /** respondToPrompt: all prompt-field values by name. */
   values?: Record<string, string>;
+  /**
+   * `GO TO`'s BFS output (task 11, §3.5): ordered rooms from (not
+   * including) the player's current room to the target, each reachable via
+   * a currently-passable exit from the previous. This is a *movement plan*
+   * only — walking it one room per world turn, narrating each hop, and
+   * handling a mid-route interruption (blocked exit revealed, a scheduled
+   * event, an NPC intercept) is the turn loop's job (a later task), not
+   * this one's; see `DeterministicParser.resolveGoTo`'s doc comment.
+   */
+  route?: RoomId[];
   /** The input line, for echo and history. */
   raw: string;
 }
@@ -89,12 +122,58 @@ export interface ScopeView {
   vocabulary: CompiledVocabulary;
   visible: (ObjectId | NpcId)[];
   parser: ParserContext;
+  /**
+   * `TAKE ALL`/`DROP ALL` eligibility (§3.5, task 11): which of `visible`'s
+   * ids are portable objects, and each visible object's current `PlaceId` —
+   * lets the parser compute "portable and not held" (TAKE), "held" (DROP),
+   * and "in `<container>`" (`TAKE ALL FROM DESK`) without reading
+   * `WorldDef`/`GameState` directly. Built by the engine (currently, before
+   * `step()` exists, hand-built by test helpers — see
+   * `tests/parser-multi.test.ts`).
+   */
+  portable: Set<ObjectId>;
+  location: Map<ObjectId, PlaceId>;
+  /**
+   * `GO TO`'s BFS graph (§3.5, task 11). Keys are exactly the visited rooms
+   * (`state.visited`); values are the rooms one currently-passable exit
+   * away, restricted to other visited rooms — `GO TO` only ever routes
+   * through rooms the player has seen, and never reveals an unvisited one.
+   * Built by the engine from `world.rooms[*].exits` + door/cond state.
+   */
+  travel: { current: RoomId; passable: Map<RoomId, RoomId[]> };
 }
 
 export type InterpretOutcome =
   | { kind: 'actions'; actions: StructuredAction[] } // TAKE ALL → many (task 11)
   | { kind: 'clarify'; question: string; options: string[]; pending: ParserContext['pending'] }
-  | { kind: 'miss'; raw: string; verb?: VerbId; knownNouns: string[] };
+  | { kind: 'miss'; raw: string; verb?: VerbId; knownNouns: string[] }
+  /**
+   * `GO TO` a room that isn't currently reachable through the visited
+   * graph — either it was never visited at all, or it was visited but no
+   * currently-passable exit chain reaches it from here (task 11, §3.5).
+   * Both cases render the same fixed line ("You don't know the way there
+   * yet."). This is parser-mechanical UI text, not narrative prose — the
+   * same precedent `buildClarify`'s hardcoded question text sets — so it's
+   * carried as a literal `message` here rather than routed through
+   * `world.responses` (the parser has no `world`/`state` to render against
+   * anyway). A dedicated outcome kind, rather than overloading `miss`,
+   * keeps "GO TO recognized a real room but can't route there" distinct
+   * from "nothing was recognized at all" for whichever future task renders
+   * outcomes.
+   */
+  | { kind: 'unreachable'; raw: string; message: string }
+  /**
+   * `TAKE ALL`/`DROP ALL`/etc. expanded to zero eligible objects (§3.5).
+   * The "There is nothing here worth carrying." family is real authored
+   * prose the parser cannot render (no `world`/`state`, and rendering has
+   * counter-rotation side effects the parser must not trigger on the
+   * engine's behalf) — so this outcome only carries what a renderer needs
+   * to look up the right family; see `./parser/multi.ts`'s
+   * `allEmptyFamilyKey` for the exact reserved key convention
+   * (`take.allEmpty`, `drop.allEmpty`, …). Not authored anywhere yet — a
+   * `narrative-writer` need, flagged in this task's report.
+   */
+  | { kind: 'allEmpty'; verb: VerbId; raw: string };
 
 export interface IntentInterpreter {
   /**
@@ -115,20 +194,40 @@ export interface IntentInterpreter {
  * - `clarify` → `pending` becomes the new question; every antecedent
  *   (`it`/`him`/`her`/`them`) and `last` carry forward unchanged (no action
  *   ran this turn).
- * - `miss` → nothing changes. In particular `pending` is *not* preserved
- *   from `prev` here — but that's fine: whenever a fresh command silently
- *   drops a pending question (§3.3), the resulting outcome is itself either
- *   a fresh `clarify` (new `pending,` handled above) or `actions`/`miss`
- *   (both of which correctly want `pending` gone). A `miss` while no
- *   `pending` was ever active is the same no-op.
- * - `actions` → `last` becomes the (first, for a multi-action outcome —
- *   task 11's `ALL`/`AND` territory) action; each resolved `dobj`/`iobj`
- *   updates `it` (an `ObjectId`) or, for an `NpcId`, whichever of
- *   `him`/`her`/`them` matches that NPC's declared `NpcDefSlice.pronoun`
+ * - `miss` / `unreachable` / `allEmpty` (task 11) → nothing changes except
+ *   `pending` clearing. In particular `pending` is *not* preserved from
+ *   `prev` here — but that's fine: whenever a fresh command silently drops
+ *   a pending question (§3.3), the resulting outcome is itself either a
+ *   fresh `clarify` (new `pending,` handled above) or one of these
+ *   no-action kinds (which correctly want `pending` gone). Any of these
+ *   three while no `pending` was ever active is the same no-op. `unreachable`
+ *   and `allEmpty` join `miss` here for the same reason: no `StructuredAction`
+ *   ran, so there is nothing to update `it`/`them`/`last` from.
+ * - `actions`, single action → `last` becomes that action; its resolved
+ *   `dobj`/`iobj` updates `it` (an `ObjectId`) or, for an `NpcId`, whichever
+ *   of `him`/`her`/`them` matches that NPC's declared `NpcDefSlice.pronoun`
  *   (`vocab.npcPronouns`) — an NPC with no declared pronoun updates none of
  *   them, rather than guessing. Referring to one NPC therefore never
- *   clobbers a differently-pronouned NPC's antecedent. `pending` clears.
+ *   clobbers a differently-pronouned NPC's antecedent.
+ * - `actions`, multiple actions (task 11's `ALL`/`AND` territory) → `last`
+ *   becomes the *first* action (§3.5). Every resolved `dobj`/`iobj` across
+ *   every expanded action instead becomes the new `them` (§3.4: "`them` →
+ *   last plural object set") — NOT `it`, repeatedly overwritten, which is
+ *   what the single-action loop above would do if reused unchanged (and
+ *   would silently lose the set down to whichever object happened to
+ *   resolve last). Any `NpcId` refs (rare in this shape — `ALL`/`AND` are
+ *   object-oriented per spec) still update `him`/`her`/`them`-singular by
+ *   declared pronoun, exactly as the single-action path does. `pending`
+ *   clears in every `actions` case.
  */
+function applyNpcPronoun(next: ParserContext, vocab: CompiledVocabulary, ref: NpcId): void {
+  const pronoun = vocab.npcPronouns.get(ref);
+  if (pronoun === 'he') next.him = ref;
+  else if (pronoun === 'she') next.her = ref;
+  else if (pronoun === 'they') next.them = ref;
+  // No declared pronoun: no antecedent update — see doc comment above.
+}
+
 export function nextParserContext(prev: ParserContext, outcome: InterpretOutcome, vocab: CompiledVocabulary): ParserContext {
   // `delete`, not `pending: undefined`, throughout — `exactOptionalPropertyTypes`
   // treats those differently, and "absent" is what "no outstanding question" means.
@@ -138,7 +237,7 @@ export function nextParserContext(prev: ParserContext, outcome: InterpretOutcome
     else delete next.pending;
     return next;
   }
-  if (outcome.kind === 'miss') {
+  if (outcome.kind === 'miss' || outcome.kind === 'unreachable' || outcome.kind === 'allEmpty') {
     const next: ParserContext = { ...prev };
     delete next.pending;
     return next;
@@ -146,20 +245,27 @@ export function nextParserContext(prev: ParserContext, outcome: InterpretOutcome
 
   const next: ParserContext = { ...prev };
   delete next.pending;
-  for (const action of outcome.actions) {
-    for (const ref of [action.dobj, action.iobj]) {
-      if (ref === undefined) continue;
-      if (isNpcId(vocab, ref)) {
-        const pronoun = vocab.npcPronouns.get(ref);
-        if (pronoun === 'he') next.him = ref;
-        else if (pronoun === 'she') next.her = ref;
-        else if (pronoun === 'they') next.them = ref;
-        // No declared pronoun: no antecedent update — see doc comment above.
-      } else {
-        next.it = ref;
+
+  if (outcome.actions.length > 1) {
+    const objectRefs: ObjectId[] = [];
+    for (const action of outcome.actions) {
+      for (const ref of [action.dobj, action.iobj]) {
+        if (ref === undefined) continue;
+        if (isNpcId(vocab, ref)) applyNpcPronoun(next, vocab, ref);
+        else objectRefs.push(ref);
+      }
+    }
+    if (objectRefs.length > 0) next.them = objectRefs;
+  } else {
+    for (const action of outcome.actions) {
+      for (const ref of [action.dobj, action.iobj]) {
+        if (ref === undefined) continue;
+        if (isNpcId(vocab, ref)) applyNpcPronoun(next, vocab, ref);
+        else next.it = ref;
       }
     }
   }
+
   if (outcome.actions[0] !== undefined) next.last = outcome.actions[0];
   return next;
 }
@@ -234,6 +340,45 @@ function buildClarify(
 }
 
 // ---------------------------------------------------------------------------
+// GO TO — breadth-first search over the visited-room graph (§3.5, task 11)
+// ---------------------------------------------------------------------------
+
+/**
+ * Shortest route from `from` to `to` over `passable` (an adjacency map,
+ * `RoomId → RoomId[]`), or `undefined` when no route exists — including
+ * when either endpoint isn't even a key (an unvisited, or otherwise
+ * unrouteable, room). `from === to` returns `[]` (already there; zero hops).
+ */
+function bfsRoute(passable: Map<RoomId, RoomId[]>, from: RoomId, to: RoomId): RoomId[] | undefined {
+  if (!passable.has(from) || !passable.has(to)) return undefined;
+  if (from === to) return [];
+
+  const cameFrom = new Map<RoomId, RoomId>();
+  const visited = new Set<RoomId>([from]);
+  const queue: RoomId[] = [from];
+
+  while (queue.length > 0) {
+    const current = queue.shift()!;
+    for (const next of passable.get(current) ?? []) {
+      if (visited.has(next)) continue;
+      visited.add(next);
+      cameFrom.set(next, current);
+      if (next === to) {
+        const route: RoomId[] = [next];
+        let node = current;
+        while (node !== from) {
+          route.unshift(node);
+          node = cameFrom.get(node)!;
+        }
+        return route;
+      }
+      queue.push(next);
+    }
+  }
+  return undefined;
+}
+
+// ---------------------------------------------------------------------------
 // DeterministicParser
 // ---------------------------------------------------------------------------
 
@@ -280,6 +425,12 @@ export class DeterministicParser implements IntentInterpreter {
   }
 
   private parseFresh(input: string, view: ScopeView, tokens: string[]): InterpretOutcome {
+    // `GO TO` (task 11, §3.5) is recognized before grammar matching at all —
+    // neither "go"/"to" nor a bare room alias is ever a declared verb word,
+    // so `matchGrammar` would just report `noVerb` for them otherwise.
+    const goTo = this.tryGoTo(tokens, input, view);
+    if (goTo !== undefined) return goTo;
+
     const result = matchGrammar(view.vocabulary, tokens, input);
 
     if (result.kind === 'noVerb') {
@@ -290,6 +441,25 @@ export class DeterministicParser implements IntentInterpreter {
     }
 
     const { action } = result;
+
+    // `AGAIN`/`G` (task 11, §3.5): a resolved zero-arg match for the
+    // reserved verb id — content declares it as an ordinary `'V'`-pattern
+    // verb (see `AGAIN_VERB_ID`'s doc comment) so it reaches here through
+    // normal grammar matching, same as LOOK or WAIT.
+    if (action.verb === AGAIN_VERB_ID && action.pattern === 'V') {
+      return this.resolveAgain(view, input);
+    }
+
+    // `ALL`/`AND`/`BUT` (task 11, §3.5): only ever shaped as a `'V dobj'`
+    // match (GO TO is handled above; `'V dobj prep iobj'` never carries
+    // multi-object syntax per the spec's own examples). `undefined` means
+    // the remaining tokens aren't an ALL/AND/BUT shape at all — fall
+    // through to ordinary single-phrase resolution unchanged.
+    if (action.pattern === 'V dobj' && action.dobj !== undefined) {
+      const multi = tryMultiObject(view, action.verb, input, action.dobj.words);
+      if (multi !== undefined) return multi;
+    }
+
     if (action.dobj === undefined && action.iobj === undefined && action.npc === undefined) {
       // No noun phrase to resolve ('V' pattern verbs — LOOK, WAIT, meta
       // verbs…): the action is already complete.
@@ -297,6 +467,57 @@ export class DeterministicParser implements IntentInterpreter {
     }
 
     return this.resolveAction(view, action, tokens);
+  }
+
+  /**
+   * `GO TO <room>` / a bare room alias (task 11, §3.5). Returns `undefined`
+   * when the input isn't this shape at all — either it doesn't start with
+   * "go to", or (as a whole) it doesn't match any `vocab.roomAliases` key —
+   * so the caller falls through to ordinary grammar matching (an ordinary
+   * ultimate `miss` for genuinely unrecognized input).
+   */
+  private tryGoTo(tokens: string[], raw: string, view: ScopeView): InterpretOutcome | undefined {
+    let phraseWords: string[] | undefined;
+    if (tokens.length >= 3 && tokens[0] === 'go' && tokens[1] === 'to') {
+      phraseWords = tokens.slice(2);
+    } else if (view.vocabulary.roomAliases.has(tokens.join(' '))) {
+      phraseWords = tokens;
+    }
+    if (phraseWords === undefined || phraseWords.length === 0) return undefined;
+
+    const target = view.vocabulary.roomAliases.get(phraseWords.join(' '));
+    if (target === undefined) return undefined; // no alias matches at all — not GO TO syntax
+
+    return this.resolveGoTo(view, target, raw);
+  }
+
+  /**
+   * BFS's `view.travel.passable` from `view.travel.current` to `target`
+   * (§3.5). Both endpoints must already be visited rooms (keys of
+   * `passable`) — `GO TO` never routes through, or reveals, an unvisited
+   * room. A route, once found, is only ever built from edges that are
+   * passable *right now* (at plan time) — that is the full extent of "stops
+   * early… if an exit is blocked" this method can deliver: live mid-route
+   * interruption (a blocked exit revealed mid-walk, a scheduled event, an
+   * NPC intercept) needs the turn loop actually walking the route one hop
+   * per world turn, which doesn't exist yet (a later task). `route` here is
+   * exactly the *movement plan* the architecture doc's own module-boundary
+   * note asks task 11 to produce, not execute.
+   */
+  private resolveGoTo(view: ScopeView, target: RoomId, raw: string): InterpretOutcome {
+    const route = bfsRoute(view.travel.passable, view.travel.current, target);
+    if (route === undefined) {
+      return { kind: 'unreachable', raw, message: "You don't know the way there yet." };
+    }
+    return { kind: 'actions', actions: [{ verb: GO_TO_VERB_ID, route, raw }] };
+  }
+
+  /** `AGAIN`/`G` (task 11, §3.5): replays `parser.last` verbatim when one exists; otherwise falls through as an ordinary zero-arg `AGAIN_VERB_ID` action, which rung 2b renders via its own authored `default` family (no handler, no built-in — existing machinery, untouched). */
+  private resolveAgain(view: ScopeView, raw: string): InterpretOutcome {
+    if (view.parser.last !== undefined) {
+      return { kind: 'actions', actions: [view.parser.last] };
+    }
+    return { kind: 'actions', actions: [{ verb: AGAIN_VERB_ID, raw }] };
   }
 
   /** Resolves whichever of `dobj`/`iobj`/`npc` the matched pattern declared, in that order, against `view` (§3.2 noun resolution + pronouns). `npc` (the `V npc about topic` slot) resolves into the final `dobj` field — `StructuredAction` has no separate `npc` field (§3.1). */

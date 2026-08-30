@@ -12,6 +12,46 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.2.18] - 2026-08-30
+
+The parser group is complete.
+
+### Added
+
+- **Architecture task 11: multi-object commands, GO TO, AGAIN, implicit
+  take.** 35 new tests; 474 green. All of it serves constitution §22 —
+  discovery is manual, repetition is automated.
+- `TAKE ALL`, `DROP ALL`, `TAKE ALL FROM <container>`, `TAKE X AND Y`,
+  `TAKE ALL BUT X`, each object answered on its own line, with eligibility
+  filtered per verb so `TAKE ALL` doesn't generate a refusal for every
+  fixture in the room.
+- `GO TO <room>` walks a breadth-first route over **visited** rooms through
+  currently passable exits — one room per turn so the clock stays honest,
+  and never naming a room the player hasn't seen. An unvisited target gets
+  "you don't know the way there yet" rather than a route.
+- **Implicit take.** `WEAR FEDORA` when the fedora is on the floor takes it
+  first and says so, rather than refusing. It respects every refusal the
+  built-in TAKE would raise, so an implicit take of a bolted-down object
+  fails *as a take*, with the take's reason.
+
+### Fixed
+
+- **A room aliased "Room A" could never be typed.** The tokenizer strips
+  `a` as an article from any position, so the alias was unreachable through
+  the real input pipeline — a content landmine that would have shipped
+  silently. Rather than teaching the tokenizer to protect vocabulary spans
+  (subtle, and a parser should not be subtle), `validate` now rejects any
+  room name or alias, object noun or adjective, or NPC noun or adjective
+  containing a word the tokenizer strips. The author gets a red test naming
+  the phrase and the word.
+
+  `NOISE_WORDS` is exported from the tokenizer and consumed by the
+  validator, so the two cannot drift — a rule checking a *copy* of that
+  list would silently stop matching the first time someone edited one.
+
+  The regression test drives `interpret()` with a raw string through the
+  real tokenizer, which is the assertion that would have caught it.
+
 ## [0.2.17] - 2026-08-30
 
 ### Added

@@ -92,8 +92,8 @@ describe('compileVocabulary', () => {
   });
 
   it('indexes room names and aliases (lowercased)', () => {
-    expect(vocab.roomAliases.get('room a')).toBe(ROOM_A);
-    expect(vocab.roomAliases.get('fixture room a')).toBe(ROOM_A);
+    expect(vocab.roomAliases.get('room alpha')).toBe(ROOM_A);
+    expect(vocab.roomAliases.get('fixture room alpha')).toBe(ROOM_A);
   });
 
   it('a noun shared by two objects lists both ids (not a collision — task 10 disambiguates)', () => {
@@ -406,8 +406,20 @@ describe('validate — vocabulary collision report', () => {
 describe('DeterministicParser — seam skeleton', () => {
   const parser = new DeterministicParser();
 
+  // task 11 added `portable`/`location`/`travel` to `ScopeView` (ALL/GO TO,
+  // §3.5) — unused by this file's grammar/vocabulary-layer tests, so empty
+  // defaults keep this helper compiling without pulling multi-object/GO TO
+  // concerns into a file that deliberately doesn't exercise them (see
+  // `tests/parser-multi.test.ts` for those).
   function view(): ScopeView {
-    return { vocabulary: vocab, visible: [KEY, LAMP, HAT, CHEST], parser: {} };
+    return {
+      vocabulary: vocab,
+      visible: [KEY, LAMP, HAT, CHEST],
+      parser: {},
+      portable: new Set(),
+      location: new Map(),
+      travel: { current: ROOM_A, passable: new Map() },
+    };
   }
 
   it('implements IntentInterpreter and fully resolves a no-object verb ("wave")', () => {

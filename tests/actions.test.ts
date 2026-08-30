@@ -256,22 +256,28 @@ describe('PUT IN', () => {
   });
 
   it('refuses putting a thing inside itself', () => {
-    const state = baseState({ objects: { [CHEST]: { open: true } } });
+    // CHEST is held via a direct overlay (not portable, so it could never
+    // get there through TAKE) purely so the dobj is already "held" and
+    // task 11's implicit-take convenience (§3.5) never triggers here — this
+    // test is about the self-loop guard, not implicit take.
+    const state = baseState({ objects: { [CHEST]: { open: true, location: 'inventory' } } });
     const result = performAction(FIXTURE_WORLD, state, { verb: BUILTIN_VERB_IDS.putIn, dobj: CHEST, iobj: CHEST });
     expect(lineText(result.events)).toBe('That would trap the iron chest inside itself.');
   });
 
   it('refuses the containment loop: putting a container inside something it already contains', () => {
+    // CHEST held via overlay for the same reason as the test above — keeps
+    // this test isolated from task 11's implicit-take convenience.
     const state = baseState({
       objects: {
-        [CHEST]: { open: true },
+        [CHEST]: { open: true, location: 'inventory' },
         [GLASS_CASE]: { location: { in: CHEST }, open: true }, // GLASS_CASE is already inside CHEST
       },
     });
     // Putting CHEST inside GLASS_CASE would nest CHEST inside something CHEST already contains.
     const result = performAction(FIXTURE_WORLD, state, { verb: BUILTIN_VERB_IDS.putIn, dobj: CHEST, iobj: GLASS_CASE });
     expect(lineText(result.events)).toBe('That would trap the glass case inside itself.');
-    expect(result.state.objects[CHEST]?.location).toBeUndefined(); // unchanged: still its authored default
+    expect(result.state.objects[CHEST]?.location).toBe('inventory'); // unchanged: still exactly where it started
   });
 
   it('succeeds into an open container', () => {
@@ -314,8 +320,9 @@ describe('WEAR', () => {
     expect(lineText(result.events)).toBe("You're already wearing the wool hat.");
   });
 
-  it('succeeds on a wearable object', () => {
-    const result = performAction(FIXTURE_WORLD, baseState(), { verb: BUILTIN_VERB_IDS.wear, dobj: HAT });
+  it('succeeds on a wearable object already held (see tests/actions.test.ts implicit-take describe block below for the not-yet-held case, task 11)', () => {
+    const state = baseState({ objects: { [HAT]: { location: 'inventory' } } });
+    const result = performAction(FIXTURE_WORLD, state, { verb: BUILTIN_VERB_IDS.wear, dobj: HAT });
     expect(result.state.objects[HAT]?.location).toBe('worn');
     expect(lineText(result.events)).toBe('You put on the wool hat.');
   });
@@ -449,5 +456,102 @@ describe('consumesTurn', () => {
     const result = performAction(FIXTURE_WORLD, baseState(), { verb: WAVE });
     expect(result.consumesTurn).toBe(false);
     expect(lineText(result.events)).toBe('You wave at nothing in particular.');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// ActionResult.ok (task 11, §8: the implicit-take exception)
+// ---------------------------------------------------------------------------
+
+describe('ActionResult.ok', () => {
+  it('is true on a built-in success', () => {
+    const result = performAction(FIXTURE_WORLD, baseState(), { verb: BUILTIN_VERB_IDS.take, dobj: HAT });
+    expect(result.ok).toBe(true);
+  });
+
+  it('is false on a built-in refusal', () => {
+    const result = performAction(FIXTURE_WORLD, baseState(), { verb: BUILTIN_VERB_IDS.take, dobj: SHELF });
+    expect(result.ok).toBe(false);
+  });
+
+  it('is true when an authored handler matches (rung 1)', () => {
+    const result = performAction(FIXTURE_WORLD, baseState(), { verb: BUILTIN_VERB_IDS.take, dobj: KEY });
+    expect(result.ok).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Implicit take (task 11, §3.5/constitution §22): WEAR/PUT IN/PUT ON on an
+// object that's present but not yet held perform the take first, visibly,
+// before evaluating their own logic — the Infocom "(first taking the X)"
+// convention. Deliberately authorized as a narrow `actions.ts` change (see
+// `withImplicitTake`'s doc comment) rather than a parser-side
+// reimplementation, specifically so an authored TAKE handler (like KEY's
+// below) still wins over the built-in the way it always does.
+// ---------------------------------------------------------------------------
+
+describe('implicit take (task 11)', () => {
+  it('WEAR on an unheld, portable, wearable object takes it first, visibly, then wears it', () => {
+    const result = performAction(FIXTURE_WORLD, baseState(), { verb: BUILTIN_VERB_IDS.wear, dobj: HAT });
+    expect(result.events.filter((e) => e.type === 'line').map((e) => (e as { text: string }).text)).toEqual([
+      'You take the wool hat.',
+      'You put on the wool hat.',
+    ]);
+    expect(result.state.objects[HAT]?.location).toBe('worn');
+    expect(result.ok).toBe(true);
+  });
+
+  it('WEAR on an unheld, non-portable object fails as a take, not as a confusing wear failure', () => {
+    // SHELF is neither portable nor wearable — the take refusal must win
+    // outright; "You can't wear the wooden shelf." must never render.
+    const result = performAction(FIXTURE_WORLD, baseState(), { verb: BUILTIN_VERB_IDS.wear, dobj: SHELF });
+    expect(lineText(result.events)).toBe("You can't take the wooden shelf.");
+    expect(result.ok).toBe(false);
+    expect(result.state.objects[SHELF]?.location).toBeUndefined(); // never moved
+  });
+
+  it('WEAR respects an authored TAKE handler override during the implicit take, not the built-in', () => {
+    // KEY has an unconditional handler overriding built-in TAKE (§8 task 8
+    // fixture data) — a parser-side reimplementation of TAKE's checks would
+    // never see it; this recursive `performAction` call does.
+    const result = performAction(FIXTURE_WORLD, baseState(), { verb: BUILTIN_VERB_IDS.wear, dobj: KEY });
+    const lines = result.events.filter((e) => e.type === 'line').map((e) => (e as { text: string }).text);
+    expect(lines[0]).toBe('You palm the brass key with practiced care.'); // the handler's own line, not take.success
+    expect(lines[1]).toBe("You can't wear the brass key."); // KEY isn't wearable — wear still refuses, post-take
+    expect(result.state.objects[KEY]?.location).toBe('inventory'); // the take genuinely happened
+  });
+
+  it('WEAR on an already-worn object needs no implicit take (unaffected by task 11)', () => {
+    const state = baseState({ objects: { [HAT]: { location: 'worn' } } });
+    const result = performAction(FIXTURE_WORLD, state, { verb: BUILTIN_VERB_IDS.wear, dobj: HAT });
+    expect(lineText(result.events)).toBe("You're already wearing the wool hat.");
+  });
+
+  it('PUT IN on an unheld, portable dobj takes it first, visibly, then puts it in an open container', () => {
+    const state = baseState({ objects: { [CHEST]: { open: true } } }); // KEY starts in ROOM_A, unheld
+    const result = performAction(FIXTURE_WORLD, state, { verb: BUILTIN_VERB_IDS.putIn, dobj: HAT, iobj: CHEST });
+    expect(result.events.filter((e) => e.type === 'line').map((e) => (e as { text: string }).text)).toEqual([
+      'You take the wool hat.',
+      'You put the wool hat in the iron chest.',
+    ]);
+    expect(result.state.objects[HAT]?.location).toEqual({ in: CHEST });
+  });
+
+  it('PUT ON an unheld, portable dobj takes it first, visibly, then puts it on a supporter', () => {
+    const result = performAction(FIXTURE_WORLD, baseState(), { verb: BUILTIN_VERB_IDS.putOn, dobj: HAT, iobj: SHELF });
+    expect(result.events.filter((e) => e.type === 'line').map((e) => (e as { text: string }).text)).toEqual([
+      'You take the wool hat.',
+      'You put the wool hat on the wooden shelf.',
+    ]);
+    expect(result.state.objects[HAT]?.location).toEqual({ on: SHELF });
+  });
+
+  it('PUT IN on an unheld, non-portable dobj fails as a take, not as a putIn failure', () => {
+    const state = baseState({ objects: { [CHEST]: { open: true } } });
+    // BOX is present (ROOM_A) but not portable — the implicit take on it
+    // must fail as a take, before putIn.notContainer/loop/closedContainer
+    // ever get a chance to run.
+    const result = performAction(FIXTURE_WORLD, state, { verb: BUILTIN_VERB_IDS.putIn, dobj: BOX, iobj: CHEST });
+    expect(lineText(result.events)).toBe("You can't take the wooden box.");
   });
 });

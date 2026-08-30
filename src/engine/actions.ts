@@ -70,6 +70,19 @@ export interface ActionResult {
   events: GameEvent[];
   consumesTurn: boolean;
   class: ActionClass | null;
+  /**
+   * `true` from `succeed()`, `false` from `refuse()` (task 11, §8: the
+   * implicit-take exception — see `withImplicitTake` below). A matched
+   * authored handler (`applyHandler`, rung 1) is `true`: it ran the
+   * content author's own intended effects, not a boilerplate refusal.
+   * `fallbackToVerbDefault` (rung 2b) is `false`: nothing the player asked
+   * for actually happened, only a generic filler response rendered. Neither
+   * of those two is exercised by `withImplicitTake`'s own recursive TAKE
+   * call in practice (TAKE always has built-in semantics, so rung 2b never
+   * runs for it; a matched TAKE handler like `KEY`'s is presumed a genuine
+   * success) — but every `ActionResult` still needs a real value here.
+   */
+  ok: boolean;
 }
 
 /** The §3.6 rung 1/rung 2 dispatcher. */
@@ -114,6 +127,7 @@ function applyHandler(world: WorldDef, state: GameState, input: ActionInput, han
     events,
     consumesTurn: handler.consumesTurn ?? !(verbDef?.meta === true),
     class: handler.class ?? verbDef?.class ?? null,
+    ok: true, // a matched handler ran the author's own intent, not a refusal — see ActionResult.ok's doc comment
   };
 }
 
@@ -138,7 +152,7 @@ function fallbackToVerbDefault(world: WorldDef, state: GameState, input: ActionI
       detail: `verb "${input.verb}" on ${input.dobj ?? '(no object)'} fell to its default family`,
     },
   ];
-  return { state: rendered.state, events, consumesTurn: verbDef.meta !== true, class: verbDef.class };
+  return { state: rendered.state, events, consumesTurn: verbDef.meta !== true, class: verbDef.class, ok: false }; // generic filler, not a genuine success — see ActionResult.ok's doc comment
 }
 
 // ---------------------------------------------------------------------------
@@ -176,6 +190,7 @@ function refuse(world: WorldDef, state: GameState, input: ActionInput, verbDef: 
     events: [{ type: 'line', kind: 'prose', text: rendered.text }],
     consumesTurn: true,
     class: verbDef?.class ?? null,
+    ok: false,
   };
 }
 
@@ -189,7 +204,50 @@ function succeed(
 ): ActionResult {
   const ctx = contextFor(world, input);
   const { state: newState, events } = apply(world, state, [{ say: family(world, familyKey) }, ...effects], ctx);
-  return { state: newState, events, consumesTurn: true, class: verbDef?.class ?? null };
+  return { state: newState, events, consumesTurn: true, class: verbDef?.class ?? null, ok: true };
+}
+
+/**
+ * The implicit-take convenience (task 11, §3.5/constitution §22 — a
+ * deliberate, narrowly-authorized exception to "parser module only": doing
+ * this correctly needs `performAction`'s real TAKE dispatch, handler
+ * overrides included, which only exists here). `WEAR`/`PUT IN`/`PUT ON`
+ * (§8 task 8's `builtinWear`/`builtinPutIn`/`builtinPutOn`) call this
+ * around their own existing logic, wrapped in `run`: if `id` (their `dobj`)
+ * isn't already held, this first performs a real recursive `TAKE` on it —
+ * respecting every refusal the built-in TAKE would raise (not portable, in
+ * a closed container, …) and any authored handler override (e.g. `KEY`'s)
+ * — before `run` ever evaluates the outer verb's own logic. A failed
+ * implicit take is returned as-is: "an implicit take of a non-portable
+ * object fails as a take, not as a confusing wear failure" (task brief,
+ * verbatim). A successful one threads its post-take `state` into `run` and
+ * prepends its own events (the "(first taking the X)" line is exactly
+ * TAKE's own `take.success` family, rendered once, reused verbatim — no new
+ * prose is written here).
+ *
+ * VISIBILITY ("must be visible to the player", task brief): deliberately
+ * NOT checked here. `performAction`'s `dobj` always arrives already
+ * resolved against `ScopeView.visible` — that's `resolveNounPhrase`'s (and
+ * pronoun resolution's) own contract (task 10), upstream of every call this
+ * module ever receives. A visibility gate inside `actions.ts` would be
+ * either redundant (the normal parser-driven path) or wrong (a direct unit
+ * `performAction` call, which has no `visible` list to check against at
+ * all — see this task's report for the direct-`performAction`-test
+ * consequence this has).
+ */
+function withImplicitTake(
+  world: WorldDef,
+  state: GameState,
+  id: ObjectId,
+  run: (world: WorldDef, state: GameState) => ActionResult,
+): ActionResult {
+  if (playerHas(world, state, id)) return run(world, state);
+
+  const takeResult = performAction(world, state, { verb: BUILTIN_VERB_IDS.take, dobj: id });
+  if (!takeResult.ok) return takeResult;
+
+  const inner = run(world, takeResult.state);
+  return { ...inner, events: [...takeResult.events, ...inner.events] };
 }
 
 function playerHas(world: WorldDef, state: GameState, id: ObjectId): boolean {
@@ -279,30 +337,36 @@ function builtinUnlock(world: WorldDef, state: GameState, input: ActionInput, ve
 
 function builtinPutIn(world: WorldDef, state: GameState, input: ActionInput, verbDef: VerbDef | undefined): ActionResult {
   const dobj = input.dobj!;
-  const iobj = input.iobj;
-  if (iobj === undefined || world.objects?.[iobj]?.container === undefined) {
-    return refuse(world, state, input, verbDef, 'putIn.notContainer');
-  }
-  if (dobj === iobj || isNestedInside(world, state, iobj, dobj)) return refuse(world, state, input, verbDef, 'putIn.loop');
-  if (!objectState(world, state, iobj, 'open')) return refuse(world, state, input, verbDef, 'putIn.closedContainer');
-  return succeed(world, state, input, verbDef, [{ move: [dobj, { in: iobj }] }], 'putIn.success');
+  return withImplicitTake(world, state, dobj, (world, state) => {
+    const iobj = input.iobj;
+    if (iobj === undefined || world.objects?.[iobj]?.container === undefined) {
+      return refuse(world, state, input, verbDef, 'putIn.notContainer');
+    }
+    if (dobj === iobj || isNestedInside(world, state, iobj, dobj)) return refuse(world, state, input, verbDef, 'putIn.loop');
+    if (!objectState(world, state, iobj, 'open')) return refuse(world, state, input, verbDef, 'putIn.closedContainer');
+    return succeed(world, state, input, verbDef, [{ move: [dobj, { in: iobj }] }], 'putIn.success');
+  });
 }
 
 function builtinPutOn(world: WorldDef, state: GameState, input: ActionInput, verbDef: VerbDef | undefined): ActionResult {
   const dobj = input.dobj!;
-  const iobj = input.iobj;
-  if (iobj === undefined || world.objects?.[iobj]?.supporter !== true) {
-    return refuse(world, state, input, verbDef, 'putOn.notSupporter');
-  }
-  if (dobj === iobj || isNestedInside(world, state, iobj, dobj)) return refuse(world, state, input, verbDef, 'putOn.loop');
-  return succeed(world, state, input, verbDef, [{ move: [dobj, { on: iobj }] }], 'putOn.success');
+  return withImplicitTake(world, state, dobj, (world, state) => {
+    const iobj = input.iobj;
+    if (iobj === undefined || world.objects?.[iobj]?.supporter !== true) {
+      return refuse(world, state, input, verbDef, 'putOn.notSupporter');
+    }
+    if (dobj === iobj || isNestedInside(world, state, iobj, dobj)) return refuse(world, state, input, verbDef, 'putOn.loop');
+    return succeed(world, state, input, verbDef, [{ move: [dobj, { on: iobj }] }], 'putOn.success');
+  });
 }
 
 function builtinWear(world: WorldDef, state: GameState, input: ActionInput, verbDef: VerbDef | undefined): ActionResult {
   const id = input.dobj!;
-  if (world.objects?.[id]?.wearable !== true) return refuse(world, state, input, verbDef, 'wear.notWearable');
-  if (objectLocation(world, state, id) === 'worn') return refuse(world, state, input, verbDef, 'wear.alreadyWorn');
-  return succeed(world, state, input, verbDef, [{ move: [id, 'worn'] }], 'wear.success');
+  return withImplicitTake(world, state, id, (world, state) => {
+    if (world.objects?.[id]?.wearable !== true) return refuse(world, state, input, verbDef, 'wear.notWearable');
+    if (objectLocation(world, state, id) === 'worn') return refuse(world, state, input, verbDef, 'wear.alreadyWorn');
+    return succeed(world, state, input, verbDef, [{ move: [id, 'worn'] }], 'wear.success');
+  });
 }
 
 function builtinRemove(world: WorldDef, state: GameState, input: ActionInput, verbDef: VerbDef | undefined): ActionResult {
@@ -326,6 +390,7 @@ function builtinRead(world: WorldDef, state: GameState, input: ActionInput, verb
     events: [{ type: 'line', kind: 'prose', text: rendered.text }],
     consumesTurn: true,
     class: verbDef?.class ?? null,
+    ok: true,
   };
 }
 

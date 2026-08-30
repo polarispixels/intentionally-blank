@@ -312,6 +312,54 @@ describe('validate — every non-meta verb has a non-null default family (§2.9)
 // `move()` guard (task 5).
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// Stage B task 11 follow-up: no room name/alias, object noun/adjective, or
+// NPC noun may contain a noise word anywhere — `dropBaseNoise` strips a
+// noise-word token from any position in the input, not just the end (the
+// real `ROOM_A` bug: name "Fixture Room A" / alias "room a" both end in the
+// noise word "a"). The rule is deliberately broadened past "ends with" to
+// "any whole word" — a leading noise word ("the lobby") breaks the same
+// way; see this task's report.
+// ---------------------------------------------------------------------------
+
+describe('validate — no room/object/NPC vocabulary word is a noise word (Stage B task 11 follow-up)', () => {
+  it('rejects a room alias ending with a noise word (the real "room a" bug)', () => {
+    const world: WorldDef = {
+      ...FIXTURE_WORLD,
+      rooms: { ...FIXTURE_WORLD.rooms, [ROOM_C]: { ...FIXTURE_WORLD.rooms![ROOM_C]!, aliases: ['room a'] } },
+    };
+    const findings = findingsOf(world, 'noise-word-vocabulary');
+    expect(findings.length).toBeGreaterThan(0);
+    expect(findings.every((f) => f.severity === 'error')).toBe(true);
+    expect(findings.some((f) => f.message.includes('room a'))).toBe(true);
+  });
+
+  it('rejects a room name starting with a noise word (proves the broadened "any word" rule, not just "ends with")', () => {
+    const world: WorldDef = {
+      ...FIXTURE_WORLD,
+      rooms: { ...FIXTURE_WORLD.rooms, [ROOM_C]: { ...FIXTURE_WORLD.rooms![ROOM_C]!, name: 'The Lobby' } },
+    };
+    const findings = findingsOf(world, 'noise-word-vocabulary');
+    expect(findings.some((f) => f.message.includes('The Lobby'))).toBe(true);
+  });
+
+  it('rejects an object noun and adjective that are noise words, and an NPC noun', () => {
+    const world: WorldDef = {
+      ...FIXTURE_WORLD,
+      objects: { ...FIXTURE_WORLD.objects, [O('fixture_noisy')]: { location: ROOM_A, nouns: ['a'], adjectives: ['the'] } },
+      npcs: { ...FIXTURE_WORLD.npcs, [N('fixture_noisy_npc')]: { nouns: ['just'] } },
+    };
+    const findings = findingsOf(world, 'noise-word-vocabulary');
+    expect(findings.some((f) => f.message.includes('object.fixture_noisy.nouns'))).toBe(true);
+    expect(findings.some((f) => f.message.includes('object.fixture_noisy.adjectives'))).toBe(true);
+    expect(findings.some((f) => f.message.includes('npc.fixture_noisy_npc.nouns'))).toBe(true);
+  });
+
+  it('accepts a clean world (no false positive on ordinary content — the fixture itself)', () => {
+    expect(findingsOf(FIXTURE_WORLD, 'noise-word-vocabulary')).toEqual([]);
+  });
+});
+
 describe('validate — no authored effect strands a plotCritical object (§2.5)', () => {
   it('rejects a handler effect that moves a plotCritical object to "nowhere"', () => {
     const world: WorldDef = {
@@ -376,5 +424,25 @@ describe('validate — no authored effect strands a plotCritical object (§2.5)'
       },
     };
     expect(findingsOf(world, 'effect-strands-plot-critical')).toEqual([]);
+  });
+});
+
+describe('noise-word-vocabulary: NPC adjectives', () => {
+  it('rejects an NPC adjective that the tokenizer would strip', () => {
+    const world = {
+      ...FIXTURE_WORLD,
+      npcs: {
+        ...FIXTURE_WORLD.npcs,
+        ['noisy_npc' as NpcId]: {
+          id: 'noisy_npc' as NpcId,
+          nouns: ['clerk'],
+          adjectives: ['the'],
+        },
+      },
+    } as unknown as WorldDef;
+    const findings = validate(world);
+    expect(
+      findings.some((f) => f.code === 'noise-word-vocabulary' && f.message.includes('npc.noisy_npc.adjectives')),
+    ).toBe(true);
   });
 });

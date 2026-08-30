@@ -46,10 +46,18 @@ const ARTICLES = new Set(['the', 'a', 'an']);
 const ALWAYS_NOISE = new Set(['please', 'just']);
 
 /**
+ * Single source of truth for "always noise" words — `dropBaseNoise` below
+ * and `validate.ts`'s noise-word-in-vocabulary rule both read from this
+ * export; neither redeclares the word list. Deliberately excludes `at` —
+ * see file header for why it's context-dependent, not unconditional noise.
+ */
+export const NOISE_WORDS: ReadonlySet<string> = new Set([...ARTICLES, ...ALWAYS_NOISE]);
+
+/**
  * Drops articles and unconditional polite noise. Does NOT drop `at` — see
  * file header. `grammar.ts` applies the context-dependent second pass once
  * it knows which verb (and therefore which `preps`) it is matching against.
  */
 export function dropBaseNoise(tokens: string[]): string[] {
-  return tokens.filter((t) => !ARTICLES.has(t) && !ALWAYS_NOISE.has(t));
+  return tokens.filter((t) => !NOISE_WORDS.has(t));
 }
