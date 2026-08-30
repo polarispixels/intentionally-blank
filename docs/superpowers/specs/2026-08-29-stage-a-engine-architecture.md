@@ -255,7 +255,8 @@ export type GameEvent =
   | { type: 'died'; deathId: string }
   | { type: 'ended'; endingId: string }
   | { type: 'restarted' }
-  | { type: 'diag'; code: 'parserMiss' | 'defaultResponse' | 'nounMiss' | 'topicMiss';
+  | { type: 'diag'; code: 'parserMiss' | 'defaultResponse' | 'nounMiss' | 'topicMiss'
+                        | 'plotCriticalGuard';
       detail: string };                                   // never rendered to players
 ```
 
@@ -316,11 +317,14 @@ Authoring errors fail `npm test`, not a play session.
 One type serves every description, response, and dialogue slot:
 
 ```ts
-export type Prose = string | string[] | ProseRule[];
+export type Prose = string | string[] | ProseRule[] | ProseRef;
+
+/** Indirection into `world.responses` — the global families of §3.6. */
+export interface ProseRef { ref: string }
 
 export interface ProseRule {
   when?: Cond;              // first matching rule wins; omit = always matches
-  text: string | string[];  // string[] = rotation variants
+  text: string | string[] | ProseRef;  // string[] = rotation variants
 }
 ```
 
@@ -333,7 +337,19 @@ export interface ProseRule {
 - `ProseRule[]` gives state-dependent variants: put the most specific `when`
   first; the last rule should usually be unconditional (validated).
 - Templating: `{name}`, `{dobj}`, `{iobj}`, `{topic}` are filled by the
-  engine (`prose.ts`), same `fill` mechanism as the MVP.
+  engine (`prose.ts`). (Note: `prose.ts` reimplements substitution rather
+  than reusing the MVP's `text.ts` helper, because `text.ts` imports from
+  `src/content/` and reusing it would breach §0 layering rule 1
+  transitively. Task 4 finding.)
+- **`ProseRef` resolves against `world.responses`.** This is what lets a
+  handler write `{ say: { ref: 'takeDefault' } }` instead of duplicating a
+  global family inline, and it is how §3.6's ladder rungs 2–5 reach their
+  authored families at all. Resolution is one hop and validated:
+  `validate` rejects an unknown `ref`, and `render` refuses a `ref` chain
+  that cycles rather than recursing forever. Rotation counters key off the
+  **referencing** node's path, so two handlers sharing one family still
+  rotate independently — otherwise every `takeDefault` in the game would
+  share a single index, which is the MVP defect in a new costume.
 
 ### 2.3 Conditions and effects (the declarative DSL, ADR 0008)
 
@@ -375,6 +391,14 @@ export type Effect =
   | { if: { when: Cond; then: Effect[]; else?: Effect[] } }
   | { script: { id: ScriptId; args?: Record<string, FlagValue> } };  // escape hatch
 ```
+
+**Rotation paths inside an effect list are derived, not passed.** A handler
+with two `say` effects must not have them share a rotation counter, and
+requiring every caller to thread distinct context is a footgun that will be
+tripped eventually. `apply` derives each effect's render path as
+`${ctx.path}.effect[i]` from the effect's index in the list, the same way
+`render` derives `${path}[i]` from a matched rule's index (§2.2). Callers
+supply one path per handler; the engine keeps the nodes distinct.
 
 The escape hatch: `ScriptFn = (world, state, args) => { state; events }` —
 pure, registered by id in `content/scripts/`, covered by the purity test,

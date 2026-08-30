@@ -174,3 +174,82 @@ describe('render(): templating', () => {
     expect(result.text).toBe('You look at {dobj}.');
   });
 });
+
+describe('render(): say-by-reference (ProseRef)', () => {
+  const WORLD_WITH_RESPONSES: WorldDef = {
+    ...WORLD,
+    responses: {
+      unknown: ['Family variant one.', 'Family variant two.'],
+      nounMiss: { ref: 'unknown' }, // one-hop chain, not a cycle
+      selfCycle: { ref: 'selfCycle' },
+      cycleA: { ref: 'cycleB' },
+      cycleB: { ref: 'cycleA' },
+    },
+  };
+
+  it('resolves a bare ref against world.responses and renders it', () => {
+    const state = baseState();
+    const result = render(WORLD_WITH_RESPONSES, state, 'verb.take.default', { ref: 'unknown' });
+    expect(result.text).toBe('Family variant one.');
+  });
+
+  it('follows a one-hop chain of refs', () => {
+    const state = baseState();
+    const result = render(WORLD_WITH_RESPONSES, state, 'verb.eat.default', { ref: 'nounMiss' });
+    expect(result.text).toBe('Family variant one.');
+  });
+
+  it('throws on a ref naming a family that does not exist', () => {
+    const state = baseState();
+    expect(() =>
+      render(WORLD_WITH_RESPONSES, state, 'verb.take.default', { ref: 'noSuchFamily' }),
+    ).toThrow();
+  });
+
+  it('throws rather than recursing on a self-referencing family', () => {
+    const state = baseState();
+    expect(() =>
+      render(WORLD_WITH_RESPONSES, state, 'verb.take.default', { ref: 'selfCycle' }),
+    ).toThrow();
+  });
+
+  it('throws rather than recursing on a two-step ref cycle', () => {
+    const state = baseState();
+    expect(() =>
+      render(WORLD_WITH_RESPONSES, state, 'verb.take.default', { ref: 'cycleA' }),
+    ).toThrow();
+  });
+
+  it('keys the rotation counter off the referencing node, not the family', () => {
+    let state = baseState();
+    // Two different handlers reference the same family.
+    const r1 = render(WORLD_WITH_RESPONSES, state, 'verb.take.default', { ref: 'unknown' });
+    state = r1.state;
+    const r2 = render(WORLD_WITH_RESPONSES, state, 'verb.give.default', { ref: 'unknown' });
+    state = r2.state;
+    // Both start at index 0 of the family's variants independently.
+    expect(r1.text).toBe('Family variant one.');
+    expect(r2.text).toBe('Family variant one.');
+    expect(state.counters).toEqual({
+      'verb.take.default': 1,
+      'verb.give.default': 1,
+    });
+    expect(state.counters['unknown']).toBeUndefined();
+
+    // Advancing one further proves they rotate independently.
+    const r3 = render(WORLD_WITH_RESPONSES, state, 'verb.take.default', { ref: 'unknown' });
+    expect(r3.text).toBe('Family variant two.');
+    expect(r3.state.counters['verb.give.default']).toBe(1);
+  });
+
+  it("resolves a ProseRef inside a ProseRule.text, keyed to the rule's own node", () => {
+    const rules: ProseRule[] = [
+      { when: { flag: FLAG_MET_MARA, is: true }, text: { ref: 'unknown' } },
+      { text: 'not met yet' },
+    ];
+    const state = baseState({ flags: { [FLAG_MET_MARA]: true } });
+    const result = render(WORLD_WITH_RESPONSES, state, 'npc.mara.greet', rules);
+    expect(result.text).toBe('Family variant one.');
+    expect(result.state.counters).toEqual({ 'npc.mara.greet[0]': 1 });
+  });
+});

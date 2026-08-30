@@ -12,6 +12,42 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.2.12] - 2026-08-29
+
+### Added
+
+- **Architecture task 5: the effects DSL.** `src/engine/effects.ts` — the
+  `Effect` union and `apply()`, returning new state plus events and never
+  mutating its inputs (proven by deep-freezing state and world in the
+  tests, which is what makes the undo ring safe). 54 tests.
+- **The `plotCritical` guard has teeth at runtime, not just in the
+  validator.** `move()` is exported as a callable that refuses to send a
+  plot-critical object to `'nowhere'` or into an NPC's hands, emitting a
+  `plotCriticalGuard` diagnostic instead — and a test proves a content
+  script calling `move()` directly still gets refused. The validator
+  cannot see inside scripts; this closes that hole. The Custodian
+  threatens to take the notebook in prose; the state machine never lets
+  him.
+- **Say-by-reference.** `ProseRef` (`{ ref }`) is now a real variant of
+  `Prose`, resolved against `world.responses`. This is how the response
+  ladder's global families (`unknown`, `nounMiss`, per-verb defaults) are
+  reached without inlining a copy into every handler.
+
+### Fixed
+
+- **Two latent shared-rotation-counter bugs**, both the MVP defect in new
+  clothing, both silent in production — the game would simply stop varying
+  its responses. Rotation paths inside an effect list are now *derived*
+  (`${path}.effect[i]`, and `.then` / `.else` inside a branch) rather than
+  threaded by the caller, so two `say` effects in one handler can no longer
+  quietly share a counter. And `ProseRef` keys its counter off the
+  *referencing* node, not the referenced family — otherwise every
+  `takeDefault` in the game would have shared one index.
+- `render` now throws on an unknown `ref` and on a cyclic `ref` chain
+  (self-reference and two-step both tested) rather than emitting blank text
+  or recursing until the stack fails. `validate` will catch both earlier in
+  task 7; rendering is the backstop.
+
 ## [0.2.11] - 2026-08-29
 
 ### Added

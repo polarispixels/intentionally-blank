@@ -35,13 +35,29 @@ import type { Cond } from './cond';
 import { evaluate } from './cond';
 import type { GameState, WorldDef } from './world';
 
-export type Prose = string | string[] | ProseRule[];
+export type Prose = string | string[] | ProseRule[] | ProseRef;
+
+/**
+ * Indirection into `world.responses` — the global families of §3.6 (e.g.
+ * `unknown`, `nounMiss`, `unknownVerbKnownNoun`). Lets a handler write
+ * `{ say: { ref: 'takeDefault' } }` instead of duplicating a shared family
+ * inline. `render` resolves it against `world.responses`, one hop at a
+ * time, chasing chains of refs but refusing to recurse through a cycle
+ * (see `select` below).
+ */
+export interface ProseRef {
+  ref: string;
+}
 
 export interface ProseRule {
   /** Omit to always match. First matching rule in the array wins. */
   when?: Cond;
   /** `string[]` rotates, indexed by this rule's own per-node counter. */
-  text: string | string[];
+  text: string | string[] | ProseRef;
+}
+
+function isProseRef(value: unknown): value is ProseRef {
+  return typeof value === 'object' && value !== null && !Array.isArray(value) && 'ref' in value;
 }
 
 /** Values available to `{name}`, `{dobj}`, `{iobj}`, `{topic}` templating. */
@@ -77,13 +93,41 @@ function fillTemplate(template: string, ctx: ProseContext): string {
  * supply an unconditional fallback rule (validated by task 7), so reaching
  * the end of the array with no match is a data bug, not a case to render
  * silently.
+ *
+ * `ProseRef` (top-level, or as a rule's `text`) is resolved against
+ * `world.responses` one hop at a time. `visited` tracks the family names
+ * already chased in this call's chain so a cycle throws instead of
+ * recursing forever — an unknown ref throws too (task 7's `validate`
+ * catches both at content-load time; `render` must never render a `ref`
+ * as silent empty text). Deliberately loud rather than a diagnostic event:
+ * both are data bugs the content author must fix, not player-facing
+ * situations to degrade gracefully around, and a thrown error fails the
+ * content test immediately instead of shipping a blank line.
+ *
+ * `path`/`node` are **not** touched by ref resolution — per §2.2, rotation
+ * counters key off the referencing node (the `path` the caller passed, or
+ * `${path}[i]` for a matched rule), never off the resolved family's own
+ * name. That is what lets two handlers share one family and still rotate
+ * independently.
  */
 function select(
   world: WorldDef,
   state: GameState,
   path: string,
   prose: Prose,
+  visited: Set<string> = new Set(),
 ): { text: string | string[]; node: string } {
+  if (isProseRef(prose)) {
+    if (visited.has(prose.ref)) {
+      throw new Error(`prose.render: "${path}" has a cyclic ref chain through "${prose.ref}"`);
+    }
+    const family = world.responses?.[prose.ref];
+    if (family === undefined) {
+      throw new Error(`prose.render: "${path}" refs unknown family "${prose.ref}"`);
+    }
+    return select(world, state, path, family, new Set(visited).add(prose.ref));
+  }
+
   if (typeof prose === 'string') return { text: prose, node: path };
 
   if (prose.length === 0) {
@@ -99,7 +143,11 @@ function select(
   for (let i = 0; i < rules.length; i++) {
     const rule = rules[i]!;
     if (rule.when === undefined || evaluate(world, state, rule.when)) {
-      return { text: rule.text, node: `${path}[${i}]` };
+      const node = `${path}[${i}]`;
+      if (isProseRef(rule.text)) {
+        return select(world, state, node, rule.text, visited);
+      }
+      return { text: rule.text, node };
     }
   }
   throw new Error(`prose.render: no rule of "${path}" matched, and none is unconditional`);
