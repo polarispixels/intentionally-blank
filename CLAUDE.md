@@ -44,12 +44,14 @@ mystery. Spec v0.1.0 — see `docs/spec/`.
    never reaches `main`.
 6. **Verify before claiming done.** `npm test` green, and for anything
    player-visible a headless CLI transcript. Report failures verbatim.
-7. **Versioning.** MAJOR = breaks saves or story canon; MINOR = new
-   player-visible content or a milestone; PATCH = fixes and tuning. Every
-   release: bump `GAME_VERSION` and `package.json`, add `## [x.y.z]` to
-   `CHANGELOG.md`, update the `BACKLOG.md` status board, `git tag vX.Y.Z`. A
-   test enforces that the three version strings match. In-game `VERSION`
-   prints it.
+7. **Versioning — every merge to `main` is a release.** MAJOR = breaks
+   saves or story canon; MINOR = new player-visible content or a milestone;
+   PATCH = fixes, tuning, docs. No change reaches `main` without: bump
+   `GAME_VERSION` and `package.json`, add `## [x.y.z]` to `CHANGELOG.md`
+   (never leave work under `[Unreleased]`), bump the `Spec version` line of
+   any spec doc touched, update the `BACKLOG.md` board if a milestone moved,
+   `git tag vX.Y.Z`. A test enforces that the version strings match. In-game
+   `VERSION` prints it. Ryan's rule: *always update the version number.*
 
 ## Model routing
 

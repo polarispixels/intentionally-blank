@@ -15,10 +15,13 @@ a git tag per release, and a test that enforces they match.
 - One version number for the project. The spec's changelog is merged into
   the root `CHANGELOG.md`; each spec doc's `Spec version` line is bumped
   when its content changes as part of a release.
-- Keep a Changelog format with an `[Unreleased]` section updated in every
-  PR that changes player-visible behavior or canon.
+- Keep a Changelog format. **Every merge to `main` is a release** — `main`
+  deploys, so there is no accumulating `[Unreleased]` section; each merge
+  adds its own `## [x.y.z]` entry and tag. (Tightened at v0.2.1 after a
+  docs-only merge shipped without a bump.)
 - Policy: MAJOR = breaks saves or story canon; MINOR = new player-visible
-  content or milestone; PATCH = fixes/tuning.
+  content or milestone; PATCH = fixes, tuning, and documentation-only
+  changes.
 - Sources of truth that must agree: `GAME_VERSION` in the engine,
   `package.json` `version`, and the top `## [x.y.z]` entry. A Vitest test
   asserts equality. Each release is tagged `vX.Y.Z`.

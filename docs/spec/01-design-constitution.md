@@ -1,6 +1,6 @@
 # 01 - Design Constitution
 
-**Spec version:** `0.1.0`
+**Spec version:** `0.2.1`
 
 ## Purpose
 

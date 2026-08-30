@@ -1,6 +1,6 @@
 # 06 - Narrative Tone and Writing Guide
 
-**Spec version:** `0.1.0`
+**Spec version:** `0.2.1`
 
 # 1. Narrative Objective
 
