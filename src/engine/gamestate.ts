@@ -120,7 +120,8 @@ export type GameEvent =
   | { type: 'restarted' }
   | {
       type: 'diag';
-      code: 'parserMiss' | 'defaultResponse' | 'nounMiss' | 'topicMiss' | 'plotCriticalGuard';
+      code: 'parserMiss' | 'defaultResponse' | 'nounMiss' | 'topicMiss' | 'plotCriticalGuard'
+          | 'phaseRefused';
       detail: string;
     };
 

@@ -75,6 +75,12 @@ describe('purity: src/content', () => {
   });
 });
 
+describe('purity: src/session', () => {
+  it('has no browser, timer, randomness, or Vue dependency', () => {
+    assertPure('src/session');
+  });
+});
+
 describe('stripNonCode', () => {
   it('removes single- and double-quoted string bodies', () => {
     expect(stripNonCode(`const a = 'window'; const b = "document";`)).not.toMatch(/window|document/);

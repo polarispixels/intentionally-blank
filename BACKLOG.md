@@ -74,6 +74,12 @@ Version targets follow the ladder in `docs/spec/README.md` and may shift.
 
 ## Prose gaps to batch into the next `narrative-writer` pass
 
+- **No authored line for acting after death or an ending.** The turn loop
+  refuses non-meta actions once `phase` is `'dead'` or `'ended'` (meta verbs
+  still work, since UNDO and RESTART ENCOUNTER are exactly what a player
+  needs then). It needs a global family saying so in voice. Batches with the
+  M1 prose.
+
 - **Bare non-built-in verbs land on `nounMiss`.** A player typing a bare
   `SEARCH` or `EXAMINE` gets "Nothing in the room admits to being it" — a
   response about a noun they never typed. The 13 built-in verbs are covered

@@ -12,6 +12,63 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.2.27] - 2026-08-30
+
+The engine is a playable loop for the first time.
+
+### Added
+
+- **Architecture task 18: the session layer and saves.** `src/session/`
+  (pure, behind a `SaveStore` interface per ADR 0010) plus
+  `src/engine/turn.ts`, the v2 turn loop that assembles parser, response
+  ladder, actions, NPCs, tick, puzzles, and knowledge into one command.
+  32 new tests; 658 green. `src/session/` joins the purity scan.
+- Save/load, autosave, a 15-deep undo ring plus a persisted `undo` slot so
+  one undo survives a browser reload, checkpoints and `RESTART ENCOUNTER`,
+  export/import, and the 20,000-entry history ceiling that flags
+  `historyTruncated` rather than truncating silently.
+- **The durability contract is now a test, not a promise.** A save is taken
+  against one world and loaded against a world with rooms, objects, and
+  flags *added* — then a turn is played against the new content off the old
+  save. New flags resolve to authored defaults, new objects to authored
+  locations, no migration involved. That works only because state is a
+  sparse overlay, which is the decision every task since ADR 0009 has been
+  protecting.
+- **A turn is one typed command.** `TAKE ALL` consumes one turn and tallies
+  one profile entry regardless of how many objects it expands to. Charging
+  per sub-action would let schedules and timed windows advance based on how
+  a player phrased something, and would reward typing items individually.
+- **The engine refuses play after death.** Nothing had gated input once
+  `phase` left `'playing'` — left to shell convention, that reaches
+  production through whichever shell nobody remembered, and the playtester
+  agent is one of those shells. Non-meta actions are now refused with no
+  tick, no clock, no tally, no turn increment; `UNDO`, `RESTART`, and
+  `RESTART ENCOUNTER` keep working, because death should cost curiosity
+  nothing (constitution §11).
+- `validate` requires a refusal family wherever content authors a `die` or
+  `end` effect. A world that can kill the player and has nothing to say
+  afterward is a content bug that should fail the build, not surface as
+  silence.
+
+### Fixed
+
+- `state.turn` was incremented by no module at all — `tick` advanced the
+  clock and nothing advanced the counter. A turn counter nobody advances
+  stays invisible until a puzzle depends on it.
+- Phase refusals emit their own `phaseRefused` diagnostic rather than
+  borrowing `defaultResponse`. The playtester audits diags to find actions
+  the game answered poorly, and "refused because you are dead" is not the
+  same finding as "nobody authored a handler". A diagnostic channel is only
+  worth having if each code means one thing.
+
+### Changed
+
+- Prompts are opened by content scripts, not by the `openPrompt` effect. A
+  prompt's title, body, and fields had no home in any world table, and
+  inventing one would have moved authored content into the engine's schema.
+  The script emits the event and the reply dispatches straight back to it —
+  never through verb grammar, never consuming a turn.
+
 ## [0.2.26] - 2026-08-30
 
 ### Added

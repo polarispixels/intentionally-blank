@@ -23,6 +23,7 @@ import type { ClueId, DayPhase, FlagId, MemoryId, NpcId, ObjectId, PlaceId, Puzz
 import { compileVocabulary } from './parser/vocabulary';
 import { NOISE_WORDS } from './parser/tokenize';
 import type { Prose, ProseRef, ProseRule } from './prose';
+import { DEAD_REFUSED_FAMILY, ENDED_REFUSED_FAMILY } from './turn';
 import type { TopicDef, VerbDef, WorldDef } from './world';
 
 export interface Finding {
@@ -54,6 +55,7 @@ export function validate(world: WorldDef): Finding[] {
   checkKnowledgeConds(world, findings);
   checkClueQuestionRefs(world, findings);
   checkPuzzles(world, findings);
+  checkDeathEndingResponseFamilies(world, findings);
 
   return findings;
 }
@@ -537,6 +539,73 @@ function checkPlotCriticalStrandEffects(world: WorldDef, findings: Finding[]): v
     handlers.forEach((handler, hi) => {
       checkPlotCriticalStrand(world, handler.effects, `object.${objId}.handlers[${hi}].effects`, findings);
     });
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Death/ending refusal families (`turn.ts`'s §5 phase gate, task 18 follow-
+// up). A world that can kill or end the player and has nothing to say
+// afterward is a content bug, not a runtime surprise: once a `{ die }`/
+// `{ end }` effect exists anywhere in the world, the matching
+// `DEAD_REFUSED_FAMILY`/`ENDED_REFUSED_FAMILY` global family must be
+// authored, or the phase gate has nothing to render for every subsequent
+// non-meta action.
+//
+// `WorldDef` has no `deaths`/`endings` registry (this file's own SCOPE
+// NOTE, above) — "declares a death/ending" therefore means "authors a
+// `{die}`/`{end}` effect somewhere," found by walking every `Effect[]`
+// site this file already knows about (object handlers, npc topics/
+// tellTopics/showResponses, events, puzzle `onSolved`), recursing into
+// `if.then`/`if.else` via the same `walkEffects` the plot-critical-strand
+// rule above uses. `{ script }` effects are opaque here for the same
+// reason they're opaque to that rule — a script could theoretically call
+// `apply()` with a `{die}`/`{end}` effect of its own construction, which
+// this build-time walk can't see; that stays a runtime concern, not this
+// rule's to catch.
+// ---------------------------------------------------------------------------
+
+function collectAllEffectLists(world: WorldDef): { effects: readonly Effect[] }[] {
+  const lists: { effects: readonly Effect[] }[] = [];
+  for (const def of Object.values(world.objects ?? {})) {
+    for (const handler of def!.handlers ?? []) lists.push({ effects: handler.effects });
+  }
+  for (const def of Object.values(world.npcs ?? {})) {
+    for (const topic of def!.topics ?? []) lists.push({ effects: topic.effects ?? [] });
+    for (const topic of def!.tellTopics ?? []) lists.push({ effects: topic.effects ?? [] });
+    for (const show of def!.showResponses ?? []) lists.push({ effects: show.effects ?? [] });
+  }
+  for (const def of Object.values(world.events ?? {})) lists.push({ effects: def!.effects });
+  for (const def of Object.values(world.puzzles ?? {})) {
+    if (def!.onSolved !== undefined) lists.push({ effects: def!.onSolved });
+  }
+  return lists;
+}
+
+function checkDeathEndingResponseFamilies(world: WorldDef, findings: Finding[]): void {
+  let hasDeath = false;
+  let hasEnding = false;
+  for (const { effects } of collectAllEffectLists(world)) {
+    walkEffects(effects, (effect) => {
+      if ('die' in effect) hasDeath = true;
+      if ('end' in effect) hasEnding = true;
+    });
+  }
+
+  if (hasDeath && world.responses?.[DEAD_REFUSED_FAMILY] === undefined) {
+    findings.push(
+      error(
+        'missing-dead-refused-family',
+        `world authors a {die} effect somewhere but responses["${DEAD_REFUSED_FAMILY}"] is not declared — the phase gate (turn.ts) has nothing to say once the player is dead`,
+      ),
+    );
+  }
+  if (hasEnding && world.responses?.[ENDED_REFUSED_FAMILY] === undefined) {
+    findings.push(
+      error(
+        'missing-ended-refused-family',
+        `world authors an {end} effect somewhere but responses["${ENDED_REFUSED_FAMILY}"] is not declared — the phase gate (turn.ts) has nothing to say once the story has ended`,
+      ),
+    );
   }
 }
 

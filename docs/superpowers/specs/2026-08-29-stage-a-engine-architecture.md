@@ -246,6 +246,7 @@ engine still never reads a clock or RNG (the world `Clock` advances only via
 
 ```ts
 export function initialState(world: WorldDef): GameState;
+// Lives in `src/engine/turn.ts` until task 22 retires the MVP's `step.ts`.
 export function step(world: WorldDef, state: GameState, action: StructuredAction): StepResult;
 
 export interface StepResult { state: GameState; events: GameEvent[] }
@@ -272,7 +273,7 @@ export type GameEvent =
   | { type: 'ended'; endingId: string }
   | { type: 'restarted' }
   | { type: 'diag'; code: 'parserMiss' | 'defaultResponse' | 'nounMiss' | 'topicMiss'
-                        | 'plotCriticalGuard';
+                        | 'plotCriticalGuard' | 'phaseRefused';
       detail: string };                                   // never rendered to players
 ```
 
@@ -403,7 +404,7 @@ export type Effect =
   | { advanceClock: number }             // minutes, beyond the per-turn default
   | { checkpoint: string }               // emit checkpoint event (§5.6)
   | { die: string } | { end: string }    // death / ending id
-  | { openPrompt: string }               // prompt id defined in a script table
+  | { openPrompt: string }               // superseded: see note below
   | { if: { when: Cond; then: Effect[]; else?: Effect[] } }
   | { script: { id: ScriptId; args?: Record<string, FlagValue> } };  // escape hatch
 ```
@@ -415,6 +416,16 @@ tripped eventually. `apply` derives each effect's render path as
 `${ctx.path}.effect[i]` from the effect's index in the list, the same way
 `render` derives `${path}[i]` from a matched rule's index (§2.2). Callers
 supply one path per handler; the engine keeps the nodes distinct.
+
+**Prompts are opened by scripts, not by the `openPrompt` effect.** Task 18
+found that a prompt's title, body, and fields have no home in any `WorldDef`
+table, and inventing one would have put authored content into the engine's
+schema for no gain. A content script emits the `prompt` event itself and
+`session.respondToPrompt` dispatches the reply straight back to that script
+— never through the verb grammar, and never consuming a turn. That is
+ADR 0008's division working as intended: the engine owns the event shape,
+content owns what the prompt says. `openPrompt` remains in the union as a
+no-op for now and is removed with the MVP in task 22.
 
 The escape hatch: `ScriptFn = (world, state, args) => { state; events }` —
 pure, registered by id in `content/scripts/`, covered by the purity test,

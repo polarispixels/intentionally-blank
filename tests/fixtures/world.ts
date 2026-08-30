@@ -78,6 +78,7 @@
 // explicit-effect-only fixtures other tasks' tests already depend on.
 
 import { C, F, M, N, O, P, Q, R, S, V } from '../../src/engine/ids';
+import { flag } from '../../src/engine/cond';
 import { BUILTIN_VERB_IDS } from '../../src/engine/actions';
 import { AGAIN_VERB_ID } from '../../src/engine/interpreter';
 import type { GameEvent, ScriptFn, WorldDef } from '../../src/engine/world';
@@ -219,6 +220,79 @@ export const fixtureScript: ScriptFn = (_world, state, args) => {
   return { state: { ...state, flags: { ...state.flags, [FLAG_BOOL]: true } }, events };
 };
 
+/**
+ * Task 18 (`tests/session.test.ts`) addition: one object whose TAKE handler
+ * exercises the `{ checkpoint }` effect arm end to end through a real turn
+ * (`effects.ts` already implements it — this fixture only needed authored
+ * data to reach it). `SIGIL`'s checkpoint id is read directly by the
+ * session tests, not looked up anywhere.
+ *
+ * NOT here: a `{ die }`/`{ end }` fixture object. `validate.ts`'s new
+ * death/ending-refusal-family rule (coordinator follow-up to task 18) means
+ * the moment *any* object in this shared fixture authors one, every world
+ * built by substituting a narrower `responses` map over `FIXTURE_WORLD`
+ * (several `tests/validate.test.ts` cases do exactly this, on purpose, to
+ * isolate the prose/rotation rules) must also carry the matching family or
+ * fail validation — a fixture-wide constraint those tests never signed up
+ * for. `tests/session.test.ts` builds its own small `{die}`/`{end}`-bearing
+ * `WorldDef` layered on top of `FIXTURE_WORLD` instead, scoped to the tests
+ * that actually need the phase gate.
+ */
+export const SIGIL = O('fixture_sigil');
+export const FIXTURE_CHECKPOINT_ID = 'fixture_checkpoint_sigil';
+
+/**
+ * Task 18 additions: a login-style prompt round-trip
+ * (`prompt` event → `respondToPrompt` → `script`, §5.7). `TERMINAL`'s
+ * TURN ON handler opens the prompt via `PROMPT_OPEN_SCRIPT` (the "real
+ * mechanism" `effects.ts`'s `openPrompt` doc comment defers to this task:
+ * a `{ script }` effect that builds the full `prompt` event itself, not
+ * the bare-id `openPrompt` effect arm). `PROMPT_RESPOND_SCRIPT` is what
+ * `session.respondToPrompt` (this task) dispatches a submitted prompt's
+ * `values` to — never reached through the ordinary verb/grammar path,
+ * exactly like the MVP's credential check it replaces (§1.4's MVP note).
+ * `FLAG_PROMPT_ATTEMPTS` mirrors the MVP's `loginAttempts` counter (a
+ * derived-modal-state read, never itself the modal state — §5.7).
+ */
+export const TERMINAL = O('fixture_terminal');
+export const FLAG_PROMPT_ATTEMPTS = F('fixture_flag_prompt_attempts');
+export const FLAG_PROMPT_SOLVED = F('fixture_flag_prompt_solved');
+export const PROMPT_OPEN_SCRIPT = S('fixture_prompt_open_script');
+export const PROMPT_RESPOND_SCRIPT = S('fixture_prompt_respond_script');
+export const FIXTURE_PROMPT_ID = 'fixture_login_prompt';
+export const FIXTURE_PROMPT_USERNAME = 'player';
+export const FIXTURE_PROMPT_PASSWORD = 'letmein';
+
+const promptOpenScript: ScriptFn = (_world, state) => ({
+  state,
+  events: [
+    {
+      type: 'prompt',
+      id: FIXTURE_PROMPT_ID,
+      title: 'Terminal Login',
+      body: 'Enter your credentials.',
+      fields: [{ name: 'username' }, { name: 'password', secret: true }],
+    },
+  ],
+});
+
+const promptRespondScript: ScriptFn = (world, state, args) => {
+  const username = String(args?.['username'] ?? '');
+  const password = String(args?.['password'] ?? '');
+  if (username === FIXTURE_PROMPT_USERNAME && password === FIXTURE_PROMPT_PASSWORD) {
+    return {
+      state: { ...state, flags: { ...state.flags, [FLAG_PROMPT_SOLVED]: true } },
+      events: [{ type: 'promptClosed', id: FIXTURE_PROMPT_ID }],
+    };
+  }
+  const current = flag(world, state, FLAG_PROMPT_ATTEMPTS);
+  const attempts = (typeof current === 'number' ? current : 0) + 1;
+  return {
+    state: { ...state, flags: { ...state.flags, [FLAG_PROMPT_ATTEMPTS]: attempts } },
+    events: [{ type: 'line', kind: 'system', text: 'Login failed.' }],
+  };
+};
+
 export const FIXTURE_WORLD: WorldDef = {
   meta: {
     // morning 06:00, afternoon 12:00, evening 18:00, night 22:00 — night
@@ -240,6 +314,8 @@ export const FIXTURE_WORLD: WorldDef = {
     [FLAG_PUZZLE_ROUTE_B]: { default: false, doc: 'task 16: PUZZLE_1 route B (analytical)' },
     [FLAG_PUZZLE_ROUTE_C]: { default: false, doc: 'task 16: PUZZLE_1 route C (social)' },
     [FLAG_PUZZLE_SOLVED]: { default: false, doc: 'task 16: set once by PUZZLE_1.onSolved' },
+    [FLAG_PROMPT_ATTEMPTS]: { default: 0, doc: 'task 18: fixture login-prompt failed-attempt counter' },
+    [FLAG_PROMPT_SOLVED]: { default: false, doc: 'task 18: set once the fixture prompt is answered correctly' },
   },
   // Task 9 (`parser/vocabulary.ts`) additions below: `name`/`aliases` on
   // every room, `nouns`/`adjectives` on every object and on `GUIDE` — the
@@ -331,6 +407,40 @@ export const FIXTURE_WORLD: WorldDef = {
     [SPARE_KEY]: { location: ROOM_A, name: 'spare key', nouns: ['key'], portable: true },
     [METAL_BOX]: { location: ROOM_A, name: 'metal box', nouns: ['box'], adjectives: ['metal'] },
     [DOOR]: { location: ROOM_B, name: 'oak door', nouns: ['door'], adjectives: ['oak'], container: { open: false } },
+    // Task 18 addition: see the doc comment at SIGIL/TERMINAL's own
+    // declarations above for why each handler is shaped this way.
+    [SIGIL]: {
+      location: ROOM_A,
+      name: 'carved sigil',
+      nouns: ['sigil'],
+      adjectives: ['carved'],
+      portable: true,
+      handlers: [
+        {
+          verbs: [BUILTIN_VERB_IDS.take],
+          class: 'direct',
+          effects: [
+            { say: 'You take the sigil. Something settles into place behind you.' },
+            { move: [SIGIL, 'inventory'] },
+            { checkpoint: FIXTURE_CHECKPOINT_ID },
+          ],
+        },
+      ],
+    },
+    [TERMINAL]: {
+      location: ROOM_A,
+      name: 'dusty terminal',
+      nouns: ['terminal'],
+      adjectives: ['dusty'],
+      description: 'A dusty terminal, somehow still powered.',
+      handlers: [
+        {
+          verbs: [BUILTIN_VERB_IDS.turnOn],
+          class: 'analytical',
+          effects: [{ script: { id: PROMPT_OPEN_SCRIPT } }],
+        },
+      ],
+    },
   },
   npcs: {
     [GUIDE]: {
@@ -543,6 +653,8 @@ export const FIXTURE_WORLD: WorldDef = {
   },
   scripts: {
     [SCRIPT_1]: fixtureScript,
+    [PROMPT_OPEN_SCRIPT]: promptOpenScript,
+    [PROMPT_RESPOND_SCRIPT]: promptRespondScript,
   },
   // Task 13 (`tests/tick.test.ts`) additions: one plain once-only event and
   // one `onlyIfWitnessed` event, exercising §2.8/§4.2/§4.3.3.
