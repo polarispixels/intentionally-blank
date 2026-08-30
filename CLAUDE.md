@@ -26,7 +26,10 @@ mystery. Spec v0.1.0 — see `docs/spec/`.
 1. **Canon labels are promoted only by Ryan.** `CANON` / `WORKING IDEA` /
    `POSSIBILITY` / `BACKLOG`. An agent may *propose* a promotion in its
    report; it may not edit a label. Implementation never silently redefines
-   story canon (spec 08 §10).
+   story canon (spec 08 §10). **Exception, for the full-game build only
+   (DEVELOPMENT.md → "Full-game build protocol"):** the main session may
+   resolve open items and promote labels, recording every decision in
+   `docs/spec/09-canon-decisions.md`. Subagents still only propose.
 2. **Docs are source code.** When a decision becomes firm it is written into
    the spec or an ADR in the same change as the code. Abandoned ideas are
    marked abandoned, not deleted.
@@ -80,7 +83,9 @@ prose; code is the middle.
 
 If a Fable subagent will not spawn, run it on Opus and say so in the report.
 While the main session is on Fable, it does the architect's work itself
-rather than round-tripping to a same-tier subagent.
+rather than round-tripping to a same-tier subagent. During the full-game
+build the main session runs on Opus and `game-architect` (Fable) writes the
+architecture and plans; see DEVELOPMENT.md.
 
 ## Token rules
 

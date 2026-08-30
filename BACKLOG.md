@@ -13,6 +13,20 @@ Maintenance rules:
 - Each milestone gets its own spec in `docs/superpowers/specs/` and plan in
   `docs/superpowers/plans/` before implementation starts.
 
+## Full-game build (one continuous run — protocol in `docs/DEVELOPMENT.md`)
+
+| Stage | Scope | Deploy | Status |
+|---|---|---|---|
+| A | Story + engine architecture: five-act causal spine, puzzle network, room list, NPC agendas, memory system, save/undo design; canon decisions registered in `docs/spec/09` | docs site | 🎯 next up |
+| B | Engine v2 (world model, parser v2, save/undo/autosave, map + open-questions UI) + the opening room (M1) | 0.3.0 | queued |
+| C | Act I: town, client, missing sibling, notebook trail (M2–M4) | 0.4–0.6 | queued |
+| D | Acts II–III: data center, underground, Dad on the USB, contradictions | 0.7–0.8 | queued |
+| E | Acts IV–V: reality travel, identity, the recursive ending | 0.9 | queued |
+| F | Hints, playtester sweeps, replay content, polish | 1.0.0 | queued |
+
+Each stage: spec → plan → build → deploy. Ryan plays the live URL at his
+discretion and may interrupt; a reset resumes from the last deployed stage.
+
 ## Status board
 
 | # | Item | Type | Target version | Status |
@@ -49,6 +63,8 @@ Version targets follow the ladder in `docs/spec/README.md` and may shift.
 - A command typed during the paced beat sequence is discarded after
   flushing (the input clears before the flush check). Either run it after
   the flush or keep the text.
+- Make the WSL browser-verification recipe (DEVELOPMENT.md) a
+  `tools/screenshot.mjs` that takes a stage script and writes PNGs.
 - `tests/purity.test.ts` strips string literals with a regex that has no
   token context, so a regex literal containing a quote character (e.g.
   `QUOTES` in `parser.ts`) blinds it to the span up to the next matching

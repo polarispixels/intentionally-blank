@@ -3,7 +3,7 @@
 **Project:** Browser-based modern text adventure
 **Working title:** *Intentionally Blank*
 **Repository:** `polarispixels/intentionally-blank`
-**Spec version:** `0.2.2`
+**Spec version:** `0.2.4`
 **Status:** Early creative and product foundation
 
 ## Purpose
@@ -53,6 +53,7 @@ curiosity.
 | `06-narrative-tone-and-writing-guide.md` | Voice, atmosphere, vocabulary, humor, reading level, and prose standards |
 | `07-backlog-and-open-questions.md` | Unresolved choices, optional ideas, and future content backlog |
 | `08-development-handoff.md` | Guidance for the coding agent and implementation boundaries |
+| `09-canon-decisions.md` | Register of open questions resolved during the full-game build (delegated canon authority) |
 
 The public docs site renders all of these as one navigable page, so there is
 no separate single-file master copy (ADR 0005, 0006).

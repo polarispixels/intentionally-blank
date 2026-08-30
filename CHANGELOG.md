@@ -12,6 +12,20 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.2.4] - 2026-08-29
+
+### Added
+
+- Full-game build protocol in `docs/DEVELOPMENT.md`: one continuous run
+  in stages A–F, each deployed to production; canon authority delegated
+  to the main session for the build with every decision recorded in the
+  new `docs/spec/09-canon-decisions.md`; main session on Opus with the
+  Fable `game-architect` writing architecture and plans. CLAUDE.md rule 1
+  and the routing table note the exception. `BACKLOG.md` gains the stage
+  board.
+- `docs/DEVELOPMENT.md`: browser verification on WSL via Windows Edge
+  headless (`--virtual-time-budget`) and an iframe harness.
+
 ## [0.2.3] - 2026-08-29
 
 ### Changed

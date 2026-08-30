@@ -205,6 +205,66 @@ Every path still bumps the version and writes the changelog entry — that is
 bookkeeping, not process. Revisit this table when it starts to feel wrong
 in either direction.
 
+## Full-game build protocol (agreed 2026-08-29)
+
+Ryan's instruction after v0.2.x: **build the entire game — the whole story,
+every act, every puzzle — as one continuous run**, using the spec and the
+main session's own creative judgment, without waiting for input.
+
+- **Waves, each deployed to production.** Work proceeds in stages; every
+  stage ends with a version bump, a changelog entry, and a deploy to
+  `main`. Ryan plays the live URL at his discretion and interrupts if
+  something looks wrong. A partial game at the public URL is expected
+  during the build.
+- **Resumable by construction.** `BACKLOG.md` carries the stage board; the
+  SDD ledger carries in-flight state. A context reset, interruption, or
+  new session resumes from the last deployed stage, never from scratch.
+- **Canon authority is delegated for this build.** The main session
+  resolves `WORKING IDEA` / `POSSIBILITY` items as the story requires and
+  promotes labels in the spec docs, recording every decision in
+  `docs/spec/09-canon-decisions.md` (what, why, what it forecloses). Ryan
+  reviews the register when he likes and may reverse anything; reversals
+  are story rewrites, so earlier is cheaper. This supersedes hard rule 1
+  for the duration of the build only.
+- **Model.** The main session runs on **Opus** for the marathon; the
+  `game-architect` agent (Fable) writes the story architecture, world
+  model, and plans in isolation with the full spec, and the main session
+  reviews and can send them back. Stage A is the highest-leverage moment:
+  its spec is deployed to the docs site before any code is written so Ryan
+  can read it.
+- **Stages** (targets, not promises): **A** story + engine architecture
+  (five-act causal spine, puzzle network, rooms, NPC agendas, memory and
+  save design) → docs deploy · **B** engine v2 + opening room → 0.3.0 ·
+  **C** town, client, notebook trail → 0.4–0.6 · **D** data center,
+  underground, Dad, contradictions → 0.7–0.8 · **E** reality travel,
+  identity, the recursive ending → 0.9 · **F** hints, playtester sweeps,
+  replay content, polish → 1.0.0.
+- **Process weight** follows the calibration table above: full ceremony for
+  stage A and engine work; light paths for rooms, puzzles, and prose.
+
+## Browser verification on WSL
+
+Playwright's bundled Chromium does not launch on this machine (missing
+system libraries). What works: the Windows-side Edge, driven headless from
+WSL —
+
+```sh
+"/mnt/c/Program Files (x86)/Microsoft/Edge/Application/msedge.exe" \
+  --headless=new --disable-gpu --hide-scrollbars --window-size=1100,800 \
+  --virtual-time-budget=30000 \
+  "--user-data-dir=C:\\Users\\<you>\\AppData\\Local\\Temp\\ib-edge" \
+  "--screenshot=C:\\Users\\<you>\\AppData\\Local\\Temp\\shot.png" \
+  "http://localhost:4173/intentionally-blank/"
+```
+
+`--virtual-time-budget` (not `--timeout`) is what lets page scripts run
+before the capture. For interaction, drop a throwaway harness page into
+`dist/` (gitignored) that embeds the app in a same-origin iframe and drives
+it with synthetic `input`/`submit` events, then screenshot the harness URL.
+Windows Edge reaches Vite's preview server on `localhost` directly; its
+remote-debugging port does not reach back into WSL. Read the PNG from
+`/mnt/c/...`. Making this a `tools/screenshot.mjs` is on the backlog.
+
 ## Adding an agent
 
 Add a file to `.claude/agents/` with `name`, `description` (this is what the
