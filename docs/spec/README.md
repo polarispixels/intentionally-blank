@@ -77,9 +77,11 @@ Suggested early version progression:
 
 ```text
 v0.1.0  Initial planning foundation
-v0.2.0  First playable opening
-v0.3.0  Notebook arc
-v0.4.0  Town expansion
+v0.2.0  Minimal playable prototype ("the machine goes")
+v0.3.0  First playable opening room
+v0.4.0  First exterior / town
+v0.5.0  Client and missing sibling
+v0.6.0  Notebook trail
 ...
 v1.0.0  Complete first game
 ```

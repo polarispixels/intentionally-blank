@@ -6,8 +6,8 @@ REPL, a deterministic simulated world, forgiving natural-language input, and
 authored prose. You wake on the floor of a ransacked room in a silent South
 Dakota town, with a headache and no name.
 
-- **Play:** https://polarispixels.github.io/intentionally-blank/ *(not yet
-  deployed — Milestone 0)*
+- **Play:** https://polarispixels.github.io/intentionally-blank/ — v0.2.0
+  is a five-minute prototype ("the machine goes"), not the story yet
 - **Docs:** https://polarispixels.github.io/intentionally-blank/docs/ —
   design canon, architecture, changelog, development process (generated
   from this repo's markdown)
@@ -20,12 +20,14 @@ Dakota town, with a headache and no name.
 
 ## Quick start
 
-Milestone 0 has not landed yet; there is no build to run. When it does:
-
 ```sh
 npm install
 npm run dev       # Vite dev server
 npm test          # Vitest — must be green before any change is "done"
-npm run play      # headless CLI REPL
+npm run typecheck # vue-tsc
+npm run play      # headless CLI REPL (add -- --script tests/fixtures/playthrough.txt --fast)
 npm run build     # dist/ (game) + dist/docs/ (docs site)
 ```
+
+Deploy = merge to `main`; GitHub Actions tests, builds, and publishes to
+Pages.
