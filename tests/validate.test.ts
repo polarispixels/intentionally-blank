@@ -2,21 +2,25 @@
 // (clock-free-solution rule), §1.1/cond.ts (npcAt-in-schedule cycle
 // warning), §6.2 (question phrasing), §8 task 7.
 //
-// SCOPE NOTE: `WorldDef` (src/engine/world.ts) is still task 6's narrow
-// slice — no `exits`, `handlers`, `verbs`, `puzzles`, `events`, `topics`,
-// `deaths`, or `endings` exist yet (those land in tasks 8, 9-11, 13-17).
-// So several §2.1 rules (verb `default` prose, puzzle clock-free-solution,
-// plot-critical-strand-via-authored-effect) have no data surface to
-// validate against yet and are not covered here — see the task report for
-// the full list and why. This file covers every rule that *is* checkable
-// against the current schema.
+// Task 8 additions: `verb.default` non-null for non-meta verbs, and the
+// plot-critical-strand-via-authored-effect rule (§2.5) — both land here
+// once `WorldDef.verbs`/`ObjectDefSlice.handlers` exist (task 8's own job
+// to add), per this file's own note below about what task 7 could not yet
+// cover.
+//
+// SCOPE NOTE: `WorldDef` (src/engine/world.ts) is still a growing slice —
+// no `exits`, `puzzles`, `events`, `topics`, `deaths`, or `endings` exist
+// yet (those land in tasks 9-11, 13-17). So several §2.1 rules (puzzle
+// clock-free-solution) have no data surface to validate against yet and
+// are not covered here.
 
 import { describe, expect, it } from 'vitest';
-import { C, F, M, N, O, Q, R } from '../src/engine/ids';
+import { C, F, M, N, O, Q, R, V } from '../src/engine/ids';
 import type { WorldDef } from '../src/engine/world';
 import type { Prose } from '../src/engine/prose';
+import { BUILTIN_VERB_IDS } from '../src/engine/actions';
 import { validate } from '../src/engine/validate';
-import { CLUE_1, FIXTURE_WORLD, GUIDE, LAMP, MEMORY_1, QUESTION_1, ROOM_A, ROOM_B, ROOM_C } from './fixtures/world';
+import { CLUE_1, FIXTURE_WORLD, GUIDE, KEY, LAMP, MEMORY_1, NOTEBOOK, QUESTION_1, ROOM_A, ROOM_B, ROOM_C } from './fixtures/world';
 
 function findingsOf(world: WorldDef, code: string) {
   return validate(world).filter((f) => f.code === code);
@@ -267,5 +271,110 @@ describe('validate — returns every finding, not just the first', () => {
     const findings = validate(world);
     expect(findings.some((f) => f.code === 'unknown-room-ref')).toBe(true);
     expect(findings.some((f) => f.code === 'unknown-flag-ref')).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// §8 task 8's first owed rule: every non-meta verb needs a non-null
+// `default` prose family.
+// ---------------------------------------------------------------------------
+
+describe('validate — every non-meta verb has a non-null default family (§2.9)', () => {
+  it('rejects a non-meta verb with default: null', () => {
+    const world: WorldDef = {
+      ...FIXTURE_WORLD,
+      verbs: {
+        ...FIXTURE_WORLD.verbs,
+        [V('fixture_broken_verb')]: { id: V('fixture_broken_verb'), words: ['kick'], patterns: ['V dobj'], class: 'direct', default: null },
+      },
+    };
+    const findings = findingsOf(world, 'verb-missing-default-family');
+    expect(findings.length).toBeGreaterThan(0);
+    expect(findings[0]!.severity).toBe('error');
+    expect(findings[0]!.message).toContain('fixture_broken_verb');
+  });
+
+  it('accepts a meta verb with default: null — meta verbs never reach the response ladder', () => {
+    const world: WorldDef = {
+      ...FIXTURE_WORLD,
+      verbs: {
+        ...FIXTURE_WORLD.verbs,
+        [V('fixture_meta_ok')]: { id: V('fixture_meta_ok'), words: ['save'], patterns: ['V'], class: null, meta: true, default: null },
+      },
+    };
+    expect(findingsOf(world, 'verb-missing-default-family')).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// §8 task 8's second owed rule: no authored effect strands a plotCritical
+// object (§2.5) — the data-side counterpart of `effects.ts`'s runtime
+// `move()` guard (task 5).
+// ---------------------------------------------------------------------------
+
+describe('validate — no authored effect strands a plotCritical object (§2.5)', () => {
+  it('rejects a handler effect that moves a plotCritical object to "nowhere"', () => {
+    const world: WorldDef = {
+      ...FIXTURE_WORLD,
+      objects: {
+        ...FIXTURE_WORLD.objects,
+        [KEY]: {
+          ...FIXTURE_WORLD.objects![KEY]!,
+          handlers: [{ verbs: [BUILTIN_VERB_IDS.drop], effects: [{ move: [NOTEBOOK, 'nowhere'] }] }],
+        },
+      },
+    };
+    const findings = findingsOf(world, 'effect-strands-plot-critical');
+    expect(findings.length).toBeGreaterThan(0);
+    expect(findings[0]!.severity).toBe('error');
+    expect(findings[0]!.message).toContain('fixture_notebook');
+  });
+
+  it('rejects a handler effect that moves a plotCritical object into npc possession, even nested inside an "if"', () => {
+    const world: WorldDef = {
+      ...FIXTURE_WORLD,
+      objects: {
+        ...FIXTURE_WORLD.objects,
+        [KEY]: {
+          ...FIXTURE_WORLD.objects![KEY]!,
+          handlers: [
+            {
+              verbs: [BUILTIN_VERB_IDS.drop],
+              effects: [{ if: { when: { flag: F('fixture_flag_bool') }, then: [{ move: [NOTEBOOK, { npc: GUIDE }] }] } }],
+            },
+          ],
+        },
+      },
+    };
+    const findings = findingsOf(world, 'effect-strands-plot-critical');
+    expect(findings.length).toBeGreaterThan(0);
+  });
+
+  it('accepts a handler effect that moves a plotCritical object between ordinary places', () => {
+    const world: WorldDef = {
+      ...FIXTURE_WORLD,
+      objects: {
+        ...FIXTURE_WORLD.objects,
+        [KEY]: {
+          ...FIXTURE_WORLD.objects![KEY]!,
+          handlers: [{ verbs: [BUILTIN_VERB_IDS.drop], effects: [{ move: [NOTEBOOK, 'inventory'] }] }],
+        },
+      },
+    };
+    expect(findingsOf(world, 'effect-strands-plot-critical')).toEqual([]);
+  });
+
+  it('does not flag a non-plotCritical object moved to "nowhere"', () => {
+    const world: WorldDef = {
+      ...FIXTURE_WORLD,
+      objects: {
+        ...FIXTURE_WORLD.objects,
+        [KEY]: {
+          ...FIXTURE_WORLD.objects![KEY]!,
+          handlers: [{ verbs: [BUILTIN_VERB_IDS.drop], effects: [{ move: [KEY, 'nowhere'] }] }],
+        },
+      },
+    };
+    expect(findingsOf(world, 'effect-strands-plot-critical')).toEqual([]);
   });
 });

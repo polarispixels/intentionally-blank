@@ -1227,6 +1227,17 @@ green + `npm test` green.
 11. **Parser: ALL, AND, BUT, GO TO, AGAIN.**
     `tests/parser-multi.test.ts`: expansions, per-line reporting, GO TO
     over visited graph with interruption, AGAIN.
+
+    **Also: implicit take.** `WEAR FEDORA` or `PUT PAGE IN NOTEBOOK` when
+    the object is present but not held should perform the take first and
+    say so — the Infocom `(first taking the fedora)` convention — rather
+    than refusing with "you aren't holding it." This is constitution §22
+    exactly: discovery is manual, repetition is automated. Task 8
+    deliberately deferred it as scope creep, correctly; it belongs here
+    with the other conveniences. It must be visible (the player is told
+    what was done on their behalf) and must respect every refusal the
+    built-in TAKE would have raised — an implicit take of a non-portable
+    object fails as a take, not as a wear.
 12. **Response ladder.** `src/engine/respond.ts`;
     `tests/respond.test.ts`: one test per rung of §3.6, seen-vs-unseen
     noun-miss, diag events emitted with correct codes.

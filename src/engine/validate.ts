@@ -20,6 +20,7 @@
 // whole list, not one error at a time).
 
 import type { Cond } from './cond';
+import type { Effect } from './effects';
 import type { ClueId, DayPhase, FlagId, MemoryId, NpcId, ObjectId, PlaceId, QuestionId, RoomId } from './ids';
 import type { Prose, ProseRef, ProseRule } from './prose';
 import type { WorldDef } from './world';
@@ -42,6 +43,8 @@ export function validate(world: WorldDef): Finding[] {
   checkResponseFamilies(world, findings);
   checkQuestionPhrasing(world, findings);
   checkPhaseTable(world, findings);
+  checkVerbDefaults(world, findings);
+  checkPlotCriticalStrandEffects(world, findings);
 
   return findings;
 }
@@ -402,5 +405,71 @@ function checkPhaseTable(world: WorldDef, findings: Finding[]): void {
       continue;
     }
     seen.set(start, name);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Verbs: every non-meta verb needs a non-null `default` family (§2.9, §8
+// task 8's first owed rule). Without this, response-ladder rung 2 (§3.6)
+// has nothing to fall back to for any verb–object pair nobody hand-
+// authored a handler for, and the game says nothing instead of something
+// in-voice. Meta verbs (SAVE/LOAD/UNDO/HINT/MAP…) are exempt — they never
+// reach the ladder, being intercepted by the session layer.
+// ---------------------------------------------------------------------------
+
+function checkVerbDefaults(world: WorldDef, findings: Finding[]): void {
+  for (const [id, def] of Object.entries(world.verbs ?? {})) {
+    if (def!.meta === true) continue;
+    if (def!.default === null) {
+      findings.push(
+        error(
+          'verb-missing-default-family',
+          `verb.${id}.default is null — every non-meta verb needs a non-null default prose family for response-ladder rung 2 (§3.6)`,
+        ),
+      );
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// No authored effect strands a plotCritical object (§2.5, §8 task 8's
+// second owed rule). Walks every object's `handlers[*].effects`, recursing
+// into `if.then`/`if.else`, looking for a literal `{ move: [id, place] }`
+// that sends a `plotCritical` object to `'nowhere'` or `{ npc: … }`.
+// `{ script }` effects are opaque here by construction — a script can only
+// be caught by the runtime guard in `effects.ts`'s `move()` (task 5),
+// which this rule sits beside, not on top of.
+// ---------------------------------------------------------------------------
+
+function walkEffects(effects: readonly Effect[], visit: (effect: Effect) => void): void {
+  for (const effect of effects) {
+    visit(effect);
+    if ('if' in effect) {
+      walkEffects(effect.if.then, visit);
+      if (effect.if.else !== undefined) walkEffects(effect.if.else, visit);
+    }
+  }
+}
+
+function checkPlotCriticalStrandEffects(world: WorldDef, findings: Finding[]): void {
+  for (const [objId, def] of Object.entries(world.objects ?? {})) {
+    const handlers = def!.handlers ?? [];
+    handlers.forEach((handler, hi) => {
+      walkEffects(handler.effects, (effect) => {
+        if (!('move' in effect)) return;
+        const [targetId, place] = effect.move;
+        if (world.objects?.[targetId]?.plotCritical !== true) return;
+        const strandsToNowhere = place === 'nowhere';
+        const strandsToNpc = typeof place === 'object' && place !== null && 'npc' in place;
+        if (strandsToNowhere || strandsToNpc) {
+          findings.push(
+            error(
+              'effect-strands-plot-critical',
+              `object.${objId}.handlers[${hi}].effects moves plot-critical object "${targetId}" to ${JSON.stringify(place)} — plot-critical objects may never leave the reachable world (§2.5)`,
+            ),
+          );
+        }
+      });
+    });
   }
 }

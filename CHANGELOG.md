@@ -12,6 +12,43 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.2.15] - 2026-08-30
+
+The core engine stack is complete. Parser next.
+
+### Added
+
+- **Architecture task 8: built-in verb semantics.** `src/engine/actions.ts`
+  — TAKE, DROP, OPEN, CLOSE, LOCK, UNLOCK, PUT IN, PUT ON, WEAR, REMOVE,
+  READ, TURN ON, TURN OFF, with their refusals, plus the response ladder's
+  rung 1 / rung 2 dispatch. 59 new tests; 349 green.
+
+  This is the split that makes 41 rooms authorable: a writer marks a fedora
+  `portable` and `wearable` and gets every one of those verbs — and every
+  refusal — without writing logic. Physics is free; the author supplies
+  prose and the interesting handlers.
+
+  Refusals carry information rather than just saying no (constitution §9):
+  a locked container says it is locked. A glass case lets you *see* an
+  object but not reach it. `PUT IN` walks the full containment ancestor
+  chain, so putting a box inside something it already contains is caught,
+  not just putting it inside itself.
+
+- The two validator rules task 7 was owed: `verb-missing-default-family`
+  (every non-meta verb must have authored default prose, or the response
+  ladder has nothing to fall back on) and `effect-strands-plot-critical`
+  (no authored handler may move a plot-critical object to `'nowhere'` or
+  into an NPC's hands, recursing through `if` branches). Scripts remain
+  opaque to the validator by design — task 5's runtime guard covers those.
+
+### Changed
+
+- Implicit take (`WEAR FEDORA` when the fedora is on the floor performing
+  the take first, and saying so) is now an explicit requirement of task 11,
+  alongside the other conveniences. Task 8 deferred it as scope creep,
+  correctly — but constitution §22 wants it, and unrecorded it would have
+  been lost.
+
 ## [0.2.14] - 2026-08-30
 
 ### Added

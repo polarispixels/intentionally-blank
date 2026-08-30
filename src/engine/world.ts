@@ -33,7 +33,14 @@
 
 import type { Cond } from './cond';
 import { evaluate } from './cond';
-import type { DayPhase, FlagId, FlagValue, MemoryId, ClueId, NpcId, ObjectId, PlaceId, QuestionId, RoomId, ScriptId } from './ids';
+import type { ActionClass, DayPhase, FlagId, FlagValue, MemoryId, ClueId, NpcId, ObjectId, PlaceId, QuestionId, RoomId, ScriptId, VerbId } from './ids';
+// Type-only: `Effect` is only referenced in `HandlerDef`'s type signature
+// below, never called at runtime from this module, so this stays a
+// compile-time-only edge even though `effects.ts` itself imports `WorldDef`
+// from here (also `import type`) — a genuine runtime cycle would need a
+// real value to flow in both directions, and neither side has one, unlike
+// the `cond.ts`/`world.ts` `evaluate` cycle documented above.
+import type { Effect } from './effects';
 import type { Prose } from './prose';
 import { objectLocation, objectState } from './resolve';
 import type { GameEvent, GameState } from './gamestate';
@@ -70,22 +77,79 @@ export interface ContainerDef {
   open?: boolean;
   locked?: boolean;
   transparent?: boolean;
+  /** The object that LOCK/UNLOCK accepts (`actions.ts`, §8 task 8). Absent ⇒ not lockable at all. */
+  key?: ObjectId;
 }
 
 /**
- * Minimal object-authoring slice of §2.5's `ObjectDef` — `location` (the
- * authored fallback the §1.1 prime rule resolves to when state has no
- * overlay entry), plus the fields darkness/scope/the plot-critical guard
- * need. Not yet `name`/`nouns`/`adjectives`/`handlers`/etc. — those are
- * later tasks' (8: actions, 9–11: parser) to add.
+ * Object-authoring slice of §2.5's `ObjectDef`. Task 6 had `location`,
+ * `hidden`, `container`, `supporter`, `lightSource`, `plotCritical` —
+ * darkness/scope/the plot-critical guard's needs. Task 8 (`actions.ts`)
+ * adds `name` (rung-2 `{name}` templating and built-in refusal prose),
+ * `portable`/`wearable`/`switchable` (the built-in verb gates), `text` and
+ * `description` (READ's fallback, §2.5), and `handlers` (rung 1). Still not
+ * `nouns`/`adjectives` — those are the parser's (tasks 9–11) to add.
  */
 export interface ObjectDefSlice {
   location: PlaceId;
+  name?: string;
   hidden?: boolean;
   container?: ContainerDef;
   supporter?: boolean;
   lightSource?: boolean; // while `on` and in scope, defeats baseline darkness (isDark, §2.4)
   plotCritical?: boolean;
+  portable?: boolean;
+  wearable?: boolean;
+  switchable?: boolean;
+  description?: Prose;
+  text?: Prose; // READ; falls back to `description` when absent (§2.5)
+  handlers?: HandlerDef[];
+}
+
+/**
+ * §2.5's authored verb response/decoration for one object: rung 1 of the
+ * §3.6 response ladder. `actions.ts`'s `performAction` looks for the first
+ * handler on the resolved `dobj` whose `verbs` includes the verb, whose
+ * `when` (if any) holds, and whose `withInstrument` matches the resolved
+ * `iobj` — first match wins, exactly as `prose.ts`'s `ProseRule` selection
+ * does. A match overrides built-in semantics entirely; it does not run
+ * *in addition to* them.
+ */
+export interface HandlerDef {
+  verbs: VerbId[];
+  when?: Cond;
+  /** `undefined` = don't care; `'any'` = some instrument required; `'none'` = no instrument; list = exactly one of these. */
+  withInstrument?: ObjectId[] | 'any' | 'none';
+  /** Overrides the verb's own `class` tag for this one handler (spec §2.5). */
+  class?: ActionClass;
+  effects: Effect[];
+  /** Default true (spec §2.9's "consumesTurn — default true"). */
+  consumesTurn?: boolean;
+}
+
+/**
+ * §2.9's verb table entry. `words`/`patterns`/`preps` are the parser's
+ * (tasks 9–11) to consume; task 8 needs only `class`, `meta`, and
+ * `default` — the response-ladder rung 2 fallback (§3.6) — but the full
+ * shape is declared here now so the parser tasks don't have to redefine
+ * (and potentially diverge from) this type.
+ */
+export interface VerbDef {
+  id: VerbId;
+  words: string[];
+  patterns: ('V' | 'V dobj' | 'V dobj prep iobj' | 'V npc about topic')[];
+  preps?: string[];
+  /** `null` = neutral (LOOK, WAIT, meta verbs). */
+  class: ActionClass | null;
+  /** SAVE/LOAD/UNDO/HINT/MAP…: no turn, no clock (§4.1). */
+  meta?: boolean;
+  /**
+   * §14 rung-2 family, `{name}`-templated. Required (non-null) for every
+   * non-meta verb — `validate` rejects a non-meta verb with `default: null`
+   * (§8 task 8's first owed rule; without this, any verb–object pair
+   * nobody hand-authored produces nothing).
+   */
+  default: Prose | null;
 }
 
 /**
@@ -127,6 +191,8 @@ export interface WorldDef {
   rooms?: Record<RoomId, RoomDefSlice>;
   objects?: Record<ObjectId, ObjectDefSlice>;
   npcs?: Record<NpcId, NpcDefSlice>;
+  /** §2.9's verb table (§8 task 8). Content seeds this; the engine ships none. */
+  verbs?: Record<VerbId, VerbDef>;
   /** Minimal slice of §2.7's `MemoryDef` — just what a `grantMemory` event needs. */
   memories?: Record<MemoryId, { lines: string[] }>;
   /** Minimal slice of §2.7's `ClueDef` — just what a `grantClue` event needs. */
