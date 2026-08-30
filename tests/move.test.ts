@@ -47,10 +47,13 @@ import {
   FLAG_ONENTER_GATED,
   FLAG_ONENTER_ONCE,
   FLAG_ONENTER_REPEAT_COUNT,
+  HAT,
   KEY,
+  LETTER,
   ROOM_A,
   ROOM_B,
   ROOM_C,
+  SHELF,
 } from './fixtures/world';
 
 const WORLD: WorldDef = { ...FIXTURE_WORLD, responses: { ...FIXTURE_WORLD.responses, ...RESPONSES } };
@@ -189,6 +192,144 @@ describe('look', () => {
     const bare: WorldDef = { ...WORLD, rooms: { ...WORLD.rooms, [ROOM_A]: { ...WORLD.rooms![ROOM_A]!, description: undefined } } };
     const state = { ...initialState(bare) };
     expect(() => look(bare, state, LOOK_VERB_ID)).toThrow(/no description/);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Room listing (§2.5 `listedAs`) — the fedora-bug fix: a room's
+// `description` is scenery; portable objects are listed separately, from
+// state, after it. Fixture-local `WorldDef` overrides below (not shared
+// `FIXTURE_WORLD` edits) so no other test's exact `lineTexts` assertions
+// are affected — HAT/LETTER are relocated to ROOM_B (baseline lit,
+// unlike ROOM_A) purely within these overrides.
+// ---------------------------------------------------------------------------
+
+const GENERIC_LISTING_FAMILY = 'room.genericListing';
+
+/** HAT (listedAs authored) and LETTER (no listedAs — "woven into prose") both moved to lit ROOM_B; a generic listing family declared for the moved case. */
+const WORLD_WITH_LISTING: WorldDef = {
+  ...WORLD,
+  objects: {
+    ...WORLD.objects,
+    [HAT]: { ...WORLD.objects![HAT]!, location: ROOM_B, listedAs: 'fixture listedAs: a grey wool hat lies folded near the door.' },
+    [LETTER]: { ...WORLD.objects![LETTER]!, location: ROOM_B },
+  },
+  responses: { ...WORLD.responses, [GENERIC_LISTING_FAMILY]: 'fixture genericListing: there is {name} here.' },
+};
+
+function stateInRoomB(overrides: Partial<GameState> = {}): GameState {
+  return { ...initialState(WORLD_WITH_LISTING), location: ROOM_B, ...overrides };
+}
+
+describe('room listing (§2.5 listedAs)', () => {
+  it('an unmoved portable object with an authored listedAs prints it after the description, on LOOK', () => {
+    const result = look(WORLD_WITH_LISTING, stateInRoomB(), LOOK_VERB_ID);
+    expect(lineTexts(result.events)).toContain('fixture listedAs: a grey wool hat lies folded near the door.');
+  });
+
+  it('an unmoved portable object with no listedAs (woven into the room\'s own prose) prints nothing extra', () => {
+    const result = look(WORLD_WITH_LISTING, stateInRoomB(), LOOK_VERB_ID);
+    // LETTER has no listedAs in this override — only HAT's line and the room's own description appear.
+    expect(lineTexts(result.events)).toEqual([
+      WORLD_WITH_LISTING.rooms![ROOM_B]!.description,
+      'fixture listedAs: a grey wool hat lies folded near the door.',
+    ]);
+  });
+
+  it('once handled — taken and dropped elsewhere — the generic listing family renders instead of listedAs', () => {
+    // KEY (portable, no listedAs authored) dropped in ROOM_B: an explicit
+    // overlay location, not KEY's own authored default (ROOM_A) — the
+    // "moved" case regardless of authored `listedAs`.
+    const state = stateInRoomB({ objects: { [KEY]: { location: ROOM_B } } });
+    const result = look(WORLD_WITH_LISTING, state, LOOK_VERB_ID);
+    expect(lineTexts(result.events)).toContain('fixture genericListing: there is a brass key here.');
+  });
+
+  it('dropped back in its own authored room still reads as "moved" (an explicit overlay entry exists) — not the staged listedAs line again', () => {
+    // §1.1 overlay principle, this task's own worked example: DROP always
+    // writes a fresh `location` overlay (`effects.ts`'s `move`), even when
+    // the destination equals the authored default — "moved" is derived
+    // from overlay *presence*, not a value comparison against `location`.
+    const state = stateInRoomB({ objects: { [HAT]: { location: ROOM_B } } }); // HAT's own authored location IS ROOM_B here
+    const result = look(WORLD_WITH_LISTING, state, LOOK_VERB_ID);
+    expect(lineTexts(result.events)).not.toContain('fixture listedAs: a grey wool hat lies folded near the door.');
+    expect(lineTexts(result.events)).toContain('fixture genericListing: there is a wool hat here.');
+  });
+
+  it('an object carried in inventory or worn is not listed at all', () => {
+    const inInventory = stateInRoomB({ objects: { [HAT]: { location: 'inventory' } } });
+    expect(lineTexts(look(WORLD_WITH_LISTING, inInventory, LOOK_VERB_ID).events)).toEqual([WORLD_WITH_LISTING.rooms![ROOM_B]!.description]);
+
+    const worn = stateInRoomB({ objects: { [HAT]: { location: 'worn' } } });
+    expect(lineTexts(look(WORLD_WITH_LISTING, worn, LOOK_VERB_ID).events)).toEqual([WORLD_WITH_LISTING.rooms![ROOM_B]!.description]);
+  });
+
+  it('scenery (not portable) is never listed, whatever its own state', () => {
+    // SHELF: supporter, not portable — even relocated to ROOM_B and unmoved, it prints nothing.
+    const withShelf: WorldDef = { ...WORLD_WITH_LISTING, objects: { ...WORLD_WITH_LISTING.objects, [SHELF]: { ...WORLD_WITH_LISTING.objects![SHELF]!, location: ROOM_B } } };
+    const result = look(withShelf, stateInRoomB(), LOOK_VERB_ID);
+    expect(lineTexts(result.events).join('\n')).not.toContain('shelf');
+  });
+
+  it('renders nothing at all while the room is dark, even for an unmoved object with a listedAs', () => {
+    // ROOM_A: baseline dark, no lit light source by default.
+    const darkWorld: WorldDef = { ...WORLD_WITH_LISTING, objects: { ...WORLD_WITH_LISTING.objects, [HAT]: { ...WORLD_WITH_LISTING.objects![HAT]!, location: ROOM_A } } };
+    const state = { ...initialState(darkWorld) }; // ROOM_A
+    const result = look(darkWorld, state, LOOK_VERB_ID);
+    expect(lineTexts(result.events)).toEqual([darkWorld.rooms![ROOM_A]!.description]);
+  });
+
+  it('the same listing renders on renderArrival, right after description, not just on LOOK', () => {
+    const state = { ...initialState(WORLD_WITH_LISTING), visited: { [ROOM_A]: 0, [ROOM_B]: 1 }, location: ROOM_B };
+    const result = renderArrival(WORLD_WITH_LISTING, state);
+    expect(lineTexts(result.events)).toEqual([
+      WORLD_WITH_LISTING.rooms![ROOM_B]!.description,
+      'fixture listedAs: a grey wool hat lies folded near the door.',
+    ]);
+  });
+
+  // Article bug: the approved family text is `'There is {name} here.'` —
+  // no article baked into the prose (hard rule 5 forbids editing it to add
+  // one). `{name}` itself must therefore already carry the article. These
+  // three use a family with no hardcoded article at all, unlike
+  // `WORLD_WITH_LISTING`'s own template above, so a regression to the bare
+  // name ("There is brass key here.") or a double article ("there is a a
+  // ...") both fail loudly here.
+  it('a dropped object reads grammatically — {name} carries its own default article', () => {
+    const world: WorldDef = {
+      ...WORLD_WITH_LISTING,
+      responses: { ...WORLD_WITH_LISTING.responses, [GENERIC_LISTING_FAMILY]: 'no-article genericListing: there is {name} here.' },
+    };
+    const state = stateInRoomB({ objects: { [KEY]: { location: ROOM_B } } });
+    const result = look(world, state, LOOK_VERB_ID);
+    expect(lineTexts(result.events)).toContain('no-article genericListing: there is a brass key here.');
+  });
+
+  it('a name beginning with a vowel gets "an"', () => {
+    const world: WorldDef = {
+      ...WORLD_WITH_LISTING,
+      objects: { ...WORLD_WITH_LISTING.objects, [KEY]: { ...WORLD_WITH_LISTING.objects![KEY]!, name: 'iron key' } },
+      responses: { ...WORLD_WITH_LISTING.responses, [GENERIC_LISTING_FAMILY]: 'no-article genericListing: there is {name} here.' },
+    };
+    const state = stateInRoomB({ objects: { [KEY]: { location: ROOM_B } } });
+    const result = look(world, state, LOOK_VERB_ID);
+    expect(lineTexts(result.events)).toContain('no-article genericListing: there is an iron key here.');
+  });
+
+  it('a proper-flagged object gets no article at all', () => {
+    const world: WorldDef = {
+      ...WORLD_WITH_LISTING,
+      objects: { ...WORLD_WITH_LISTING.objects, [KEY]: { ...WORLD_WITH_LISTING.objects![KEY]!, name: 'Marlow', proper: true } },
+      responses: { ...WORLD_WITH_LISTING.responses, [GENERIC_LISTING_FAMILY]: 'no-article genericListing: there is {name} here.' },
+    };
+    const state = stateInRoomB({ objects: { [KEY]: { location: ROOM_B } } });
+    const result = look(world, state, LOOK_VERB_ID);
+    expect(lineTexts(result.events)).toContain('no-article genericListing: there is Marlow here.');
+  });
+
+  it('the bespoke listedAs line (an object still at its authored position) is untouched — it is a full sentence, not articleized', () => {
+    const result = look(WORLD_WITH_LISTING, stateInRoomB(), LOOK_VERB_ID);
+    expect(lineTexts(result.events)).toContain('fixture listedAs: a grey wool hat lies folded near the door.');
   });
 });
 

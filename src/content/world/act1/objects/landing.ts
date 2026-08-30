@@ -54,7 +54,7 @@ const landingStairs: ObjectDefSlice = {
 };
 
 const banisterExamine =
-  'Dark wood, turned on a lathe by somebody who was paid by the hour and did not mind. The top rail is polished pale the whole way along; the balusters under it are furred grey with dust that nobody has ever had a reason to touch. A hand’s worth of house history, put there one hand at a time.';
+  'Dark wood, turned on a lathe by somebody who was paid by the hour and did not mind. The top rail is polished pale the whole way along; the balusters under it are furred grey with dust that nobody has ever had a reason to touch.';
 
 const slideDown =
   'The rail is exactly the rail that a certain kind of person slides down. You get a hand on it, and your head immediately supplies a short film of how the rest of it goes, in which the newel post at the bottom features prominently and repeatedly.\n\nYou take the hand back.';

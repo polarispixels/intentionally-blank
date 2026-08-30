@@ -67,7 +67,7 @@ const page78: ObjectDefSlice = {
         },
       ],
     },
-    { verbs: [TAKE], effects: [{ say: 'You take the page. It weighs nothing, which is fitting.' }, { move: [PAGE_78, 'inventory'] }] },
+    { verbs: [TAKE], effects: [{ say: 'You take the page. It weighs nothing.' }, { move: [PAGE_78, 'inventory'] }] },
     { verbs: [SMELL], effects: [{ say: 'Paper, felt, and hatband. It has been in that hat a long time.' }] },
     {
       verbs: [CUT],

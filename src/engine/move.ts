@@ -70,7 +70,8 @@ import { apply } from './effects';
 import { objectState } from './resolve';
 import { render } from './prose';
 import { tick } from './tick';
-import type { ExitDefSlice, GameEvent, GameState, WorldDef } from './world';
+import type { ExitDefSlice, GameEvent, GameState, ObjectDefSlice, WorldDef } from './world';
+import { isDark, objectHasBeenMoved, objectsListedInRoom } from './world';
 
 /**
  * Reserved verb ids for the twelve exit directions (§2.4's `ExitDef.dir`
@@ -111,6 +112,36 @@ export const LOOK_VERB_ID = V('look');
 /** The two global families this module renders when no exit-specific prose is authored (see this task's report for the exact keys). */
 const NO_EXIT_FAMILY = 'move.noExit';
 const BLOCKED_FAMILY = 'move.blocked';
+
+/**
+ * §2.5's generic room-listing family: renders for a portable object once
+ * it has been handled (`objectHasBeenMoved`) — "There is a {name} here."
+ * territory, `{name}`-templated exactly like the response-family
+ * convention documented in `src/content/responses.ts`. Not yet declared in
+ * `world.responses` as of this task — see this task's report for the
+ * exact family this key needs and why it's left to `narrative-writer`
+ * rather than authored here (hard rule 5).
+ */
+const GENERIC_LISTING_FAMILY = 'room.genericListing';
+
+/**
+ * The generic-listing family's own `{name}` (§2.5 fix): unlike every other
+ * `{name}` interpolation in this engine — bare, "take the fedora", handler
+ * prose — `GENERIC_LISTING_FAMILY`'s approved text is `'There is {name}
+ * here.'` with no article of its own (hard rule 5 forbids adding one to the
+ * authored string), so `{name}` has to arrive already articleized.
+ * `def.proper` objects (an NPC-like object whose `name` is a proper name)
+ * get none at all; `def.article` overrides the word; otherwise it's
+ * derived from `name`'s first letter (a/an) so ordinary content never has
+ * to annotate anything. Used only by the moved-object branch below —
+ * `listedAs` (the other branch) is a full authored sentence and keeps the
+ * bare `name`.
+ */
+function articleizedName(def: ObjectDefSlice | undefined, name: string): string {
+  if (def?.proper) return name;
+  const article = def?.article ?? (/^[aeiou]/i.test(name) ? 'an' : 'a');
+  return `${article} ${name}`;
+}
 
 export interface MoveOutcome {
   state: GameState;
@@ -214,7 +245,53 @@ export function traverseDirection(world: WorldDef, state: GameState, verb: VerbI
 // LOOK
 // ---------------------------------------------------------------------------
 
-/** `description` alone, no `firstVisit`/`onEnter` — shared by `look` and `executeGoTo`'s empty-route ("already there") case. */
+/**
+ * §2.5's room listing: appended after `description`, on arrival and on
+ * `LOOK` alike (this task's brief) — shared by `renderDescription` (below)
+ * and `renderArrival`. For every portable object currently present in
+ * `roomId` (`objectsListedInRoom`, `world.ts`, declaration-order like
+ * every other listing in this engine — `views.ts`'s own convention): an
+ * untouched one (`objectHasBeenMoved` false) prints its own authored
+ * `listedAs` line, if the author wrote one — an object woven entirely
+ * into the room's own `description` prose while it stays put authors no
+ * `listedAs` at all, and this prints nothing extra for it. A handled one
+ * prints the generic `GENERIC_LISTING_FAMILY` line instead, `{name}`-
+ * templated: the staged sentence stopped being true the moment the
+ * player touched it.
+ *
+ * Renders nothing at all while `roomId` is dark (`isDark`, `world.ts`,
+ * §2.4) — a judgment call this task's brief doesn't spell out, but the
+ * room's own dark-variant `description` already says nothing concrete is
+ * visible; appending an object listing under it would contradict that in
+ * the same breath. Carried objects are unaffected (`objectsListedInRoom`
+ * only ever returns what's physically in the room, never inventory/worn),
+ * matching the rest of this engine's "you always know what you're
+ * carrying, dark or not" convention.
+ */
+function renderRoomListing(world: WorldDef, state: GameState, roomId: RoomId): { state: GameState; events: GameEvent[] } {
+  if (isDark(world, state, roomId)) return { state, events: [] };
+  const ids = objectsListedInRoom(world, state, roomId);
+  let current = state;
+  const events: GameEvent[] = [];
+
+  for (const id of ids) {
+    const def = world.objects![id]!;
+    const name = def.name ?? id;
+    if (objectHasBeenMoved(current, id)) {
+      const rendered = render(world, current, `room.${roomId}.listing.${id}`, { ref: GENERIC_LISTING_FAMILY }, { name: articleizedName(def, name) });
+      current = rendered.state;
+      events.push({ type: 'line', kind: 'prose', text: rendered.text });
+    } else if (def.listedAs !== undefined) {
+      const rendered = render(world, current, `object.${id}.listedAs`, def.listedAs, { name });
+      current = rendered.state;
+      events.push({ type: 'line', kind: 'prose', text: rendered.text });
+    }
+  }
+
+  return { state: current, events };
+}
+
+/** `description`, then the room listing (§2.5) — shared by `look` and `executeGoTo`'s empty-route ("already there") case. Never `firstVisit`/`onEnter`. */
 function renderDescription(world: WorldDef, state: GameState): { state: GameState; events: GameEvent[] } {
   const roomId = state.location;
   const def = world.rooms?.[roomId];
@@ -222,7 +299,8 @@ function renderDescription(world: WorldDef, state: GameState): { state: GameStat
     throw new Error(`move: room "${roomId}" has no description to render`);
   }
   const rendered = render(world, state, `room.${roomId}.description`, def.description);
-  return { state: rendered.state, events: [{ type: 'line', kind: 'prose', text: rendered.text }] };
+  const listing = renderRoomListing(world, rendered.state, roomId);
+  return { state: listing.state, events: [{ type: 'line', kind: 'prose', text: rendered.text }, ...listing.events] };
 }
 
 /** `LOOK` (§8 task 20b): re-renders `description` only — never `firstVisit`, which fires once, ever, on genuine first entry (`renderArrival`). Not `onEnter` either: that's an entry hook, and LOOK doesn't re-enter anything. */
@@ -266,11 +344,11 @@ function runOnEnter(world: WorldDef, state: GameState, roomId: RoomId): { state:
  * Renders arrival at `state.location` (§2.4, this task's core deliverable):
  * `firstVisit` prepended exactly once (the turn `state.visited[room]` is
  * first set — never again, including across save/load, since `visited` is
- * ordinary saved state), then the state-appropriate `description`, then
- * `onEnter`. Called from exactly one place — `turn.ts`'s `step()` — per
- * this file's header; never called by this module's own traversal
- * functions, so a relocation is rendered exactly once regardless of how it
- * happened.
+ * ordinary saved state), then the state-appropriate `description`, then the
+ * room listing (§2.5 — `renderRoomListing`, above), then `onEnter`. Called
+ * from exactly one place — `turn.ts`'s `step()` — per this file's header;
+ * never called by this module's own traversal functions, so a relocation is
+ * rendered exactly once regardless of how it happened.
  */
 export function renderArrival(world: WorldDef, state: GameState): { state: GameState; events: GameEvent[] } {
   const roomId = state.location;
@@ -303,6 +381,10 @@ export function renderArrival(world: WorldDef, state: GameState): { state: GameS
   const rendered = render(world, current, `room.${roomId}.description`, def.description);
   current = rendered.state;
   events.push({ type: 'line', kind: 'prose', text: rendered.text });
+
+  const listing = renderRoomListing(world, current, roomId);
+  current = listing.state;
+  events.push(...listing.events);
 
   const entered = runOnEnter(world, current, roomId);
   current = entered.state;

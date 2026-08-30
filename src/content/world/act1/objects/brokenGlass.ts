@@ -34,7 +34,7 @@ const brokenGlass: ObjectDefSlice = {
       verbs: [TOUCH],
       effects: [
         {
-          say: 'Cold, and sharper than you gave it credit for. You withdraw the finger with the speed of a man who has recently learned that not everything in this room is on his side.',
+          say: 'Cold, and sharper than you gave it credit for. You take the finger back faster than you put it out.',
         },
       ],
     },

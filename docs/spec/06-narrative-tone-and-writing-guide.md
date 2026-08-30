@@ -1,6 +1,6 @@
 # 06 - Narrative Tone and Writing Guide
 
-**Spec version:** `0.2.2`
+**Spec version:** `0.3.2`
 
 # 1. Narrative Objective
 
@@ -383,3 +383,64 @@ or complication. For writers this means:
   second is not lost.
 - If a scene gives something unusual attention, record it as a *setup* so a
   later scene can pay it off (constitution §30).
+
+---
+
+# 19. Observing vs Performing
+
+A calibration note from the first playtest of authored prose (v0.3.1). It
+applies to every room still to be written.
+
+Test every line:
+
+> **Is the narrator observing, or performing?**
+
+Observation earns its keep. Performance asks the reader to admire the
+sentence — and the reader notices being asked.
+
+## The worked example
+
+The opening room's lamp came on with:
+
+```text
+There is a click of exactly the right size, and the room happens.
+```
+
+It fails in two ways at once:
+
+1. **It gives an abstract noun a physical property it has not earned.** A
+   click has no size. The phrase means *well made, and satisfying*, and it
+   makes the reader do a small unpaid conversion to get there.
+2. **Its second clause does work the first already did.** *You pull*, and the
+   lamp coming on, carry the beat between them.
+
+It now reads:
+
+```text
+You pull. There is a click, and the room happens.
+```
+
+The reach is gone. The observation — and the joke that was actually working —
+is intact.
+
+## Two habits to check for
+
+- **Abstract nouns with borrowed bodies.** A click with a size. Seconds you
+  can hold. History measured by the handful. If a noun cannot be touched, do
+  not give it a weight, a texture, or a temperature unless the sentence is
+  *paying* for that metaphor rather than decorating with it.
+- **The trailing clause that explains.** When a sentence has landed, the
+  clause after it is usually the narrator admiring the landing. Cut it.
+  `It weighs nothing.` is better than `It weighs nothing, which is fitting.`
+  This is §17 applied one clause at a time.
+
+## What this is not
+
+It is a trim, not a change of voice. Dry, observant, slightly adversarial
+stays. So does every joke that carries information, every failure response
+that teaches something, and every clause planted for a second reading (§12).
+Personification is not banned — a room can decline to comment. The lines to
+cut are the ones that reach for a joke the moment did not need.
+
+The dial: **ten percent quieter, not half.** If a pass removes the room's
+personality, it has overshot and should be reverted.

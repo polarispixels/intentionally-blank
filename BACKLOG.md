@@ -117,6 +117,14 @@ a browser profile holding an autosave from a previous run took the resume
 branch and rendered nothing. A first-time player sees the opening
 correctly; confirmed on a clean profile.
 
+## Open: the pen has no listing line
+
+`PEN` (`src/content/world/act1/objects/misc.ts`) is portable, sits in the
+opening room, has no `listedAs`, and is not named in the room description —
+so nothing announces it, though `TAKE PEN` works if a player guesses. Either
+a one-line `listedAs` from `narrative-writer` or a decision to make it
+scenery. Not urgent; it is invisible rather than broken.
+
 ## Fast-follows for 0.3.1 (proposed by `narrative-writer`, both sound)
 
 - **Add a `{dir}` template variable to the movement families.** With no way

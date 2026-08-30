@@ -20,7 +20,7 @@ import type { WorldDef } from '../src/engine/world';
 import type { Prose } from '../src/engine/prose';
 import { BUILTIN_VERB_IDS } from '../src/engine/actions';
 import { validate } from '../src/engine/validate';
-import { CLUE_1, FIXTURE_WORLD, GUIDE, KEY, LAMP, MEMORY_1, NOTEBOOK, QUESTION_1, QUESTION_2, ROOM_A, ROOM_B, ROOM_C } from './fixtures/world';
+import { CLUE_1, FIXTURE_WORLD, GUIDE, KEY, LAMP, LETTER, MEMORY_1, NOTEBOOK, QUESTION_1, QUESTION_2, ROOM_A, ROOM_B, ROOM_C } from './fixtures/world';
 
 function findingsOf(world: WorldDef, code: string) {
   return validate(world).filter((f) => f.code === code);
@@ -550,5 +550,68 @@ describe('validate — answerable questions carry their recap (§6.2)', () => {
       questions: { ...FIXTURE_WORLD.questions, hanging: { text: 'Who am I?' } },
     } as unknown as WorldDef;
     expect(validate(world).some((f) => f.code === 'question-answerable-without-recap')).toBe(false);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Room description vs. portable-object staleness (§2.5 `listedAs` task) —
+// the fedora-bug tripwire.
+// ---------------------------------------------------------------------------
+
+describe('validate — room description mentions a portable object it is authored at (§2.5)', () => {
+  // LETTER, not KEY: the fixture also places DOOR_KEY/SPARE_KEY at ROOM_A
+  // sharing KEY's bare noun "key" (task 10's own deliberate ambiguity
+  // fixture) — real, multi-object collisions, but noisy for isolating one
+  // rule's behavior. LETTER's noun ("letter") and adjective ("folded") are
+  // each authored on exactly one fixture object.
+  it('warns when a room\'s description contains a portable object\'s own noun, whole-word', () => {
+    const world: WorldDef = {
+      ...FIXTURE_WORLD,
+      rooms: { ...FIXTURE_WORLD.rooms, [ROOM_A]: { ...FIXTURE_WORLD.rooms![ROOM_A]!, description: 'A dusty room. On the floor lies a letter.' } },
+    };
+    const findings = findingsOf(world, 'room-description-mentions-portable');
+    expect(findings.length).toBe(1);
+    expect(findings[0]!.severity).toBe('warning');
+    expect(findings[0]!.message).toContain('letter');
+    expect(findings[0]!.message).toContain(LETTER);
+  });
+
+  it('warns on a portable object\'s adjective too, not just its noun', () => {
+    // LETTER: adjectives ['folded'].
+    const world: WorldDef = {
+      ...FIXTURE_WORLD,
+      rooms: { ...FIXTURE_WORLD.rooms, [ROOM_A]: { ...FIXTURE_WORLD.rooms![ROOM_A]!, description: 'Everything in here is folded twice over.' } },
+    };
+    expect(findingsOf(world, 'room-description-mentions-portable').length).toBe(1);
+  });
+
+  it('matches whole words only — an inflected form does not trigger (a stated, accepted gap, not a bug)', () => {
+    const world: WorldDef = {
+      ...FIXTURE_WORLD,
+      rooms: { ...FIXTURE_WORLD.rooms, [ROOM_A]: { ...FIXTURE_WORLD.rooms![ROOM_A]!, description: 'A stack of letters sits by the window.' } },
+    };
+    expect(findingsOf(world, 'room-description-mentions-portable')).toEqual([]);
+  });
+
+  it('does not warn for a non-portable (scenery) object, even when its noun appears in the room\'s description', () => {
+    // SHELF: location ROOM_A, nouns ['shelf'], NOT portable.
+    const world: WorldDef = {
+      ...FIXTURE_WORLD,
+      rooms: { ...FIXTURE_WORLD.rooms, [ROOM_A]: { ...FIXTURE_WORLD.rooms![ROOM_A]!, description: 'A wooden shelf runs along one wall.' } },
+    };
+    expect(findingsOf(world, 'room-description-mentions-portable')).toEqual([]);
+  });
+
+  it('does not warn for a portable object authored in a DIFFERENT room, even if this room\'s text happens to use the same word', () => {
+    const world: WorldDef = {
+      ...FIXTURE_WORLD,
+      objects: { ...FIXTURE_WORLD.objects, [LETTER]: { ...FIXTURE_WORLD.objects![LETTER]!, location: ROOM_B } }, // LETTER moved off ROOM_A
+      rooms: { ...FIXTURE_WORLD.rooms, [ROOM_A]: { ...FIXTURE_WORLD.rooms![ROOM_A]!, description: 'On the floor lies a letter.' } },
+    };
+    expect(findingsOf(world, 'room-description-mentions-portable')).toEqual([]);
+  });
+
+  it('the shared fixture world itself is clean of this warning', () => {
+    expect(findingsOf(FIXTURE_WORLD, 'room-description-mentions-portable')).toEqual([]);
   });
 });

@@ -242,6 +242,18 @@ export const RESPONSES = {
     'Nothing has been done yet, so there is nothing to do again.',
     'You do it all again: the nothing, exactly as before, to precisely the same effect.',
   ],
+
+  // Room listing family (prose doc §17.2) — printed after room descriptions
+  // for handled-and-dropped objects. Global, not room-scoped: it fires for
+  // every portable object in the game, so it stays plain and says nothing it
+  // cannot know. Templated on {name} (the object's article: 'a fedora',
+  // 'the loose page'). Variant 1 is the most-seen Infocom line. No jokes
+  // here — the floor is allowed to be a floor; the wit lives in `examine`.
+  'room.genericListing': [
+    'There is {name} here.',
+    'There is {name} on the floor.',
+    'There is {name} lying where it was put down.',
+  ],
 } satisfies Record<string, Prose>;
 
 /**

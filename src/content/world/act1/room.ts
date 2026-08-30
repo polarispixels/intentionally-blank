@@ -30,6 +30,21 @@
 // `FLAG_TERMINAL_TRIED` were declared but never set (ids.ts's own table).
 // Room-level handlers run full `Effect[]`, so those two now set their flag
 // alongside the exact same text `verbs.ts` already exports.
+//
+// FIXED (was an architecture gap: `ObjectDefSlice.listedAs`, spec §2.5, was
+// never implemented — nothing listed a room's portable contents at all, so
+// the fedora's presence had to be baked into this room's own `description`
+// prose, where it went stale the instant the player took it off the
+// floor). `description` below no longer names the fedora anywhere — the
+// "and beside it, crown down, a fedora"/"and a fedora beside it, crown
+// down" clauses are deleted outright (not reworded; hard rule 5), not
+// moved verbatim into a `listedAs` field, because that field's text is
+// `narrative-writer`'s to author, not this task's (see this task's
+// report). Left as an open seam: `objects/fedora.ts`'s `FEDORA` object has
+// no `listedAs` yet, so as of this change nothing prints "a fedora" in
+// this room at all until one is authored — a real, temporary content gap,
+// not a bug in `move.ts`'s rendering (`tests/world-act1-playthrough.test.ts`
+// is adjusted to match, with the same note).
 
 import type { Cond } from '../../../engine/cond';
 import type { EventDef, HandlerDef, RoomDefSlice } from '../../../engine/world';
@@ -88,7 +103,7 @@ const DARK_VARIANT_2 =
 
 const LIT_LAMP_FALLEN_FIRST_SIGHT_DOOR_SHUT = [
   'The lamp lies on its side and burns anyway, so every shadow in the room goes up the walls instead of across the floor. Nothing here is where a thing should be, and none of it is where its shadow says it is.',
-  'Somebody has gone through this room. The desk is over on its face with its legs in the air; two of its drawers are out and empty on the boards and the third has been worked at and is still shut. Papers cover the floor — not thrown, exactly. Set down. Broken glass catches the light along the baseboard. There is a dark stain on the boards roughly where your head was, and beside it, crown down, a fedora.',
+  'Somebody has gone through this room. The desk is over on its face with its legs in the air; two of its drawers are out and empty on the boards and the third has been worked at and is still shut. Papers cover the floor — not thrown, exactly. Set down. Broken glass catches the light along the baseboard. There is a dark stain on the boards roughly where your head was.',
   'An old computer terminal sits on a stand in the corner. Nobody bothered to knock it over. The air smells of scorched dust off the bulb and, underneath that, of a room that has been cold for a while. The door is shut. The window is not curtained.',
 ].join('\n\n');
 
@@ -99,19 +114,19 @@ const LIT_LAMP_FALLEN_FIRST_SIGHT_DOOR_SHUT = [
 // sentence, leaving the rest of each paragraph untouched.
 const LIT_LAMP_FALLEN_FIRST_SIGHT_DOOR_OPEN = [
   'The lamp lies on its side and burns anyway, so every shadow in the room goes up the walls instead of across the floor. Nothing here is where a thing should be, and none of it is where its shadow says it is.',
-  'Somebody has gone through this room. The desk is over on its face with its legs in the air; two of its drawers are out and empty on the boards and the third has been worked at and is still shut. Papers cover the floor — not thrown, exactly. Set down. Broken glass catches the light along the baseboard. There is a dark stain on the boards roughly where your head was, and beside it, crown down, a fedora.',
+  'Somebody has gone through this room. The desk is over on its face with its legs in the air; two of its drawers are out and empty on the boards and the third has been worked at and is still shut. Papers cover the floor — not thrown, exactly. Set down. Broken glass catches the light along the baseboard. There is a dark stain on the boards roughly where your head was.',
   'An old computer terminal sits on a stand in the corner. Nobody bothered to knock it over. The air smells of scorched dust off the bulb and, underneath that, of a room that has been cold for a while. The door stands open where you left it, and the landing light lies across the boards in a long pale wedge. The window is not curtained.',
 ].join('\n\n');
 
 const LIT_LAMP_RIGHTED_DOOR_SHUT = [
-  "The lamp stands where a lamp stands, and the room's shadows have agreed to go downward again. It is not an improvement so much as a change of genre: you can now see the mess plainly rather than dramatically.",
-  'Somebody has gone through this room. The desk lies on its face, two drawers out and empty beside it, the third worked at and still shut. Papers cover the boards, set down rather than thrown. Broken glass along the baseboard. A dark stain where your head was, and a fedora beside it, crown down.',
+  "The lamp stands where a lamp stands, and the room's shadows have agreed to go downward again. It is not an improvement, exactly. You can now see the mess plainly rather than dramatically.",
+  'Somebody has gone through this room. The desk lies on its face, two drawers out and empty beside it, the third worked at and still shut. Papers cover the boards, set down rather than thrown. Broken glass along the baseboard. A dark stain where your head was.',
   'The terminal in the corner has not been touched by anyone, including you. The door is shut. The window is not curtained, and shows a rectangle of street-coloured nothing.',
 ].join('\n\n');
 
 const LIT_LAMP_RIGHTED_DOOR_OPEN = [
-  "The lamp stands where a lamp stands, and the room's shadows have agreed to go downward again. It is not an improvement so much as a change of genre: you can now see the mess plainly rather than dramatically.",
-  'Somebody has gone through this room. The desk lies on its face, two drawers out and empty beside it, the third worked at and still shut. Papers cover the boards, set down rather than thrown. Broken glass along the baseboard. A dark stain where your head was, and a fedora beside it, crown down.',
+  "The lamp stands where a lamp stands, and the room's shadows have agreed to go downward again. It is not an improvement, exactly. You can now see the mess plainly rather than dramatically.",
+  'Somebody has gone through this room. The desk lies on its face, two drawers out and empty beside it, the third worked at and still shut. Papers cover the boards, set down rather than thrown. Broken glass along the baseboard. A dark stain where your head was.',
   'The terminal in the corner has not been touched by anyone, including you. The door stands open where you left it, and the landing light lies across the boards in a long pale wedge. The window is not curtained, and shows a rectangle of street-coloured nothing.',
 ].join('\n\n');
 

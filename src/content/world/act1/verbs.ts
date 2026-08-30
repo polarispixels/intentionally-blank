@@ -289,7 +289,7 @@ export const ACT1_VERBS: Record<string, VerbDef> = {
     words: ['knock'],
     patterns: ['V dobj'],
     class: 'direct',
-    default: 'You knock on your own door from the inside. Nothing answers, and you are left holding the several seconds afterwards.',
+    default: 'You knock on your own door from the inside. Nothing answers, and you stand there a moment longer than you meant to.',
   },
   // §8.11 — works in the dark on purpose (constitution §10: the dark is
   // never a dead end); this is a distinct bare verb from `SEARCH`, not a

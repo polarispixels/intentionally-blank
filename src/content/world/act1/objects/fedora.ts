@@ -15,8 +15,9 @@
 import type { Effect } from '../../../../engine/effects';
 import type { HandlerDef, ObjectDefSlice } from '../../../../engine/world';
 import type { ProseRule } from '../../../../engine/prose';
-import { FEDORA, FEDORA_BAND, MEM_HAT, PAGE_78, YOUR_ROOM } from '../ids';
+import { FEDORA, FEDORA_BAND, FLOOR_LAMP, MEM_HAT, PAGE_78, YOUR_ROOM } from '../ids';
 import { BREAK, CUT, EXAMINE, READ, REMOVE, SEARCH, SMELL, TAKE, TASTE, WEAR } from '../verbs';
+import { ROOM_DARK } from './common';
 
 const examine: ProseRule[] = [
   {
@@ -43,6 +44,13 @@ const bandSearch: ProseRule[] = [
 
 const bandSearchEffects: Effect[] = [{ say: bandSearch }, { reveal: PAGE_78 }];
 
+const listedAs: ProseRule[] = [
+  {
+    when: { all: [{ not: { has: FEDORA } }, { not: ROOM_DARK }] },
+    text: 'A grey felt fedora lies beside the stain, crown down.',
+  },
+];
+
 const fedora: ObjectDefSlice = {
   location: YOUR_ROOM,
   name: 'fedora',
@@ -51,6 +59,7 @@ const fedora: ObjectDefSlice = {
   portable: true,
   wearable: true,
   description: examine,
+  listedAs,
   handlers: [
     { verbs: [EXAMINE], effects: [{ say: examine }] },
     { verbs: [SEARCH], effects: bandSearchEffects },
@@ -89,7 +98,7 @@ const fedora: ObjectDefSlice = {
       when: { objectAt: [FEDORA, 'worn'] },
       effects: [
         {
-          say: 'You take the hat off. The room gets fractionally louder and the headache gets fractionally worse, which suggests the hat was doing more work than either of you admitted.',
+          say: 'You take the hat off. The room gets fractionally louder and the headache gets fractionally worse.',
         },
         { move: [FEDORA, 'inventory'] },
       ],

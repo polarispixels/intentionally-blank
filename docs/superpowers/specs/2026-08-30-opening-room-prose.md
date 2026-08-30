@@ -2606,3 +2606,250 @@ There is a chain somewhere near your hand.
 > chain still has to find the chain. If this rule is cut, cut it whole — do
 > not cut the chain sentence out of it.
 
+
+---
+
+## 16. Voice calibration pass — `before → after`
+
+**Added:** 2026-08-30, fifth pass · **Author:** `narrative-writer`
+**Trigger:** Ryan's spot-check of v0.3.1 (`docs/DEVELOPMENT.md` prose gate).
+**Direction:** *turn the wit down by 10%.* Ten percent, not fifty.
+
+**Nothing in §1–§15 is edited in place.** Every revision below is stated as
+`before → after` with its exact home, so a builder can find the string it
+replaces and re-transcribe it, and so the diff is visible. **Where §16
+supersedes an earlier string, §16 wins.**
+
+### 16.0 The test being applied
+
+*Is the narrator observing, or performing?* Observation earns its keep;
+performance asks the reader to admire the sentence. The named failure —
+*a click of exactly the right size* — fails twice: it gives an abstract noun
+a physical property it has not earned (a click has no size), and its second
+clause does work the first already did. Every revision below is one of those
+two faults, and nothing else was touched. Standing form of this test is now
+guide §19.
+
+**Explicitly out of scope and unchanged:** §2's opening beats, all of §4.9
+(the terminal, `USER NOT RECOGNIZED`, the screen burn), §6's memory fragment,
+§7.9 `WHO AM I`, and §4.12's body responses. Those work.
+
+---
+
+### 16.1 The pull chain — §4.3
+
+The named line, and the room's central tutorial beat.
+
+**1. `pull` — lamp off, first ever**
+
+> **before** — `You pull. There is a click of exactly the right size, and the room happens.`
+>
+> **after** — `You pull. There is a click, and the room happens.`
+
+> **Note.** The click stays because a ball-chain switch really does click;
+> only its unearned dimension goes. *The room happens* is untouched and still
+> must not be expanded (§4.3's original note stands).
+
+**2. `pull` — lamp on, first time**
+
+> **before** — `You pull the chain and the room goes away again. The dark is precisely where you left it, and it has not been improved by the interval.`
+>
+> **after** — `You pull the chain and the room goes away again. The dark is precisely where you left it.`
+
+> **Note.** Three clauses were saying one thing. The cut also retires a tic:
+> *not improved by* recurs at §15.1.3, where it is the better instance.
+
+**3. `pull` — lamp on, subsequent**
+
+> **before** — `Off. The dark returns without ceremony and without any apparent hard feelings.`
+>
+> **after** — `Off. The dark returns without ceremony.`
+
+> **Note.** The dark cannot have hard feelings, and *without ceremony* had
+> already made the joke.
+
+Variant *lamp off, subsequent* (`Click. The room comes back, arranged exactly
+as you left it, which is badly.`) is **unchanged**.
+
+---
+
+### 16.2 Room description — §3.2 Rule 3
+
+> **before** — `The lamp stands where a lamp stands, and the room's shadows have agreed to go downward again. It is not an improvement so much as a change of genre: you can now see the mess plainly rather than dramatically.`
+>
+> **after** — `The lamp stands where a lamp stands, and the room's shadows have agreed to go downward again. It is not an improvement, exactly. You can now see the mess plainly rather than dramatically.`
+
+> **Note.** *A change of genre* is the narrator standing outside the fiction
+> to admire its own lighting, and the colon then explained the phrase (guide
+> §17). *Plainly rather than dramatically* was always the observation; it now
+> stands on its own. Rules 1, 2 and 4 are unchanged apart from §16.6.
+
+---
+
+### 16.3 Fedora — §4.1 `remove`
+
+> **before** — `You take the hat off. The room gets fractionally louder and the headache gets fractionally worse, which suggests the hat was doing more work than either of you admitted.`
+>
+> **after** — `You take the hat off. The room gets fractionally louder and the headache gets fractionally worse.`
+
+> **Note.** The two fractional changes *are* the observation. The trailing
+> clause drew the inference the reader had already drawn, and *either of you*
+> gave the hat an opinion it does not need.
+
+---
+
+### 16.4 Floor lamp — §4.2, righting it
+
+> **before** — `You get the lamp upright. It takes both hands and a pause in the middle, during which your head delivers a short editorial. Standing, it throws its light downward the way light is supposed to go, and the room stops looking like a photograph of itself and starts looking like a room.`
+>
+> **after** — `You get the lamp upright. It takes both hands and a pause in the middle that you spend with your eyes shut. Standing, it throws its light downward the way light is supposed to go, and the room stops looking like a photograph of itself and starts looking like a room.`
+
+> **Note.** Two reasons. *A short editorial* is a borrowed body for a pain,
+> and — the larger problem — the head-as-commentator joke ran **four** times
+> in this room (§4.2 editorial, §4.4 *explains, at length and with examples*,
+> §7.5 *objects immediately and at volume*, §7.13 *describes, in some detail*).
+> Guide §14 forbids a joke becoming a catchphrase. Cutting the weakest of the
+> four leaves three, spread across three sections, which reads as a running
+> gag rather than a habit. §4.4, §7.5 and §7.13 are **unchanged**.
+
+---
+
+### 16.5 Four smaller reaches
+
+**Page 7/8 — §4.7 `take`**
+
+> **before** — `You take the page. It weighs nothing, which is fitting.`
+>
+> **after** — `You take the page. It weighs nothing.`
+
+> **Note.** *Which is fitting* is the narrator explaining its own irony about
+> a blank page. Guide §17: trust the player. It lands harder unexplained.
+
+**Broken glass — §4.8 `touch`**
+
+> **before** — `Cold, and sharper than you gave it credit for. You withdraw the finger with the speed of a man who has recently learned that not everything in this room is on his side.`
+>
+> **after** — `Cold, and sharper than you gave it credit for. You take the finger back faster than you put it out.`
+
+> **Note.** The simile was a paragraph of attitude bolted to a physical
+> reflex. The replacement is the same reflex, observed.
+
+**Door — §4.10 `knock on door`**
+
+> **before** — `You knock on your own door from the inside. Nothing answers, and you are left holding the several seconds afterwards.`
+>
+> **after** — `You knock on your own door from the inside. Nothing answers, and you stand there a moment longer than you meant to.`
+
+> **Note.** Seconds cannot be held — the click's exact fault. The awkward
+> pause survives, in a body that can have one.
+
+**Banister — §15.1.5 `examine`**
+
+> **before** — `Dark wood, turned on a lathe by somebody who was paid by the hour and did not mind. The top rail is polished pale the whole way along; the balusters under it are furred grey with dust that nobody has ever had a reason to touch. A hand's worth of house history, put there one hand at a time.`
+>
+> **after** — `Dark wood, turned on a lathe by somebody who was paid by the hour and did not mind. The top rail is polished pale the whole way along; the balusters under it are furred grey with dust that nobody has ever had a reason to touch.`
+
+> **Note.** History does not come by the handful, and the cut sentence
+> restated the polished rail it followed. The paragraph ends better where the
+> dust is.
+
+---
+
+### 16.6 The fedora leaves the room description
+
+**Why.** The engine now lists portable objects after the room description,
+from live state, so a taken object cannot go on lying on the floor in prose.
+The fedora's staging therefore moves out of §3.2 and into `listedAs` (§17.1).
+
+**Rule 2** (lit · lamp fallen · first sight) — **delete the seven words
+`, and beside it, crown down, a fedora`**, keeping the full stop:
+
+> **before** — `There is a dark stain on the boards roughly where your head was, and beside it, crown down, a fedora.`
+>
+> **after** — `There is a dark stain on the boards roughly where your head was.`
+
+**Rule 3** (lit · lamp righted) — **delete `, and a fedora beside it, crown down`**:
+
+> **before** — `A dark stain where your head was, and a fedora beside it, crown down.`
+>
+> **after** — `A dark stain where your head was.`
+
+**Rule 4** does not mention the fedora and needs no change. The **dark**
+variants (Rule 1, §15.3.1) do not mention it either; the listing must not
+fire in the dark.
+
+> **Note — §9 density audit still holds.** Rule 2's "useful object" was the
+> fedora. It is still the first thing named after the description, one line
+> later, in §17.1's `listedAs` — the handle is unchanged, only its home has
+> moved. The stain keeps its own sentence, which is if anything an
+> improvement: the stain is a clue and was sharing a clause with a hat.
+
+---
+
+## 17. Object listing strings
+
+**Added:** 2026-08-30, fifth pass · **Author:** `narrative-writer`
+
+Two families the engine's Zork-style listing needs. Both are printed **after**
+the room description, from live state, so nothing can go stale.
+
+### 17.1 `object.fedora.listedAs`
+
+Printed while the fedora is untouched, where the author placed it. A single
+unconditional string — not a rotation; a staged object is in one place and
+saying so twice differently would read as the room shifting.
+
+```text
+A grey felt fedora lies beside the stain, crown down.
+```
+
+> **Note.** It carries the two facts that left §3.2 — *beside the stain* and
+> *crown down* — in nine words, and it deliberately does not spend anything
+> else: §4.1's `examine` owns the good felt, the band, the sweat line, and
+> *the way a hat lands when the head it was on stops participating*. The
+> listing's job is to be a handle, not a paragraph.
+>
+> **Conditions.** Fires only when the fedora has never been taken **and** the
+> room is lit. In the dark, `FEEL AROUND` (§8.11) is how the hat is found —
+> *"something with a brim on it, about an arm's length away"* — and that
+> stays the only way, so the tutorial arc from chain to light is not
+> short-circuited by a list.
+>
+> **After it is taken, `listedAs` never fires again**, even if the hat is
+> dropped in this room on the same spot. It cannot: the stain is where the
+> hat *was*, and a hat put back down beside it is a different sentence about
+> a different act. §17.2 takes over permanently.
+
+### 17.2 `room.listedGeneric`
+
+**Path:** `room.listedGeneric` — `string[]`, per-node rotation, order
+preserved. Global, not room-scoped: it fires for every handled-and-dropped
+object in the game, so it stays plain and says nothing it cannot know.
+Templated on `{name}`, which supplies the object's article
+(`a fedora`, `the loose page`).
+
+1. `There is {name} here.`
+2. `There is {name} on the floor.`
+3. `There is {name} lying where it was put down.`
+
+> **Note.** Variant 1 is the most-seen and is deliberately the Infocom line,
+> word for word — it is the plainest true sentence in the form and it is what
+> players of this kind of game expect a floor to say. Variant 2 adds only the
+> surface. Variant 3 is the longest thing this family may ever do and still
+> asserts nothing about *who* put the object down, which matters: an NPC, a
+> later mechanic, or the player three rooms and an hour ago are all covered.
+>
+> **`{name}` must never start the sentence.** Object names carry lowercase
+> articles, and a rotation that has to capitalise them will eventually print
+> *A fedora* where the room already said *a fedora*, or worse, sentence-case
+> a proper noun that had a reason to be lowercase. All three variants keep
+> the template mid-sentence.
+>
+> **No jokes here, by design.** This string is printed after every room
+> description in the game for the rest of the player's life. A line that is
+> funny the first time is furniture the twentieth. The wit in this game lives
+> in `examine`; the floor is allowed to be a floor.
+>
+> **ASSUMPTION** — the key name. The brief offered `room.listedGeneric`; I
+> have kept it. If the engine would rather this hung off the object
+> (`object.<id>.listed`) with a global fallback, the strings are unchanged.

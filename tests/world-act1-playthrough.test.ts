@@ -95,12 +95,25 @@ describe('Act I room 1 — CLI playthrough', () => {
   });
 
   it('PULL CHAIN lights the room for the first time', () => {
-    expect(stdout).toContain('You pull. There is a click of exactly the right size, and the room happens.');
+    expect(stdout).toContain('You pull. There is a click, and the room happens.');
   });
 
   it('the lit room description follows, lamp fallen, first sight', () => {
     expect(stdout).toContain('The lamp lies on its side and burns anyway');
-    expect(stdout).toContain('a fedora');
+  });
+
+  // Room-listing fix (§2.5 `listedAs`, architecture-gap task): the
+  // description used to name the fedora directly ("...and beside it,
+  // crown down, a fedora"), which went stale the instant it was taken —
+  // the bug this task fixes. That clause is deleted outright from
+  // `room.ts` (not reworded — hard rule 5); the replacement is
+  // `FEDORA.listedAs` (opening-room-prose spec §17.1, now landed),
+  // rendered by `move.ts` after the description while the hat is still
+  // unmoved — the fedora is announced on the first LOOK after the room
+  // lights, not baked into the room's own description.
+  it('the fedora is announced by its own listedAs line on LOOK, before it is ever examined or taken', () => {
+    const beforeExamine = stdout.slice(0, stdout.indexOf('> examine fedora'));
+    expect(beforeExamine).toContain('A grey felt fedora lies beside the stain, crown down.');
   });
 
   it('EXAMINE FEDORA reveals it, TAKE and WEAR pick it up and fire the memory', () => {
@@ -117,7 +130,7 @@ describe('Act I room 1 — CLI playthrough', () => {
   });
 
   it('TAKE PAGE and READ PAGE render the raking-light variant and note the clue', () => {
-    expect(stdout).toContain('You take the page. It weighs nothing, which is fitting.');
+    expect(stdout).toContain('You take the page. It weighs nothing.');
     expect(stdout).toContain('THIS PAGE INTENTIONALLY LEFT BLANK');
     expect(stdout).toContain('the page stops being blank');
     expect(stdout).toContain('◆ clue noted: The blank page is not blank');

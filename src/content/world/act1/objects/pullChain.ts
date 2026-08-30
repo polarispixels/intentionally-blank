@@ -49,10 +49,10 @@ const pullChain: ObjectDefSlice = {
                 if: {
                   when: { not: { flag: FLAG_LAMP_FIRST_OFF_DONE } },
                   then: [
-                    { say: 'You pull the chain and the room goes away again. The dark is precisely where you left it, and it has not been improved by the interval.' },
+                    { say: 'You pull the chain and the room goes away again. The dark is precisely where you left it.' },
                     { set: [FLAG_LAMP_FIRST_OFF_DONE, true] },
                   ],
-                  else: [{ say: 'Off. The dark returns without ceremony and without any apparent hard feelings.' }],
+                  else: [{ say: 'Off. The dark returns without ceremony.' }],
                 },
               },
               { setState: [FLOOR_LAMP, 'on', false] },
@@ -62,7 +62,7 @@ const pullChain: ObjectDefSlice = {
                 if: {
                   when: { not: { flag: FLAG_LAMP_FIRST_ON_DONE } },
                   then: [
-                    { say: 'You pull. There is a click of exactly the right size, and the room happens.' },
+                    { say: 'You pull. There is a click, and the room happens.' },
                     { set: [FLAG_LAMP_FIRST_ON_DONE, true] },
                   ],
                   else: [{ say: 'Click. The room comes back, arranged exactly as you left it, which is badly.' }],

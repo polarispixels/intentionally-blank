@@ -143,6 +143,39 @@ export interface ObjectDefSlice {
   reachableInDark?: boolean;
   description?: Prose;
   text?: Prose; // READ; falls back to `description` when absent (§2.5)
+  /**
+   * §2.5's room-listing line: what `move.ts`'s room rendering prints after
+   * a room's `description` while this object is still unmoved from its
+   * authored `location` (`objectHasBeenMoved`, below, is false) — "the
+   * bespoke sentence... which is what makes a room read like prose rather
+   * than a manifest." Optional: a portable object fully woven into the
+   * room's own `description` prose (no separate listing line needed while
+   * it stays put) simply omits this. Once the object has been handled
+   * (`objectHasBeenMoved`), this is never rendered — the room's generic
+   * listing family takes over instead, since the staged sentence is no
+   * longer true. Never mentions state a room's `description` should
+   * already cover (light, other objects); this is one object's own line.
+   */
+  listedAs?: Prose;
+  /**
+   * Overrides the article `move.ts`'s generic room-listing family
+   * (`room.genericListing`, §2.5) prepends to `name` when this object has
+   * been handled and lies wherever it was put down — the family text is
+   * `'There is {name} here.'`, so `{name}` itself must carry it. Left
+   * unset, the article defaults from `name`'s first letter (a/an), which
+   * is right for the overwhelming majority of objects; author this only
+   * for the exceptions (a plural, a mass noun). Ignored when `proper` is
+   * true. Bare `name` (no article) is unaffected everywhere else —
+   * `take`, refusals, handler prose all keep using it as authored.
+   */
+  article?: string;
+  /**
+   * True for an object whose `name` is a proper name and takes no article
+   * at all in the generic listing family — an NPC-like object called
+   * "Marlow" must render "There is Marlow here.", never "There is a
+   * Marlow here." Overrides `article`.
+   */
+  proper?: boolean;
   handlers?: HandlerDef[];
 }
 
@@ -663,4 +696,74 @@ export function scope(world: WorldDef, state: GameState): ObjectId[] {
     if (dark) return reachableByTouch(world, state, state.location, id);
     return inScopeAt(world, state, state.location, id);
   });
+}
+
+// ---------------------------------------------------------------------------
+// Room listing (§2.5 `listedAs`, this task) — the fix for the "fedora still
+// on the floor after you took it" bug: a room's `description` is scenery
+// (never goes stale because nothing in it moves); portable objects are
+// listed separately, from state, after it.
+// ---------------------------------------------------------------------------
+
+/**
+ * Whether `id`'s location has ever been explicitly written by an effect (a
+ * `move` — including TAKE's and DROP's own built-in `{ move: [...] }`),
+ * rather than still resolving purely through `objectLocation`'s authored-
+ * default fallback (§1.1's overlay principle: an unset overlay entry means
+ * "still where content put it"). Deliberately a *presence* check on the
+ * overlay, not a value comparison against the authored `location` — DROP
+ * back in the exact room an object started in still calls `{ move: [id,
+ * state.location] }` (`actions.ts`'s `builtinDrop`), which unconditionally
+ * writes a fresh overlay entry (`effects.ts`'s `move`/`patchObject`) even
+ * though the resulting *value* matches the authored default again. A value
+ * comparison would therefore call a dropped-back object "unmoved" and
+ * re-print its staged `listedAs` line, contradicting this task's own
+ * worked example ("took and dropped elsewhere, **or dropped back**" both
+ * print the generic line). Presence, not value, is what "has been
+ * handled" actually means here — and it's still derived, not a new flag:
+ * this reads the exact overlay slot `objectLocation` already resolves
+ * through, so it needs no extra bookkeeping and survives save/load for
+ * free (§1.1).
+ */
+export function objectHasBeenMoved(state: GameState, id: ObjectId): boolean {
+  return state.objects[id]?.location !== undefined;
+}
+
+/**
+ * Portable objects physically present in `room` right now — what
+ * `move.ts`'s room rendering lists after a room's `description`, on
+ * arrival and on `LOOK` alike (§2.5). Walks the same containment shapes
+ * `inScopeAt` does (direct in the room; on a supporter in the room; inside
+ * an open-or-transparent container in the room, recursively — nesting
+ * depth is not limited), but is its own recursion rather than a reuse of
+ * `inScopeAt`: that function's `'inventory'`/`'worn'` arm returns true
+ * whenever `room === state.location` (correct for `scope()`, which is
+ * about to add the player's own hands to what's usable) — reused here it
+ * would wrongly count whatever the player is carrying as "resting in the
+ * room they're standing in". This walk instead returns `false` outright
+ * for `'inventory'`/`'worn'`/`'self'`/`'nowhere'`/`{ npc }`, at every
+ * level of the chain, not only the top. Scenery (`portable` unset or
+ * `false`) is never listed regardless of its location or state — it lives
+ * in the room's own prose, correctly, per this task's brief. `hidden`
+ * objects are excluded the same way `scope()` excludes them.
+ */
+export function objectsListedInRoom(world: WorldDef, state: GameState, room: RoomId): ObjectId[] {
+  const ids = Object.keys(world.objects ?? {}) as ObjectId[];
+  return ids.filter((id) => {
+    const def = world.objects![id]!;
+    if (def.portable !== true) return false;
+    if (objectState(world, state, id, 'hidden')) return false;
+    return physicallyInRoom(world, state, room, id);
+  });
+}
+
+function physicallyInRoom(world: WorldDef, state: GameState, room: RoomId, id: ObjectId): boolean {
+  const loc = objectLocation(world, state, id);
+  if (typeof loc === 'string') return loc === room; // false for 'inventory'/'worn'/'self'/'nowhere' too — none equals a real RoomId
+  if ('in' in loc) {
+    if (!physicallyInRoom(world, state, room, loc.in)) return false;
+    return objectState(world, state, loc.in, 'open') || isTransparent(world, loc.in);
+  }
+  if ('on' in loc) return physicallyInRoom(world, state, room, loc.on);
+  return false; // { npc } — carried by an NPC, not resting in the room
 }

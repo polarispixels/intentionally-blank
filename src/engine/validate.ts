@@ -48,6 +48,7 @@ export function validate(world: WorldDef): Finding[] {
   checkPlotCriticalStrandEffects(world, findings);
   checkVocabularyCollisions(world, findings);
   checkRoomExits(world, findings);
+  checkRoomDescriptionMentionsPortable(world, findings);
   checkNoiseWordVocabulary(world, findings);
   checkWitnessedEvents(world, findings);
   checkQuestionAnswers(world, findings);
@@ -412,6 +413,103 @@ function checkResponseFamilies(world: WorldDef, findings: Finding[]): void {
     state.set(key, 'done');
   };
   for (const key of keys) detectCycle(key, []);
+}
+
+// ---------------------------------------------------------------------------
+// Room description vs. portable-object staleness (§2.5, `listedAs` task) —
+// the bug class that shipped `your_room`'s original "beside it, crown
+// down, a fedora" line: prose that names an object's noun/adjective as
+// part of the room's own authored text goes stale the instant the object
+// moves, because nothing re-renders that text when state changes.
+// `ObjectDefSlice.listedAs` (this task) is the fix — a portable object's
+// room-presence is rendered from state, after the description, instead of
+// baked into it; this rule is the tripwire that stops the next room from
+// shipping the same mistake.
+// ---------------------------------------------------------------------------
+
+function escapeRegExp(word: string): string {
+  return word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/** Every literal string leaf reachable from `prose` without resolving a `ProseRef` (a ref's own family is a different node's text, not this one's). */
+function collectLiteralStrings(prose: Prose, out: string[]): void {
+  if (isProseRef(prose)) return;
+  if (typeof prose === 'string') {
+    out.push(prose);
+    return;
+  }
+  if (prose.length === 0) return;
+  if (typeof prose[0] === 'string') {
+    out.push(...(prose as string[]));
+    return;
+  }
+  for (const rule of prose as ProseRule[]) {
+    if (typeof rule.text === 'string') out.push(rule.text);
+    else if (Array.isArray(rule.text)) out.push(...rule.text);
+    // rule.text as ProseRef: skip — that family's text belongs to its own node.
+  }
+}
+
+/**
+ * Warns when a room's `description` text contains a whole word matching a
+ * noun or adjective belonging to a `portable` object *authored* at that
+ * room (`ObjectDefSlice.location === roomId` — a static, authoring-time
+ * check against the declared default, not a runtime/overlay one; §1.1
+ * state is never available to `validate`). This is exactly the shape of
+ * bug that shipped: `your_room`'s description said "...a fedora" in prose
+ * while `FEDORA` itself is portable and placed there, so the sentence went
+ * stale the moment a player took the hat off the floor.
+ *
+ * A WARNING, not an error, because it has real false positives by design
+ * (this task's brief): a description can legitimately use a common word
+ * that also happens to be a *different* object's adjective — nothing
+ * static can tell "this sentence is staging the object" from "this
+ * sentence uses the same word for something else" without understanding
+ * English. (`your_room` itself trips this: the dark variant's "a grey
+ * rectangle" — the window — shares the word "grey" with `FEDORA`'s own
+ * adjective; a real, accepted false positive, not a bug in this rule.)
+ *
+ * KNOWN GAPS, stated rather than silently accepted:
+ *   - Only objects placed *directly* in the room (`location === roomId`)
+ *     are checked — one placed `{ on }`/`{ in }` something that is itself
+ *     in the room is not, so the same bug one level of nesting down ships
+ *     uncaught.
+ *   - Only `description` is scanned, not `firstVisit` or handler prose,
+ *     which can go equally stale.
+ *   - Whole-word matching only (`\b`) — an inflected form ("fedoras",
+ *     "felted") is missed in the false-negative direction.
+ *   - This rule is blind to movement by design: it runs once against
+ *     authored data, not per-state, so it can never know whether a mention
+ *     describes the object's *current* position — that judgment is exactly
+ *     what `listedAs` exists to take over from prose.
+ */
+function checkRoomDescriptionMentionsPortable(world: WorldDef, findings: Finding[]): void {
+  for (const [roomId, roomDef] of Object.entries(world.rooms ?? {})) {
+    if (roomDef!.description === undefined) continue;
+    const texts: string[] = [];
+    collectLiteralStrings(roomDef!.description, texts);
+    if (texts.length === 0) continue;
+    const combined = texts.join('\n').toLowerCase();
+
+    for (const [objId, objDef] of Object.entries(world.objects ?? {})) {
+      if (objDef!.portable !== true) continue;
+      if (objDef!.location !== roomId) continue;
+
+      const words = [...(objDef!.nouns ?? []), ...(objDef!.adjectives ?? [])];
+      for (const word of words) {
+        const re = new RegExp(`\\b${escapeRegExp(word.toLowerCase())}\\b`);
+        if (re.test(combined)) {
+          findings.push(
+            warning(
+              'room-description-mentions-portable',
+              `room.${roomId}.description mentions "${word}", also a noun/adjective of portable object "${objId}" (authored at this room) — if this word describes ${objId}'s position, the sentence will go stale the moment a player moves it; consider a "listedAs" line instead (or ignore if this is a genuine unrelated use of the word)`,
+            ),
+          );
+          break; // one warning per object per room is enough
+        }
+      }
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------

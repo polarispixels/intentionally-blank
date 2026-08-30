@@ -25,7 +25,7 @@ const examine: ProseRule[] = [
 ];
 
 const rightTheLamp =
-  'You get the lamp upright. It takes both hands and a pause in the middle, during which your head delivers a short editorial. Standing, it throws its light downward the way light is supposed to go, and the room stops looking like a photograph of itself and starts looking like a room.';
+  'You get the lamp upright. It takes both hands and a pause in the middle that you spend with your eyes shut. Standing, it throws its light downward the way light is supposed to go, and the room stops looking like a photograph of itself and starts looking like a room.';
 
 const tipTheLamp =
   'You lay the lamp back down on its side, carefully, which is a strange thing to do to a lamp and an even stranger thing to be careful about. The shadows climb the walls again.';

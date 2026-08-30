@@ -12,6 +12,65 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.3.2] - 2026-08-31
+
+Both notes from Ryan's playtest, fixed.
+
+### Fixed
+
+- **The room described objects the player was holding.** Take the fedora,
+  `LOOK`, and it was still on the floor beside the stain.
+
+  Cause: `ObjectDef.listedAs` was specified in §2.5 but never implemented,
+  and nothing listed a room's contents at all — so the only way to mention
+  an object was to bake it into the room's description prose, where it
+  becomes false the moment the object moves. It would have corrupted all 32
+  rooms; Ryan found it in the first one.
+
+  Fixed on the classic model: a description is **scenery**, and portable
+  objects are listed after it from live state. An object still where the
+  author placed it prints its bespoke staged line; one the player has
+  **handled** prints a plain one instead, because the artful sentence stops
+  being true once the player has been involved. "Has been handled" derives
+  from overlay presence rather than a stored flag, so it survives save/load
+  for free.
+
+- A `validate` **warning** when a room description names a portable object
+  in that room — so the remaining 30 rooms cannot repeat it. It has one
+  known false positive in act1 ("grey", the window, versus the fedora's
+  adjective), documented and asserted rather than silenced.
+
+- Generic listings now carry an article. The authored line is
+  `There is {name} here.` and `{name}` rendered bare, giving "There is
+  fedora here." Fixed in the engine rather than by rewriting the prose,
+  since the same template serves every object in the game — objects gain
+  optional `article` / `proper` control, defaulting sensibly, so a
+  proper-named NPC never renders as "a Marlow".
+
+### Changed — voice
+
+- **The wit is down about 10%**, on Ryan's note (and his wife's, who
+  identified it precisely: *a click cannot have a size*). Ten revisions,
+  each recorded as a visible before → after diff rather than a silent edit.
+
+  > ~~There is a click of exactly the right size, and the room happens.~~
+  > **You pull. There is a click, and the room happens.**
+
+  Applying the diagnosis rather than the note found two more instances of
+  the identical fault — seconds that could be "held", house history arriving
+  "by the handful" — and one thing nobody had noticed: the head-as-commentator
+  joke ran **four times** in one room. Three reads as a running gag; four
+  reads as a tic.
+
+- **Tone guide §19, "Observing vs Performing"** — the durable half. The
+  test is whether the narrator is observing or performing: observation
+  earns its keep, performance asks the reader to admire the sentence. Two
+  named habits to watch (abstract nouns given borrowed bodies; the trailing
+  clause that explains the joke it just told) and a guardrail: *"a trim, not
+  a change of voice — ten percent quieter, not half. If a pass removes the
+  room's personality, it has overshot."* That note governs the 30 rooms
+  still unwritten.
+
 ## [0.3.1] - 2026-08-31
 
 Scope recalibrated before Act I content begins.
