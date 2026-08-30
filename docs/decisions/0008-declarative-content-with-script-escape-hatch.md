@@ -8,7 +8,8 @@ ADR 0003 says content is "typed data with no logic beyond declarative
 conditions." Engine v2 (Stage A spec) needs content to express
 state-dependent prose, memory triggers, multi-route puzzles, and NPC
 schedules — but also genuinely bespoke sequences (the credentials terminal,
-poker, resource trading) that a condition/effect DSL would express badly.
+poker, censor-proof message composition — canon A6) that a condition/effect
+DSL would express badly.
 Two failure modes bracket the choice: functions sprinkled through content
 files (untestable, unserializable, uninspectable) versus a DSL that grows
 into an accidental programming language.

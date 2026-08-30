@@ -12,6 +12,57 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.2.9] - 2026-08-29
+
+**Stage A is complete.** The whole game now exists on paper: five acts, 41
+rooms, 28 puzzles, and the engine they run on. Docs-only — no engine code
+has changed yet. Stage B starts implementation.
+
+### Added
+
+- `docs/superpowers/specs/2026-08-29-stage-a-story-architecture.md` — the
+  five-act causal spine (every major beat linked by BUT/THEREFORE), the
+  puzzle dependency graph with a two-open-threads verification and a
+  walking-dead audit, the room list by zone, 10 NPC agendas, 24 memory
+  fragments in two strata, set-piece justifications, and a 20-row
+  setup→payoff ledger.
+
+### Changed — canon
+
+Fifteen decisions promoted to `CANON` and recorded as entries 3–17 of
+`docs/spec/09-canon-decisions.md`, under the full-game build protocol.
+Spec docs 02, 03, 04, and 07 updated to match; rejected options are marked
+abandoned rather than deleted (spec 08 §10). The two worth reading first:
+
+- **The investigator is a subject Jules created** — body randomized,
+  memory state intentionally blank, seeded from Jules's own offline
+  snapshot. The missing person and the person searching are the same mind
+  on two sides of an erasure, which is spec 00's "the two mysteries are
+  one" met literally. Everything from Act IV down rests on this.
+- **Washington DC, Mount Rushmore, Puerto Rico, the distant station, and a
+  playable Catan sequence are cut as locations** — each survives
+  compressed (Luke visits the facility; Rushmore is a postcard carrying a
+  Mandela beat aimed at the player's own memory; Puerto Rico is a
+  circular-ownership paper clue; the station folds into the Mars sky
+  reveal). Scope: the architecture already prices at the 30k-word ceiling.
+
+Also settled: the client is Jack (sibling IV); Jules was deprecated, not
+abducted; the reactor's hidden load computes the town; erasure works by
+three learnable rules and a physical agent, the Custodian; the notebook
+and credentials are cached at Wall Drug; page 7/8 has three functions
+across three acts; a four-phase day replaces exact-turn scheduling; the
+escape room is an identity proof in Act IV; one canonical ending.
+
+### Changed — engine architecture
+
+Reconciled against the story architecture's ten engine requirements:
+clock-phase conditions and a `phase()` selector (a four-phase day is now
+the authored surface over the one-minute tick), a `plotCritical` class the
+validator *and* the runtime `move` primitive both refuse to strand,
+censor-proof message composition named as a script escape-hatch case with
+multi-field prompt values, and a worked page 7/8 example establishing the
+document-physics idiom. That last needed no new schema — only the example.
+
 ## [0.2.8] - 2026-08-29
 
 Stage A, first half: the engine architecture the rest of the game is built

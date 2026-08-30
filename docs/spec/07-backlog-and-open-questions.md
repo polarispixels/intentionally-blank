@@ -1,10 +1,41 @@
 # 07 - Backlog and Open Questions
 
-**Spec version:** `0.1.0`
+**Spec version:** `0.2.9`
 
 This document intentionally preserves unresolved ideas.
 
 Do not silently convert these into canon.
+
+## Status after Stage A (2026-08-29)
+
+The full-game build resolved a large block of these. **Resolved questions
+are marked inline below and are not deleted** (spec 08 §10) — the options
+that were rejected are part of the record, and the reasoning for each
+choice lives in `09-canon-decisions.md`.
+
+| Section | Question | Status |
+|---|---|---|
+| A1 | Who is the client? | **Resolved** — Jack, sibling IV (register 4) |
+| A2 | What happened to the missing sibling? | **Resolved** — deprecated (register 5) |
+| A3 | What is the protagonist? | **Resolved** — a subject Jules created (register 3) |
+| A4 | Why memory-rewrite resistant? | **Resolved** — same entry (register 3) |
+| A5 | Nature of the underground facility? | **Resolved** — it computes the layer (register 7) |
+| A6 | Is there an original reality? | **Still open, deliberately.** Nothing in Stage A answers it, and the ending is built not to. |
+| B1 | What is hidden on the blank page? | **Resolved** — three functions (register 13) |
+| B2 | Where are the admin credentials? | **Resolved** — back cover + page 7/8 indentation (register 6) |
+| B3 | Why confiscate handwritten material? | **Resolved** — analog survives reconciliation (register 14) |
+| C1–C5 | Dad specifics | **Resolved** — copied 2041, no robot body in v1 (register 10) |
+| D | Family integration | **Resolved in outline** by the act structure; per-scene detail is Stage C–E work |
+| E | Location backlog | **Resolved** — see register 9 for what is in, cut, and compressed |
+| F | Inside jokes | Standing guidance; unchanged |
+| G1–G2 | Behavioral dimensions and profile visibility | **Resolved** — three dimensions kept; profile revealed in Act IV (register 3's R13) |
+| G3 | How much time pressure? | **Resolved** — four-phase day, soft windows (register 11) |
+| G4 | How many endings? | **Resolved** — one canonical ending; playthroughs differ in understanding (register 15) |
+| H | Technical backlog | Unchanged; still post-v1 |
+| I | Future creative iteration | Unchanged — and now the home for the cut set pieces |
+
+What is left genuinely open is A6, section F's ongoing joke discipline, and
+everything in H and I. That is the correct amount of open.
 
 ---
 

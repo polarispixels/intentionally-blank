@@ -120,6 +120,7 @@ export type TopicId = string & { __topic: true };
 
 export type FlagValue = boolean | number | string;
 export type ActionClass = 'analytical' | 'social' | 'direct';
+export type DayPhase = 'morning' | 'afternoon' | 'evening' | 'night';
 
 /** Where a thing can be. */
 export type PlaceId =
@@ -264,7 +265,11 @@ script mode dumps them, and the `playtester` agent greps them.
 
 The MVP's account modal survives as the generic `prompt` event plus a
 `respondToPrompt` action; modal content and credential checking are content
-(a script effect), not engine.
+(a script effect), not engine. A prompt reply carries **all** field values —
+`StructuredAction.values: Record<string, string>` keyed by field name — so a
+script can collect multi-field composed input (the credentials pair, or a
+message drafted against the censor for P13/P22); single-field free text also
+arrives the ordinary way via `StructuredAction.text`/`raw`.
 
 ---
 
@@ -274,7 +279,12 @@ The MVP's account modal survives as the generic `prompt` event plus a
 
 ```ts
 export interface WorldDef {
-  meta: { title: string; startRoom: RoomId; minutesPerTurn: number };
+  meta: {
+    title: string; startRoom: RoomId; minutesPerTurn: number;
+    /** Start minute-of-day of each phase (canon A9's 4-phase day). */
+    phases: Record<DayPhase, number>;   // e.g. morning: 360, afternoon: 720, evening: 1080, night: 1320
+    weekLength: number;                 // 7; weekday = (clock.day - 1) % weekLength
+  };
   rooms: Record<RoomId, RoomDef>;
   objects: Record<ObjectId, ObjectDef>;
   npcs: Record<NpcId, NpcDef>;
@@ -295,7 +305,9 @@ export interface WorldDef {
 `validate(world)` (engine function, run by a content test) enforces every
 cross-reference: exits point at rooms, effects touch declared flags only,
 every referenced prose family exists, every non-meta verb has a `default`
-family, every puzzle has a clock-free solution (§4.4), no empty variant.
+family, every puzzle has a clock-free solution (§4.3), no effect strands a
+plot-critical object (§2.5), no `dark` cond references a light source
+(§2.4), no empty variant.
 Authoring errors fail `npm test`, not a play session.
 
 ### 2.2 Prose: state-dependent variants + per-node rotation
@@ -336,7 +348,9 @@ export type Cond =
   | { memory: MemoryId } | { clue: ClueId }
   | { question: [QuestionId, 'unopened' | 'open' | 'answered'] }
   | { npcAt: [NpcId, RoomId] } | { met: NpcId }
-  | { clock: { day?: number; after?: number; before?: number } } // minutes of day
+  | { clock: { day?: number; after?: number; before?: number } } // raw minutes — rare, precise cases only
+  | { clockPhase: DayPhase }            // canon A9: the normal way to write schedules
+  | { weekday: number }                 // 0-based, for weekly windows (poker night, trash day)
   | { profileLeader: ActionClass }
   | { chance?: never }                                         // deliberately absent: no RNG
   | { all: Cond[] } | { any: Cond[] } | { not: Cond };
@@ -363,8 +377,13 @@ export type Effect =
 
 The escape hatch: `ScriptFn = (world, state, args) => { state; events }` —
 pure, registered by id in `content/scripts/`, covered by the purity test,
-unit-testable alone. Poker, the terminal, Catan-ish trading — anything the
-DSL would express badly — is a script. The DSL is deliberately **not** a
+unit-testable alone. Poker, the terminal, and **message composition against
+the censor** (canon A6 rule 1: a message is rewritten in transit unless
+composed so the system cannot parse it — the family-idiom / folded-paper /
+Luke-vocabulary channel behind P13 and P22) — anything the DSL would
+express badly — is a script. The censor check is deterministic and
+player-learnable: a pure function over the composed text and the flag set,
+no AI (ADR 0004). The DSL is deliberately **not** a
 programming language: no loops, no arithmetic beyond inc/dec/atLeast, no
 random. When authoring fights the DSL, write a script; when scripts start
 duplicating a pattern three times, promote the pattern into the DSL (an
@@ -444,6 +463,7 @@ export interface ObjectDef {
   switchable?: boolean;         // TURN ON/OFF
   lightSource?: boolean;        // while `on` and in scope, defeats baseline darkness (isDark, §2.4)
   tags?: string[];              // 'analog', 'evidence', 'notebook-page'…
+  plotCritical?: boolean;       // indestructible class — see below (constitution §10)
   description: Prose;           // EXAMINE
   text?: Prose;                 // READ (falls back to description)
   listedAs?: Prose;             // line in room description, if not woven into prose
@@ -451,20 +471,87 @@ export interface ObjectDef {
 }
 ```
 
+**The indestructible class.** `plotCritical: true` (the notebook, the USB,
+the film, page 7/8, …) means the object can never leave the reachable
+world: it may move freely between rooms, containers, and the inventory, but
+never to `'nowhere'` and never into NPC possession (`{ npc: … }`) — the
+Custodian *threatens* confiscation in prose; the state machine never
+realizes it (canon A6/A12, appendix item 8). Two layers of teeth:
+
+- `validate(world)` **rejects** any authored `Effect` that moves a
+  plot-critical object to `'nowhere'` or `{ npc: … }` — sits beside the
+  clock-free-solution rule as walking-dead prevention (constitution §10).
+- The engine's `move` implementation (which scripts cannot bypass) refuses
+  such a move at runtime, leaving state unchanged and emitting a
+  `diag` event — belt for what the validator cannot see inside scripts.
+
 Built-in verb semantics (`actions.ts`) give every object correct boring
 behavior for TAKE/DROP/OPEN/CLOSE/LOCK/UNLOCK/PUT IN/PUT ON/WEAR/READ/TURN
 ON/OFF with authored global default families. `handlers` override or
 decorate. That split is what makes 40–60 rooms authorable: a writer supplies
 prose and the interesting handlers; physics is free.
 
+**Document physics needs no new mechanism** (story appendix item 6). Pages,
+pressure indentation, fits-into relations, and media comparison are ordinary
+handlers plus `Cond`/`Effect` data: a `COMPARE` verb rides the existing
+`V dobj prep iobj` pattern, indentation is a hidden property revealed by an
+instrument handler, and recontextualization is a `ProseRule`. Because page
+7/8 is the most-referenced object relationship in the game (canon A11: three
+functions on one sheet), here is the idiom builders copy rather than invent:
+
+```ts
+export const page78: ObjectDef = {
+  id: O('page_7_8'),
+  name: 'loose page',
+  nouns: ['page', 'sheet', 'paper'], adjectives: ['loose', 'torn', 'blank'],
+  location: 'nowhere',            // revealed from the fedora (§2.10)
+  portable: true, plotCritical: true, tags: ['analog', 'evidence', 'notebook-page'],
+  description: [
+    // function 3 (creation record): final-meaning recontextualization — data, not a new mechanism
+    { when: { flag: F('read_creation_record') },
+      text: 'Page 7/8. THIS PAGE INTENTIONALLY LEFT BLANK. You have seen this sheet listed somewhere since — line three of INITIAL OBJECTS.' },
+    { when: { prop: [O('page_7_8'), 'rubbed', true] },
+      text: 'Under pencil shading, the blank page keeps its confession: grooves spelling a username, a password, and a line about a drugstore.' },
+    { text: 'A torn-out sheet. Page 7 on one side, 8 on the other. Both sides: THIS PAGE INTENTIONALLY LEFT BLANK.' },
+  ],
+  handlers: [
+    // function 1 (pagination proof): fits-into as a compare handler
+    { verbs: ['compare', 'fit'], withInstrument: [O('notebook')], class: 'analytical',
+      when: { has: O('notebook') },
+      effects: [{ say: 'The torn edge seats into the notebook’s gap like it never left. Pages 7 and 8 were removed — and someone numbered the crime.' },
+                { grantClue: 'pages_match_gap' as ClueId }] },
+    // function 2 (pressure indentation): reveal via instrument; graphite, not magic
+    { verbs: ['rub', 'shade'], withInstrument: [O('pencil')], class: 'analytical',
+      when: { not: { prop: [O('page_7_8'), 'rubbed', true] } },
+      effects: [{ setProp: [O('page_7_8'), 'rubbed', true] },
+                { say: 'You shade the page sideways. What the pen above once pressed comes up pale: two words and a place.' },
+                { grantClue: 'indented_credentials' as ClueId },
+                { openQuestion: Q('what_is_at_wall_drug') }] },
+    // instrument-free attempts still teach (constitution §9): failure produces information
+    { verbs: ['rub', 'shade'], withInstrument: 'none', class: 'analytical',
+      effects: [{ say: 'Your thumb finds faint grooves. Writing pressed through from a page above it. You’d need something to bring it up — graphite, say.' }] },
+  ],
+};
+```
+
+The microfiche-vs-database comparison is the same `compare` idiom with
+conds selecting the authored contradiction text and a `grantClue` — media
+disagreement is data too.
+
 ### 2.6 NPCs
 
 ```ts
 export interface ScheduleRule {
-  when?: Cond;                  // typically clock windows + flags; first match wins
+  when?: Cond;                  // typically clockPhase/weekday + flags; first match wins
   room: RoomId | 'offstage';
   activity?: Prose;             // "Marlow is behind the desk, pretending to read."
 }
+
+// e.g. Marlow:
+//   { when: { all: [{ clockPhase: 'morning' }, { not: { flag: F('client_arrived') } }] },
+//     room: R('hotel_lobby'), activity: '…' },
+//   { when: { clockPhase: 'night' }, room: 'offstage' },
+//   { room: R('hotel_lobby') }        // unconditional last rule
 
 export interface TopicDef {
   id: TopicId;
@@ -701,7 +788,8 @@ export interface StructuredAction {
   prep?: string;
   iobj?: ObjectId | NpcId;
   topic?: string;               // ASK/TELL, raw topic words
-  text?: string;                // SAY …, answers to prompts
+  text?: string;                // SAY …, single-field free text
+  values?: Record<string, string>;  // respondToPrompt: all prompt-field values by name
   raw: string;                  // the input line, for echo and history
 }
 ```
@@ -799,6 +887,16 @@ coverage mechanism (ADR 0004's consequence).
   Non-meta actions advance it `minutesPerTurn` (default 1); travel and
   scripted effects can add more (`advanceClock`). Meta verbs (SAVE, MAP,
   HINT, VERSION…) cost nothing.
+- **The authored surface of time is the 4-phase day** (canon A9), derived
+  from the minute clock — phases do not replace it. `tick.ts` exports
+  `phase(meta, clock): DayPhase` (boundaries from `meta.phases`) and
+  `weekday(meta, clock): number` (`(day - 1) % weekLength`); the
+  `clockPhase` and `weekday` Cond arms evaluate through them. Schedules,
+  weekly windows (poker night, trash day, deliveries), and nightly
+  maintenance are written in phases and weekdays; the raw minute `clock`
+  arm stays for the rare precise beat. Hard story events are
+  progress-triggered and merely schedule-dressed — missing a window costs
+  a cycle (it recurs next phase/week), never the game (§4.3.4).
 - Nothing player-visible uses the clock in early acts except flavor (light
   through the window, a wall clock — analog, naturally). The machinery is
   cheap; retrofitting it was the expensive path (BACKLOG M1 note).
@@ -816,8 +914,10 @@ the action's class. All pure, all inside `step`.
 Rules that keep Deadline's life without its cruelty:
 
 1. **Schedules are condition windows, not move counting.** "Marlow: lobby
-   from 9:00–12:00 while `client_arrived` is unset" — generous windows,
+   during `morning` while `client_arrived` is unset" — phase-sized windows,
    flag-gated so story pacing, not the player's step count, dominates.
+   Weekly windows recur by construction (`weekday` comes around again), so
+   a missed poker night is a wait, not a loss.
 2. **Positions derive; they don't drift.** Because position is computed from
    the schedule each tick, an NPC is never "lost" by a missed update, and a
    loaded save is always consistent.
@@ -1042,7 +1142,9 @@ green + `npm test` green.
    independently; counter survives serialize/deserialize), templating.
 5. **Effects.** `src/engine/effects.ts`; `tests/effects.test.ts`: every
    `Effect` arm against fixture world, `if` branching, script dispatch,
-   immutability (deep-freeze input).
+   runtime plot-critical guard (`move` to `'nowhere'`/`{npc}` refused, diag
+   emitted, state unchanged — including from inside a script), immutability
+   (deep-freeze input).
 6. **State + world resolution.** `src/engine/state.ts`,
    `src/engine/world.ts`; `tests/world.test.ts`: overlay fallback for
    object/NPC/flag/question lookups (`flag`, `questionStatus` resolvers,
@@ -1051,7 +1153,9 @@ green + `npm test` green.
    closed vs. open container — and `initialState(world)`.
 7. **Validation.** `src/engine/validate.ts`; `tests/validate.test.ts`:
    each rule from §2.1 rejects a deliberately broken fixture; plus
-   clock-free-solution rule (§4.3.4) and question-phrasing rule (§6.2).
+   clock-free-solution rule (§4.3.4), plot-critical strand rule (§2.5),
+   dark-cond-vs-light-source warning (§2.4), and question-phrasing rule
+   (§6.2).
 8. **Built-in actions.** `src/engine/actions.ts`; `tests/actions.test.ts`:
    take/drop/open/close/lock/unlock/put in/put on/wear/read/turn on-off
    semantics, handler-overrides-builtin, `consumesTurn`.
@@ -1070,7 +1174,9 @@ green + `npm test` green.
     `tests/respond.test.ts`: one test per rung of §3.6, seen-vs-unseen
     noun-miss, diag events emitted with correct codes.
 13. **Tick: clock, events, schedules.** `src/engine/tick.ts`;
-    `tests/tick.test.ts`: minutes advance, meta verbs free, EventDef
+    `tests/tick.test.ts`: minutes advance, meta verbs free, `phase()` /
+    `weekday()` boundary cases (first/last minute of each phase, week
+    wraparound) and the `clockPhase`/`weekday` Cond arms, EventDef
     once/witnessed semantics, schedule-derived NPC position, pin/unpin,
     follower precedence (following > pin > schedule; setFollowing on/off;
     follower moves with GO TO multi-room travel).
@@ -1090,8 +1196,9 @@ green + `npm test` green.
 18. **Session + saves.** `src/session/`; `tests/session.test.ts` (with
     `MemoryStore`): save/load round-trip, autosave cadence, undo ring +
     post-reload single undo, checkpoints/restart-encounter, export/import,
-    history ceiling + `historyTruncated`, death menu flow. Also adds
-    `src/session/` to the purity scan (task 1 residual).
+    history ceiling + `historyTruncated`, prompt round-trip
+    (`prompt` event → `respondToPrompt` with `values` → script), death menu
+    flow. Also adds `src/session/` to the purity scan (task 1 residual).
 19. **Migrations + durability.** `src/session/migrate.ts`;
     `tests/migrate.test.ts`: fixture-save chain, renames table, replay
     invariant (history replay reproduces state bit-for-bit on same
@@ -1135,7 +1242,14 @@ architect-level schema change, not a builder improvisation.
 
 ---
 
-## 10. Open questions for Ryan
+## 10. Open questions for Ryan — **ratified 2026-08-29**
+
+All four resolved by the main session: (1) MVP opening preserved as a
+no-canon secret, option (b) — story architecture may still claim it as a
+cold open later; (2) undo 15 / 1-across-reload ships; (3) 1 minute/turn
+stands as the underlying tick, with the 4-phase day (§4.1, canon A9) as the
+authored scheduling surface derived from it; (4) scripts stay in
+`src/content/scripts/`. Original questions kept below for the record.
 
 1. **The MVP opening's story role** (§7.4). Options: (a) cold-open
    prologue that hard-cuts into waking in Room 204 — the arrest could be

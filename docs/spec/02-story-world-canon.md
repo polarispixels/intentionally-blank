@@ -1,6 +1,6 @@
 # 02 - Story and World Canon
 
-**Spec version:** `0.2.2`
+**Spec version:** `0.2.9`
 
 # Canon Status
 
@@ -282,13 +282,47 @@ Possible future uses:
 - code revealed under unusual light
 - analog evidence that escaped digital rewrite
 
-The precise hidden function remains open.
+## CANON: the hidden function, decided
+
+*(Canon register entry 13. Promoted from "the precise hidden function
+remains open".)*
+
+The sheet does **three** jobs, one per act band:
+
+1. **Pagination proof** (Act II) — it fits the gap in the recovered
+   notebook, which proves the notebook was in the investigator's room
+   before the attack. That should be impossible, and it is the first crack
+   in "you are only a hired stranger."
+2. **Pressure indentation** (Act II–IV) — the credentials and the cache
+   line, impressed from the page Jules wrote on top of it. Rubbing reveals
+   them. This is the analytical player's early route to the credentials.
+3. **An item on the creation record** (Act V) — page 7/8 appears in
+   `INITIAL OBJECTS` on the record that created the investigator. The joke
+   becomes the title becomes the protagonist's own manifest.
+
+The other options above (invisible ink, UV, chemical response, "nothing,
+with the absence itself meaningful") are **abandoned**, not deleted —
+recorded here per spec 08 §10.
 
 ---
 
 # 10. Admin Credentials
 
-## WORKING IDEA
+## CANON
+
+*(Promoted from `WORKING IDEA` — canon register entries 6 and 14.)*
+
+The credentials are `admin` / `admin-password`, handwritten by Jules
+**inside the notebook's back cover**, and separately preserved as **pressure
+indentation on the loose page 7/8** (the sheet lay under the page he wrote
+them on). Two locations, deliberately: the back cover serves the ordinary
+first-run pacing, and the indentation rewards analytical Act I play — and
+supports the second-playthrough effect below without gating anyone.
+
+They are accepted at the root console in Act V, where "they would have been
+accepted all along" is the point.
+
+## Original working note, preserved
 
 Somewhere in or on the notebook is a handwritten administrative login.
 
@@ -451,7 +485,20 @@ A strong metaphorical direction:
 
 # 15. The Reactor and Compute Mystery
 
-## WORKING IDEA
+## CANON
+
+*(Promoted from `WORKING IDEA` — canon register entry 7.)*
+
+The reactor's unexplained baseline load **computes the local layer** — the
+town and the people in it. The load curve dips every night when the town
+sleeps, which is how the player proves it: Eli's public-filings audit laid
+over the archive ledger. This is the game's midpoint detonation, delivered
+by a graph rather than a monologue.
+
+Whether *this* layer is itself computed somewhere else stays open and
+unanswered (§20, and open question 07 A6).
+
+## Original working note, preserved
 
 The data center's dedicated nuclear power system may consume far more energy than its public workloads justify.
 
@@ -465,7 +512,21 @@ Late-game realization:
 
 # 16. Facility Chronology Contradictions
 
-## POSSIBILITY
+## CANON — the artifacts exist. What they mean stays open.
+
+*(Promoted from `POSSIBILITY` — canon register entry 7's companion.)*
+
+Physical artifacts carrying impossible dates **do** appear, and are never
+explained. They are the only evidence of *layer recursion* — the world
+having been reconciled before, perhaps many times, under calendars that do
+not match ours. The player is expected to notice and never to be told.
+
+This is deliberately separate from the *subject recursion* (Jules → the
+investigator → the subject the player creates), which the story does
+resolve. Keeping the two apart is what lets the ending land without
+explaining the cosmology.
+
+## Original note, preserved
 
 Although the facility was built around 2030, the player may discover physical artifacts with impossible dates.
 
@@ -524,7 +585,24 @@ Final meaning:
 
 # 18. Reality Travel and Impossible Locations
 
-## WORKING IDEA
+## CANON for v1 — scope decided
+
+*(Canon register entry 9. The full reasoning is in the story architecture
+§6, "Set-piece justification".)*
+
+The story does move beyond South Dakota, but **not by visiting most of
+these places**. v1 ships: the Wall Drug cache, a compressed Mars habitat
+(film retrieval), and the archive's reconstructed environments — including
+the family escape room. Cut *as locations*: Washington DC, Mount Rushmore,
+Puerto Rico, and the distant station. Each survives as an object or a clue
+rather than a zone, because none of them had an honest causal chain of its
+own (constitution §32) and the architecture already prices at the 30k-word
+ceiling (spec 00).
+
+The reinterpretation below — places first, environments later — is
+unchanged and remains the point of the archive zone.
+
+## Original working note, preserved
 
 The story may eventually move far beyond South Dakota.
 
@@ -634,7 +712,11 @@ These questions should emerge through play, not exposition.
 
 # 21. Causal Spine of Act I
 
-## WORKING IDEA
+## CANON — and extended to five acts
+
+*(Promoted from `WORKING IDEA`. The full five-act spine now lives in
+`docs/superpowers/specs/2026-08-29-stage-a-story-architecture.md` §1; the
+Act I chain below is unchanged and is its first movement.)*
 
 Major beats connect by causation or complication, never by "and then"
 (design constitution §29). The current spine of the opening:

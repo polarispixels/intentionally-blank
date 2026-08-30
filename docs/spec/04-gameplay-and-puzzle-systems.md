@@ -1,6 +1,6 @@
 # 04 - Gameplay and Puzzle Systems
 
-**Spec version:** `0.1.0`
+**Spec version:** `0.2.9`
 
 # 1. Core Interaction Loop
 
@@ -294,7 +294,19 @@ This is a model for the larger design philosophy:
 
 # 9. Catan-Inspired Sequence
 
-## BACKLOG / WORKING IDEA
+## CUT FROM v1 — flavor only
+
+*(Canon register entry 9. Not deleted: marked cut, per spec 08 §10.)*
+
+There is no playable Catan sequence in v1. Catan survives as family flavor
+— a mentioned game, a remembered argument about a road, Dad's insufferable
+confidence about it. The scope reasoning is in the story architecture §6:
+the game already prices at the 30k-word ceiling, and a trading minigame
+that teaches its own rules is expensive content that no beat requires.
+
+Restorable post-1.0 (07 I). The working note below is preserved for that.
+
+## Original working note, preserved
 
 A future sequence may use resource-trading logic recognizably inspired by Catan.
 
@@ -317,7 +329,24 @@ Dad may be exceptionally good at the game.
 
 # 10. Escape-Room Sequence
 
-## BACKLOG
+## CANON — Act IV, and it is a reveal, not a minigame
+
+*(Promoted from `BACKLOG` — canon register entry 3's consequence.)*
+
+The escape room is real content and lands in Act IV, inside the facility's
+archive of reconstructed environments. What it reconstructs is **the
+family's last day all together**, rebuilt out of harvested memories — with
+Jules present as a blank silhouette in the middle of it.
+
+The room only completes if the player performs Jules's role from memory.
+
+He can. Perfectly.
+
+That is the whole point: it is an identity proof disguised as a puzzle, and
+it obeys the standards below because the solution is something the player
+has been unknowingly assembling for three acts. No combination-lock spam.
+
+## Original backlog note, preserved
 
 A literal or simulated escape-room environment may become:
 
@@ -435,6 +464,28 @@ Inspired by *Deadline*, important NPCs may:
 Avoid creating brittle schedules that force exact move counting.
 
 Time should add life, not cruelty.
+
+## CANON: the time model
+
+*(Canon register entry 11, resolving open question 07 G3.)*
+
+- A **four-phase day**: morning, afternoon, evening, night. NPC locations
+  are posted per phase, not per turn.
+- **Weekly recurring windows** for the things a town does on a rhythm:
+  poker night, trash day, deliveries.
+- A **nightly maintenance rhythm** — which is how the player eventually
+  notices that the town's people go somewhere at night and do not remember
+  it.
+- Hard story events are **progress-triggered and schedule-dressed**: the
+  presidential visit happens because the player earned it, and merely
+  *looks* like it happened on a calendar.
+
+The standing rule, which validation enforces rather than trusting authors
+to remember: **missing a window costs a cycle, never the game.** Every
+puzzle keeps at least one solution route with no clock term in it.
+
+**Abandoned** (spec 08 §10): exact-turn event windows; permanently missable
+events; any real-time pressure economy.
 
 ---
 

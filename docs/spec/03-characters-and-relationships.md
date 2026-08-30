@@ -1,6 +1,6 @@
 # 03 - Characters and Relationships
 
-**Spec version:** `0.2.5`
+**Spec version:** `0.2.9`
 
 # 1. The Protagonist
 
@@ -21,11 +21,38 @@ They appear to be a private investigator or detective.
 
 That interpretation may later be recontextualized.
 
-## POSSIBILITY
+## CANON — what the protagonist is
 
-"Investigator" may ultimately refer to a system role.
+*(Promoted from `POSSIBILITY` — canon register entry 3. This is the single
+highest-blast-radius decision in the project; everything from Act IV
+onward is built on it.)*
 
-The protagonist may have been designed or instantiated to investigate anomalies inside the simulation.
+The investigator is a **subject created by Jules** at the facility's root
+console, days before Jules was deprecated:
+
+- body **randomized** — the player never wears Jules's face, which is why
+  the family cannot recognize him by sight
+- occupation **investigator**
+- initial memory state **intentionally blank**
+- seeded from an **offline snapshot of Jules's own mind** — their father's
+  backup method, applied by a son to himself
+
+This answers both open questions at once. "Investigator" *is* a system
+role, and the resistance to memory rewriting (07 A4) follows from the
+construction: an offline-derived substrate, and a blank with nothing
+addressable in it for the rewrite daemon to find.
+
+The consequence the whole game turns on: **the missing person and the
+person searching are the same mind on two sides of an erasure.** Spec 00's
+mandate — "the two mysteries are revealed to be one mystery" — is met
+literally rather than thematically.
+
+It also makes the fixed recursive ending (02 §19) the *second* use of a
+console the story has already established, rather than a device that
+arrives in the last ten minutes.
+
+**Abandoned** (spec 08 §10): protagonist as ordinary human; as the
+system's own diagnostic agent; as one android among many.
 
 ---
 
@@ -50,19 +77,28 @@ The client initially appears potentially delusional because:
 
 But physical and emotional evidence supports the client's account.
 
-## POSSIBILITY
+## CANON: the client is Jack, sibling IV
 
-The client may later turn out to be:
+*(Promoted from `POSSIBILITY` — canon register entry 4.)*
 
-- connected to the corporation
-- connected to government intelligence
-- connected to a foreign entity
-- connected to the facility
-- another artificial person
-- intentionally placed to activate or recruit the investigator
-- something stranger
+Jack is the brother who **found the notebook** (canon §8 of doc 02:
+"another sibling eventually found it"), confronted Jules about it, and was
+lied to. After Jules disappeared, Jack hired the investigator — paying
+cash, because his letters to his famous siblings kept coming back answered
+in a voice that was not theirs.
 
-Do not decide too early.
+Why Jack and not another sibling: he is the only one free to be locally
+present; his monster truck is a traversal resource the plot actually needs
+(03 §9); and "the ordinary brother nobody believes" is the emotional core
+of the surface mystery. His certainty about Jules is emotional, not
+detailed — he keeps the *fact* of his brother while losing the face.
+
+The "activation mechanism" possibility survives in weakened form: Jules
+**counted on** Jack hiring his creation. Jack still acts freely, and never
+knows.
+
+**Abandoned** (spec 08 §10): the client as a corporate, government, or
+foreign plant; as an artificial person; as anyone outside the family.
 
 ---
 
@@ -147,7 +183,29 @@ Before disappearing, Jules:
 
 The character should not be a simple innocent victim.
 
-## WORKING DIRECTION
+## CANON: what happened to him
+
+*(Promoted from `WORKING DIRECTION` — canon register entry 5.)*
+
+Jules traced the facility's impossible cooling load down to Sublevel 6 and
+below, was flagged by the system, and was **deprecated**: erased from
+records and from social memory, his snapshot archived at root. Not
+kidnapped. Deleted — and filed.
+
+Before it took him he did what his father had taught the family by
+example: he made offline insurance. He cached the notebook, Dad's USB, and
+a canister of undeveloped film at Wall Drug, and he created the
+investigator (§1).
+
+This is 07 A2's predicted combination — partly *deleted*, partly
+*intentionally disappeared*, by contingency rather than escape — and it
+keeps him morally complicated rather than a simple victim, as the working
+direction below requires.
+
+**Abandoned** (spec 08 §10): Jules alive in hiding; physically kidnapped; a
+double agent; a villain.
+
+## WORKING DIRECTION — retained, and still true
 
 Jules may simultaneously have:
 
@@ -203,6 +261,26 @@ The copy should not exist only because he wanted immortality.
 Stronger motivation:
 
 > He realized human or artificial memory could not be trusted and created an offline backup of himself as insurance.
+
+## CANON: the specifics
+
+*(Canon register entry 10, resolving open questions 07 C1–C5.)*
+
+- **Copy date: 2041.** Before Jules ever went looking, so Dad is a
+  historian of how the facility got built and never a spoiler for what is
+  under it. The whole Act II–III structure leans on this line.
+- **Motive**, sharpened from the insurance answer above: decades earlier he
+  watched a hearing transcript change overnight. He never proved it. He
+  backed himself up.
+- **Corruption**: bad-block sectors plus *confident confabulation past his
+  cutoff* — he does not know what he does not know. The player can detect
+  it by date-checking his claims, which is the mechanic that keeps him from
+  solving the game.
+- **No robot body in v1.** Terminal-bound, plus Jack's portable speaker rig
+  once the player needs him mobile. The USB → terminal → body → party
+  member progression in §6 stays the post-1.0 path (as 07 C4 advises).
+- **First demonstrated skill**: poker coaching. Facility construction
+  history second.
 
 ---
 
@@ -360,6 +438,26 @@ She may enter later in the story.
 - Mars
 - reality verification
 - evidence that a distant station or sky is not what it appears to be
+
+---
+
+# 10a. The Non-Family Roster
+
+## CANON — working names
+
+*(Canon register entry 16. The lowest-stakes rows in the register: these
+are working names so prose can be written at all. `narrative-writer` may
+re-voice them and the main session approves; renaming any of them costs
+nothing.)*
+
+| Name | Role |
+|---|---|
+| **Nolan** | Jules's old manager at the facility. Canon already — he is named in the notebook ("Asked Nolan. Says there is no Sublevel 6."). |
+| **Marlow** | Night clerk at the motel. Saw who came upstairs. |
+| **Sheriff Dana Whitlock** | Delivers, flatly and as an aside, that the records have no investigator either. |
+| **Pearl** | Runs the diner. The town's memory, such as it is. |
+| **Dot** | Wall Drug. Keeper of the claim-ticket counter. |
+| **the Custodian** | Unnamed in fiction. Gray coveralls. The system's physical agent — it cannot address analog evidence, so it sends someone to collect it by hand. He is why the room was ransacked, and the player walks past him from Act I onward. |
 
 ---
 

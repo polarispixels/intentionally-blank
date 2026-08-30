@@ -3,7 +3,7 @@
 **Project:** Browser-based modern text adventure
 **Working title:** *Intentionally Blank*
 **Repository:** `polarispixels/intentionally-blank`
-**Spec version:** `0.2.4`
+**Spec version:** `0.2.9`
 **Status:** Early creative and product foundation
 
 ## Purpose
