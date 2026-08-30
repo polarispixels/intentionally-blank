@@ -114,6 +114,12 @@ Implement:
 
 Do not rush into late-game simulation revelations.
 
+The milestone list above is a build order, not a story. Each milestone's
+spec must state its causal link to the previous one in `BUT` / `THEREFORE`
+terms (design constitution §29; the current chain is in
+`02-story-world-canon.md` §21). "And then the player reaches the town" is
+a warning sign, not a plan.
+
 ---
 
 # 4. Content Modeling

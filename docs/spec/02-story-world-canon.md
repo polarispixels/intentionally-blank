@@ -629,3 +629,50 @@ Questions raised:
 - Does a configuration parameter determine personality, or merely classify behavior?
 
 These questions should emerge through play, not exposition.
+
+---
+
+# 21. Causal Spine of Act I
+
+## WORKING IDEA
+
+Major beats connect by causation or complication, never by "and then"
+(design constitution §29). The current spine of the opening:
+
+```text
+The investigator wakes up with no memory.
+
+THEREFORE
+they search the room for evidence of who they are.
+
+BUT
+the room has been ransacked and most useful evidence is gone.
+
+THEREFORE
+they follow the surviving clues into town.
+
+BUT
+the person connected to those clues insists that a sibling has disappeared
+whom nobody else remembers.
+
+THEREFORE
+the investigator begins investigating the missing person.
+
+BUT
+all digital records say the person never existed.
+
+THEREFORE
+they begin looking for physical and analog evidence.
+
+BUT
+the missing person's handwritten notebook is gone.
+
+THEREFORE
+finding the notebook becomes a major objective.
+```
+
+Each milestone in `08-development-handoff.md` §3 should be able to name
+its link in this chain. Later acts get their own spine as they firm up;
+until then, later locations (Puerto Rico, Washington, Mars, the station)
+remain `WORKING IDEA` / `POSSIBILITY` and must be reached *because* of a
+prior beat (constitution §32).

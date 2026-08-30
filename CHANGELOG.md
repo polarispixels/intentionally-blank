@@ -12,6 +12,19 @@ that the version strings agree. (ADR 0005)
 
 ## [Unreleased]
 
+### Changed
+
+- Storytelling framework (Ryan, 2026-08-29): design constitution gains
+  §29 *Major Beats Connect by Causation or Complication* (the BUT /
+  THEREFORE test, "and then" as a warning sign, the event→therefore→but
+  rhythm, breathing room), §30 *Setup Leads to Payoff*, §31 *Prefer
+  Recontextualization Over Revelation*, §32 *Set Pieces Earn Their Place
+  Causally*, and §25 extended with the chain of dramatic questions. Story
+  canon gains §21 *Causal Spine of Act I* (`WORKING IDEA`). Writing guide
+  gains §18 *Beat Notes*. Development handoff §3 requires each milestone
+  spec to state its causal link. `narrative-writer` and `game-architect`
+  agents carry the beat test.
+
 ## [0.2.0] - 2026-08-29
 
 "The machine goes." First playable prototype at

@@ -364,3 +364,22 @@ DO NOT FORMAT
 do not add a paragraph explaining why that is funny.
 
 Trust the player.
+
+---
+
+# 18. Beat Notes: BUT / THEREFORE
+
+Design constitution §29 requires major story beats to connect by causation
+or complication. For writers this means:
+
+- When a scene advances major progression, state its link to the previous
+  beat in one line of authoring notes: `THEREFORE …` or `BUT …`. If the
+  only honest link is `AND THEN`, flag it before writing the prose.
+- Atmosphere, jokes, and quiet scenes are exempt. A horse, a billboard, a
+  strange object may exist because they are memorable.
+- Plant clues with two readings (constitution §31): a mundane first meaning
+  that holds up in Act I, and a second meaning the player can reach later
+  without being reminded. Note both readings in the authoring notes so the
+  second is not lost.
+- If a scene gives something unusual attention, record it as a *setup* so a
+  later scene can pay it off (constitution §30).
