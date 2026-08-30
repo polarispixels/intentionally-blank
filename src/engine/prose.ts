@@ -1,0 +1,134 @@
+// The Prose engine (spec §2.2, §8 task 4) — one type serves every room
+// description, object/verb response, and dialogue slot, with state-
+// dependent variants and per-node rotation.
+//
+// This module supersedes the MVP's `src/engine/text.ts`: that file's
+// `fill()` would have worked unchanged, but it lives in a module that also
+// exports `formatSay()`, which imports `SAY_SPECIAL` from `../content`.
+// The task constraint is that the engine must not import from
+// `src/content/`, and importing anything from `text.ts` pulls its whole
+// module graph — including that content import — along for the ride.
+// Rather than split `text.ts` (out of scope for this task, and `text.ts`
+// is MVP code slated for retirement alongside `step.ts`/`parser.ts` in
+// task 22), `prose.ts` reimplements the same `{key}` substitution
+// mechanism locally, so it stays a leaf the engine can depend on cleanly.
+//
+// PATH ID CONVENTION — every later task and every content author depends
+// on this:
+//
+//   Callers supply a stable `path` string that mirrors the authored data
+//   shape, e.g. `room.hotel_204.description`, `object.brass_key.take`,
+//   `npc.mara.topics.wallet`. Use dots for nesting exactly as the content
+//   file nests it. Two nodes collide only if they are, in fact, the same
+//   authored slot, because the path *is* that slot's address — there is no
+//   separate id to keep in sync by hand.
+//
+//   When `prose` is a `ProseRule[]`, the rule that matches is itself a
+//   distinct node from its siblings (each rule can carry its own
+//   independent rotation), so `render` addresses it as `${path}[i]` where
+//   `i` is the matched rule's index in the array — e.g.
+//   `room.hotel_204.description[1]`, matching the example in spec §2.2.
+//   Callers never construct this suffixed form themselves; they always
+//   pass the bare family path and let `render` derive the node.
+
+import type { Cond } from './cond';
+import { evaluate } from './cond';
+import type { GameState, WorldDef } from './world';
+
+export type Prose = string | string[] | ProseRule[];
+
+export interface ProseRule {
+  /** Omit to always match. First matching rule in the array wins. */
+  when?: Cond;
+  /** `string[]` rotates, indexed by this rule's own per-node counter. */
+  text: string | string[];
+}
+
+/** Values available to `{name}`, `{dobj}`, `{iobj}`, `{topic}` templating. */
+export interface ProseContext {
+  name?: string;
+  dobj?: string;
+  iobj?: string;
+  topic?: string;
+  [key: string]: string | undefined;
+}
+
+export interface ProseResult {
+  text: string;
+  /**
+   * Rotation reads and writes `state.counters` (§1.2), so rendering is not
+   * a pure read — it returns the state to continue threading through
+   * `step`/undo, rather than mutating its input or reaching for a
+   * module-level variable. When nothing rotated, this is the same `state`
+   * reference that was passed in.
+   */
+  state: GameState;
+}
+
+/** Replace `{key}` placeholders from `ctx`; an unresolved key is left as-is. */
+function fillTemplate(template: string, ctx: ProseContext): string {
+  return template.replace(/\{(\w+)\}/g, (whole, key: string) => ctx[key] ?? whole);
+}
+
+/**
+ * Resolves `prose` against `state` to the text/node-path pair that should
+ * be rendered, without touching rotation yet. Throws if `prose` is a
+ * `ProseRule[]` and no rule matches — content authoring should always
+ * supply an unconditional fallback rule (validated by task 7), so reaching
+ * the end of the array with no match is a data bug, not a case to render
+ * silently.
+ */
+function select(
+  world: WorldDef,
+  state: GameState,
+  path: string,
+  prose: Prose,
+): { text: string | string[]; node: string } {
+  if (typeof prose === 'string') return { text: prose, node: path };
+
+  if (prose.length === 0) {
+    throw new Error(`prose.render: "${path}" has no variants/rules to select from`);
+  }
+
+  if (typeof prose[0] === 'string') {
+    // string[] rotation family — the whole array is one node.
+    return { text: prose as string[], node: path };
+  }
+
+  const rules = prose as ProseRule[];
+  for (let i = 0; i < rules.length; i++) {
+    const rule = rules[i]!;
+    if (rule.when === undefined || evaluate(world, state, rule.when)) {
+      return { text: rule.text, node: `${path}[${i}]` };
+    }
+  }
+  throw new Error(`prose.render: no rule of "${path}" matched, and none is unconditional`);
+}
+
+/**
+ * Renders a `Prose` node to text. `path` is the node's stable id per the
+ * convention documented at the top of this file — the same `path` must be
+ * passed on every render of the same authored slot for rotation to work.
+ */
+export function render(
+  world: WorldDef,
+  state: GameState,
+  path: string,
+  prose: Prose,
+  ctx: ProseContext = {},
+): ProseResult {
+  const { text, node } = select(world, state, path, prose);
+
+  if (typeof text === 'string') {
+    return { text: fillTemplate(text, ctx), state };
+  }
+
+  if (text.length === 0) {
+    throw new Error(`prose.render: "${node}" has zero rotation variants`);
+  }
+
+  const n = state.counters[node] ?? 0;
+  const chosen = text[n % text.length]!;
+  const counters = { ...state.counters, [node]: n + 1 };
+  return { text: fillTemplate(chosen, ctx), state: { ...state, counters } };
+}

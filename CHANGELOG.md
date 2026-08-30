@@ -12,6 +12,33 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.2.11] - 2026-08-29
+
+### Added
+
+- **Architecture task 4: the prose engine.** `src/engine/prose.ts` —
+  `Prose`/`ProseRule` types and `render()`, with first-match rule
+  selection, `{key}` templating, and per-node rotation. 13 new tests.
+
+  This carries the fix for a real MVP defect. Rotation used to be indexed
+  by `state.turn`, so refusal variants never rotated at all once `turn`
+  froze in the prompt and game-over phases, and every response family
+  shared one index — two unrelated refusals advanced each other's
+  rotation. Rotation is now keyed by a per-node path id held in
+  `state.counters`, so nodes rotate independently and resume exactly where
+  they were after a save and load. `render()` returns text *and* new state
+  rather than mutating, which is what keeps it correct under undo.
+
+### Changed
+
+- Task 22 now also deletes `src/engine/text.ts`, and gains a stated
+  acceptance criterion: enforce the engine's no-content-imports rule with
+  a test. Four MVP engine files import from `src/content/` today and
+  nothing catches it — the purity test checks browser and Vue
+  dependencies, not layering. Surfaced by task 4, which could not reuse
+  `text.ts`'s templating helper precisely because importing it would have
+  dragged `src/content/` into the new engine transitively.
+
 ## [0.2.10] - 2026-08-29
 
 First code of engine v2. Nothing imports it yet — the deployed game is

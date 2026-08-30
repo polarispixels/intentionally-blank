@@ -25,6 +25,7 @@ function baseState(overrides: Partial<GameState> = {}): GameState {
     objects: {},
     npcs: {},
     flags: {},
+    counters: {},
     visited: {},
     memories: [],
     clues: [],

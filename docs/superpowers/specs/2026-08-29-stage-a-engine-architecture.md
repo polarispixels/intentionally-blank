@@ -1216,8 +1216,22 @@ green + `npm test` green.
 21. **MVP prologue port.** `src/content/` scene + golden-transcript test
     against `tests/fixtures/playthrough.txt` equivalent output.
 22. **Shell switch + old-engine deletion.** `src/ui/` on Session; remove
-    MVP `step/state/parser/types`; full playthrough test via CLI. (Merges
-    with M1 content in Stage B; version 0.3.0.)
+    MVP `step/state/parser/types` **and `text.ts`**; full playthrough test
+    via CLI. (Merges with M1 content in Stage B; version 0.3.0.)
+
+    **Acceptance includes enforcing §0 layering rule 1 with a test.** Today
+    four MVP files import from `src/content/` — `state.ts`, `step.ts` (two
+    imports), and `text.ts` — which is exactly what v2 forbids and what
+    makes the engine a generic IF engine rather than this game's engine.
+    Nothing currently catches it: `tests/purity.test.ts` checks for browser
+    and Vue dependencies, not layering. Once the MVP files are gone, add
+    `src/content/` (and any `../content` specifier) to that test's
+    `FORBIDDEN_MODULES` for `src/engine/`, and mutation-test it. The rule
+    is not real until a test fails on it.
+
+    Discovered during task 4: a builder could not reuse `text.ts`'s `fill`
+    helper precisely because importing it would have pulled `src/content/`
+    into the new engine transitively.
 
 Sequencing: 1–2 are shipped (v0.2.6, v0.2.7); Stage B opens at task 3. 3→8 in order (each depends on
 the previous); 9–11 after 6; 12 after 9–11; 13–17 after 8 (13 before 14);
