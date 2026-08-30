@@ -18,17 +18,44 @@ Maintenance rules:
 | # | Item | Type | Target version | Status |
 |---|---|---|---|---|
 | P | Process foundation: CLAUDE.md, agents, ADRs, repo, Pages target | Process | — | ✅ done (unreleased) |
-| M0 | Foundation: repo skeleton, Vite/TS/Vue/Vitest, CI → Pages, docs-site generator, core command loop, deterministic state container, save/load/undo skeleton, headless CLI, version test | Engine | 0.1.x | 🎯 next up — brainstorm + spec first |
-| M1 | Opening Room vertical slice: wake on floor, darkness, headache, fedora, lamp, pull chain, desk, terminal, one locked/hidden object, first memory fragment, first reasonable-action jokes, exit to town | Content + engine | 0.2.0 | queued |
-| M2 | First exterior / town: empty street, brick buildings, horses, glow, Wall Drug billboard, uncertain era, one or two buildings, first client connection or memory path | Content | 0.3.0 | idea |
-| M3 | Client and missing sibling: remembered hiring, sibling claim, first memory discrepancy, first evidence the client may be right, notebook objective | Content | 0.4.0 | idea |
-| M4 | Notebook trail: loose page 7/8, THIS PAGE INTENTIONALLY LEFT BLANK, notebook dependency graph, first analog-vs-digital contradiction | Content | 0.5.0 | idea |
-| A1 | `playtester` agent (needs M0's headless CLI) | Process | with M0/M1 | queued |
+| M0 | MVP "the machine goes": Vite/TS/Vue/Vitest, CI → Pages, docs-site generator, pure reducer engine, parser, modal + credentials joke, GAME OVER/RESTART, headless CLI, version test | Engine + content | 0.2.0 | ✅ shipped v0.2.0 — spec `docs/superpowers/specs/2026-08-29-mvp-design.md` (see CHANGELOG 0.2.0) |
+| M1 | Opening Room vertical slice: wake on floor, darkness, headache, fedora, lamp, pull chain, desk, terminal, one locked/hidden object, first memory fragment, first reasonable-action jokes, exit to town | Content + engine | 0.3.0 | 🎯 next up — brainstorm + spec first |
+| M2 | First exterior / town: empty street, brick buildings, horses, glow, Wall Drug billboard, uncertain era, one or two buildings, first client connection or memory path | Content | 0.4.0 | idea |
+| M3 | Client and missing sibling: remembered hiring, sibling claim, first memory discrepancy, first evidence the client may be right, notebook objective | Content | 0.5.0 | idea |
+| M4 | Notebook trail: loose page 7/8, THIS PAGE INTENTIONALLY LEFT BLANK, notebook dependency graph, first analog-vs-digital contradiction | Content | 0.6.0 | idea |
+| A1 | `playtester` agent (the headless CLI exists as of v0.2.0: `npm run play -- --script <file> --fast`) | Process | with M1 | queued |
 
 Milestone definitions come from `docs/spec/08-development-handoff.md` §3.
 Version targets follow the ladder in `docs/spec/README.md` and may shift.
 
-## Notes carried into the M0 design
+## Notes carried out of the MVP (v0.2.0)
+
+- Verbs players will try that the MVP parser sends to `unknown` — cheap
+  eggs for M1: `inventory`/`i`, `x screen`/`x computer`/`x cursor`/`x
+  window`, `stand`/`get up`/`leave`, `wait`/`z`, `sing`, `xyzzy`, `sudo`,
+  `google <thing>`/`search <thing>`, `close`/`cancel` at the modal, `undo`
+  after game over.
+- Response-variant rotation is indexed by `turn`, which freezes in the
+  prompt/over phases, so refusal variants never rotate. M1's world model
+  should index rotation by a per-response counter.
+- The CLI's readline loop can interleave input during beat delays; a bad
+  `--script` path prints a raw stack trace.
+- `describeAction` echo vocabulary lives in the engine; if the echo ever
+  becomes authored (e.g. "You say: …"), move it to content.
+- Save/undo: the `promptFailed` path is not recorded in the transcript and
+  the modal's error/hint visibility is UI-only; a save taken at
+  `loginAttempts: 2` would reopen a bare modal. Derive `revealHint` from
+  `loginAttempts` when saves exist.
+- A command typed during the paced beat sequence is discarded after
+  flushing (the input clears before the flush check). Either run it after
+  the flush or keep the text.
+- `tests/purity.test.ts` strips string literals with a regex that has no
+  token context, so a regex literal containing a quote character (e.g.
+  `QUOTES` in `parser.ts`) blinds it to the span up to the next matching
+  quote. It still catches imports at file top. Replace with a tokenizer
+  (or strip `/regex/` literals first) before relying on it for M1.
+
+## Notes carried into the M1 design
 
 - The opening-room schema cannot be "minimal, refactor later": it must
   already express state-dependent variants, memory triggers, and multiple

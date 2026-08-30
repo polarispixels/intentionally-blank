@@ -20,6 +20,10 @@ download the spec forbids requiring.
   `DeterministicParser` implementation. `LocalLLMAdapter` /
   `RemoteLLMAdapter` are named in the interface's doc comment as future
   slots and nothing more.
+- *Status at v0.2.0:* the prototype ships the bare `parse(input): Action`
+  function as the interpreter; the `IntentInterpreter` interface and
+  `DeterministicParser` class land with Milestone 1's world model. The rule
+  (no AI, engine sees only structured actions) is unchanged.
 - The `playtester` agent is the tool for finding parser gaps.
 
 ## Consequences

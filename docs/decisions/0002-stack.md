@@ -17,6 +17,10 @@ cold start) or a server, both contrary to ADR 0001.
 - **Vue 3** for the REPL shell only (see ADR 0003).
 - **Vitest** for tests; fast enough for a tight TDD loop.
 - **Node 24 / npm** as the toolchain; a `package-lock.json` is committed.
+- The `typescript` devDependency is aliased to `npm:@typescript/typescript6`
+  (Microsoft's published bridge release). Plain resolution yields
+  TypeScript 7, the native-port compiler with no JavaScript `tsc`, which
+  `vue-tsc` cannot load. Revisit when `vue-tsc` supports TS 7.
 
 ## Consequences
 

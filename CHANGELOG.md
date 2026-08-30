@@ -12,22 +12,35 @@ that the version strings agree. (ADR 0005)
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-08-29
+
+"The machine goes." First playable prototype at
+https://polarispixels.github.io/intentionally-blank/ — a five-minute
+proof of the REPL, parser, state, event trigger, modal, credentials,
+game over, and restart. Not the story yet.
+
 ### Added
 
+- Browser REPL (Vue 3 + Vite) with a deterministic parser and synonym
+  table, authored responses with rotating variants, a turn counter that
+  opens the ACCOUNT REQUIRED modal on turn 4, the `user`/`password` joke,
+  the Internet Police sequence, GAME OVER, and RESTART.
+- Pure reducer engine (`parse`, `step`, `start`) with a full-playthrough
+  test; state is serializable so save/undo can be added later.
+- Headless CLI: `npm run play` (with `--script <file> --fast` for scripted
+  runs).
+- Generated docs site at `/docs/` from the repo's markdown.
+- GitHub Actions workflow: test → build → deploy to Pages on push to `main`.
+- Version-sync test (`GAME_VERSION` = `package.json` = CHANGELOG).
 - Development process: `CLAUDE.md` (hard rules, model routing, token rules,
-  workflow), agent roster in `.claude/agents/` (`game-architect`,
-  `narrative-writer`, `code-reviewer`, `game-builder`, `qa-verifier`,
-  `world-scribe`, `scout`), `docs/DEVELOPMENT.md`, ADRs 0001–0007.
-- `BACKLOG.md` with the milestone status board (M0–M4 from spec 08 §3).
-- Repository `polarispixels/intentionally-blank`; GitHub Pages target
-  `https://polarispixels.github.io/intentionally-blank/`.
+  workflow), agent roster in `.claude/agents/`, `docs/DEVELOPMENT.md`,
+  ADRs 0001–0007, `BACKLOG.md` with the milestone status board.
 
 ### Changed
 
-- Spec package flattened into `docs/spec/` (the nine numbered docs plus
-  README). `MASTER_SPEC.md` dropped in favor of the generated docs site;
-  the spec's own changelog merged into this file. Repository target in the
-  spec README updated from `/blank` to `intentionally-blank`.
+- Spec package flattened into `docs/spec/`; `MASTER_SPEC.md` dropped in
+  favor of the generated docs site; the spec's changelog merged here.
+  Version ladder shifted: the real opening room is now 0.3.0.
 
 ## [0.1.0] - 2026-08-29
 
