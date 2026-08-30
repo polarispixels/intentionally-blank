@@ -1,6 +1,6 @@
 # 00 - Product and Story Overview
 
-**Spec version:** `0.1.0`
+**Spec version:** `0.3.1`
 
 ## TLDR
 
@@ -61,7 +61,29 @@ A useful internal audience benchmark is older teenagers and young adults who are
 
 The target should be closer to classic Infocom density than to a long modern novel.
 
-**Working scope target:**
+**Working scope target** *(recalibrated 2026-08-31 — canon register entry
+21. The original 20,000–30,000 figure was set before any room existed; the
+shipped opening room measured ~3,700 player-visible words, which projects
+to ~150,000 across the original 41-room map. Ryan's call was a balanced
+compromise across all three levers rather than any one of them: fewer
+rooms, lighter typical density, and a somewhat longer game.)*
+
+- **32 rooms**, in three density tiers: **4 hero** rooms at ~3,000 words
+  each (the opening, the Sublevel 6 maintenance bay, the escape-room
+  chamber, the Blank Room — one at each act boundary), **~24 standard**
+  rooms at ~1,200 words, and **~4 light** rooms at ~400–600
+- roughly **50,000 to 55,000** authored words
+- approximately **10 to 14 hours** for a thoughtful first playthrough
+
+The tier word targets are the enforcement mechanism: "write less" is not
+an instruction anyone can follow, but a number is. Density is cut from
+**breadth, not anticipation** — fewer objects per room, with the objects
+that remain keeping their full set of authored responses. Constitution §14
+is the quality being protected, and thinning the *answers* would trade
+away exactly the thing that makes the opening room work.
+
+**Original target, preserved** (spec 08 §10 — abandoned figures are marked,
+not deleted):
 
 - roughly 20,000 to 30,000 authored words
 - approximately 8 to 12 hours for a thoughtful first playthrough

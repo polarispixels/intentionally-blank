@@ -12,6 +12,55 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.3.1] - 2026-08-31
+
+Scope recalibrated before Act I content begins.
+
+### Changed — canon
+
+- **The game is 32 rooms and ~50–55k words, not 41 rooms and 20–30k**
+  (register entries 21–23; spec 00's scope section rewritten, the original
+  figures preserved rather than deleted).
+
+  The original target was set before any room existed. The shipped opening
+  measured **~3,700 player-visible words for one room**, which projects to
+  ~150,000 across the old map — five times the stated budget. Ryan's call
+  was a balanced compromise across all three levers rather than any one of
+  them: fewer rooms, lighter typical density, a somewhat longer game.
+
+- **Density is now tiered, with numbers**: 4 hero rooms at ~3,000 words —
+  one at each act boundary, the opening, the Sublevel 6 maintenance bay,
+  the escape-room chamber, the Blank Room — ~24 standard rooms at ~1,200,
+  and ~4 light rooms at ~400–600. The number is the mechanism; "write
+  less" is not an instruction a writer can follow.
+
+- Density is cut from **breadth, not anticipation**: fewer objects per
+  room, with surviving objects keeping their full authored responses. A
+  room with six well-answered objects beats one with fifteen thin ones,
+  and thinning the answers would trade away the constitution §14 quality
+  that makes the opening room work.
+
+- Poker moves from a separate back room to **the Sundown Diner after
+  Friday close** — a state variant rather than a location. Every mechanic
+  survives at the table.
+
+- S3 Cold Storage is cut; its tape rack and the checkout card signed *J.*
+  move to the tool crib.
+
+### Notes
+
+**Nothing story-level was cut.** All 28 puzzles, all 21 named reveals, all
+20 setup→payoff ledger lines, every NPC and every open-thread guarantee
+survive; three ledger lines change house and two puzzles are restaged. The
+architect landed at 32 rather than the 30 I asked for and defended the
+difference — the three rooms it refused to cut are the town's independent
+evidence channels, whose loss would collapse the puzzle network back into
+a chain.
+
+Trajectory after the cut: ~53–54k words, ~10–14 hours. A named reserve
+exists — the Landing shipped at hero density for what is structurally a
+corridor, worth ~2k in a later trim.
+
 ## [0.3.0] - 2026-08-30
 
 **The live URL is the real game.** Engine v2 replaces the MVP prototype,
