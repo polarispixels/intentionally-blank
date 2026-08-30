@@ -1,4 +1,7 @@
 <script setup lang="ts">
+// Every `Line.kind` (`./lines.ts`) gets its own CSS class (`styles.css`) —
+// memories, clues, and questions render distinctly from ordinary prose, per
+// §8 task 22's own requirement.
 import type { Line } from './lines';
 defineProps<{ lines: Line[] }>();
 </script>

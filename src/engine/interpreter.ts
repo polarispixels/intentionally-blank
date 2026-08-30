@@ -27,14 +27,20 @@
 
 import type { NpcId, ObjectId, PlaceId, RoomId, VerbId } from './ids';
 import { V } from './ids';
-import type { CompiledVocabulary } from './parser/vocabulary';
-import { dropBaseNoise, tokenize } from './parser/tokenize';
-import { knownNounsIn, matchGrammar } from './parser/grammar';
-import type { UnresolvedAction, UnresolvedNounPhrase } from './parser/grammar';
-import type { ResolveResult } from './parser/resolver';
-import { candidateName, isNpcId, joinWithOr, knownWordsFor, resolveNounPhrase } from './parser/resolver';
-import { resolvePronoun } from './parser/pronouns';
-import { tryMultiObject } from './parser/multi';
+import type { CompiledVocabulary, ResolveResult, UnresolvedAction, UnresolvedNounPhrase } from './parser';
+import {
+  candidateName,
+  dropBaseNoise,
+  isNpcId,
+  joinWithOr,
+  knownNounsIn,
+  knownWordsFor,
+  matchGrammar,
+  resolveNounPhrase,
+  resolvePronoun,
+  tokenize,
+  tryMultiObject,
+} from './parser';
 
 /**
  * Reserved verb id for `GO TO` (task 11, §3.5). Never added to `world.verbs`

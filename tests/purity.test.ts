@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { importedModules, stripNonCode } from './helpers/source-scan';
@@ -32,6 +32,27 @@ const FORBIDDEN_MODULES: readonly RegExp[] = [
   /(^|\/)ui\//,
 ];
 
+/**
+ * §0's layering rule 1, added by §8 task 22: `src/engine/` and
+ * `src/session/` may never import `src/content/` (any specifier with a
+ * `content` path segment, matching a relative `'../content'` however many
+ * `../` it takes to get there) — content is data these layers are handed by
+ * a caller (`WorldDef`), not something they reach into themselves. Before
+ * this task, nothing checked it: four now-deleted MVP engine files
+ * (`state.ts`, `step.ts` twice over, `text.ts`) imported `'../content'`
+ * directly, and `npm test` stayed green the whole time. This list is
+ * deliberately separate from `FORBIDDEN_MODULES` above (rather than adding
+ * to it directly) so `src/content`'s own purity check — which legitimately
+ * has no reason to ever match this pattern against its own internal
+ * relative imports, but isn't the rule this task is asserting — stays
+ * scoped to exactly what §0 actually forbids for it (browser/Vue/node
+ * only). See the mutation-check tests below: the rule "is not real until a
+ * test fails on it" (this task's own brief), so those tests inject a real
+ * violation and prove `assertPure` actually catches it, not just that the
+ * pattern sits unused in a list.
+ */
+const FORBIDDEN_MODULES_LAYERING: readonly RegExp[] = [...FORBIDDEN_MODULES, /(^|\/)content(\/|$)/];
+
 function listTsFiles(dir: string): string[] {
   const files: string[] = [];
   for (const entry of readdirSync(dir)) {
@@ -42,7 +63,7 @@ function listTsFiles(dir: string): string[] {
   return files;
 }
 
-function assertPure(dir: string): void {
+function assertPure(dir: string, forbiddenModules: readonly RegExp[] = FORBIDDEN_MODULES): void {
   const root = join(process.cwd(), dir);
   const files = listTsFiles(root);
   expect(files.length, `${dir} has no TypeScript files to check`).toBeGreaterThan(0);
@@ -51,7 +72,7 @@ function assertPure(dir: string): void {
     const source = readFileSync(file, 'utf8');
 
     for (const specifier of importedModules(source)) {
-      for (const pattern of FORBIDDEN_MODULES) {
+      for (const pattern of forbiddenModules) {
         expect(pattern.test(specifier), `${file} imports "${specifier}" (${pattern})`).toBe(false);
       }
     }
@@ -64,8 +85,8 @@ function assertPure(dir: string): void {
 }
 
 describe('purity: src/engine', () => {
-  it('has no browser, timer, randomness, or Vue dependency', () => {
-    assertPure('src/engine');
+  it('has no browser, timer, randomness, Vue, or content dependency', () => {
+    assertPure('src/engine', FORBIDDEN_MODULES_LAYERING);
   });
 });
 
@@ -76,8 +97,48 @@ describe('purity: src/content', () => {
 });
 
 describe('purity: src/session', () => {
-  it('has no browser, timer, randomness, or Vue dependency', () => {
-    assertPure('src/session');
+  it('has no browser, timer, randomness, Vue, or content dependency', () => {
+    assertPure('src/session', FORBIDDEN_MODULES_LAYERING);
+  });
+});
+
+// §0 layering rule 1's mutation check (§8 task 22's own instruction: "the
+// rule is not real until a test fails on it"). Each test below writes a
+// real, scratch `.ts` file into the real directory `assertPure` scans, with
+// a real `'../content'`-shaped import, and confirms `assertPure` throws
+// against it — proving the new pattern in `FORBIDDEN_MODULES_LAYERING`
+// actually fires, the way the four now-deleted MVP files' violations never
+// did. The scratch file is removed in `finally`, so nothing survives this
+// test run; it exists only for the moment `assertPure` scans the directory.
+describe('purity: layering rule mutation check (§0 rule 1, §8 task 22)', () => {
+  it('src/engine: a scratch file importing "../content/..." makes assertPure fail', () => {
+    const scratch = join(process.cwd(), 'src/engine/__purity_layering_mutation_check__.ts');
+    writeFileSync(scratch, `import { WORLD } from '../content/world/act1';\nexport const _x = WORLD;\n`);
+    try {
+      expect(() => assertPure('src/engine', FORBIDDEN_MODULES_LAYERING)).toThrow();
+    } finally {
+      rmSync(scratch);
+    }
+  });
+
+  it('src/session: a scratch file importing "../content/..." makes assertPure fail', () => {
+    const scratch = join(process.cwd(), 'src/session/__purity_layering_mutation_check__.ts');
+    writeFileSync(scratch, `import { WORLD } from '../content/world/act1';\nexport const _x = WORLD;\n`);
+    try {
+      expect(() => assertPure('src/session', FORBIDDEN_MODULES_LAYERING)).toThrow();
+    } finally {
+      rmSync(scratch);
+    }
+  });
+
+  it('without the layering patterns, the same scratch file is invisible (proves the base FORBIDDEN_MODULES list alone never caught this)', () => {
+    const scratch = join(process.cwd(), 'src/engine/__purity_layering_mutation_check__.ts');
+    writeFileSync(scratch, `import { WORLD } from '../content/world/act1';\nexport const _x = WORLD;\n`);
+    try {
+      expect(() => assertPure('src/engine', FORBIDDEN_MODULES)).not.toThrow();
+    } finally {
+      rmSync(scratch);
+    }
   });
 });
 

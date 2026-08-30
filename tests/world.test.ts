@@ -13,13 +13,17 @@ import {
   GUIDE,
   HIDDEN_COIN,
   KEY,
+  KEY_FOB,
   LAMP,
   NOTEBOOK,
   QUESTION_1,
   ROOM_A,
   ROOM_B,
   ROOM_C,
+  SELF_TEST,
+  SELF_TEST_PART,
   SHELF,
+  TOUCHABLE,
 } from './fixtures/world';
 
 function baseState(overrides: Partial<GameState> = {}): GameState {
@@ -305,6 +309,64 @@ describe('scope() — visibility (§0)', () => {
     const visible = scope(FIXTURE_WORLD, state);
     expect(visible).toContain(BOX); // ROOM_A's authored default location
     expect(visible).toContain(LAMP);
+  });
+
+  // Gap 1 (dark-reachability): `reachableInDark` — the per-object "findable
+  // by touch" exception scope()'s all-or-nothing dark rule used to lack
+  // entirely (see world.ts's own doc comment on the field).
+  describe('reachableInDark — per-object touch exception (§2.4)', () => {
+    it('a reachableInDark object physically in the dark room stays in scope', () => {
+      const state = baseState({ location: ROOM_A });
+      expect(scope(FIXTURE_WORLD, state)).toContain(TOUCHABLE);
+    });
+
+    it('a reachableInDark object is still excluded once it is no longer physically present in the dark room', () => {
+      const state = baseState({ location: ROOM_A, objects: { [TOUCHABLE]: { location: ROOM_B } } });
+      // ROOM_B is lit, so this also proves reachableInDark never grants
+      // scope from a different room — only physical presence + the flag.
+      expect(scope(FIXTURE_WORLD, state)).not.toContain(TOUCHABLE);
+    });
+
+    it('an object nested on something carried is reachable in the dark with no reachableInDark flag of its own', () => {
+      const state = baseState({ location: ROOM_A, objects: { [KEY]: { location: 'inventory' } } });
+      expect(scope(FIXTURE_WORLD, state)).toContain(KEY_FOB);
+    });
+
+    it('an object nested on something NOT carried, and not itself flagged, stays out of scope in the dark', () => {
+      // KEY stays at its authored default (ROOM_A) — not carried.
+      const state = baseState({ location: ROOM_A });
+      expect(scope(FIXTURE_WORLD, state)).not.toContain(KEY_FOB);
+    });
+  });
+
+  // The 'self' PlaceId (ids.ts's own doc comment): part of the player, not
+  // tied to any room, always in scope, always reachable in the dark, with
+  // no reachableInDark flag needed — this is what X ME / TOUCH HEAD /
+  // SEARCH POCKETS rely on working from every room, not just the one a
+  // body part happened to be authored against.
+  describe("'self' PlaceId — always in scope, wherever the player is (§8 gap: PlaceId had no way to say 'part of the player')", () => {
+    it('a self-placed object is in scope from ROOM_B — a room it was never authored against', () => {
+      const state = baseState({ location: ROOM_B });
+      expect(scope(FIXTURE_WORLD, state)).toContain(SELF_TEST);
+    });
+
+    it('a self-placed object is in scope from ROOM_C too', () => {
+      const state = baseState({ location: ROOM_C });
+      expect(scope(FIXTURE_WORLD, state)).toContain(SELF_TEST);
+    });
+
+    it('a sub-part resting { on: self-placed-object } inherits scope with no location or flag of its own', () => {
+      const state = baseState({ location: ROOM_B });
+      expect(scope(FIXTURE_WORLD, state)).toContain(SELF_TEST_PART);
+    });
+
+    it('stays in scope in a dark room, with no reachableInDark flag authored on it', () => {
+      // ROOM_A is baseline-dark in the fixture, and no light source is on.
+      const state = baseState({ location: ROOM_A });
+      const visible = scope(FIXTURE_WORLD, state);
+      expect(visible).toContain(SELF_TEST);
+      expect(visible).toContain(SELF_TEST_PART);
+    });
   });
 });
 

@@ -1874,3 +1874,735 @@ holding on to, and the drawer comes open about four inches — which is enough.
   washstand appears only in the quarantined mirror prose (§12.2).
 - Marlow is never named; the "somebody two floors down" lines refer to no one.
 
+
+---
+
+## 14. Later additions — gap-fill pass
+
+**Added:** 2026-08-30, third pass · **Author:** `narrative-writer`
+**Status:** authored prose, awaiting voice review and Ryan's spot-check
+
+Three strings the wiring pass needed and this document had not supplied.
+**Nothing in §1–§13 is revised by this section.** Where a slot below reuses
+an existing string it quotes it verbatim and says so, so the builder has a
+complete table in one place rather than a cross-reference.
+
+### 14.1 The fedora memory's title
+
+**Path:** `world.memories.mem_hat.title` — shown in the `MEMORIES` list.
+Replaces the `The Hat` placeholder currently in `knowledge.ts`.
+
+```text
+Rain on a hat
+```
+
+> **Note — why this one.** Three requirements pulled against each other: it
+> has to be findable in a list the player reads hours later, it must not
+> spoil the fragment, and it must read as *something the player remembers*
+> rather than *something the game filed*. The clue titles (§1) are
+> deductions and are written as sentences — *The search took its time*,
+> *The bolt was thrown from inside*. Memories are not deductions, so they
+> should not sound like them. A short sensory noun phrase, lifted from the
+> fragment's own first line, does all three jobs: the player recognizes it
+> the way you recognize your own memory in a list, by its texture rather
+> than by its content.
+>
+> **Register proposed for the other 23 (architect's call, not canon):**
+> short sensory noun phrase, three or four words, no verb, no article at the
+> front where it can be dropped, nothing that states what the memory *means*.
+>
+> It does not spoil. It names the weather and the object and withholds the
+> sidewalk, the voice, and the one clause that matters — *you have never in
+> your life owned anything that did that*. And it survives the second
+> reading (§10.4): in Act V, a memory of rain on a hat, titled by the
+> machine that supplied it, is exactly as thin as it always was.
+>
+> Runner-up, if the main session wants the fragment's own cadence rather
+> than a label: `The sound of rain on a hat`. I prefer the shorter one — it
+> sits better in a column of two dozen.
+
+### 14.2 Room-level `SMELL` and `LISTEN`, by light state
+
+§3.4 authored both senses before the engine had a room-level slot for them,
+and wrote them for a lit room: the smell names *hot dust off the bulb*, which
+is wrong with the lamp off. These are the same two families re-stated as
+`ProseRule[]` with the dark state supplied.
+
+The dark strings are the ones doing real work. Before the chain is found,
+hearing and smelling are the player's **only** channels, so each dark line
+carries one piece of room information the player cannot otherwise get, and
+one reason to want the light on. Neither uses a sight word.
+
+---
+
+**`SMELL`** (no object) — **`room.your_room.smell`** — `ProseRule[]`, match
+order as listed
+
+**Rule 1** — `when: { flag: 'window_open' }` — *(unchanged, quoted from §3.4)*
+```text
+Cold air off the alley: dust, cut grass, and the faint scoured smell that comes before rain. Underneath it the room's own smell is still there, waiting to come back.
+```
+
+**Rule 2** — `when: { not: { objectState: ['floor_lamp','on',true] } }` — **DARK** — *(new)*
+```text
+Cold plaster, old carpet, and the flat mineral smell of a room that has been
+shut up a while. Nearer the floor, where you are, there is something else:
+iron, faint, and close enough that you would rather find out what it is with
+a light on.
+```
+
+**Rule 3** — otherwise — **LIT** — *(unchanged, quoted from §3.4)*
+```text
+Cold plaster, hot dust off the bulb, old carpet, and under all of it the flat mineral smell of a room that has not had a window open in it for some time.
+```
+
+> **Note.** Rule 2 gets the player to the stain (§4.13) by nose, from the
+> floor, in the dark, without a single sight verb — and it does not say
+> *blood*. It says *iron*, which is what §4.13's own `smell` says, and it
+> lets the player do the rest. The clause "close enough that you would
+> rather find out what it is with a light on" is the second tutorial
+> affordance after the chain, and like the chain it issues no instruction.
+> Rule 2 must sort **above** Rule 3 and **below** Rule 1: an open window in
+> the dark is still an open window.
+
+---
+
+**`LISTEN`** (no object) — **`room.your_room.listen`** — `ProseRule[]`,
+match order as listed
+
+**Rule 1** — `when: { not: { objectState: ['floor_lamp','on',true] } }` — **DARK** — *(new)*
+```text
+Everything is sharper in the dark. The radiator ticking above you as it lets
+go of the evening. The house shifting its weight somewhere below. And past
+the glass, very faint, the sound a town makes when nothing in it is moving,
+which is nearly the sound of no town at all.
+```
+
+**Rule 2** — otherwise — **LIT** — *(unchanged, quoted from §3.4; keep both
+variants, in this order)*
+1. `The radiator ticks. The house settles. Under both of those there is the particular quiet of a town where the traffic stopped and nobody restarted it.`
+2. `Nothing, and then a stair tread taking somebody's weight two floors down, and then nothing again for a while.`
+
+> **Note — what the dark variant is for.** It puts three things on the
+> player's map by ear alone: the radiator is *above* them (so they are on
+> the floor), the house has people in it *below* them (so there is a
+> downstairs, which is the exit), and there is glass between them and
+> outside (so the grey rectangle from the opening beats is a window).
+> None of that is stated as a fact about the room; it is stated as a fact
+> about the sound, which is all a man on a floor in the dark actually has.
+>
+> **Second reading (§10.4), planted in one clause.** *"Nearly the sound of
+> no town at all."* Act I: a small place at three in the morning, and the
+> narrator being dry about it. Later: exactly what it says. This is the same
+> machinery as §4.9's `USER NOT RECOGNIZED` — the line is literally true in
+> both readings and commits to neither. Do not soften it to "almost no sound
+> at all"; the noun has to be *town*, and it has to be the thing that is
+> missing rather than the sound.
+>
+> ASSUMPTION: the radiator is above the player and the stairwell below,
+> consistent with §2's opening beats ("somewhere above you a radiator
+> ticks") and §13's boarding-house assumption. If the room moves to a ground
+> floor, one clause in each line moves with it.
+
+### 14.3 Ruling on the three phrasings the builder could not reach
+
+The builder flagged three headers in §4 and §5 whose player-facing phrasing
+does not currently parse, and correctly left them unreachable rather than
+quietly rewording my prose. Rulings, in order of how much they cost:
+
+**1. `LOOK THROUGH WINDOW` (§5) — rephrase; do not change the parser.**
+`look through` belongs to `search`, and `SEARCH WINDOW` is authored (§5) to
+deliver the sill clue. That collision is survivable and, on inspection,
+almost benign: a player who types `LOOK THROUGH WINDOW` gets a paragraph
+about the latch, the broken paint and the smears — the wrong answer, but an
+in-world, informative, *interesting* wrong answer that they will follow up.
+The view is one obvious rephrase away.
+
+So: the header in §5 should be read as
+`LOOK OUT WINDOW / LOOK OUT OF WINDOW / LOOK OUTSIDE / LOOK AT VIEW`, and
+`look through window` is dropped as an authored phrasing. The prose is
+unchanged. Please make sure `look out` and `look out of` both reach it, with
+and without the noun — `LOOK OUT` bare should give the view, because in a
+room with exactly one window it is unambiguous.
+
+A per-object verb override that let the window claim `look through` for
+itself would be strictly better, and I would take it if it is cheap. It is
+not worth a parser change on its own.
+
+**2. `PULL CHAIN OFF` (§4.3) — drop it.** `PULL CHAIN` is the single most
+important command in the room and nothing may be allowed to shadow it, least
+of all a trailing particle. `TAKE CHAIN` and `BREAK CHAIN` both reach the
+response, which is all it needs; add `YANK CHAIN` and `RIP CHAIN` if
+synonyms are free. The phrasing is rare and the risk is not.
+
+**3. `EXAMINE CABLES` (§4.9) — keep it, with a corrected noun list.** The
+paragraph behind it is a **P12** setup (the air gap) and it should not depend
+on a player guessing `LOOK BEHIND TERMINAL`; "what's it plugged into" is the
+first thing a person asks about a computer. Add `cable`, `cables`, `port`,
+`ports`, `socket`, `sockets` to the terminal's nouns, all routing `examine`
+to the existing §4.9 string.
+
+**Do not add `cord`.** `cord` is already a noun on `pull_chain` (§4.3), and
+the chain outranks the terminal's cabling by a wide margin. If the noun list
+is not cheap, drop `examine cables` and keep `LOOK BEHIND TERMINAL` alone —
+the loss is one phrasing, not the paragraph.
+
+### 14.4 Note on §8.9 (`INVENTORY` at start)
+
+§8.9's room-scoped empty-hands line predates the engine having a real
+inventory verb, and the global `inventory.empty` family now exists
+(`2026-08-30-response-families.md` §8). §8.9 should **stay** as a
+`your_room` override and should **not** be replaced by the global: the empty
+inventory in this room is a clue about the search, and the global family
+cannot know that. Everywhere else in the game, the global fires.
+
+Architect's call whether the override retires once the player is carrying
+something; my preference is that it does not — a player who drops the hat and
+types `I` in this room should still get the clue.
+
+---
+
+## 15. Later additions — the Landing, the build boundary, and the open door
+
+**Added:** 2026-08-30, fourth pass · **Author:** `narrative-writer`
+**Status:** authored prose, awaiting voice review and Ryan's spot-check
+
+Three gaps found by playing the room from the CLI. **Nothing in §1–§14 is
+revised by this section** except §15.3, which supplies a *replacement clause*
+for one sentence that §3.2 repeats three times and names the sentence exactly.
+
+- **§15.1** — the Landing: the room beyond the door, which currently has no
+  description and crashes when entered.
+- **§15.2** — the build boundary at the top of the stairs, in system voice.
+- **§15.3** — the door-open variant of `The door is shut.`
+
+`again.nothing` (the fourth gap) is global and lives in
+`2026-08-30-response-families.md` §9, not here.
+
+---
+
+### 15.1 The Landing
+
+**Room id:** `landing` (currently declared as `LANDING_STUB` /
+`act1_landing_stub` in `ids.ts` purely so `validate()` had a target — that id
+should lose its `_stub` and its "carries no authored content" doc comment
+with this pass).
+
+This authors **only the landing outside his door**. Marlow, the front desk,
+the guest register, the key rack and the register's torn-page impression are
+two floors down and belong to M2. Nothing below names a person, and nothing
+below is a puzzle.
+
+> **CANON QUESTION.** Story architecture §3 lists Zone 1 room 2 as
+> **"Landing & Front Desk"** — one room, Marlow's post. The geometry in §2
+> and §4.10 of this document puts the desk **two floors down** from the
+> player's door, so a single room cannot hold both. I have written the
+> upstairs landing as its **own small room**, with the desk downstairs and
+> out of scope. Either canon room 2 splits in two (this landing + "Front
+> Desk"), or this landing is a new unlisted room. **ASSUMPTION**, needs a
+> ruling before M2 lays out the zone.
+
+#### 15.1.1 Light — a ruling, not a preference
+
+**The landing is never dark, and takes no `dark` field.** §4.10's
+`LOOK UNDER DOOR` already establishes it: *"a strip of landing light the
+colour of weak tea."* The light is canon, it comes up the stairwell from the
+lamp two floors down (§4.10's `OPEN DOOR`), and it is not the player's to
+switch off.
+
+This is also a constitution §10 requirement and not only a continuity one. A
+player can leave the room with the lamp off and the fedora on the floor,
+carrying nothing and no light source. If the landing were dark, that player
+is standing in a dark room with no chain to pull. The landing being lit from
+below is what makes stepping out in the dark a recoverable move.
+
+#### 15.1.2 Display name
+
+**Path:** `room.landing.name`
+
+```text
+Upstairs Landing
+```
+
+> **Note.** No leading article, so it survives `validate.ts`'s noise-word
+> rule that defeated `A Rented Room` (§3.1, and `room.ts`'s header). No floor
+> number, because none is canon. Fallback if the main session wants flatter:
+> `Landing`. **ASSUMPTION** — both are mine, same standing as §13 item 4.
+
+#### 15.1.3 Description
+
+**Path:** `room.landing.description` — one unconditional rule. No dark
+variant (§15.1.1), no state variants: nothing on this landing changes in M1.
+
+```text
+A landing two floors up, no wider than it needs to be. There is a bulb in a
+wire cage on the ceiling and it has not burned in a long while, so all the
+light on this floor comes up out of the stairwell from somewhere at the
+bottom of it. Everything here — the doors, the rail, the pattern in the
+carpet — is lit from underneath, and none of it is improved by that.
+
+Three doors. Yours, behind you, with a brass number screwed on at eye
+height. Two others, both shut, with no light under either. A strip of carpet
+runs the length of the landing, worn to the backing in a line down the
+middle. Along the well runs a banister of dark wood, with the top rail
+polished pale by everybody who has ever lived up here.
+
+The stairs go down in flights, around a square well, to a turn you cannot
+see past. Above the landing there is only ceiling: the stairs run one way.
+The air is old carpet and older coffee, and two floors down there is a lamp
+on, and a radio turned low, and somebody not making any more noise than they
+have to.
+```
+
+> **Note — §9 density audit.** Strange visual: a whole floor lit from
+> underneath, which rhymes on purpose with the fallen lamp two feet the other
+> side of the door. Useful object: the stairs (and the doors, and the rail).
+> Sensory: old carpet, older coffee, coming up a stairwell. Clue: two shut
+> doors with no light under either — whatever happened in his room happened a
+> few feet from two rooms that took no notice. Possible action: down, knock,
+> lean over the rail, read his own door.
+>
+> **Second reading (§10.4).** *"The stairs run one way."* Act I: a top-floor
+> landing, and the narrator being flat about architecture. Same machinery as
+> §4.9's `USER NOT RECOGNIZED` — literally true, commits to neither reading.
+> Do not soften it to "the stairs only go down."
+>
+> **ASSUMPTIONS**, all set dressing, all cheap to cut: the dead bulb in its
+> wire cage, three doors on the floor, the worn runner, the banister, and
+> that this is the **top** floor. The last one is not free-floating — §3.4's
+> `LOOK UP` in his own room already describes a pressed-tin ceiling with the
+> brown map of an old roof leak on it, which wants a roof above it.
+
+#### 15.1.4 Room-level senses
+
+**`SMELL`** — `room.landing.smell`
+
+```text
+Old carpet, cold plaster, and coffee — real coffee, out of a pot that has
+been standing on the heat too long, coming up the well from whoever is awake
+at the bottom of it.
+```
+
+**`LISTEN`** — `room.landing.listen`
+
+1.
+```text
+A radio two floors down, turned below the point where it carries words. Under
+it a chair takes somebody's weight and gives it back. Nobody is coming up,
+and nobody has been asked to.
+```
+2.
+```text
+The house doing what houses do at this hour, which is settle, and tick, and
+occasionally take a breath in one of the rooms you cannot see into.
+```
+
+**`LOOK UP`** — `room.landing.up`
+
+```text
+Ceiling, a single bulb in a wire cage that is not lit and has not been for
+some time, and above that the underside of a roof that has been letting
+water in somewhere for years. You have seen where it comes out.
+```
+
+> **Note.** The last sentence is a cross-link to §3.4's `LOOK UP`, and it is
+> the corroboration for the top-floor assumption. It costs nothing and it
+> makes the house one house.
+
+**`LOOK DOWN`** — `room.landing.down` *(also the answer to `LEAN OVER RAIL`
+and `LOOK OVER BANISTER`)*
+
+```text
+You lean out over the rail. The well drops away in stacked rectangles — this
+landing, the one under it, the one under that — and at the bottom there is a
+floor with a light on it, a corner of something wooden, and no person
+standing in the part of it you can see.
+```
+
+> **Note.** Looking is free. **Only going down hits §15.2's boundary.** That
+> distinction matters: a version boundary the player can see past is honest,
+> and a wall they cannot even lean over is the soft wall constitution §10
+> forbids. Nothing below the rail is named — "a corner of something wooden"
+> is deliberately not a desk.
+
+#### 15.1.5 The furniture
+
+Five objects. None is portable, none is a puzzle, and none of them needs to
+exist for the room to work — they exist so that the room answers when it is
+poked at, which is the difference between a place and a corridor.
+
+---
+
+**`landing_stairs`** — nouns: stairs, stair, staircase, steps, stairway,
+stairwell, well, flight, flights, banister *(see the banister note below)*
+
+**`examine`**
+```text
+Wooden stairs going down in flights around a square well, to a turn you
+cannot see past. The treads are cupped in the middle where everybody who has
+ever lived up here has put a foot in the same place, and the runner on them
+gives out entirely three steps down, where somebody decided the carpet had
+gone far enough.
+
+Somewhere at the bottom a lamp is on. Its light gets all the way up here,
+which is more than can be said for anybody.
+```
+
+**`listen`**
+```text
+Nothing on the stairs themselves. Further down, a radio, a chair, and the
+particular silence of a person who has stopped what they were doing because
+a door opened upstairs.
+```
+
+> **Note — P4's hook, and the only forward reference on this landing.** It
+> names nobody, and it does not say the person downstairs is listening; it
+> says they stopped. The player supplies the rest. Consistent with §4.6's
+> kick, §4.10's `OPEN DOOR`, and §7.5's sing.
+
+**`touch` / `climb` / `go down`** — see **§15.2**.
+
+---
+
+**`landing_banister`** — nouns: banister, bannister, rail, railing, handrail,
+newel, newel post, balusters
+
+**`examine`**
+```text
+Dark wood, turned on a lathe by somebody who was paid by the hour and did
+not mind. The top rail is polished pale the whole way along; the balusters
+under it are furred grey with dust that nobody has ever had a reason to
+touch. A hand's worth of house history, put there one hand at a time.
+```
+
+**`slide down banister` / `ride banister`** — the one every player types
+```text
+The rail is exactly the rail that a certain kind of person slides down. You
+get a hand on it, and your head immediately supplies a short film of how the
+rest of it goes, in which the newel post at the bottom features prominently
+and repeatedly.
+
+You take the hand back.
+```
+
+> **Note.** Constitution §14 and §9, same construction as §5's
+> `CLIMB OUT WINDOW`: the attempt is acknowledged, the refusal is in-world
+> (the concussion, not the level design), and it does not touch §15.2's
+> boundary — a player who slides down a banister and lands in a system
+> message has been told the same thing twice in two registers. If the builder
+> would rather route this to §15.2, the loss is a good line; the gain is one
+> fewer place to keep in sync. My preference is to keep it.
+
+---
+
+**`your_door_outside`** — the player's own door from the landing side.
+Nouns: door, my door, my room, number, brass number, keyhole, lock
+
+> **Wiring note.** `door` (`act1_door`, §4.10) lives in `your_room` and its
+> prose is written from the inside — the bolt, the keep, "a number on the far
+> side of it." From the landing the player is looking at the far side. Either
+> `act1_door`'s location becomes both rooms and its handlers gain a
+> `when: { inRoom: landing }` branch, or this is a second object. Architect's
+> call; the prose is the same either way.
+
+**`examine`**
+```text
+Your door from the outside, which is a different door: painted, numbered,
+and giving nothing away. The brass number is screwed on at eye height with
+the top screw gone, so it hangs a few degrees off true, and somebody has got
+used to that. Below it is a keyhole, and in the keyhole there is no key.
+
+There is no key in your pocket either. Houses like this one keep the spare
+on a board behind a desk downstairs, along with everybody else's.
+```
+
+> **Note — the pull to M2, in one clause.** The key rack is canon
+> (architecture §3, room 2) and a lodger does not need a memory to know where
+> a boarding house keeps its spares. So the player leaves this landing with a
+> concrete reason to go down that is not curiosity: *he cannot lock his own
+> room.* That reason survives the build boundary and will still be waiting
+> when the stairs open.
+
+**`read number` / `examine number`** — **`object.your_door_outside.readNumber`**
+```text
+You read your own room number. It is a number. Nothing happens when you read
+it: no flicker, no argument, nothing that says you have ever stood on this
+landing with a key in your hand and counted along the doors.
+
+The absence is worth rather more than the number.
+```
+
+> **CANON QUESTION — §13 item 6, still open.** The numeral is deliberately
+> not stated, because it is not canon and P4's register may want to choose it.
+> The line is written so the dodge is the *point* — a man reading his own door
+> number and getting no recognition off it — rather than a gap. Once the main
+> session picks a number this line can quote it and lose nothing. **Do not let
+> a builder pick one.**
+
+**`lock door` / `close door` from this side**
+```text
+You pull it to. Without a key it will not do any better than that, and the
+bolt — which is the only thing on this door that ever worked properly — is
+on the wrong side of it now.
+```
+
+---
+
+**`landing_doors`** — the two other rooms on the floor. Nouns: other doors,
+other door, doors, neighbours doors, neighbors doors, next door
+
+> **Wiring note.** `door`/`doors` collides with `your_door_outside` above and
+> with `act1_door`. If the parser cannot carry the ambiguity, give this object
+> only the qualified nouns (`other door`, `other doors`, `next door`) and let
+> bare `door` resolve to the player's own. That is the right default: on a
+> landing outside your own room, "the door" is yours.
+
+**`examine`**
+```text
+Two more doors on this floor, numbered like yours and shut like yours. No
+light under either, no sound behind either. Whatever went on in your room
+tonight went on a few feet from both of them, and neither of them appears to
+have taken the slightest notice.
+```
+
+**`knock`**
+```text
+You knock. It is not a loud knock — some instinct you did not consult made it
+a polite one — and nothing answers it. You wait out the length of time in
+which somebody would have answered, and then a bit more than that, and then
+stop waiting.
+```
+
+**`open` / `unlock` / `try handle`**
+```text
+Locked, both of them, in the ordinary way of doors that belong to other
+people. Whatever is behind them is their business, and at this hour it is
+going to stay that way.
+```
+
+**`listen`**
+```text
+You put an ear to one and then the other. Both give you the same thing:
+a room with nothing moving in it.
+```
+
+---
+
+**`landing_carpet`** — nouns: carpet, runner, rug, matting, pattern
+
+**`examine`**
+```text
+A strip of patterned carpet tacked down the length of the landing, worn
+through to the backing in a line down the middle and still bright at the
+edges where nobody has ever had a reason to walk. Somewhere under the
+pattern there used to be flowers.
+```
+
+> **Note.** "There used to be flowers" is the same joke as §8.6's wallpaper,
+> told once more in a different room, which is how a building acquires a
+> landlord. If the main session finds that repetitive rather than cumulative,
+> cut the sentence; the rest of the paragraph stands.
+
+**`look under carpet`**
+```text
+You get a corner of it up off its tacks. Underneath there is board, and a
+quantity of grit that has been sifting down through the weave for longer
+than anybody now in this house has been in it, and no envelope, no key, and
+no note.
+
+It was worth the four seconds.
+```
+
+> **Note.** Constitution §9: the failure is informative — the player has now
+> personally established that this landing is not hiding anything, which is
+> what they wanted to know. "It was worth the four seconds" is the narrator
+> declining to be sarcastic about a perfectly sensible idea.
+
+#### 15.1.6 Exits
+
+| dir | to | notes |
+|---|---|---|
+| `in` | `your_room` | via `door`. Also `back`, `enter room`, `enter door`, `open door` + `in`. |
+| `down` | — | **no exit.** §15.2's boundary answers it. |
+
+**`exit.travelText`** (landing → `your_room`) — `ProseRule[]`
+
+| when | text |
+|---|---|
+| `{ not: { objectState: ['floor_lamp','on',true] } }` | `You push the door open and step back into the dark, which has been keeping your place.` |
+| otherwise | `You step back into your room. Nothing in it has taken the opportunity to move.` |
+
+> **Note.** No `firstVisit` for the landing. §4.11's `exit.travelText` out of
+> `your_room` already does that job — *"You step out onto the landing and
+> pull the door to behind you. It does not latch. You leave it not latching"*
+> — and a first-visit paragraph on top of it would say the same thing twice
+> in the same breath.
+>
+> **`OUT` on the landing** should reach §15.2, not `your_room`. A player who
+> types `OUT` in a stairwell wants to leave the building. `IN` and `BACK` go
+> back through the door.
+
+#### 15.1.7 Beat test (constitution §29, guide §18)
+
+**THEREFORE** — the room gave him a hat, a blank page and a machine that
+will not know him, and nothing anywhere in it with a name on it; **therefore**
+he goes out to find somebody who does.
+
+**BUT** — the only two doors on this floor are shut, dark, and locked, and
+the only person awake in the building is at the bottom of two flights of
+stairs. The landing does not answer anything. It points, and the thing it
+points at is a floor down, behind a desk, holding a coffee pot.
+
+That is the honest beat. The landing's *own* content is deliberately thin —
+it is a hinge, not a scene — and §15.2 is what stops the hinge swinging in
+this build.
+
+**Setups planted (§30), for the ledger:**
+
+| Setup | Pays off |
+|---|---|
+| No key in the lock, no key in his pocket, and a board of spares behind a desk downstairs | M2 — the key rack (architecture §3, room 2) |
+| His own door number produces no recognition | M2 — the guest register's gap where a name was |
+| Somebody two floors down stops moving when a door opens upstairs | P4 — Marlow saw who came up and never saw him come down |
+| Two shut doors that took no notice | corroborates `clue_calm_search` — the search was quiet enough that a floor of lodgers slept through it |
+| *"The stairs run one way"* | second reading, unassigned — see §10.4 |
+
+---
+
+### 15.2 The build boundary — the stairs, in system voice
+
+**Fires:** any attempt to descend from the landing — `DOWN`, `D`,
+`DOWNSTAIRS`, `GO DOWN`, `DESCEND`, `TAKE STAIRS`, `ENTER STAIRS`,
+`CLIMB DOWN`, `FOLLOW STAIRS`, `OUT`, `GO TO DESK`, `GO TO LOBBY`. Renders,
+does not move the player, and changes nothing.
+
+**This is not narrator prose and must not be rendered as narrator prose.** It
+is chrome, in the register of the MVP's `GAME OVER` (`state.ts` /
+`App.vue`'s `{ kind: 'system' }`, `play.ts`'s bare-line output), and the
+builder should emit it as `kind: 'system'` for exactly that reason. If it
+renders as a normal `say` it becomes a voice in the fiction telling the
+player the world stops, which is the soft wall constitution §10 forbids —
+the whole point of putting it in system voice is that it is honestly *about
+the software*, and a player can reason about a software boundary.
+
+**No second-person, no "you", no apology, no thanks-for-playing.** Two
+variants, plainest first; a player who wants down will type it more than once.
+
+**Path:** `system.buildBoundary` — `string[]`
+
+1.
+```text
+END OF BUILD
+
+This version ends at the top of these stairs. The rest of the house, and the
+town it stands in, are not in this build.
+```
+
+2.
+```text
+END OF BUILD
+
+The stairs go down. This build does not. Everything past this landing
+belongs to a later version.
+```
+
+> **Note — why it is not an in-world refusal.** Every other closed direction
+> in this game gets an in-world reason the player can act on: the window is
+> refused by a concussion, the drawer by a bent runner, the other doors by
+> other people's locks. There is no honest in-world reason the stairs are
+> shut, and inventing one — a jammed door at the turn, a stair out, Marlow
+> saying not tonight — would be **story canon this document does not have**
+> and a wall the player could reason at forever. The stairs are shut because
+> the game is not finished. Saying so costs two lines and lies about nothing.
+>
+> **`GO DOWN` is not `move.blocked` and not `move.noExit`.** Both of those
+> families (`2026-08-30-response-families.md` §7) are in-world and would be
+> wrong here: `move.noExit` tells the player the geography ends, which is
+> false and un-drawable on their map; `move.blocked` tells them there is
+> something to open, which is worse. The landing must declare **no** `down`
+> exit and intercept the direction ahead of the movement families.
+>
+> **If the engine can interpolate the version string** (`GAME_VERSION`, the
+> same value `VERSION` prints), variant 1's first sentence is better as
+> *"Version x.y.z ends at the top of these stairs."* I have not written it
+> that way because no template variable for it exists and inventing one in
+> prose is how a string ends up rendering `{version}` to a player. Builder's
+> call; the substitution is clean if the slot is there.
+>
+> **Line 1 is a fixed header**, like `GAME OVER`. Keep it identical across
+> variants and keep it in caps; it is what makes the block read as chrome at
+> a glance, before the player has read a word of it.
+
+**What must still work on the landing after this fires:** looking down the
+well (§15.1.4), listening to the stairs (§15.1.5), examining anything, and
+going back in. The boundary stops one verb. It does not close the room.
+
+---
+
+### 15.3 The door-open variant of the room description
+
+**The sentence being replaced is `The door is shut.`** It occurs three times
+in §3.2, once in each lit rule, always in the final paragraph:
+
+| §3.2 rule | context |
+|---|---|
+| Rule 2 (lit · lamp fallen · first sight) | `…of a room that has been cold for a while. **The door is shut.** The window is not curtained.` |
+| Rule 3 (lit · lamp righted) | `…has not been touched by anyone, including you. **The door is shut.** The window is not curtained, and shows…` |
+| Rule 4 (lit · searched) | `The terminal waits in the corner. **The door is shut.** The window shows the same rectangle…` |
+
+**Replacement**, for all three, when `{ objectState: ['door','open',true] }`:
+
+```text
+The door stands open where you left it, and the landing light lies across
+the boards in a long pale wedge.
+```
+
+> **Note.** One string for all three rules on purpose. It is a complete
+> sentence pair in the same rhythm as the clause it replaces, it carries the
+> landing's weak-tea light into the room (§4.10's `LOOK UNDER DOOR`, §15.1.1),
+> and the wedge on the boards is a light-direction detail that sits correctly
+> against both lamp states — beside the fallen lamp's shadows going up the
+> walls (Rule 2) and under the righted lamp's ordinary downward light
+> (Rule 3).
+>
+> **Condition, not flag.** Use `{ objectState: [DOOR, 'open', true] }`.
+> `FLAG_DOOR_BOLT_DRAWN` is the wrong test — it latches true on the first
+> `OPEN DOOR` and never clears, so a player who opens the door and closes it
+> again would keep getting the open text. `door.ts` already maintains
+> `objectState` correctly on both `OPEN` and `CLOSE`.
+>
+> **Structural cost.** Each of §3.2's three lit rules becomes two — a
+> door-open variant and the existing door-shut one — or the final paragraph
+> is composed from a shared clause. Either is fine; this is the builder's
+> call, and it is the reason this section supplies one replacement string
+> rather than three rewritten paragraphs.
+
+#### 15.3.1 Optional — the dark rules
+
+Not asked for, and listed here rather than assumed. §3.2's two **dark**
+variants do not mention the door at all, so an open door in a dark room is
+currently invisible — the player opens the door, the landing light comes in,
+and `LOOK` describes an unbroken dark. A player will notice.
+
+The fix is prose, not a mechanic: the landing bulb is dead and the only light
+is coming up two flights of well (§15.1.1, §15.1.3), so an open door puts a
+wedge on the boards and lights nothing. **The room stays dark.** No light
+source changes hands, no `lightSource` is declared on the door, `isDark()` is
+untouched.
+
+**Path:** `room.your_room.description`, a new rule sorting **above** §3.2's
+Rule 1 — `when: { all: [ROOM_DARK, { objectState: ['door','open',true] }] }`
+
+```text
+The door is open, and it has bought you a wedge of weak landing light on the
+boards and nothing else. The dark on either side of it is exactly as dark as
+it was. There is a grey rectangle across the room that is probably a window.
+There is a chain somewhere near your hand.
+```
+
+> **Note.** The last two sentences are §3.2 dark variant 1's, verbatim, on
+> purpose: the tutorial affordance is the only thing in the dark description
+> that must never be lost, and a player who opens the door before finding the
+> chain still has to find the chain. If this rule is cut, cut it whole — do
+> not cut the chain sentence out of it.
+

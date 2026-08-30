@@ -35,7 +35,25 @@ export type PlaceId =
   | { npc: NpcId } // carried by an NPC
   | 'inventory'
   | 'worn'
+  | 'self' // part of the player's own body — see below
   | 'nowhere'; // not yet in the world (revealed later)
+
+/**
+ * `'self'` — part of the player's own body (a hand, a wound, a pocket),
+ * distinct from `'inventory'`/`'worn'`: nothing the player is carrying, they
+ * simply *are*. Always in scope regardless of `state.location` (the body
+ * goes wherever the player goes — no room needs to re-place it), always
+ * reachable in the dark (touching your own hand needs no light), and never
+ * listed by `INVENTORY` (`views.ts`'s `inventoryView` only ever collects
+ * `'inventory'`/`'worn'`, so a `'self'`-placed object is structurally
+ * excluded, not filtered out by a special case). `world.ts`'s `inScopeAt`/
+ * `reachableByTouch`, `respond.ts`'s `hasSeenObject`, and `actions.ts`'s
+ * `playerHas` all treat it the same way they already treat `'inventory'`/
+ * `'worn'`. See `src/content/world/act1/objects/self.ts` for the worked
+ * example — `SELF` used to sit at a fixed `RoomId` (a body is not scenery)
+ * before that, and at `'inventory'` (a body is not carried gear) before
+ * that.
+ */
 
 /**
  * Typed id constructors. Content files brand plain strings once, at the

@@ -123,6 +123,29 @@ export const METAL_BOX = O('fixture_metal_box');
 /** Task 11 addition: gates the ROOM_B <-> ROOM_C exit (closed by default — that edge starts blocked). Not portable; not a real "container", just reusing `objectState`'s `container.open` field for door state. */
 export const DOOR = O('fixture_door');
 
+/**
+ * Gap 1 (dark-reachability) additions: `TOUCHABLE` — `reachableInDark:
+ * true`, placed directly in dark `ROOM_A` — the "findable by touch though
+ * the room is dark and nobody is carrying it" case (a pull chain, a wound).
+ * `KEY_FOB` — an ordinary object nested `{ on: KEY }` with NO
+ * `reachableInDark` of its own, exercising the other half of the fix: an
+ * object resting on/in something that is itself carried is touch-reachable
+ * by inheriting *that* object's carried-ness, not by being flagged itself
+ * (the SELF-sub-part case — touching your own hand needs no authoring).
+ */
+export const TOUCHABLE = O('fixture_touchable');
+export const KEY_FOB = O('fixture_key_fob');
+
+/**
+ * `'self'` `PlaceId` fixture (the "player's body" case, `src/engine/ids.ts`'s
+ * own doc comment): `SELF_TEST` is placed `location: 'self'` — no room, no
+ * `reachableInDark` flag of its own — and `SELF_TEST_PART` rests `{ on:
+ * SELF_TEST }`, exercising the same "sub-part inherits scope/touch from its
+ * self-placed parent" recursion `KEY_FOB` exercises for a carried parent.
+ */
+export const SELF_TEST = O('fixture_self');
+export const SELF_TEST_PART = O('fixture_self_part');
+
 export const GUIDE = N('fixture_guide');
 /**
  * Task 10 fix-2 additions (coordinator review): NPCs with a declared
@@ -147,6 +170,19 @@ export const ASK = V('fixture_ask'); // 'V npc about topic' — the only pattern
 
 /** Task 11 (`tests/parser-multi.test.ts`) addition: WAIT/Z, an ordinary 'V'-pattern, non-meta verb with an authored default family — needs no parser code of its own (§3.5). */
 export const WAIT = V('fixture_wait');
+
+/**
+ * Gap 3/4 (room-level handlers) addition: a bare, `'V'`-pattern-only verb
+ * whose real answer lives on `ROOM_A` (`RoomDefSlice.handlers`), not on its
+ * own `default` — the ambient-sense (SMELL/LISTEN) and flag-setting
+ * (STAND/terminal-login) cases these gaps exist for. Deliberately a
+ * different verb from `WAIT`: `WAIT` bare is already asserted elsewhere to
+ * reach `fallbackToVerbDefault`'s rung 2b, and giving `ROOM_A` a handler for
+ * it would silently break those tests.
+ */
+export const SIGH = V('fixture_sigh');
+/** Set by `ROOM_A`'s `SIGH` room-level handler — proves a room handler can run a real `Effect`, not just render `Prose` (gap 4). */
+export const FLAG_SIGHED = F('fixture_flag_sighed');
 
 export const MEMORY_1 = M('fixture_memory_1');
 export const CLUE_1 = C('fixture_clue_1');
@@ -337,6 +373,7 @@ export const FIXTURE_WORLD: WorldDef = {
     [FLAG_ONENTER_GATED]: { default: false, doc: 'task 20b: set by ROOM_B onEnter, gated on FLAG_ONENTER_GATE_TRIGGER' },
     [FLAG_ONENTER_GATE_TRIGGER]: { default: false, doc: 'task 20b: gates the ROOM_B onEnter above' },
     [FLAG_ONENTER_REPEAT_COUNT]: { default: 0, doc: 'task 20b: incremented every ROOM_C entry (onEnter once:false)' },
+    [FLAG_SIGHED]: { default: false, doc: 'gap 3/4: set by ROOM_A\'s bare-verb room-level handler for SIGH' },
   },
   // Task 9 (`parser/vocabulary.ts`) additions below: `name`/`aliases` on
   // every room, `nouns`/`adjectives` on every object and on `GUIDE` — the
@@ -372,6 +409,12 @@ export const FIXTURE_WORLD: WorldDef = {
         // route assertion changes.
         { dir: 'up', to: ROOM_C, when: { flag: FLAG_ONENTER_GATE_TRIGGER } },
       ],
+      // Gap 3/4: a room-level bare-verb handler — SIGH has no dobj-capable
+      // pattern (see its `verbs` entry below), so this is the *only* place
+      // its response can come from, and it runs a real `Effect` (a `set`),
+      // not just `Prose` — the exact case `VerbDef.default` could never
+      // reach on its own.
+      handlers: [{ verbs: [SIGH], effects: [{ say: 'fixture: a room-level sigh.' }, { set: [FLAG_SIGHED, true] }] }],
     },
     [ROOM_B]: {
       name: 'Fixture Room B',
@@ -479,6 +522,10 @@ export const FIXTURE_WORLD: WorldDef = {
     [SPARE_KEY]: { location: ROOM_A, name: 'spare key', nouns: ['key'], portable: true },
     [METAL_BOX]: { location: ROOM_A, name: 'metal box', nouns: ['box'], adjectives: ['metal'] },
     [DOOR]: { location: ROOM_B, name: 'oak door', nouns: ['door'], adjectives: ['oak'], container: { open: false } },
+    [TOUCHABLE]: { location: ROOM_A, name: 'small touchable', nouns: ['touchable'], reachableInDark: true },
+    [KEY_FOB]: { location: { on: KEY }, name: 'key fob', nouns: ['fob'] },
+    [SELF_TEST]: { location: 'self', name: 'yourself', nouns: ['self'] },
+    [SELF_TEST_PART]: { location: { on: SELF_TEST }, name: 'a hand', nouns: ['hand'] },
     // Task 18 addition: see the doc comment at SIGIL/TERMINAL's own
     // declarations above for why each handler is shaped this way.
     [SIGIL]: {
@@ -619,6 +666,10 @@ export const FIXTURE_WORLD: WorldDef = {
     // WAIT's for the ordinary turn-pass case.
     [AGAIN_VERB_ID]: { id: AGAIN_VERB_ID, words: ['again', 'g'], patterns: ['V'], class: null, default: "There's nothing to repeat." },
     [WAIT]: { id: WAIT, words: ['wait', 'z'], patterns: ['V'], class: null, default: 'Time passes.' },
+    // Gap 3/4: bare, 'V'-only — `ROOM_A`'s own `handlers` entry is this
+    // verb's real (and only reachable) answer; `default` here is dead
+    // prose, same convention as the direction verbs below.
+    [SIGH]: { id: SIGH, words: ['sigh'], patterns: ['V'], class: 'direct', default: 'fixture: dead prose, never rendered.' },
     // Task 20b additions: the twelve direction verbs (`DIRECTION_VERB_IDS`,
     // reserved by `move.ts` the same way `BUILTIN_VERB_IDS` reserves
     // TAKE/DROP/etc.) plus `LOOK`. Each direction's `words` carries its

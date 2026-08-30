@@ -15,7 +15,7 @@
 import { evaluate } from '../engine/cond';
 import type { NpcId, ObjectId, PlaceId, RoomId } from '../engine/ids';
 import type { ScopeView } from '../engine/interpreter';
-import type { CompiledVocabulary } from '../engine/parser/vocabulary';
+import type { CompiledVocabulary } from '../engine/parser';
 import { isDark, npcRoom, objectLocation, objectState, scope as objectsInScope } from '../engine/world';
 import type { GameState, WorldDef } from '../engine/world';
 

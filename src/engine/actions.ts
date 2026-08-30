@@ -95,6 +95,16 @@ export function performAction(world: WorldDef, state: GameState, input: ActionIn
   const builtin = input.dobj !== undefined ? BUILTINS[input.verb] : undefined;
   if (builtin !== undefined) return builtin(world, state, input, verbDef);
 
+  // §8 gap 3: a bare verb (no `dobj`, so no object-level handler/built-in
+  // was even attempted above) checks the CURRENT ROOM's own `handlers`
+  // next, before falling to the verb's generic `default` — see
+  // `RoomDefSlice.handlers`'s doc comment. A resolved `dobj` never reaches
+  // this branch at all, matching rung 1/2's usual object-first precedence.
+  if (input.dobj === undefined) {
+    const roomHandler = findRoomHandler(world, state, input);
+    if (roomHandler !== undefined) return applyHandler(world, state, input, roomHandler, verbDef);
+  }
+
   return fallbackToVerbDefault(world, state, input, verbDef);
 }
 
@@ -104,6 +114,22 @@ export function performAction(world: WorldDef, state: GameState, input: ActionIn
 
 function findHandler(world: WorldDef, state: GameState, input: ActionInput): HandlerDef | undefined {
   const handlers = world.objects?.[input.dobj!]?.handlers ?? [];
+  return handlers.find(
+    (h) =>
+      h.verbs.includes(input.verb) &&
+      (h.when === undefined || evaluate(world, state, h.when)) &&
+      instrumentMatches(h.withInstrument, input.iobj),
+  );
+}
+
+/**
+ * Room-level counterpart of `findHandler` (§8 gap 3): the same
+ * verb/`when`/`withInstrument` matching rule, sourced from
+ * `world.rooms[state.location].handlers` instead of an object's own. Only
+ * ever consulted for a bare verb — see `performAction`'s call site.
+ */
+function findRoomHandler(world: WorldDef, state: GameState, input: ActionInput): HandlerDef | undefined {
+  const handlers = world.rooms?.[state.location]?.handlers ?? [];
   return handlers.find(
     (h) =>
       h.verbs.includes(input.verb) &&
@@ -144,15 +170,29 @@ function fallbackToVerbDefault(world: WorldDef, state: GameState, input: ActionI
   }
   const ctx = contextFor(world, input, verbDefaultPath(input.verb));
   const rendered = render(world, state, ctx.path!, verbDef.default, ctx);
-  const events: GameEvent[] = [
-    { type: 'line', kind: 'prose', text: rendered.text },
-    {
+  const events: GameEvent[] = [{ type: 'line', kind: 'prose', text: rendered.text }];
+  // §8 gap 6: the diag means "nobody authored anything better" — false for
+  // a bare call to a verb whose OWN grammar declares a bare `'V'` pattern
+  // (STAND, WAIT, the room's own login-attempt verb, …). For those, `default`
+  // isn't a generic filler standing in for a missing handler; it IS the
+  // designed, complete answer for exactly this shape of input (this verb was
+  // never going to have a dobj-based handler to fall back from — there's no
+  // "better" to have missed). A resolved `dobj` reaching this function always
+  // means a real gap regardless of what other patterns the verb declares —
+  // only the bare case is ever silenced. See `isDesignedBareResponse`.
+  if (!isDesignedBareResponse(input, verbDef)) {
+    events.push({
       type: 'diag',
       code: 'defaultResponse',
       detail: `verb "${input.verb}" on ${input.dobj ?? '(no object)'} fell to its default family`,
-    },
-  ];
+    });
+  }
   return { state: rendered.state, events, consumesTurn: verbDef.meta !== true, class: verbDef.class, ok: false }; // generic filler, not a genuine success — see ActionResult.ok's doc comment
+}
+
+/** See `fallbackToVerbDefault`'s own comment on this check (§8 gap 6). */
+function isDesignedBareResponse(input: ActionInput, verbDef: VerbDef): boolean {
+  return input.dobj === undefined && verbDef.patterns.includes('V');
 }
 
 // ---------------------------------------------------------------------------
@@ -280,7 +320,7 @@ function withImplicitTake(
 
 function playerHas(world: WorldDef, state: GameState, id: ObjectId): boolean {
   const loc = objectLocation(world, state, id);
-  return loc === 'inventory' || loc === 'worn';
+  return loc === 'inventory' || loc === 'worn' || loc === 'self';
 }
 
 /** Whether `subject`'s location chain (following `in`/`on`) ever reaches `target` — the containment-loop check (§8 task 8). */

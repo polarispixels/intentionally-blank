@@ -72,6 +72,23 @@ Version targets follow the ladder in `docs/spec/README.md` and may shift.
   separate import-specifier check. Mutation-tested against an injected
   `window.location` and an injected `vue` import.
 
+## `again.nothing` family (blocks registering AGAIN/G)
+
+`AGAIN`/`G` is built in the engine (task 11) and reserved as
+`AGAIN_VERB_ID`, but act1 does not register it because a bare `AGAIN` with
+nothing to repeat needs an authored family and hard rule 5 forbids
+inventing one. One family, 2–3 variants. Batch with the next writer pass;
+`G` is a real convenience players expect.
+
+## Memory-title register (proposed by `narrative-writer`, adopt)
+
+Memory titles are what the player sees in the `MEMORIES` list, possibly
+hours after recovering the fragment. The register set by the first one
+("Rain on a hat"): **a short sensory noun phrase, no verb, never stating
+what the memory means.** It should read as something the player remembers
+rather than something they were told. Apply to the remaining 23 fragments
+as they are written.
+
 ## Grammar gap: no free-text pattern (found in task 21)
 
 v2's grammar has four pattern shapes, all noun-phrase-resolved, and none

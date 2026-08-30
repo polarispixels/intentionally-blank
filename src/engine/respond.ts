@@ -51,17 +51,25 @@
 //     reached with a resolved `dobj` (built-in semantics claim that case
 //     outright), so it's authored bare-safe by construction (response-
 //     families doc §0 note 5: "Take what?", not `{name}`-templated).
-//   - `'noPattern'` + a non-built-in verb → falls through to rung 3
-//     (nounMiss) rather than rendering that verb's `default`, which IS
-//     `{name}`-templated (§6) and would render broken ("...the {name}...")
-//     with no object to fill it. None of the ~47 non-built-in verbs in
-//     `VERB_DEFAULTS` has a second, bare-safe prompt authored — see this
-//     task's report for the full list — so this is the correct fallback,
-//     not a workaround.
+//   - `'noPattern'` + a non-built-in verb (§8 gap 5) → renders the global
+//     `bareVerb` family instead (`respondToBareNonBuiltinVerb`, below),
+//     `{verb}`-templated on the verb's own canonical word
+//     (`VerbDef.words[0]`) — `bareVerb` was authored (response-families
+//     doc §7) specifically for this shape, because rendering the verb's
+//     own `default` here would be broken — it IS `{name}`-templated (§6)
+//     and would render with no object to fill it — and none of the ~47
+//     non-built-in verbs in `VERB_DEFAULTS` has a second, bare-safe prompt
+//     authored. Still tagged `defaultResponse` (same code as the built-in
+//     bare case above): unlike gap 6's `isDesignedBareResponse` suppression
+//     in `actions.ts` — for a verb whose own `default` genuinely IS the
+//     complete bare answer — `bareVerb` is a generic stand-in nobody wrote
+//     a real answer for, so the diag still means what it always means:
+//     "nobody authored anything better."
 //   - `'nounUnresolved'` (or `reason` absent, e.g. an older/hand-built
 //     outcome) → rung 3 as before, seen/unseen split included.
 
 import type { ActionClass, NpcId, ObjectId, VerbId } from './ids';
+import { V } from './ids';
 import type { GameEvent, GameState, WorldDef } from './world';
 import { npcRoom } from './world';
 import { objectLocation, objectState } from './resolve';
@@ -71,10 +79,28 @@ import { hasBuiltinSemantics, performAction, verbDefaultPath } from './actions';
 import type { InterpretOutcome, StructuredAction } from './interpreter';
 import { GO_TO_VERB_ID } from './interpreter';
 import { directionForVerb, executeGoTo, look, LOOK_VERB_ID, traverseDirection } from './move';
-import type { CompiledVocabulary } from './parser/vocabulary';
-import { candidateName, isNpcId } from './parser/resolver';
-import { allEmptyFamilyKey } from './parser/multi';
+import type { CompiledVocabulary } from './parser';
+import { allEmptyFamilyKey, candidateName, isNpcId } from './parser';
 import { NPC_VERB_IDS, respondToAsk, respondToGreeting, respondToShow, respondToTell } from './npc';
+import { inventoryView } from './views';
+
+/**
+ * Reserved verb id for `INVENTORY`/`I` (§8 gap 2). Content declares the
+ * words/patterns/class in `world.verbs` exactly like any other verb (see
+ * `act1/verbs.ts`) — recognized here by id, the same convention
+ * `LOOK_VERB_ID`/`GO_TO_VERB_ID` already set, because the actual listing is
+ * dynamic engine behavior (`respondToInventory`, below), not authored
+ * prose. `patterns` must be `['V']` only (bare, no `dobj` ever) — that's
+ * what lets the EMPTY case's fallthrough to `performAction` land on gap 6's
+ * `isDesignedBareResponse` (no spurious `defaultResponse` diag for the
+ * ordinary "nothing to list" case). `default` should be authored as a
+ * `ProseRef` to the shared `inventory.empty` family, not inline text —
+ * `respondToInventory`'s own EMPTY branch reuses the ordinary rung-1/2b
+ * machinery (room-handler override included) rather than reimplementing
+ * it, so whatever `default` says IS what an un-overridden empty-inventory
+ * room renders.
+ */
+export const INVENTORY_VERB_ID = V('inventory');
 
 export interface RespondResult {
   state: GameState;
@@ -186,6 +212,9 @@ function respondToAction(world: WorldDef, state: GameState, vocab: CompiledVocab
   if (action.verb === LOOK_VERB_ID) {
     return look(world, state, action.verb);
   }
+  if (action.verb === INVENTORY_VERB_ID) {
+    return respondToInventory(world, state, action.verb);
+  }
 
   if (action.verb === NPC_VERB_IDS.ask && dobj !== undefined && isNpcId(vocab, dobj) && action.topic !== undefined) {
     return respondToAsk(world, state, vocab, dobj, action.topic);
@@ -250,14 +279,50 @@ function respondToShowDefault(world: WorldDef, state: GameState, vocab: Compiled
   };
 }
 
+/**
+ * `INVENTORY`/`I` (§8 gap 2): dynamic, unlike task 22a's static stopgap —
+ * lists exactly what `inventoryView` finds carried/worn right now, dark or
+ * not (no `scope()`/light gate at all — see that view's own doc comment).
+ *
+ * EMPTY: handed off to `performAction` rather than rendered here directly —
+ * that reuses gap 3's room-handler dispatch for free, so a room can author
+ * its own `handlers` entry for `INVENTORY_VERB_ID` (the opening room's own
+ * "you have nothing, and that's the clue" line, design doc §8.9/§14.4) that
+ * takes precedence over the ordinary global `inventory.empty` family
+ * (`VerbDef.default`, authored as a `ProseRef` to it — see this id's own
+ * doc comment). Safe to route through the ordinary bare-verb machinery: a
+ * room's INVENTORY handler only ever matters when this function has already
+ * confirmed the inventory really is empty.
+ *
+ * NON-EMPTY: this module's own job — `inventory.carrying` (global, "no
+ * room, no act, no canon" per its own doc note) as a one-line header,
+ * followed by one line per item reusing its own already-authored `name`
+ * mechanically (no new prose for the per-item lines; worn ones marked).
+ */
+function respondToInventory(world: WorldDef, state: GameState, verb: VerbId): RespondResult {
+  const items = inventoryView(world, state);
+  if (items.length === 0) {
+    const result = performAction(world, state, { verb });
+    return { state: result.state, events: result.events, class: result.class };
+  }
+  const cls = world.verbs?.[verb]?.class ?? null;
+  const header = render(world, state, 'inventory.carrying', family(world, 'inventory.carrying'));
+  const events: GameEvent[] = [
+    { type: 'line', kind: 'prose', text: header.text },
+    ...items.map((item): GameEvent => ({ type: 'line', kind: 'system', text: item.worn ? `${item.name} (worn)` : item.name })),
+  ];
+  return { state: header.state, events, class: cls };
+}
+
 // ---------------------------------------------------------------------------
 // Rungs 3–5 — nothing resolved
 // ---------------------------------------------------------------------------
 
 function respondToMiss(world: WorldDef, state: GameState, vocab: CompiledVocabulary, outcome: Extract<InterpretOutcome, { kind: 'miss' }>): RespondResult {
   if (outcome.verb !== undefined) {
-    if (outcome.reason === 'noPattern' && hasBuiltinSemantics(outcome.verb)) {
-      return respondToBareVerb(world, state, outcome.verb);
+    if (outcome.reason === 'noPattern') {
+      if (hasBuiltinSemantics(outcome.verb)) return respondToBareVerb(world, state, outcome.verb);
+      return respondToBareNonBuiltinVerb(world, state, outcome.verb);
     }
     return respondToNounMiss(world, state, vocab, outcome.verb, outcome.knownNouns);
   }
@@ -279,6 +344,34 @@ function respondToMiss(world: WorldDef, state: GameState, vocab: CompiledVocabul
 function respondToBareVerb(world: WorldDef, state: GameState, verb: VerbId): RespondResult {
   const result = performAction(world, state, { verb });
   return { state: result.state, events: result.events, class: result.class };
+}
+
+/**
+ * A bare, object-free invocation of a NON-built-in verb (§8 gap 5) — see
+ * this file's header note on why this can't reuse `respondToBareVerb`'s
+ * `performAction` route: that would render `verbDef.default` directly,
+ * which for a non-built-in verb IS `{name}`-templated (§6) and has no
+ * object to fill it. `bareVerb` (response-families doc §7) is the one
+ * global family authored specifically for this shape, `{verb}`-templated
+ * on the verb's own canonical word (`VerbDef.words[0]` — the parser only
+ * hands this function a resolved `VerbId`, not which synonym the player
+ * typed, and `words[0]` is this codebase's usual "the" word for a verb
+ * when one is needed, e.g. `verbDefaultPath`). Tagged `defaultResponse`,
+ * same as the built-in bare case — `bareVerb` is a generic stand-in, not a
+ * designed complete answer, so the diag keeps meaning what it always means.
+ */
+function respondToBareNonBuiltinVerb(world: WorldDef, state: GameState, verb: VerbId): RespondResult {
+  const verbDef = world.verbs?.[verb];
+  const verbWord = verbDef?.words[0] ?? verb;
+  const rendered = render(world, state, 'bareVerb', family(world, 'bareVerb'), { verb: verbWord });
+  return {
+    state: rendered.state,
+    events: [
+      { type: 'line', kind: 'prose', text: rendered.text },
+      { type: 'diag', code: 'defaultResponse', detail: `verb "${verb}" called bare — rendered the global bareVerb family` },
+    ],
+    class: verbDef?.class ?? null,
+  };
 }
 
 /** Rung 3. Spoiler boundary: `nounMiss.seen` only for a candidate the player has actually seen (see file header); `nounMiss.unseen` never names anything. */
@@ -355,7 +448,7 @@ function hasSeenObject(world: WorldDef, state: GameState, id: ObjectId): boolean
   if (objectState(world, state, id, 'hidden')) return false;
   const loc = objectLocation(world, state, id);
   if (typeof loc === 'string') {
-    if (loc === 'inventory' || loc === 'worn') return true; // carried: trivially seen
+    if (loc === 'inventory' || loc === 'worn' || loc === 'self') return true; // carried, worn, or part of the player: trivially seen
     if (loc === 'nowhere') return false; // not yet revealed into the world
     return state.visited[loc] !== undefined;
   }

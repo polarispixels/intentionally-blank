@@ -666,3 +666,117 @@ quiet rather than funny, and it does not explain the menu either.
 1. The story is over. Nothing entered here changes what it was.
 2. It has finished. The world stops taking instructions at the end — no hard feelings, simply nothing further to do with them.
 3. Whatever this is, it happens after the last page, in the quiet part, where nothing gets written down.
+
+---
+
+## 8. Later additions — inventory
+
+**Added:** 2026-08-30, third pass · **Author:** `narrative-writer`
+**Status:** authored prose, awaiting voice review and Ryan's spot-check
+
+Two families for the inventory listing. The five craft constraints in §0
+apply unchanged, plus two specific to this pair:
+
+- **Rotation is per-family.** There is one inventory node, and a player types
+  `I` more often than almost anything else, so **every variant is seen, many
+  times, by every player**. They are ordered plainest-first like everything
+  else, but the real constraint here is §4's: a line that tries to be funny
+  every single time becomes noise, and noise in the middle of a check the
+  player is running for information is worse than nothing. These are short
+  on purpose.
+- **Global, so: no room, no act, no canon.** Nothing below assumes walls,
+  weather, a coat, pockets, or that the player has ever owned anything.
+
+### `inventory.empty`
+
+**Fires:** `I` / `INVENTORY` with nothing held and nothing worn.
+
+The opening room begins with empty hands, so variant 1 is a candidate for the
+first or second line a player ever reads that is not the opening beats. It is
+written flat for that reason: the joke, if any, belongs to the room, not to
+the family. In `your_room` the room-scoped override
+(`2026-08-30-opening-room-prose.md` §8.9) takes precedence, because there the
+empty inventory is a clue; everywhere else in all five acts, these fire.
+
+1. You are carrying nothing. Both hands empty, which is at least easy to keep track of.
+2. You take stock. Two hands, the clothes you are standing in, and no property whatsoever.
+3. Nothing at all. You check twice, on the grounds that the first check was carried out by somebody who had already decided the answer.
+
+### `inventory.carrying`
+
+**Fires:** `I` / `INVENTORY` with at least one item held or worn. The engine
+supplies the item names; this is only the frame.
+
+**My call: a one-line frame, not a bare list.** A bare list is defensible and
+I considered it — but in a scrolling REPL the list needs a boundary, or it
+reads as a continuation of whatever the last response was, and the player has
+to work out where the game stopped talking and started enumerating. One short
+line does that for the cost of one line. *"You are carrying:"* is also the
+genre's own idiom, and this is not a place to be original at the player's
+expense.
+
+Rendered as a header, with the list following on subsequent lines. Each ends
+in a colon and carries no terminal period.
+
+1. You are carrying:
+2. You have on you:
+3. In hand and on your person:
+
+> **Note.** If the engine renders the frame **inline** rather than as a
+> header — `You are carrying a hat, a page and a coin.` — use variant 1 only,
+> with the colon dropped and the list spliced in; variants 2 and 3 do not
+> survive being turned into sentence heads. If the engine prefers a single
+> fixed frame over rotation, use variant 1 and drop the others; nothing is
+> lost. **ASSUMPTION:** worn items are distinguished by the engine's own
+> listing (`(being worn)` or similar) and not by this frame — three frames
+> that each had to account for worn-versus-held would be three frames doing
+> the engine's job badly.
+
+---
+
+## 9. Later additions — AGAIN with nothing to repeat
+
+**Added:** 2026-08-30, fourth pass · **Author:** `narrative-writer`
+**Status:** authored prose, awaiting voice review and Ryan's spot-check
+
+One family. The five craft constraints in §0 apply unchanged, plus:
+
+- **Global.** Fires in every room, in all five acts, indoors and out. Nothing
+  below assumes walls, a floor, a room, light, an inventory, or that the
+  player has done anything at all — which is the whole condition it answers.
+- **Rotation is per-family**, and a player reaches this at most a handful of
+  times in a playthrough, usually in the first thirty seconds. Variant 1 is
+  therefore the one that has to teach; 2 and 3 are for the player who types
+  it again to see what happens, which is exactly the curiosity §8 of the
+  constitution says to reward.
+- **No template variables.** `{verb}` is not available here — the player may
+  have typed `AGAIN` or `G`, and quoting the wrong one back is worse than
+  quoting neither.
+
+### `again.nothing`
+
+**Fires:** `AGAIN` / `G` with no previous command to repeat — the first
+command of a new game, or the first after a `RESTART`. The engine repeats
+nothing; no time passes and nothing changes.
+
+`G` is a convenience players arrive already expecting, and a player who types
+it on turn one and gets `unknown` (rung 5) has been told the game does not
+know the word, which is false and is the wrong first impression to hand
+somebody. Variant 1 says what the verb is for, in one clause, without a
+tutorial voice.
+
+1. There is no last command to repeat. Give one, and this will give it a second time.
+2. Nothing has been done yet, so there is nothing to do again.
+3. You do it all again: the nothing, exactly as before, to precisely the same effect.
+
+> **Note.** Variant 3 performs the action rather than refusing it
+> (constitution §8) and implies no state change (§0 note 2) — the player asked
+> for a repeat of nothing and gets one. It is the reward for the second try.
+> None of the three scolds, and none of them says "I don't understand," which
+> is the one thing this family exists to avoid.
+>
+> **Not authored here:** registering `again` and `g` as words, and the
+> ordinary case where there *is* a command to repeat. The engine re-runs the
+> stored command and renders whatever that command renders; it should not
+> print a frame line of its own before it. That is a wiring decision, not
+> prose.

@@ -25,7 +25,7 @@ import type { InterpretOutcome, ScopeView, StructuredAction } from '../src/engin
 import { compileVocabulary } from '../src/engine/parser/vocabulary';
 import { objectLocation } from '../src/engine/resolve';
 import type { GameState, WorldDef } from '../src/engine/world';
-import { RESPONSES } from '../src/content/response-families';
+import { RESPONSES } from '../src/content/responses';
 import {
   FIXTURE_WORLD,
   HAT,

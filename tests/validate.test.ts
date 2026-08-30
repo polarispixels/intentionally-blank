@@ -54,13 +54,14 @@ describe('validate — referential integrity', () => {
     expect(findings[0]!.message).toContain('no_such_box');
   });
 
-  it('accepts location forms that need no referential check: inventory/worn/nowhere', () => {
+  it('accepts location forms that need no referential check: inventory/worn/self/nowhere', () => {
     const world: WorldDef = {
       ...FIXTURE_WORLD,
       objects: {
         ...FIXTURE_WORLD.objects,
         [O('inv_object')]: { location: 'inventory' },
         [O('worn_object')]: { location: 'worn' },
+        [O('self_object')]: { location: 'self' },
         [O('nowhere_object')]: { location: 'nowhere' },
       },
     };

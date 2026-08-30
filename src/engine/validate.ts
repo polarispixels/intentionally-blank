@@ -20,8 +20,7 @@
 import type { Cond } from './cond';
 import type { Effect } from './effects';
 import type { ClueId, DayPhase, FlagId, MemoryId, NpcId, ObjectId, PlaceId, PuzzleId, QuestionId, RoomId, VerbId } from './ids';
-import { compileVocabulary } from './parser/vocabulary';
-import { NOISE_WORDS } from './parser/tokenize';
+import { compileVocabulary, NOISE_WORDS } from './parser';
 import type { Prose, ProseRef, ProseRule } from './prose';
 import { DEAD_REFUSED_FAMILY, ENDED_REFUSED_FAMILY } from './turn';
 import type { TopicDef, VerbDef, WorldDef } from './world';
@@ -128,7 +127,7 @@ function checkPropTargetRef(world: WorldDef, id: ObjectId | NpcId, path: string,
 /** Checks a `PlaceId`'s referential target — shared by `ObjectDefSlice.location` and `Cond`'s `objectAt` place. */
 function checkPlaceRef(world: WorldDef, place: PlaceId, path: string, findings: Finding[]): void {
   if (typeof place === 'string') {
-    if (place === 'inventory' || place === 'worn' || place === 'nowhere') return;
+    if (place === 'inventory' || place === 'worn' || place === 'self' || place === 'nowhere') return;
     checkRoomRef(world, place, path, findings);
     return;
   }

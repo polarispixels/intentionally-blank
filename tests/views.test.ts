@@ -10,13 +10,15 @@
 // in `state` must not appear in the corresponding view's output.
 
 import { describe, expect, it } from 'vitest';
-import { mapView, memoriesView, notebookView, questionsView } from '../src/engine/views';
+import { inventoryView, mapView, memoriesView, notebookView, questionsView } from '../src/engine/views';
 import type { GameState } from '../src/engine/world';
 import {
   CLUE_1,
   FIXTURE_WORLD,
   FLAG_QUESTION_ANSWER,
   FLAG_QUESTION_OPEN,
+  HAT,
+  KEY,
   MEMORY_1,
   MEMORY_2,
   QUESTION_1,
@@ -24,6 +26,8 @@ import {
   ROOM_A,
   ROOM_B,
   ROOM_C,
+  SELF_TEST,
+  SELF_TEST_PART,
 } from './fixtures/world';
 
 function baseState(overrides: Partial<GameState> = {}): GameState {
@@ -209,5 +213,41 @@ describe('memoriesView()', () => {
     // The view is exactly the recovered list; nothing alongside it names a total.
     expect(Array.isArray(view)).toBe(true);
     expect(view).toHaveLength(1);
+  });
+});
+
+// §8 gap 2: `INVENTORY` had no selector anywhere in v2 — a pure read-only
+// query, same shape as this file's other three views, over what is
+// currently carried/worn (never scope- or light-gated: what you're
+// carrying needs no light to know about — see world.ts's `scope()`, whose
+// dark branch already special-cased inventory/worn for exactly this).
+describe('inventoryView()', () => {
+  it('lists a carried object, worn: false', () => {
+    const state = baseState({ objects: { [KEY]: { location: 'inventory' } } });
+    expect(inventoryView(FIXTURE_WORLD, state)).toEqual([{ id: KEY, name: 'brass key', worn: false }]);
+  });
+
+  it('lists a worn object, worn: true', () => {
+    const state = baseState({ objects: { [HAT]: { location: 'worn' } } });
+    expect(inventoryView(FIXTURE_WORLD, state)).toEqual([{ id: HAT, name: 'wool hat', worn: true }]);
+  });
+
+  it('excludes an object that is neither carried nor worn, even a portable one sitting in the room', () => {
+    const state = baseState(); // KEY/HAT stay at their authored default locations (ROOM_A) — neither carried
+    const view = inventoryView(FIXTURE_WORLD, state);
+    expect(view.some((e) => e.id === KEY)).toBe(false);
+    expect(view.some((e) => e.id === HAT)).toBe(false);
+  });
+
+  it('is empty when nothing is carried or worn', () => {
+    expect(inventoryView(FIXTURE_WORLD, baseState())).toEqual([]);
+  });
+
+  it('never lists a "self"-placed object — a body part is not a carried item', () => {
+    // SELF_TEST is placed 'self' by its authored default (no overlay needed);
+    // SELF_TEST_PART rests { on: SELF_TEST }. Neither is 'inventory'/'worn'.
+    const view = inventoryView(FIXTURE_WORLD, baseState());
+    expect(view.some((e) => e.id === SELF_TEST)).toBe(false);
+    expect(view.some((e) => e.id === SELF_TEST_PART)).toBe(false);
   });
 });

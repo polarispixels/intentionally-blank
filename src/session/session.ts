@@ -10,7 +10,7 @@
 import { apply } from '../engine/effects';
 import type { ActionClass, ScriptId } from '../engine/ids';
 import type { InterpretOutcome } from '../engine/interpreter';
-import type { CompiledVocabulary } from '../engine/parser/vocabulary';
+import type { CompiledVocabulary } from '../engine/parser';
 import { step } from '../engine/turn';
 import { initialState } from '../engine/world';
 import type { GameEvent, GameState, WorldDef } from '../engine/world';

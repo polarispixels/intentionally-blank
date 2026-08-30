@@ -35,8 +35,9 @@
 // later session/CLI layer composes, rather than guessing at the missing
 // wiring here.
 
-import type { ClueId, MemoryId, PuzzleId, QuestionId, RoomId } from './ids';
+import type { ClueId, MemoryId, ObjectId, PuzzleId, QuestionId, RoomId } from './ids';
 import { evaluate, questionStatus } from './cond';
+import { objectLocation } from './resolve';
 import type { GameEvent, GameState, WorldDef } from './world';
 
 /** One open question with an available hint ladder — `HINT`'s listing. */
@@ -356,4 +357,49 @@ export function memoriesView(world: WorldDef, state: GameState): MemoryEntry[] {
     }
     return { id, title: def.title, lines: def.lines };
   });
+}
+
+// ---------------------------------------------------------------------------
+// §8 gap 2 — `INVENTORY`. Not in the earlier task 16/17 sections above: it
+// arrived later, closing an engine gap `INVENTORY`/`I` was found to have no
+// selector or verb at all in v2 (task 22a stubbed the verb with a static,
+// state-blind string). Same governing rule as this file's other views —
+// derived, read-only, structurally absent means genuinely absent — but
+// deliberately NOT gated by `scope()`/light: what the player is carrying or
+// wearing is known regardless of whether the room is dark (`scope()`'s own
+// dark branch already treats `inventory`/`worn` as always reachable, for
+// exactly this reason — see `world.ts`).
+// ---------------------------------------------------------------------------
+
+/** One carried or worn item — `INVENTORY`'s listing. */
+export interface InventoryEntry {
+  id: ObjectId;
+  name: string;
+  worn: boolean;
+}
+
+/**
+ * `INVENTORY`/`I` — every object whose current place (`objectLocation`,
+ * overlay-with-authored-fallback per §1.1) resolves to `'inventory'` or
+ * `'worn'`, in `world.objects` declaration order (this file's usual
+ * listing convention). Deliberately excludes `'self'`-placed objects (a
+ * body part is not a carried item — see `ids.ts`'s `PlaceId` doc comment):
+ * the check below is exactly `'inventory'`/`'worn'`, so a `'self'` object
+ * is structurally never a candidate, not filtered out by a special case.
+ * `name` is the object's own authored `name` — reused,
+ * not new prose (hard rule 5); `worn` distinguishes the two carried places
+ * for the caller to render however it likes ("(worn)", a separate
+ * "wearing:" section, …) — this function makes no formatting decision
+ * beyond that one boolean, the same restraint `mapView`/`notebookView`/
+ * `memoriesView` already practice.
+ */
+export function inventoryView(world: WorldDef, state: GameState): InventoryEntry[] {
+  const ids = Object.keys(world.objects ?? {}) as ObjectId[];
+  const entries: InventoryEntry[] = [];
+  for (const id of ids) {
+    const loc = objectLocation(world, state, id);
+    if (loc !== 'inventory' && loc !== 'worn') continue;
+    entries.push({ id, name: world.objects![id]!.name ?? id, worn: loc === 'worn' });
+  }
+  return entries;
 }

@@ -6,7 +6,7 @@
 // objects must walk the family's variants, per-family counters
 // independent). Reuses `tests/fixtures/world.ts`'s `FIXTURE_WORLD` for
 // objects/rooms/handlers, merging in the real approved prose
-// (`src/content/response-families.ts`) so these tests exercise genuine
+// (`src/content/responses.ts`) so these tests exercise genuine
 // wiring, not placeholder text.
 
 import { describe, expect, it } from 'vitest';
@@ -14,11 +14,11 @@ import { V } from '../src/engine/ids';
 import type { GameState, WorldDef } from '../src/engine/world';
 import { scope } from '../src/engine/world';
 import { BUILTIN_VERB_IDS, performAction } from '../src/engine/actions';
-import { respond } from '../src/engine/respond';
+import { INVENTORY_VERB_ID, respond } from '../src/engine/respond';
 import { DeterministicParser } from '../src/engine/interpreter';
 import type { InterpretOutcome, ScopeView } from '../src/engine/interpreter';
 import { compileVocabulary } from '../src/engine/parser/vocabulary';
-import { RESPONSES, VERB_DEFAULTS } from '../src/content/response-families';
+import { RESPONSES, VERB_DEFAULTS } from '../src/content/responses';
 import { BOX, CHEST, FIXTURE_WORLD, HAT, JACK, KEY, LAMP, ROOM_A, ROOM_B, SHELF } from './fixtures/world';
 import type { ObjectId } from '../src/engine/ids';
 
@@ -27,6 +27,10 @@ const EXAMINE = V('fixture_examine_real');
 
 const WORLD: WorldDef = {
   ...FIXTURE_WORLD,
+  // 'inventory.empty'/'inventory.carrying' are real approved families
+  // (responses.ts, response-families doc §8) — reused here (not
+  // duplicated as fixture placeholders) so these tests exercise the real
+  // wiring, matching this file's own stated convention (see header).
   responses: { ...FIXTURE_WORLD.responses, ...RESPONSES },
   verbs: {
     ...FIXTURE_WORLD.verbs,
@@ -35,6 +39,8 @@ const WORLD: WorldDef = {
     // is only ever reached bare (§0 note 5), safely `{name}`-free.
     [BUILTIN_VERB_IDS.take]: { ...FIXTURE_WORLD.verbs![BUILTIN_VERB_IDS.take]!, default: VERB_DEFAULTS['take'] },
     [EXAMINE]: { id: EXAMINE, words: ['snurf'], patterns: ['V dobj'], class: 'analytical', default: VERB_DEFAULTS['examine'] },
+    // `default` is a `ProseRef` to the global family — see `INVENTORY_VERB_ID`'s own doc comment for why.
+    [INVENTORY_VERB_ID]: { id: INVENTORY_VERB_ID, words: ['inventory', 'i'], patterns: ['V'], class: null, default: { ref: 'inventory.empty' } },
   },
 };
 
@@ -154,12 +160,13 @@ describe('respond — bare-verb miss (reason discriminator, coordinator fix-2)',
     expect(diagCodes(result.events)).toEqual(['defaultResponse']); // rung 2, never 'nounMiss'
   });
 
-  it('a bare non-built-in verb falls through to rung 3 rather than rendering its {name}-templated default broken', () => {
+  it('a bare non-built-in verb renders the bareVerb family, {verb}-templated on its own canonical word (§8 gap 5) — never its {name}-templated default, and never nounMiss', () => {
     const outcome: InterpretOutcome = { kind: 'miss', raw: 'snurf', verb: EXAMINE, knownNouns: [], reason: 'noPattern' };
     const result = respond(WORLD, baseState(), vocab, outcome);
-    expect(lineText(result.events)).toBe(RESPONSES['nounMiss.unseen'][0]);
+    expect(lineText(result.events)).toBe(RESPONSES['bareVerb'][0]!.replace(/\{verb\}/g, 'snurf'));
     expect(lineText(result.events)).not.toContain('{name}');
-    expect(diagCodes(result.events)).toEqual(['nounMiss']);
+    expect(lineText(result.events)).not.toContain('{verb}');
+    expect(diagCodes(result.events)).toEqual(['defaultResponse']); // rung 2's bare-safe family, same code as the built-in bare case above
   });
 
   it("interpreter.ts itself sets reason: 'noPattern' for a genuinely bare known verb", () => {
@@ -259,5 +266,62 @@ describe('rotation: global families key on the family, not the object (actions.t
     result = performAction(WORLD, state, { verb: BUILTIN_VERB_IDS.take, dobj: HAT });
     state = result.state;
     expect(lineText(result.events)).toBe(RESPONSES['take.alreadyHeld'][1]!.replace(/\{name\}/g, 'wool hat'));
+  });
+});
+
+// ---------------------------------------------------------------------------
+// INVENTORY (§8 gap 2): dispatched before `performAction`, like LOOK/GO TO —
+// dynamic, unlike task 22a's static stopgap, and unaffected by darkness
+// (see `inventoryView`'s own doc comment: what you carry needs no light).
+// ---------------------------------------------------------------------------
+
+describe('respond — INVENTORY (gap 2)', () => {
+  it('lists carried and worn items behind a header line, worn ones marked, and emits no diag', () => {
+    const state = baseState({ objects: { [KEY]: { location: 'inventory' }, [HAT]: { location: 'worn' } } });
+    const outcome: InterpretOutcome = { kind: 'actions', actions: [{ verb: INVENTORY_VERB_ID, raw: 'inventory' }] };
+    const result = respond(WORLD, state, vocab, outcome);
+    const lines = result.events.filter((e) => e.type === 'line').map((e) => (e as { text: string }).text);
+    expect(lines[0]).toBe(RESPONSES['inventory.carrying'][0]);
+    expect(lines).toContain('brass key');
+    expect(lines.some((l) => l.includes('wool hat') && l.includes('worn'))).toBe(true);
+    expect(diagCodes(result.events)).toEqual([]);
+  });
+
+  it('renders the authored inventory.empty family when nothing is carried or worn', () => {
+    const outcome: InterpretOutcome = { kind: 'actions', actions: [{ verb: INVENTORY_VERB_ID, raw: 'inventory' }] };
+    const result = respond(WORLD, baseState(), vocab, outcome);
+    expect(lineText(result.events)).toBe(RESPONSES['inventory.empty'][0]);
+    expect(diagCodes(result.events)).toEqual([]);
+  });
+
+  it('a room can override the empty-inventory line via its own handlers (design doc §8.9/§14.4) — takes precedence over the global family', () => {
+    const worldWithOverride: WorldDef = {
+      ...WORLD,
+      rooms: {
+        ...WORLD.rooms,
+        [ROOM_A]: { ...WORLD.rooms![ROOM_A]!, handlers: [{ verbs: [INVENTORY_VERB_ID], effects: [{ say: 'fixture: your room-scoped empty-hands clue.' }] }] },
+      },
+    };
+    const result = respond(worldWithOverride, baseState({ location: ROOM_A }), vocab, {
+      kind: 'actions',
+      actions: [{ verb: INVENTORY_VERB_ID, raw: 'inventory' }],
+    });
+    expect(lineText(result.events)).toBe('fixture: your room-scoped empty-hands clue.');
+    expect(diagCodes(result.events)).toEqual([]); // rung 1 (a room handler match), not the global default
+  });
+
+  it('works in a dark room — carrying something needs no light', () => {
+    // ROOM_A is baseline-dark in the fixture.
+    const state = baseState({ location: ROOM_A, objects: { [KEY]: { location: 'inventory' } } });
+    const outcome: InterpretOutcome = { kind: 'actions', actions: [{ verb: INVENTORY_VERB_ID, raw: 'inventory' }] };
+    const result = respond(WORLD, state, vocab, outcome);
+    expect(result.events.some((e) => e.type === 'line' && (e as { text: string }).text === 'brass key')).toBe(true);
+  });
+
+  it('end to end: the real parser resolves bare "inventory" and dispatches to it', () => {
+    const state = baseState({ objects: { [KEY]: { location: 'inventory' } } });
+    const outcome = new DeterministicParser().interpret('inventory', buildView(state));
+    const result = respond(WORLD, state, vocab, outcome);
+    expect(result.events.some((e) => e.type === 'line' && (e as { text: string }).text === 'brass key')).toBe(true);
   });
 });

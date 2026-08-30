@@ -9,6 +9,7 @@ import {
   CHEST,
   FIXTURE_WORLD,
   FLAG_BOOL,
+  FLAG_SIGHED,
   GLASS_CASE,
   HAT,
   KEY,
@@ -17,6 +18,7 @@ import {
   NOTEBOOK,
   ROOM_A,
   SHELF,
+  SIGH,
   SMELL,
   WAVE,
 } from './fixtures/world';
@@ -429,6 +431,34 @@ describe('rung 2b — verb default family, for a verb with no built-in semantics
     expect(diag).toMatchObject({ type: 'diag', code: 'defaultResponse' });
     expect(result.class).toBe('analytical');
   });
+
+  it('SMELL bare (a resolved dobj-capable verb, just with no dobj given) still emits the diag — a genuinely incomplete command, not a designed bare form', () => {
+    const result = performAction(FIXTURE_WORLD, baseState(), { verb: SMELL });
+    expect(result.events.some((e) => e.type === 'diag' && e.code === 'defaultResponse')).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Gap 6: `fallbackToVerbDefault`'s `defaultResponse` diag is a false
+// positive when a bare verb's `default` IS its designed, complete answer —
+// i.e. the verb's own `patterns` declares a bare `'V'` form. Suppressed
+// only for that exact case; a resolved `dobj` always still means a real
+// coverage gap, whatever else the verb's `patterns` declares (see the SMELL
+// case above, and STAND/SUDO-style verbs that declare BOTH 'V' and 'V dobj'
+// — a real dobj should still get flagged).
+// ---------------------------------------------------------------------------
+
+describe('rung 2b — defaultResponse diag suppression for a designed bare form (gap 6)', () => {
+  it('a bare verb whose patterns declare "V" (its default IS the intended bare answer) emits no diag', () => {
+    const result = performAction(FIXTURE_WORLD, baseState(), { verb: WAVE });
+    expect(lineText(result.events)).toBe('You wave at nothing in particular.');
+    expect(result.events.some((e) => e.type === 'diag')).toBe(false);
+  });
+
+  it('a bare verb whose patterns do NOT declare "V" (e.g. TAKE, "V dobj" only) still emits the diag — genuinely incomplete input', () => {
+    const result = performAction(FIXTURE_WORLD, baseState(), { verb: BUILTIN_VERB_IDS.take });
+    expect(result.events.some((e) => e.type === 'diag' && e.code === 'defaultResponse')).toBe(true);
+  });
 });
 
 describe('consumesTurn', () => {
@@ -455,6 +485,36 @@ describe('consumesTurn', () => {
   it('is false at rung 2b for a meta verb', () => {
     const result = performAction(FIXTURE_WORLD, baseState(), { verb: WAVE });
     expect(result.consumesTurn).toBe(false);
+    expect(lineText(result.events)).toBe('You wave at nothing in particular.');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Room-level handlers (§2.4's `RoomDef.handlers`, §8 gap 3/4): a bare verb
+// (no `dobj`) with no dobj-based handler/built-in to match routes to the
+// current room's own `handlers` before falling to the verb's own `default`.
+// ---------------------------------------------------------------------------
+
+describe('room-level handlers — bare verb (gap 3/4)', () => {
+  it('a bare verb with a matching room handler runs it instead of the verb default, including a real Effect', () => {
+    const result = performAction(FIXTURE_WORLD, baseState(), { verb: SIGH });
+    expect(lineText(result.events)).toBe('fixture: a room-level sigh.');
+    expect(result.state.flags[FLAG_SIGHED]).toBe(true);
+    // Rung 1 (an authored match, even a room-level one), never rung 2b:
+    expect(result.events.some((e) => e.type === 'diag')).toBe(false);
+    expect(result.ok).toBe(true);
+  });
+
+  it('a resolved dobj never consults room handlers, even for a verb with no matching dobj handler/built-in', () => {
+    // SMELL has no built-in semantics and HAT has no SMELL handler of its
+    // own — this must still fall to rung 2b, not to ROOM_A's SIGH handler
+    // (a different verb) or leak into the room-handler branch at all.
+    const result = performAction(FIXTURE_WORLD, baseState(), { verb: SMELL, dobj: HAT });
+    expect(lineText(result.events)).toBe('You smell nothing special about the wool hat.');
+  });
+
+  it('a bare verb in a room with no matching handler still falls through to the verb default', () => {
+    const result = performAction(FIXTURE_WORLD, baseState(), { verb: WAVE });
     expect(lineText(result.events)).toBe('You wave at nothing in particular.');
   });
 });

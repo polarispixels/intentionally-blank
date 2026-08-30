@@ -58,7 +58,7 @@
 
 import type { InterpretOutcome, ParserContext } from '../engine/interpreter';
 import type { ClueId, MemoryId, NpcId, ObjectId, PlaceId, PuzzleId, QuestionId, RoomId } from '../engine/ids';
-import type { CompiledVocabulary } from '../engine/parser/vocabulary';
+import type { CompiledVocabulary } from '../engine/parser';
 import { step } from '../engine/turn';
 import { initialState } from '../engine/world';
 import type { GameState, NpcOverlay, ObjectOverlay, WorldDef } from '../engine/world';

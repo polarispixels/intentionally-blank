@@ -116,7 +116,7 @@ export function evaluate(world: WorldDef, state: GameState, cond: Cond): boolean
 
   if ('has' in cond) {
     const location = objectLocation(world, state, cond.has);
-    return location === 'inventory' || location === 'worn';
+    return location === 'inventory' || location === 'worn' || location === 'self';
   }
 
   if ('at' in cond) return state.location === cond.at;

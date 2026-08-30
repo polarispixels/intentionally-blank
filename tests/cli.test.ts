@@ -6,69 +6,22 @@ import { fileURLToPath } from 'node:url';
 import { afterAll, describe, expect, it } from 'vitest';
 import { compileVocabulary } from '../src/engine/parser/vocabulary';
 import { initialState } from '../src/engine/world';
-import { DOOR, FIXTURE_WORLD, GUIDE, ROOM_A, ROOM_B } from './fixtures/world';
+import { DOOR, FIXTURE_WORLD, GUIDE, ROOM_A, ROOM_B, SELF_TEST, SELF_TEST_PART, TOUCHABLE } from './fixtures/world';
 import { renderEvent } from '../src/cli/render';
 import { buildScopeView } from '../src/cli/scope';
 
 const dir = mkdtempSync(join(tmpdir(), 'ib-cli-'));
 afterAll(() => rmSync(dir, { recursive: true, force: true }));
 
-/** Run the headless CLI, returning stdout, stderr, and the exit status. */
-function play(args: string[]): { stdout: string; stderr: string; status: number } {
-  try {
-    const stdout = execFileSync('npx', ['tsx', 'src/cli/play.ts', ...args], {
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'pipe'],
-      timeout: 60_000,
-    });
-    return { stdout, stderr: '', status: 0 };
-  } catch (error) {
-    const e = error as { stdout?: string; stderr?: string; status?: number };
-    return { stdout: e.stdout ?? '', stderr: e.stderr ?? '', status: e.status ?? -1 };
-  }
-}
-
-describe('headless CLI', () => {
-  it('plays a script and reaches the account prompt', () => {
-    const script = join(dir, 'ok.txt');
-    writeFileSync(script, ['look', 'help', 'say hello', 'look'].join('\n'));
-    const { stdout, status } = play(['--script', script, '--fast']);
-    expect(status).toBe(0);
-    expect(stdout).toContain('ACCOUNT REQUIRED');
-  });
-
-  it('reports a missing script file on one line, without a stack trace', () => {
-    const { stderr, status } = play(['--script', join(dir, 'nope.txt'), '--fast']);
-    expect(status).toBe(1);
-    expect(stderr).toContain('script not found');
-    expect(stderr).not.toContain('at ');
-    expect(stderr.trim().split('\n')).toHaveLength(1);
-  });
-
-  it('reports a missing --script value without a stack trace', () => {
-    const { stderr, status } = play(['--script']);
-    expect(status).toBe(1);
-    expect(stderr).toContain('--script needs a file path');
-    expect(stderr).not.toContain('at ');
-  });
-
-  it('skips blank lines in a script', () => {
-    const script = join(dir, 'blanks.txt');
-    writeFileSync(script, ['look', '', '   ', 'help'].join('\n'));
-    const { stdout, status } = play(['--script', script, '--fast']);
-    expect(status).toBe(0);
-    expect(stdout).not.toMatch(/^> \s*$/m);
-  });
-});
-
 // ---------------------------------------------------------------------------
 // CLI v2 (§8 task 20) — `src/cli/repl.ts`, session-backed on `createSession`.
-// The MVP CLI above is untouched and stays the shipped game (task brief:
-// "keep play.ts working as-is and add the v2 entry point beside it" — no
-// real game content exists in `src/content` yet for v2 to run against;
-// task 21 ships that). `render.ts`/`scope.ts` are pure and unit-tested
-// directly, no process spawn needed; `repl.ts` itself is exercised by
-// spawning it, exactly like the MVP CLI above.
+// Task 22 retired the MVP CLI (`./play.ts`) and switched `npm run play`
+// (and this file) over to this shell entirely; `render.ts`/`scope.ts` are
+// pure and unit-tested directly, no process spawn needed. `--script`/
+// `--world` error-handling coverage that used to live against the MVP CLI
+// (missing script file, missing `--script` value, blank-line skipping) is
+// ported below against `repl.ts` — the same `die()`/script-loop code shape,
+// now the only CLI there is.
 // ---------------------------------------------------------------------------
 
 describe('renderEvent (pure)', () => {
@@ -108,10 +61,17 @@ describe('renderEvent (pure)', () => {
 describe('buildScopeView (pure)', () => {
   const vocab = compileVocabulary(FIXTURE_WORLD);
 
-  it('excludes NPCs (and everything but carried gear) from a dark room', () => {
-    const state = initialState(FIXTURE_WORLD); // ROOM_A: baseline dark, nothing lit
+  it('excludes NPCs (and everything but carried gear, self-placed fixtures, and touch-reachable fixtures) from a dark room', () => {
+    // TOUCHABLE (gap 1's `reachableInDark` fixture) is authored directly in
+    // ROOM_A on purpose, to be reachable by touch there — moved out of the
+    // room here (setup only, not this test's assertion) so this test keeps
+    // proving its own, narrower premise: nothing *else* is visible.
+    const state = { ...initialState(FIXTURE_WORLD), objects: { [TOUCHABLE]: { location: ROOM_B } } }; // ROOM_A: baseline dark, nothing lit
     const view = buildScopeView(FIXTURE_WORLD, state, vocab);
-    expect(view.visible).toEqual([]);
+    // SELF_TEST/SELF_TEST_PART (the 'self' PlaceId fixture) are always in
+    // scope, dark or not — a body part, unlike an ordinary object, needs no
+    // touch-reachable flag of its own (see ids.ts's PlaceId doc comment).
+    expect(view.visible).toEqual([SELF_TEST, SELF_TEST_PART]);
   });
 
   it('includes a scheduled NPC once the room is lit and visited', () => {
@@ -130,7 +90,7 @@ function repoPath(relativeToTests: string): string {
 /**
  * Writes a `--world` module for `repl.ts` to `d`: the shared engine test
  * fixture (`tests/fixtures/world.ts`) layered with the real global
- * response-ladder prose (`src/content/response-families.ts`) — the same
+ * response-ladder prose (`src/content/responses.ts`) — the same
  * combination `tests/session.test.ts`/`tests/migrate.test.ts` already use
  * — plus three additions scoped to this test file alone:
  *   - ROOM_A's `dark: true` is dropped. Unmodified, the fixture's start
@@ -153,7 +113,7 @@ function repoPath(relativeToTests: string): string {
 function writeWorldModule(d: string): string {
   const path = join(d, 'world.mjs');
   const fixtures = repoPath('./fixtures/world.ts');
-  const responses = repoPath('../src/content/response-families.ts');
+  const responses = repoPath('../src/content/responses.ts');
   const actions = repoPath('../src/engine/actions.ts');
   writeFileSync(
     path,
@@ -216,11 +176,11 @@ function writeScript(d: string, name: string, lines: string[]): string {
 describe('CLI v2 (session-backed REPL)', () => {
   const worldPath = writeWorldModule(dir);
 
-  it('requires --world (no default game content exists yet)', () => {
-    const { stderr, status } = playV2(['--script', writeScript(dir, 'noop.txt', ['look']), '--fast']);
-    expect(status).toBe(1);
-    expect(stderr).toContain('--world');
-    expect(stderr).not.toContain('at ');
+  it('defaults to the real shipped game (act1) when --world is omitted (§8 task 22)', () => {
+    const saveDir = mkdtempSync(join(tmpdir(), 'ib-cli-v2-'));
+    const { stdout, status } = playV2(['--save-dir', saveDir, '--script', writeScript(dir, 'noop.txt', ['look']), '--fast']);
+    expect(status).toBe(0);
+    expect(stdout).toContain('Darkness.'); // act1's opening room, canon-locked (tests/world-act1-playthrough.test.ts)
   });
 
   it('reports a --world module that does not export WORLD', () => {
@@ -229,6 +189,29 @@ describe('CLI v2 (session-backed REPL)', () => {
     const { stderr, status } = playV2(['--world', badWorld, '--script', writeScript(dir, 'noop2.txt', ['look']), '--fast']);
     expect(status).toBe(1);
     expect(stderr).toContain('does not export WORLD');
+  });
+
+  it('reports a missing script file on one line, without a stack trace (ported from the retired MVP CLI\'s own coverage)', () => {
+    const { stderr, status } = playV2(['--script', join(dir, 'nope.txt'), '--fast']);
+    expect(status).toBe(1);
+    expect(stderr).toContain('script not found');
+    expect(stderr).not.toContain('at ');
+    expect(stderr.trim().split('\n')).toHaveLength(1);
+  });
+
+  it('reports a missing --script value without a stack trace', () => {
+    const { stderr, status } = playV2(['--script']);
+    expect(status).toBe(1);
+    expect(stderr).toContain('--script needs a file path');
+    expect(stderr).not.toContain('at ');
+  });
+
+  it('skips blank lines in a script', () => {
+    const saveDir = mkdtempSync(join(tmpdir(), 'ib-cli-v2-'));
+    const script = writeScript(dir, 'blanks.txt', ['look', '', '   ', 'look']);
+    const { stdout, status } = playV2(['--world', worldPath, '--save-dir', saveDir, '--script', script, '--fast']);
+    expect(status).toBe(0);
+    expect(stdout).not.toMatch(/^> \s*$/m);
   });
 
   it('plays through the parser for real, including disambiguation, against a real ScopeView', () => {

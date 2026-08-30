@@ -1,24 +1,24 @@
 // CLI v2 (spec §0, §8 task 20): a session-backed REPL on `createSession`,
-// replacing the MVP loop's direct `step()` calls. Built a real `ScopeView`
-// every turn (`./scope.ts`) and drives `DeterministicParser` for real,
-// rather than hand-building `InterpretOutcome`s the way every engine test
-// up to this point has (`turn.ts`'s own SCOPE header names this file as
-// the place that closes that gap).
+// driving `DeterministicParser` for real against a production `ScopeView`
+// built every turn (`./scope.ts`) rather than hand-building
+// `InterpretOutcome`s the way every engine test up to this point has
+// (`turn.ts`'s own SCOPE header names this file as the place that closes
+// that gap).
 //
-// The MVP CLI (`./play.ts`) is untouched and stays the shipped game until
-// task 22 switches the shell over (task brief: "keep play.ts working
-// as-is and add the v2 entry point beside it" — the option this file
-// takes, since no real game content exists in `src/content` yet for v2 to
-// run against; task 21 is what ships that).
+// Task 22 retired the MVP CLI (`./play.ts`) and switched `npm run play` over
+// to this file — see `package.json`.
 //
-// WORLD LOADING: no default game content exists yet, so `--world <module>`
-// is required — a path to a module that exports `WORLD: WorldDef` and,
-// optionally, `PROMPT_SCRIPTS: Record<string, ScriptId>` (see "PROMPT
-// ROUND-TRIP" below for why the second one exists). `tests/cli.test.ts`
-// points this at a small generated module layering the shared engine test
-// fixture (`tests/fixtures/world.ts`) with the real global response-ladder
-// prose (`src/content/response-families.ts`) — the same combination
-// `tests/session.test.ts` and `tests/migrate.test.ts` already use.
+// WORLD LOADING: `--world <module>` loads an arbitrary world module (a path
+// to one exporting `WORLD: WorldDef` and, optionally, `PROMPT_SCRIPTS:
+// Record<string, ScriptId>` — see "PROMPT ROUND-TRIP" below for why the
+// second one exists) — how `tests/cli.test.ts` points this at a small
+// generated module layering the shared engine test fixture
+// (`tests/fixtures/world.ts`) with the real global response-ladder prose
+// (`src/content/responses.ts`), the same combination `tests/session.test.ts`
+// and `tests/migrate.test.ts` already use. Omitted, it defaults to the real
+// shipped game (`src/content/world/act1`, task 22's own wiring) — so a
+// player just runs `npm run play` with no flags and starts in the opening
+// room.
 //
 // META COMMANDS (§5.3): spec text calls these "engine-parsed,
 // session-executed," which in the shipped game means content registers
@@ -51,10 +51,11 @@ import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import type { ScriptId } from '../engine/ids';
 import { DeterministicParser } from '../engine/interpreter';
-import { compileVocabulary } from '../engine/parser/vocabulary';
-import type { CompiledVocabulary } from '../engine/parser/vocabulary';
+import { compileVocabulary } from '../engine/parser';
+import type { CompiledVocabulary } from '../engine/parser';
 import { availableHints, mapView, memoriesView, notebookView, questionsView, revealHint } from '../engine/views';
 import type { GameEvent, WorldDef } from '../engine/world';
+import { WORLD as ACT1_WORLD } from '../content/world/act1';
 import {
   createSession,
   deathOptions,
@@ -375,10 +376,15 @@ async function feed(line: string): Promise<void> {
 }
 
 async function main(): Promise<void> {
-  if (worldPath === undefined) die('--world <module> is required (no default game content exists yet — see task 21)');
-  const mod = await loadWorldModule(worldPath);
-  WORLD = mod.WORLD;
-  PROMPT_SCRIPTS = mod.PROMPT_SCRIPTS ?? {};
+  if (worldPath === undefined) {
+    // No --world flag: the real shipped game (task 22's default-world wiring).
+    WORLD = ACT1_WORLD;
+    PROMPT_SCRIPTS = {};
+  } else {
+    const mod = await loadWorldModule(worldPath);
+    WORLD = mod.WORLD;
+    PROMPT_SCRIPTS = mod.PROMPT_SCRIPTS ?? {};
+  }
   vocab = compileVocabulary(WORLD);
   session = createSession(WORLD);
   store = new FileStore(saveDir ?? resolve('.ib-saves'));

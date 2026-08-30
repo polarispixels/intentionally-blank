@@ -51,8 +51,8 @@ import { evaluate } from './cond';
 import { apply } from './effects';
 import { render } from './prose';
 import type { GameEvent, GameState, NpcDefSlice, ShowResponseDef, TopicDef, WorldDef } from './world';
-import { candidateName } from './parser/resolver';
-import type { CompiledVocabulary } from './parser/vocabulary';
+import { candidateName } from './parser';
+import type { CompiledVocabulary } from './parser';
 
 /**
  * Reserved verb ids content must use (in `world.verbs`) for the

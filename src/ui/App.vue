@@ -1,115 +1,118 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref } from 'vue';
-import { parse, start, step } from '../engine';
-import type { GameEvent, GameState } from '../engine';
-import { PROMPT } from '../content';
+// The Vue shell (§8 task 22: "src/ui/ moves onto Session"). Thin by design —
+// every real decision (parsing, turns, saves, death handling) lives in
+// `./controller.ts`, exercised the same way by `tests/ui-controller.test.ts`
+// with no DOM at all. This component's own job is: wire the browser-only
+// bits `./controller.ts` deliberately doesn't touch (`localStorage`, the
+// wall clock, beat-pacing timers, scrolling, focus) and render `UiState`.
+import { onBeforeUnmount, ref, watch } from 'vue';
+import { DeterministicParser } from '../engine/interpreter';
+import { compileVocabulary } from '../engine/parser';
+import type { DeathOption } from '../session/session';
+import { WORLD } from '../content/world/act1';
 import { GAME_VERSION } from '../version';
+import {
+  chooseDeathOption,
+  createUiState,
+  deathMenuOptions,
+  flushAllBeats,
+  flushOneBeat,
+  submitCommand,
+  submitPrompt,
+} from './controller';
+import type { ControllerOpts, UiState } from './controller';
+import { LocalStorageStore } from './store';
 import Transcript from './Transcript.vue';
-import type { Line } from './lines';
 import CommandInput from './CommandInput.vue';
-import AccountModal from './AccountModal.vue';
+import PromptModal from './PromptModal.vue';
 
 const BEAT_MS = 900;
 
-const state = ref<GameState>(start().state);
-const lines = ref<Line[]>([]);
-const pending = ref<Line[]>([]);
-let timer: ReturnType<typeof setTimeout> | null = null;
+// The one real game world this shell ever plays (§8 task 22's "wire act1 as
+// the default world"). `vocab`/`parser` are stateless/world-derived, built
+// once; `store` is the only browser API this file touches directly.
+const store = new LocalStorageStore();
+const vocab = compileVocabulary(WORLD);
+const parser = new DeterministicParser();
+const opts: ControllerOpts = {
+  world: WORLD,
+  vocab,
+  parser,
+  store,
+  now: () => new Date().toISOString(),
+  gameVersion: GAME_VERSION,
+  promptScripts: {}, // act1 uses no generic-prompt content yet
+};
 
-const modalOpen = ref(false);
-const modal = ref<{ title: string; body: string; usernamePlaceholder: string; hint: string }>({ title: PROMPT.title, body: PROMPT.body, usernamePlaceholder: PROMPT.usernamePlaceholder, hint: PROMPT.hint });
-const modalError = ref('');
-const modalReveal = ref(false);
-const gameOver = ref(false);
+const deathLabels: Record<DeathOption, string> = {
+  undo: 'UNDO',
+  restartEncounter: 'RESTART ENCOUNTER',
+  restart: 'RESTART',
+};
+
+// Resumes the autosave if one exists (browser reloads are common; a
+// spawned CLI process has no equivalent) — game state resumes exactly;
+// the visible transcript does not replay history, only the session does.
+const ui = ref<UiState>(createUiState(WORLD, store));
 const input = ref<InstanceType<typeof CommandInput> | null>(null);
+let timer: ReturnType<typeof setTimeout> | null = null;
 
 function scrollToEnd(): void {
   requestAnimationFrame(() => window.scrollTo({ top: document.body.scrollHeight }));
 }
 
-function push(line: Line): void {
-  lines.value.push(line);
+/** Reveals queued beats one at a time; a fresh command flushes the rest at once (`onPageClick`/`submit` below) rather than interleaving. */
+function pump(): void {
+  if (timer !== null) {
+    clearTimeout(timer);
+    timer = null;
+  }
+  if (ui.value.pending.length === 0) return;
+  ui.value = flushOneBeat(ui.value);
   scrollToEnd();
+  if (ui.value.pending.length > 0) timer = setTimeout(pump, BEAT_MS);
 }
 
-/** Reveal queued beats one at a time; `flush` shows the rest at once. */
-function pump(flush = false): void {
-  if (timer) { clearTimeout(timer); timer = null; }
-  if (pending.value.length === 0) return;
-  if (flush) {
-    while (pending.value.length) push(pending.value.shift()!);
-    return;
-  }
-  push(pending.value.shift()!);
-  if (pending.value.length) timer = setTimeout(() => pump(), BEAT_MS);
-}
-
-function apply(events: readonly GameEvent[]): void {
-  for (const e of events) {
-    switch (e.type) {
-      case 'echo': push({ kind: 'player', text: e.text }); break;
-      case 'say': push({ kind: 'game', text: e.text }); break;
-      case 'openPrompt':
-        modal.value = { title: e.title, body: e.body, usernamePlaceholder: e.usernamePlaceholder, hint: e.hint };
-        modalError.value = '';
-        modalReveal.value = false;
-        modalOpen.value = true;
-        break;
-      case 'promptFailed':
-        modalError.value = e.text;
-        modalReveal.value = e.revealHint;
-        break;
-      case 'closePrompt':
-        modalOpen.value = false;
-        break;
-      case 'beat':
-        pending.value.push({ kind: 'game', text: e.text });
-        break;
-      case 'gameOver':
-        pending.value.push({ kind: 'game', text: e.aside });
-        pending.value.push({ kind: 'system', text: 'GAME OVER' });
-        gameOver.value = true;
-        break;
-      case 'restarted':
-        pending.value = [];
-        lines.value = [];
-        gameOver.value = false;
-        modalOpen.value = false;
-        break;
-    }
-  }
-  if (pending.value.length && !timer) pump();
+function startPumpIfNeeded(): void {
+  if (ui.value.pending.length > 0 && timer === null) timer = setTimeout(pump, BEAT_MS);
 }
 
 function submit(text: string): void {
-  // A command typed during a paced beat sequence used to be swallowed: this
-  // flushed and returned, but CommandInput had already cleared the field. Now
-  // the beats flush and the command still runs. A bare Enter only flushes.
-  if (pending.value.length) pump(true);
-  if (text.trim() === '') return;
-  const r = step(state.value, parse(text));
-  state.value = r.state;
-  apply(r.events);
+  ui.value = submitCommand(ui.value, text, opts);
+  scrollToEnd();
+  startPumpIfNeeded();
 }
 
-function submitCredentials(username: string, password: string): void {
-  const r = step(state.value, { type: 'submitCredentials', username, password });
-  state.value = r.state;
-  apply(r.events);
-  if (!modalOpen.value) input.value?.focus();
+function submitPromptForm(values: Record<string, string>): void {
+  ui.value = submitPrompt(ui.value, values, opts);
+  scrollToEnd();
+  startPumpIfNeeded();
+  if (ui.value.prompt === undefined) input.value?.focus();
 }
 
-function restart(): void { submit('restart'); input.value?.focus(); }
+function chooseDeath(option: DeathOption): void {
+  ui.value = chooseDeathOption(ui.value, WORLD, store, option);
+  input.value?.focus();
+}
 
 function onPageClick(e: MouseEvent): void {
   const t = e.target as HTMLElement | null;
   if (t?.closest('dialog, button, a, input')) return;
-  if (pending.value.length) pump(true);
+  if (ui.value.pending.length > 0) {
+    ui.value = flushAllBeats(ui.value);
+    scrollToEnd();
+  }
   input.value?.focus();
 }
 
-onMounted(() => { apply(start().events); });
-onBeforeUnmount(() => { if (timer) clearTimeout(timer); });
+watch(
+  () => ui.value.lines.length,
+  () => scrollToEnd(),
+);
+
+onBeforeUnmount(() => {
+  if (timer !== null) clearTimeout(timer);
+});
 </script>
 
 <template>
@@ -119,25 +122,31 @@ onBeforeUnmount(() => { if (timer) clearTimeout(timer); });
       <hr />
     </header>
     <main>
-      <Transcript :lines="lines" />
-      <button v-if="gameOver && pending.length === 0" class="restart" type="button" @click="restart">RESTART</button>
-      <!-- `pending` is a ref; templates auto-unwrap it, so `.length` here is reactive. -->
+      <Transcript :lines="ui.lines" />
+      <div v-if="ui.session.state.phase === 'dead' && ui.pending.length === 0" class="death-menu">
+        <button
+          v-for="option in deathMenuOptions(ui, store)"
+          :key="option"
+          type="button"
+          class="restart"
+          @click="chooseDeath(option)"
+        >
+          {{ deathLabels[option] }}
+        </button>
+      </div>
     </main>
     <footer>
       <hr />
       v{{ GAME_VERSION }} &middot; <a href="docs/">docs</a>
     </footer>
     <CommandInput ref="input" @submit="submit" />
-    <AccountModal
-      :open="modalOpen"
-      :title="modal.title"
-      :body="modal.body"
-      :username-placeholder="modal.usernamePlaceholder"
-      :hint="modal.hint"
-      :forgot-label="PROMPT.forgotLabel"
-      :error="modalError"
-      :reveal-hint="modalReveal"
-      @submit="submitCredentials"
+    <PromptModal
+      :open="ui.prompt !== undefined"
+      :title="ui.prompt?.title ?? ''"
+      :body="ui.prompt?.body ?? ''"
+      :fields="ui.prompt?.fields ?? []"
+      :error="ui.prompt?.error"
+      @submit="submitPromptForm"
     />
   </div>
 </template>

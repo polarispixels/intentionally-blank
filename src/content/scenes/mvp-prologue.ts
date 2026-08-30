@@ -5,9 +5,12 @@
 // prose, no connection to Jules or the town.
 //
 // SOURCE OF TRUTH: every string below is the same string the shipped MVP
-// renders — imported directly from the MVP's own content modules
-// (`../responses`, `../prompt`, `../sequence`) and reused, not retyped, so
-// there is no hand-transcription to get subtly wrong. Two purely mechanical
+// rendered — imported from its own content modules, preserved alongside
+// this scene once task 22 retired the MVP engine and deleted the top-level
+// `src/content/{responses,prompt,sequence}.ts` those strings used to live in
+// (`./mvp-prologue-responses`, `./mvp-prologue-prompt`,
+// `./mvp-prologue-sequence` — moved, not retyped, so there is still no
+// hand-transcription to get subtly wrong). Two purely mechanical
 // exceptions, neither of which touches wording:
 //   1. `ask.generic`'s `{who}` placeholder is rewritten to `{name}` — v2's
 //      prose context (`prose.ts`'s `ProseContext`) has no `who` key; `name`
@@ -88,9 +91,9 @@ import type {
   VerbDef,
   WorldDef,
 } from '../../engine/world';
-import { CREDENTIALS, LOGIN_FAIL, PROMPT } from '../prompt';
-import { OPENING, RESPONSES as MVP_RESPONSES, SAY_SPECIAL } from '../responses';
-import { GAME_OVER_ASIDE, LOGIN_SUCCESS, SEQUENCE } from '../sequence';
+import { CREDENTIALS, LOGIN_FAIL, PROMPT } from './mvp-prologue-prompt';
+import { OPENING, RESPONSES as MVP_RESPONSES, SAY_SPECIAL } from './mvp-prologue-responses';
+import { GAME_OVER_ASIDE, LOGIN_SUCCESS, SEQUENCE } from './mvp-prologue-sequence';
 
 /** Re-exported, unused by this world — see this file's header, "WHAT DID NOT PORT". Kept so the MVP's freeform-SAY data is not lost, only unwired. */
 export const UNPORTED_SAY_SPECIAL = SAY_SPECIAL;

@@ -38,7 +38,7 @@ import { compileVocabulary } from '../src/engine/parser/vocabulary';
 import { step } from '../src/engine/turn';
 import { initialState } from '../src/engine/world';
 import type { GameState, WorldDef } from '../src/engine/world';
-import { RESPONSES } from '../src/content/response-families';
+import { RESPONSES } from '../src/content/responses';
 import { buildScopeView } from '../src/cli/scope';
 import {
   DOOR,
@@ -90,14 +90,14 @@ describe('traverseDirection', () => {
     const state = baseState(); // ROOM_A only declares 'n' and (when-gated) 'up'
     const result = traverseDirection(WORLD, state, DIRECTION_VERB_IDS.s, 's');
     expect(result.state.location).toBe(ROOM_A);
-    expect(lineTexts(result.events)).toEqual([WORLD.responses!['move.noExit']]);
+    expect(lineTexts(result.events)).toEqual([(WORLD.responses!['move.noExit'] as string[])[0]]);
   });
 
   it('an exit whose `when` does not currently hold reads as no exit at all, not as blocked', () => {
     const state = baseState(); // ROOM_A -> ROOM_C ("up") gated on FLAG_ONENTER_GATE_TRIGGER, false by default
     const result = traverseDirection(WORLD, state, DIRECTION_VERB_IDS.up, 'up');
     expect(result.state.location).toBe(ROOM_A);
-    expect(lineTexts(result.events)).toEqual([WORLD.responses!['move.noExit']]);
+    expect(lineTexts(result.events)).toEqual([(WORLD.responses!['move.noExit'] as string[])[0]]);
   });
 
   it('once the `when` gate holds, the exit exists and can be crossed', () => {
@@ -117,8 +117,8 @@ describe('traverseDirection', () => {
     const state = baseState({ location: ROOM_C }); // ROOM_C -> ROOM_B ("w") has a door, no blockedText
     const result = traverseDirection(WORLD, state, DIRECTION_VERB_IDS.w, 'w');
     expect(result.state.location).toBe(ROOM_C);
-    expect(lineTexts(result.events)).toEqual([WORLD.responses!['move.blocked']]);
-    expect(result.events).not.toEqual(expect.arrayContaining([{ type: 'line', kind: 'prose', text: WORLD.responses!['move.noExit'] }]));
+    expect(lineTexts(result.events)).toEqual([(WORLD.responses!['move.blocked'] as string[])[0]]);
+    expect(result.events).not.toEqual(expect.arrayContaining([{ type: 'line', kind: 'prose', text: (WORLD.responses!['move.noExit'] as string[])[0] }]));
   });
 
   it('opening the door makes the same exit passable', () => {
@@ -317,7 +317,7 @@ describe('executeGoTo', () => {
     const state = baseState({ location: ROOM_C, visited: { [ROOM_A]: 0, [ROOM_B]: 1, [ROOM_C]: 2 } });
     const result = executeGoTo(WORLD, state, [ROOM_A]); // ROOM_C has no exit to ROOM_A at all
     expect(result.state.location).toBe(ROOM_C);
-    expect(lineTexts(result.events)).toEqual([WORLD.responses!['move.noExit']]);
+    expect(lineTexts(result.events)).toEqual([(WORLD.responses!['move.noExit'] as string[])[0]]);
   });
 
   it('GO_TO_VERB_ID has no declared class (never registered in world.verbs) — always tallies null', () => {

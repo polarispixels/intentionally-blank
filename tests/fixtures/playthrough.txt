@@ -1,9 +1,0 @@
-say hello world
-ask jeeves the weather
-dig a tunnel
-help
-look
-login admin admin
-login user password
-look
-restart

@@ -28,7 +28,7 @@ import { DEAD_REFUSED_FAMILY, ENDED_REFUSED_FAMILY } from '../src/engine/turn';
 import { validate } from '../src/engine/validate';
 import { scope } from '../src/engine/world';
 import type { WorldDef } from '../src/engine/world';
-import { RESPONSES } from '../src/content/response-families';
+import { RESPONSES } from '../src/content/responses';
 import { MemoryStore } from '../src/session/store';
 import { HISTORY_CEILING, appendHistory } from '../src/session/savefile';
 import type { HistoryEntry } from '../src/session/savefile';
@@ -70,7 +70,7 @@ const NOW = '2026-08-30T00:00:00.000Z';
 // The fixture's own `responses` only covers the built-in verbs' own
 // families (§8 task 8's rule); the §3.6 ladder's global families
 // ('unknown', 'nounMiss.*', …) live in real approved prose
-// (`src/content/response-families.ts`) — merged in the same way
+// (`src/content/responses.ts`) — merged in the same way
 // `tests/respond.test.ts` does, so a miss outcome (the autosave-cadence
 // test's "nothing consumed a turn" case) renders instead of throwing.
 const WORLD: WorldDef = { ...FIXTURE_WORLD, responses: { ...FIXTURE_WORLD.responses, ...RESPONSES } };
@@ -472,7 +472,12 @@ describe('phase gate: no world turn survives death or an ending', () => {
   });
 
   it('falls back to a diag (no line) when no refusal family is authored', () => {
-    const worldWithNoFamily: WorldDef = { ...PHASE_GATE_WORLD, responses: { ...WORLD.responses } };
+    // Explicitly drop DEAD_REFUSED_FAMILY/ENDED_REFUSED_FAMILY — `WORLD.responses`
+    // now carries both (responses.ts §7), so this has to strip them
+    // back out to keep testing "no refusal family is authored" rather than
+    // "a family exists but this test forgot about it".
+    const { [DEAD_REFUSED_FAMILY]: _dead, [ENDED_REFUSED_FAMILY]: _ended, ...responsesWithNoRefusalFamily } = WORLD.responses!;
+    const worldWithNoFamily: WorldDef = { ...PHASE_GATE_WORLD, responses: responsesWithNoRefusalFamily };
     const store = new MemoryStore();
     const o = opts(store);
     let session = createSession(worldWithNoFamily);

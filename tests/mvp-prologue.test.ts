@@ -7,12 +7,15 @@
 //      spawns it) reaches every MVP beat — the opening, Jeeves, the unknown
 //      fallback, the account prompt, a failed then a correct login, the
 //      arrest, GAME OVER, the post-death refusal, and RESTART — using the
-//      same authored strings the MVP renders (imported from the MVP's own
-//      content modules, not retyped), with every deliberate difference from
-//      the MVP's own `tests/fixtures/playthrough.txt` run recorded below.
+//      same authored strings the MVP rendered (preserved in
+//      `src/content/scenes/mvp-prologue-*.ts`, not retyped), with every
+//      deliberate difference from the MVP's own transcript recorded below.
 //
-// DELIBERATE DIFFERENCES from the MVP transcript (`tests/playthrough.test.ts`
-// / `tests/fixtures/playthrough.txt`), each with its one-line reason:
+// DELIBERATE DIFFERENCES from the MVP transcript (task 22 deleted the MVP
+// engine and its own golden-transcript test —
+// `tests/playthrough.test.ts` / `tests/fixtures/playthrough.txt`, the
+// original source for this comparison — but the differences below still
+// hold and are recorded here for whoever next touches this scene):
 //
 //   - No `SAY` line. v2's grammar has no free-text capture pattern (see
 //     `mvp-prologue.ts`'s header) — out of this task's granted modules.
@@ -55,9 +58,9 @@ import {
   PROMPT_SCRIPTS,
   WORLD,
 } from '../src/content/scenes/mvp-prologue';
-import { CREDENTIALS, PROMPT, LOGIN_FAIL } from '../src/content/prompt';
-import { RESPONSES as MVP_RESPONSES, OPENING } from '../src/content/responses';
-import { LOGIN_SUCCESS, SEQUENCE, GAME_OVER_ASIDE } from '../src/content/sequence';
+import { CREDENTIALS, PROMPT, LOGIN_FAIL } from '../src/content/scenes/mvp-prologue-prompt';
+import { RESPONSES as MVP_RESPONSES, OPENING } from '../src/content/scenes/mvp-prologue-responses';
+import { LOGIN_SUCCESS, SEQUENCE, GAME_OVER_ASIDE } from '../src/content/scenes/mvp-prologue-sequence';
 
 const dir = mkdtempSync(join(tmpdir(), 'ib-mvp-prologue-'));
 afterAll(() => rmSync(dir, { recursive: true, force: true }));

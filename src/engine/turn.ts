@@ -104,7 +104,7 @@ import type { GameEvent, GameState, WorldDef } from './world';
 import type { InterpretOutcome } from './interpreter';
 import { nextParserContext } from './interpreter';
 import { renderArrival } from './move';
-import type { CompiledVocabulary } from './parser/vocabulary';
+import type { CompiledVocabulary } from './parser';
 import { render } from './prose';
 import { respond } from './respond';
 import { tick } from './tick';

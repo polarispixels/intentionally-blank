@@ -11,14 +11,12 @@ import { describe, expect, it } from 'vitest';
 import { BUILTIN_VERB_IDS } from '../src/engine/actions';
 import { DeterministicParser, nextParserContext } from '../src/engine/interpreter';
 import type { ScopeView } from '../src/engine/interpreter';
-// NOTE: imported from the concrete submodule, not the bare '../src/engine/parser'
-// specifier — that specifier resolves to the sibling MVP `src/engine/parser.ts`
-// file (file resolution wins over a directory index), not `parser/index.ts`.
-// Task 9's own tests already avoid it for the same reason.
-import { introduceIt } from '../src/engine/parser/pronouns';
-import { resolveNounPhrase } from '../src/engine/parser/resolver';
-import type { UnresolvedNounPhrase } from '../src/engine/parser/grammar';
-import { compileVocabulary } from '../src/engine/parser/vocabulary';
+// Task 22 deleted the MVP's sibling `src/engine/parser.ts`, so the bare
+// '../src/engine/parser' specifier now resolves to `parser/index.ts` (the
+// barrel) instead of colliding with that file — no more need for the
+// per-submodule imports task 9/10 used to work around it.
+import { compileVocabulary, introduceIt, resolveNounPhrase } from '../src/engine/parser';
+import type { UnresolvedNounPhrase } from '../src/engine/parser';
 import { initialState } from '../src/engine/world';
 import type { GameState } from '../src/engine/world';
 import {

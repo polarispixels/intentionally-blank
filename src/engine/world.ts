@@ -119,6 +119,28 @@ export interface ObjectDefSlice {
   portable?: boolean;
   wearable?: boolean;
   switchable?: boolean;
+  /**
+   * Findable by touch even when the room is dark (§2.4/§8 gap 1: the
+   * opening room's pull chain — the tutorial affordance a player must be
+   * able to find by feel before any light exists to see it by). `scope()`'s
+   * dark branch is otherwise all-or-nothing ("only `inventory`/`worn` stays
+   * reachable"); this is the per-object exception, checked against the
+   * object's *own* current placement (`objectLocation`/`inScopeAt` — the
+   * same physical-presence rule sight uses, minus the sight itself), not
+   * inherited by anything resting on or inside it. A boolean field rather
+   * than a string tag in the free-form `tags` list below: every other
+   * gameplay-mechanical switch on this interface (`hidden`, `portable`,
+   * `plotCritical`, …) is a typed boolean the engine checks directly;
+   * `tags` is content-authoring metadata (`'analog'`, `'evidence'`, …) the
+   * engine never reads, and stringly-matching a `'tactile'` entry out of it
+   * would blur that boundary and be one typo away from silently doing
+   * nothing. See `world.ts`'s `scope()`/`reachableByTouch` for the other
+   * half of this: an object resting on/in something that is itself carried
+   * (a player's own hand, a coat pocket) needs no flag of its own — it
+   * inherits touch-reachability by following the same containment chain
+   * `inScopeAt` already walks for sight.
+   */
+  reachableInDark?: boolean;
   description?: Prose;
   text?: Prose; // READ; falls back to `description` when absent (§2.5)
   handlers?: HandlerDef[];
@@ -219,6 +241,21 @@ export interface RoomDefSlice {
   firstVisit?: Prose;
   onEnter?: OnEnterRule[];
   exits?: ExitDefSlice[];
+  /**
+   * Room-level verb handlers (§2.4) — ambient senses with no direct object
+   * (SMELL/LISTEN with nothing named) and other bare-verb actions whose
+   * answer belongs to the room itself rather than to any one object (§8 gap
+   * 3/4: STAND, a terminal login attempt, …). Matched by `actions.ts`'s
+   * `performAction` the same way an object's own `handlers` are — first
+   * `verbs`/`when`/`withInstrument` match wins — but only ever consulted
+   * for a verb with no `dobj` at all, and only once no dobj-based
+   * handler/built-in has already claimed the verb (there is none to claim
+   * it, since `dobj` is absent): see that module's own call site for why.
+   * Unlike an object's `handlers`, these run full `Effect`s (not just
+   * `Prose`), which is what makes a bare verb able to set a flag at all —
+   * `VerbDef.default` alone never could.
+   */
+  handlers?: HandlerDef[];
 }
 
 /**
@@ -536,7 +573,7 @@ function isTransparent(world: WorldDef, id: ObjectId): boolean {
  */
 function inScopeAt(world: WorldDef, state: GameState, room: RoomId, id: ObjectId): boolean {
   const loc = objectLocation(world, state, id);
-  if (loc === 'inventory' || loc === 'worn') return room === state.location;
+  if (loc === 'inventory' || loc === 'worn' || loc === 'self') return room === state.location;
   if (typeof loc === 'string') return loc === room;
   if ('in' in loc) {
     if (!inScopeAt(world, state, room, loc.in)) return false;
@@ -577,23 +614,53 @@ function hasActiveLightSourceInScope(world: WorldDef, state: GameState, room: Ro
 }
 
 /**
+ * Whether `id` is reachable by TOUCH in a dark room — §8 gap 1's fix to
+ * `scope()`'s previously all-or-nothing dark rule. Two independent routes,
+ * either one is enough:
+ *
+ *   1. `id` is carried (`inventory`/`worn`) — unchanged from before this
+ *      fix: you always know what you're holding, dark or not.
+ *   2. `id` rests `{ in }`/`{ on }` something that is *itself* reachable by
+ *      touch (recursively — this is what lets an object resting on a
+ *      carried item, e.g. a sub-part of the player's own body, work with no
+ *      `reachableInDark` flag of its own: touching your own hand needs no
+ *      separate authoring), OR `id` itself is flagged `reachableInDark` and
+ *      is currently physically present (`inScopeAt` — the same
+ *      containment/open-container rule sight uses, just without the sight).
+ *
+ * `reachableInDark` is checked on `id` directly, never inherited downward
+ * onto whatever rests on/in it — a lamp being findable by touch would not
+ * itself make things sitting on its shade findable too; each object that
+ * needs to be feelable in the dark says so.
+ */
+function reachableByTouch(world: WorldDef, state: GameState, room: RoomId, id: ObjectId): boolean {
+  // Checked first, and on `id` itself only (never inherited via the
+  // recursion below) — see this function's own doc comment.
+  if (world.objects?.[id]?.reachableInDark === true) return inScopeAt(world, state, room, id);
+  const loc = objectLocation(world, state, id);
+  if (loc === 'inventory' || loc === 'worn' || loc === 'self') return true;
+  if (typeof loc === 'object') {
+    if ('in' in loc) return reachableByTouch(world, state, room, loc.in);
+    if ('on' in loc) return reachableByTouch(world, state, room, loc.on);
+  }
+  return false;
+}
+
+/**
  * Everything the player can currently see and reach: room contents,
  * supporters, open-or-transparent containers (recursively), inventory, and
  * worn items — excluding `hidden` objects and, when the room is dark,
- * excluding everything except what's carried (`inventory`/`worn`), which
- * stays reachable by touch (the classic IF convention: `INVENTORY` and
- * dropping/taking your own gear still work in the dark; you just can't see
- * the room around you).
+ * excluding everything except what's reachable by touch (`reachableByTouch`,
+ * above): carried items (the classic IF convention: `INVENTORY` and
+ * dropping/taking your own gear still work in the dark) plus whatever
+ * content has explicitly authored as findable by feel (§2.4/§8 gap 1).
  */
 export function scope(world: WorldDef, state: GameState): ObjectId[] {
   const ids = Object.keys(world.objects ?? {}) as ObjectId[];
   const dark = isDark(world, state, state.location);
   return ids.filter((id) => {
     if (objectState(world, state, id, 'hidden')) return false;
-    if (dark) {
-      const loc = objectLocation(world, state, id);
-      return loc === 'inventory' || loc === 'worn';
-    }
+    if (dark) return reachableByTouch(world, state, state.location, id);
     return inScopeAt(world, state, state.location, id);
   });
 }
