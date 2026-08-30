@@ -1,6 +1,6 @@
 # 08 - Development Handoff
 
-**Spec version:** `0.2.1`
+**Spec version:** `0.2.2`
 
 # 1. Purpose
 

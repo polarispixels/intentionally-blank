@@ -1,3 +1,4 @@
+import { GAME_VERSION } from '../src/version';
 import { describe, expect, it } from 'vitest';
 import { TRIGGER_TURN, initialState, parse, start, step } from '../src/engine';
 import type { GameEvent, GameState } from '../src/engine';
@@ -49,7 +50,7 @@ describe('playing phase', () => {
     expect(run(start().state, '').events).toEqual([]);
     const v = run(start().state, 'version');
     expect(v.state.turn).toBe(0);
-    expect(texts(v.events)[1]).toContain('0.2.0');
+    expect(texts(v.events)[1]).toContain(GAME_VERSION);
   });
   it('opens the prompt exactly on the trigger turn', () => {
     const before = run(start().state, ...Array(TRIGGER_TURN - 1).fill('look'));

@@ -1,6 +1,6 @@
 # 02 - Story and World Canon
 
-**Spec version:** `0.2.1`
+**Spec version:** `0.2.2`
 
 # Canon Status
 

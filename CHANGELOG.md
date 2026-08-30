@@ -12,6 +12,15 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.2.2] - 2026-08-29
+
+### Fixed
+
+- `tests/step.test.ts` asserted the literal `0.2.0` in the `VERSION`
+  response instead of `GAME_VERSION`, so the 0.2.1 bump failed CI and never
+  deployed. The test now reads the constant. v0.2.1's tag stands but was
+  never live; this release carries its content.
+
 ## [0.2.1] - 2026-08-29
 
 ### Changed
@@ -26,7 +35,7 @@ enforces that the version strings agree. (ADR 0005)
   gains §18 *Beat Notes*. Development handoff §3 requires each milestone
   spec to state its causal link. `narrative-writer` and `game-architect`
   agents carry the beat test. Spec docs 01, 02, 06, 08 and the spec README
-  now carry `Spec version: 0.2.1`.
+  now carry `Spec version: 0.2.2`.
 - Versioning rule tightened: every merge to `main` is a release and bumps
   the version (docs-only changes are PATCH). There is no accumulating
   `[Unreleased]` section. (CLAUDE.md rule 7, ADR 0005, DEVELOPMENT.md)
