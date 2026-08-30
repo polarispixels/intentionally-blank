@@ -18,8 +18,8 @@ Maintenance rules:
 | Stage | Scope | Deploy | Status |
 |---|---|---|---|
 | A | Story + engine architecture: five-act causal spine, puzzle network, room list, NPC agendas, memory system, save/undo design; canon decisions registered in `docs/spec/09` | docs site | ✅ **complete v0.2.9** — story architecture (41 rooms, 28 puzzles, 5 acts) + engine v2 architecture + ADRs 0008–0010; 15 canon decisions promoted (register entries 3–17) |
-| B | Engine v2 (world model, parser v2, save/undo/autosave, map + open-questions UI) + the opening room (M1) | 0.3.0 | 🎯 in progress — plan is architecture §8 tasks 3–22; tasks 1–2 shipped in v0.2.6/v0.2.7 |
-| C | Act I: town, client, missing sibling, notebook trail (M2–M4) | 0.4–0.6 | queued |
+| B | Engine v2 (world model, parser v2, save/undo/autosave, map + open-questions UI) + the opening room (M1) | 0.3.0 | ✅ **shipped v0.3.0** — 23 tasks, 729 tests; the live URL is now the real game |
+| C | Act I: town, client, missing sibling, notebook trail (M2–M4) | 0.4–0.6 | 🎯 next up |
 | D | Acts II–III: data center, underground, Dad on the USB, contradictions | 0.7–0.8 | queued |
 | E | Acts IV–V: reality travel, identity, the recursive ending | 0.9 | queued |
 | F | Hints, playtester sweeps, replay content, polish | 1.0.0 | queued |
@@ -33,7 +33,7 @@ discretion and may interrupt; a reset resumes from the last deployed stage.
 |---|---|---|---|---|
 | P | Process foundation: CLAUDE.md, agents, ADRs, repo, Pages target | Process | — | ✅ done (unreleased) |
 | M0 | MVP "the machine goes": Vite/TS/Vue/Vitest, CI → Pages, docs-site generator, pure reducer engine, parser, modal + credentials joke, GAME OVER/RESTART, headless CLI, version test | Engine + content | 0.2.0 | ✅ shipped v0.2.0 — spec `docs/superpowers/specs/2026-08-29-mvp-design.md` (see CHANGELOG 0.2.0) |
-| M1 | Opening Room vertical slice: wake on floor, darkness, headache, fedora, lamp, pull chain, desk, terminal, one locked/hidden object, first memory fragment, first reasonable-action jokes, exit to town | Content + engine | 0.3.0 | 🎯 next up — brainstorm + spec first |
+| M1 | ✅ **shipped 0.3.0** — Opening Room vertical slice: wake on floor, darkness, headache, fedora, lamp, pull chain, desk, terminal, one locked/hidden object, first memory fragment, first reasonable-action jokes, exit to town | Content + engine | 0.3.0 | 🎯 next up — brainstorm + spec first |
 | M2 | First exterior / town: empty street, brick buildings, horses, glow, Wall Drug billboard, uncertain era, one or two buildings, first client connection or memory path | Content | 0.4.0 | idea |
 | M3 | Client and missing sibling: remembered hiring, sibling claim, first memory discrepancy, first evidence the client may be right, notebook objective | Content | 0.5.0 | idea |
 | M4 | Notebook trail: loose page 7/8, THIS PAGE INTENTIONALLY LEFT BLANK, notebook dependency graph, first analog-vs-digital contradiction | Content | 0.6.0 | idea |

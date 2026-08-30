@@ -27,13 +27,12 @@ import type { DeterministicParser } from '../engine/interpreter';
 import type { CompiledVocabulary } from '../engine/parser';
 import type { GameEvent, WorldDef } from '../engine/world';
 import {
-  createSession,
   deathOptions,
   load,
   respondToPrompt,
-  restart,
   restartEncounter,
   save,
+  startSession,
   takeTurn,
   undo,
 } from '../session/session';
@@ -78,10 +77,32 @@ export interface ControllerOpts {
   promptScripts: Record<string, ScriptId>;
 }
 
-/** A fresh playthrough, or the autosave resumed if one exists (`store` slot `'auto'`) — reload continuity, browser-only (the CLI has no equivalent: a spawned process never persists across invocations by itself). */
-export function createUiState(world: WorldDef, store: SaveStore): UiState {
-  const loaded = load(store, 'auto');
-  return { session: loaded ?? createSession(world), lines: [], pending: [] };
+/**
+ * A fresh playthrough, or the autosave resumed if one exists (`store` slot
+ * `'auto'`) — reload continuity, browser-only (the CLI has no equivalent: a
+ * spawned process never persists across invocations by itself). A resumed
+ * autosave is a game already begun — its opening arrival rendered once,
+ * long ago, into a transcript this reload does not replay (this file's own
+ * header) — so only the fresh-playthrough branch calls `startSession` and
+ * renders its events; `load`'s branch renders nothing.
+ *
+ * Takes the full `ControllerOpts` (not bare `world`/`store`) because
+ * applying the opening's events needs the same `promptScripts` table
+ * `applyOneEvent`'s `prompt` case always needs — no world in this repo
+ * opens a prompt as part of room arrival today, but the type stays honest
+ * about what rendering an arbitrary event stream actually requires.
+ */
+export function createUiState(opts: ControllerOpts): UiState {
+  const loaded = load(opts.store, 'auto');
+  if (loaded !== undefined) return { session: loaded, lines: [], pending: [] };
+
+  const started = startSession(opts.world);
+  let ui: UiState = { session: started.session, lines: [], pending: [] };
+  for (const e of started.events) {
+    if (e.type === 'diag') continue;
+    ui = applyOneEvent(ui, e, opts);
+  }
+  return ui;
 }
 
 /** A `UiState` with an empty transcript and no open prompt — `restart`'s shape, whichever code path reaches it (a `restarted` event, or the death menu's own RESTART button). Built via a fresh object literal, never `{ ...ui, prompt: undefined }`, so the `prompt` key is omitted rather than present-with-`undefined` (`tsconfig`'s `exactOptionalPropertyTypes`). */
@@ -218,11 +239,26 @@ export function deathMenuOptions(ui: UiState, store: SaveStore): DeathOption[] {
   return deathOptions(ui.session, store);
 }
 
-/** One death-menu choice, clicked. RESTART clears the transcript (a fresh playthrough); UNDO/RESTART ENCOUNTER keep it — the player is looking at the same story, just rewound. */
-export function chooseDeathOption(ui: UiState, world: WorldDef, store: SaveStore, option: DeathOption): UiState {
-  if (option === 'restart') return freshUi(restart(world));
-  if (option === 'undo') return { ...ui, session: undo(ui.session, store) };
-  const restored = restartEncounter(store);
+/**
+ * One death-menu choice, clicked. RESTART clears the transcript for a
+ * fresh playthrough — and, like any other new game, renders its opening
+ * arrival (`startSession`, not `freshUi` over a bare `createSession`
+ * anymore — the bug this file's `createUiState` also fixes). UNDO/RESTART
+ * ENCOUNTER keep the transcript — the player is looking at the same
+ * story, just rewound, not a new one.
+ */
+export function chooseDeathOption(ui: UiState, opts: ControllerOpts, option: DeathOption): UiState {
+  if (option === 'restart') {
+    const started = startSession(opts.world);
+    let next: UiState = { session: started.session, lines: [], pending: [] };
+    for (const e of started.events) {
+      if (e.type === 'diag') continue;
+      next = applyOneEvent(next, e, opts);
+    }
+    return next;
+  }
+  if (option === 'undo') return { ...ui, session: undo(ui.session, opts.store) };
+  const restored = restartEncounter(opts.store);
   return restored === undefined ? ui : { ...ui, session: restored };
 }
 

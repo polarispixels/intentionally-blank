@@ -26,8 +26,8 @@ import { compileVocabulary } from '../src/engine/parser/vocabulary';
 import { objectLocation } from '../src/engine/resolve';
 import { DEAD_REFUSED_FAMILY, ENDED_REFUSED_FAMILY } from '../src/engine/turn';
 import { validate } from '../src/engine/validate';
-import { scope } from '../src/engine/world';
-import type { WorldDef } from '../src/engine/world';
+import { initialState, scope } from '../src/engine/world';
+import type { GameEvent, GameState, WorldDef } from '../src/engine/world';
 import { RESPONSES } from '../src/content/responses';
 import { MemoryStore } from '../src/session/store';
 import { HISTORY_CEILING, appendHistory } from '../src/session/savefile';
@@ -43,6 +43,7 @@ import {
   restart,
   restartEncounter,
   save,
+  startSession,
   takeTurn,
   undo,
 } from '../src/session/session';
@@ -53,6 +54,7 @@ import {
   FIXTURE_PROMPT_PASSWORD,
   FIXTURE_PROMPT_USERNAME,
   FIXTURE_WORLD,
+  FLAG_ONENTER_REPEAT_COUNT,
   FLAG_PROMPT_ATTEMPTS,
   FLAG_PROMPT_SOLVED,
   HAT,
@@ -61,6 +63,7 @@ import {
   LETTER,
   PROMPT_RESPOND_SCRIPT,
   ROOM_A,
+  ROOM_C,
   SIGIL,
   TERMINAL,
   WAVE,
@@ -247,6 +250,66 @@ describe('RESTART', () => {
     expect(fresh.state.turn).toBe(0);
     expect(fresh.history).toEqual([]);
     expect(fresh.undoRing).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// startSession — the opening arrival (bug fix: neither shell ever rendered
+// it; `createSession` alone deliberately doesn't, per `gamestate.ts`'s own
+// doc comment on `initialState`). `startSession` is a companion to
+// `createSession`, not a change to its return shape — see this file's own
+// `createSession` call sites above, none of which want an opening render.
+// ---------------------------------------------------------------------------
+
+describe('startSession', () => {
+  it("renders the start room's genuine first-visit arrival — firstVisit, then description — leaving turn/clock/profile untouched", () => {
+    const { session, events } = startSession(WORLD);
+    const roomA = WORLD.rooms![ROOM_A]!;
+    const lineTexts = events.filter((e): e is Extract<GameEvent, { type: 'line' }> => e.type === 'line').map((e) => e.text);
+    expect(lineTexts).toEqual([roomA.firstVisit, roomA.description]);
+
+    expect(session.state.visited[ROOM_A]).toBe(0); // marked, same as createSession's own seeding
+    expect(session.state.turn).toBe(0);
+    expect(session.state.clock).toEqual(initialState(WORLD).clock);
+    expect(session.state.profile).toEqual(initialState(WORLD).profile);
+    expect(session.undoRing).toEqual([]);
+    expect(session.history).toEqual([]);
+  });
+
+  it("createSession alone still renders nothing — the pre-existing contract every other caller here relies on", () => {
+    const session = createSession(WORLD);
+    expect(session.state.visited[ROOM_A]).toBe(0); // seeded directly, never via renderArrival
+  });
+});
+
+// ---------------------------------------------------------------------------
+// LOAD must never re-render an arrival (§5.5's own "LOAD/IMPORT reseeds the
+// ring" — a restored save resumes a game already begun). ROOM_C's onEnter
+// is `once: false` (increments `FLAG_ONENTER_REPEAT_COUNT` on every genuine
+// entry) specifically so a `load` that wrongly ran `renderArrival` on the
+// loaded state would be caught here even though `visited[ROOM_C]` is
+// already set (which alone would silently suppress a re-fired `firstVisit`
+// but not a re-fired `onEnter`).
+// ---------------------------------------------------------------------------
+
+describe('LOAD does not re-render', () => {
+  it('a loaded session carries the exact saved state — no arrival, no re-run onEnter', () => {
+    const store = new MemoryStore();
+    const o = opts(store);
+    const state: GameState = {
+      ...initialState(WORLD),
+      location: ROOM_C,
+      turn: 5,
+      visited: { [ROOM_A]: 0, [ROOM_C]: 1 },
+      flags: { [FLAG_ONENTER_REPEAT_COUNT]: 3 },
+    };
+    const session: SessionState = { state, undoRing: [], history: [{ turn: 5, input: 'up' }], historyTruncated: false };
+    save(session, { ...o, slot: 'mysave' });
+
+    const loaded = load(store, 'mysave');
+    expect(loaded).toBeDefined();
+    expect(loaded!.state).toEqual(state);
+    expect(loaded!.state.flags[FLAG_ONENTER_REPEAT_COUNT]).toBe(3); // not incremented by a phantom re-arrival
   });
 });
 

@@ -39,9 +39,7 @@ import { ROOM_DARK } from './objects/common';
 import { SMELL, LISTEN, STAND, standDefault, terminalTypeDefault } from './verbs';
 import {
   DOOR,
-  EVT_OPENING_SEEN,
   FLAG_LAMP_RIGHTED,
-  FLAG_OPENING_SEEN,
   FLAG_ROOM_SEARCHED,
   FLAG_STOOD_UP,
   FLAG_TERMINAL_TRIED,
@@ -130,8 +128,6 @@ const LIT_SEARCHED_DOOR_OPEN = [
 ].join('\n\n');
 
 const description: ProseRule[] = [
-  // Rule 1a — first-ever render, still dark: the opening beats (once).
-  { when: { all: [ROOM_DARK, { not: { flag: FLAG_OPENING_SEEN } }] }, text: OPENING_TEXT },
   // Rule 1 — dark, ordinary rotation. §15.3.1's optional dark/door-open
   // rule is NOT added here — the doc marks it optional ("not asked for"),
   // and this task's brief doesn't ask for it either; see this task's report.
@@ -224,13 +220,6 @@ const roomHandlers: HandlerDef[] = [
   { verbs: [INVENTORY_VERB_ID], effects: [{ say: 'Nothing. Not a wallet, not a key, not a scrap of paper. Whoever went through your coat did the job properly, and appears to have had time to be neat about it.' }] },
 ];
 
-export const openingSeenEvent: EventDef = {
-  id: EVT_OPENING_SEEN,
-  when: { not: { flag: FLAG_OPENING_SEEN } },
-  once: true,
-  effects: [{ set: [FLAG_OPENING_SEEN, true] }],
-};
-
 export const yourRoom: RoomDefSlice = {
   // No `name` — see this file's header. `RoomDefSlice.name` can't vary by
   // state, and "A Rented Room" itself starts with a noise word ("a"),
@@ -252,7 +241,6 @@ export const yourRoom: RoomDefSlice = {
   // currently unreachable in ordinary play: `initialState()` seeds
   // `visited[startRoom]` directly and never calls `renderArrival` for the
   // start room (`gamestate.ts`'s own doc comment) — the opening beats above
-  // are what actually renders instead, via `description`'s Rule 1a. See
   // this file's header.
   firstVisit: OPENING_TEXT,
   exits: [{ dir: 'out', to: LANDING, door: DOOR, travelText: EXIT_TRAVEL_TEXT }],

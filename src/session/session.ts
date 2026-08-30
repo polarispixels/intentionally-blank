@@ -10,6 +10,7 @@
 import { apply } from '../engine/effects';
 import type { ActionClass, ScriptId } from '../engine/ids';
 import type { InterpretOutcome } from '../engine/interpreter';
+import { renderArrival } from '../engine/move';
 import type { CompiledVocabulary } from '../engine/parser';
 import { step } from '../engine/turn';
 import { initialState } from '../engine/world';
@@ -43,6 +44,46 @@ export interface SessionState {
 /** A fresh playthrough (§1.3's `initialState`, with an empty session on top). */
 export function createSession(world: WorldDef): SessionState {
   return { state: initialState(world), undoRing: [], history: [], historyTruncated: false };
+}
+
+/** A fresh playthrough's `createSession`, plus its opening arrival's events. */
+export interface NewSessionResult {
+  session: SessionState;
+  events: GameEvent[];
+}
+
+/**
+ * A fresh playthrough whose opening arrival has already been rendered —
+ * the bug this function exists to fix (see its own commit/PR for the full
+ * account): `createSession` alone hands back `initialState`'s state with
+ * nothing ever narrated (`gamestate.ts`'s own doc comment explains why —
+ * `visited[startRoom]` is seeded directly so `GO TO`/the map view work
+ * from turn zero — but that seeding is also exactly what makes
+ * `move.ts`'s `renderArrival` treat the start room as already visited and
+ * skip it). `startSession` reruns `initialState`'s state through
+ * `renderArrival` — a genuine arrival, `firstVisit` included, `visited`
+ * marked, `onEnter` run, all of it — by momentarily un-seeding
+ * `visited[startRoom]` first; `renderArrival` reseeds it to the exact same
+ * value (`state.turn`, still `0`) itself, so the returned session's state
+ * matches `createSession`'s except for whatever `firstVisit`/`onEnter`
+ * actually changed. `state.turn`/`clock`/`profile` are untouched —
+ * `renderArrival` never touches them; arriving where the game already
+ * begins is not a turn.
+ *
+ * A companion to `createSession`, not a change to its return shape: this
+ * file's own tests, `migrate.ts`'s `replay()`, and every other existing
+ * caller want the bare `SessionState` `createSession` already returns and
+ * have no interest in an opening render (`replay` in particular must not
+ * observe events invisible to `history`). Shells call `startSession`
+ * instead, exactly once per new game — on mount / process start, and again
+ * on `RESTART` (a new game, unlike `LOAD`/`UNDO`/`RESTART ENCOUNTER`,
+ * which resume one already begun and must not re-render the opening).
+ */
+export function startSession(world: WorldDef): NewSessionResult {
+  const seeded = initialState(world);
+  const unarrived: GameState = { ...seeded, visited: {} };
+  const { state, events } = renderArrival(world, unarrived);
+  return { session: { state, undoRing: [], history: [], historyTruncated: false }, events };
 }
 
 /** What every persisting call needs and nothing it doesn't (ADR 0010's `now()`/`SaveStore` seams). */

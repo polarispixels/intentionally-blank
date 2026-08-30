@@ -53,7 +53,7 @@ const deathLabels: Record<DeathOption, string> = {
 // Resumes the autosave if one exists (browser reloads are common; a
 // spawned CLI process has no equivalent) — game state resumes exactly;
 // the visible transcript does not replay history, only the session does.
-const ui = ref<UiState>(createUiState(WORLD, store));
+const ui = ref<UiState>(createUiState(opts));
 const input = ref<InstanceType<typeof CommandInput> | null>(null);
 let timer: ReturnType<typeof setTimeout> | null = null;
 
@@ -91,7 +91,7 @@ function submitPromptForm(values: Record<string, string>): void {
 }
 
 function chooseDeath(option: DeathOption): void {
-  ui.value = chooseDeathOption(ui.value, WORLD, store, option);
+  ui.value = chooseDeathOption(ui.value, opts, option);
   input.value?.focus();
 }
 

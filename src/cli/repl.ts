@@ -57,16 +57,15 @@ import { availableHints, mapView, memoriesView, notebookView, questionsView, rev
 import type { GameEvent, WorldDef } from '../engine/world';
 import { WORLD as ACT1_WORLD } from '../content/world/act1';
 import {
-  createSession,
   deathOptions,
   exportSave,
   importSave,
   listSaves,
   load,
   respondToPrompt,
-  restart,
   restartEncounter,
   save,
+  startSession,
   takeTurn,
   undo,
 } from '../session/session';
@@ -250,10 +249,13 @@ async function handleMeta(cmd: MetaCommand): Promise<void> {
       out(session === before ? '(nothing to undo)' : '(undone)');
       return;
     }
-    case 'restart':
-      session = restart(WORLD);
+    case 'restart': {
+      const started = startSession(WORLD);
+      session = started.session;
       for (const line of renderEvent({ type: 'restarted' }).lines) out(line);
+      await renderEvents(started.events, '[restart]');
       return;
+    }
     case 'restartEncounter': {
       const restored = restartEncounter(store);
       if (restored === undefined) {
@@ -386,8 +388,10 @@ async function main(): Promise<void> {
     PROMPT_SCRIPTS = mod.PROMPT_SCRIPTS ?? {};
   }
   vocab = compileVocabulary(WORLD);
-  session = createSession(WORLD);
+  const started = startSession(WORLD);
+  session = started.session;
   store = new FileStore(saveDir ?? resolve('.ib-saves'));
+  await renderEvents(started.events, '[start]');
 
   if (scriptFile !== undefined) {
     for (const line of readFileSync(scriptFile, 'utf8').split('\n')) {

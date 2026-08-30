@@ -132,9 +132,7 @@ export const FLAG_WINDOW_OPEN = F('act1_window_open');
  * inside `room.your_room.description`'s first (dark) rule; flips via the
  * matching ambient event the following tick, same as the MVP prologue.
  */
-export const FLAG_OPENING_SEEN = F('act1_opening_seen');
 
-export const EVT_OPENING_SEEN = 'act1_opening_seen_event';
 
 /**
  * Not in the prose doc's own §1 table either — track the pull chain's

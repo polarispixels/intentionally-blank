@@ -53,7 +53,7 @@ describe('browser-facing path: a real act1 playthrough slice', () => {
   it('plays through movement, examine/take/wear/search/read, a memory, a clue, and persists to the store', () => {
     const store = new MemoryStore();
     const o = opts(ACT1_WORLD, store);
-    let ui: UiState = createUiState(ACT1_WORLD, store);
+    let ui: UiState = createUiState(o);
 
     // Dark room: X ME still works (Part 1's own 'self' PlaceId fix).
     ui = submitCommand(ui, 'look', o);
@@ -112,17 +112,18 @@ describe('browser-facing path: a real act1 playthrough slice', () => {
   it('a bare Enter (empty submit) does not push a player line or advance the turn', () => {
     const store = new MemoryStore();
     const o = opts(ACT1_WORLD, store);
-    let ui: UiState = createUiState(ACT1_WORLD, store);
+    let ui: UiState = createUiState(o); // already carries the rendered opening arrival
     const before = ui.session.state.turn;
+    const linesBefore = ui.lines;
     ui = submitCommand(ui, '   ', o);
-    expect(ui.lines).toEqual([]);
+    expect(ui.lines).toBe(linesBefore); // nothing pushed
     expect(ui.session.state.turn).toBe(before);
   });
 
   it('flushOneBeat reveals exactly one queued line at a time; flushAllBeats reveals the rest', () => {
     const store = new MemoryStore();
     const o = opts(ACT1_WORLD, store);
-    let ui: UiState = createUiState(ACT1_WORLD, store);
+    let ui: UiState = createUiState(o);
     ui = submitCommand(ui, 'pull chain', o);
     const queued = ui.pending.length;
     if (queued > 0) {
@@ -136,12 +137,12 @@ describe('browser-facing path: a real act1 playthrough slice', () => {
   it('resuming from an existing "auto" save continues the same session (browser-reload continuity)', () => {
     const store = new MemoryStore();
     const o = opts(ACT1_WORLD, store);
-    let ui: UiState = createUiState(ACT1_WORLD, store);
+    let ui: UiState = createUiState(o);
     ui = submitCommand(ui, 'pull chain', o);
     const turnAfterFirstCommand = ui.session.state.turn;
 
     // A fresh UiState, as if the page reloaded — same store, same world.
-    const resumed = createUiState(ACT1_WORLD, store);
+    const resumed = createUiState(o);
     expect(resumed.session.state.turn).toBe(turnAfterFirstCommand);
     expect(resumed.session.state.location).toBe(ui.session.state.location);
     // The visible transcript does not replay — only the session resumes
@@ -154,7 +155,7 @@ describe('browser-facing path: the prompt round-trip and the death menu', () => 
   function freshPrologue(): { ui: UiState; o: ControllerOpts; store: MemoryStore } {
     const store = new MemoryStore();
     const o = opts(PROLOGUE_WORLD, store, PROMPT_SCRIPTS);
-    return { ui: createUiState(PROLOGUE_WORLD, store), o, store };
+    return { ui: createUiState(o), o, store };
   }
 
   it('a wrong login attempt buffers its failure text onto the reopened prompt, rather than losing it behind a modal that just stays open', () => {
@@ -195,10 +196,13 @@ describe('browser-facing path: the prompt round-trip and the death menu', () => 
     const options = deathMenuOptions(ui, store);
     expect(options).toContain('restart');
 
-    // RESTART clears the transcript and returns to a fresh, playing session.
-    const restarted = chooseDeathOption(ui, PROLOGUE_WORLD, store, 'restart');
+    // RESTART clears the transcript and returns to a fresh, playing session
+    // — and, like any other new game (bug fix: neither shell used to render
+    // this at all), its opening arrival is rendered right into it rather
+    // than leaving a blank transcript behind an empty prompt.
+    const restarted = chooseDeathOption(ui, o, 'restart');
     expect(restarted.session.state.phase).toBe('playing');
-    expect(restarted.lines).toEqual([]);
+    expect(restarted.lines.some((l) => l.kind === 'prose' && l.text.includes('You are sitting in front of a computer.'))).toBe(true);
     expect(restarted.pending).toEqual([]);
   });
 });

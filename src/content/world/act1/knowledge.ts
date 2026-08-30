@@ -20,7 +20,6 @@ import {
   FLAG_LAMP_FIRST_OFF_DONE,
   FLAG_LAMP_FIRST_ON_DONE,
   FLAG_LAMP_RIGHTED,
-  FLAG_OPENING_SEEN,
   FLAG_POCKETS_CHECKED,
   FLAG_ROOM_SEARCHED,
   FLAG_STOOD_UP,
@@ -39,7 +38,6 @@ export const ACT1_FLAGS: WorldDef['flags'] = {
   [FLAG_WOUND_EXAMINED]: { default: false, doc: 'set by X WOUND / TOUCH HEAD' },
   [FLAG_DOOR_BOLT_DRAWN]: { default: false, doc: 'set by the first OPEN DOOR — gates the door description' },
   [FLAG_WINDOW_OPEN]: { default: false, doc: 'set by OPEN WINDOW — gates the room smell' },
-  [FLAG_OPENING_SEEN]: { default: false, doc: 'builder addition — gates §2\'s opening beats to a single render at game start; see ids.ts' },
   [FLAG_LAMP_FIRST_ON_DONE]: { default: false, doc: 'builder addition — §4.3\'s pull-chain first-light line, see ids.ts' },
   [FLAG_LAMP_FIRST_OFF_DONE]: { default: false, doc: 'builder addition — §4.3\'s pull-chain first-dark-again line, see ids.ts' },
 };

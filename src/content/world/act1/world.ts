@@ -8,9 +8,9 @@ import { ACT1_CLUES, ACT1_FLAGS, ACT1_MEMORIES } from './knowledge';
 import { landingRoom } from './landing';
 import { ACT1_OBJECTS } from './objects/index';
 import { ACT1_RESPONSES } from './responses';
-import { openingSeenEvent, yourRoom } from './room';
+import { yourRoom } from './room';
 import { ACT1_VERBS } from './verbs';
-import { EVT_OPENING_SEEN, LANDING, YOUR_ROOM } from './ids';
+import { LANDING, YOUR_ROOM } from './ids';
 
 export const WORLD: WorldDef = {
   meta: {
@@ -25,7 +25,6 @@ export const WORLD: WorldDef = {
   rooms: { [YOUR_ROOM]: yourRoom, [LANDING]: landingRoom },
   objects: ACT1_OBJECTS,
   verbs: ACT1_VERBS,
-  events: { [EVT_OPENING_SEEN]: openingSeenEvent },
   clues: ACT1_CLUES,
   memories: ACT1_MEMORIES,
   responses: { ...RESPONSES, ...ACT1_RESPONSES },

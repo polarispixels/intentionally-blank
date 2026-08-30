@@ -12,6 +12,65 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.3.0] - 2026-08-30
+
+**The live URL is the real game.** Engine v2 replaces the MVP prototype,
+and the opening room is playable.
+
+### Added
+
+- **The opening room and the landing.** Wake in the dark with a headache
+  that has geography, find the lamp's pull chain by touch, and search a
+  room somebody else already searched. Thirteen objects, four room states,
+  the first memory fragment, sixteen room-specific responses to things a
+  curious player will actually try, and a two-step secret. The build stops
+  at the top of the stairs; town is next.
+- **Engine v2**, 23 tasks: a forgiving parser (synonyms, adjectives,
+  disambiguation, pronouns that survive a save, `TAKE ALL`, `GO TO`,
+  implicit take), built-in physics for thirteen verbs, world events and
+  four-phase NPC schedules, memories, clues and questions, puzzles with a
+  behavioral profile, map/notebook/hint views, and a session layer with
+  autosave, undo, checkpoints, and migrations.
+- **A `'self'` place**, so the player's body follows the player. It had
+  previously been in the player's inventory (which listed "yourself" as a
+  carried item) and then pinned to one room (which broke the moment a
+  second room existed) — two wrong answers because the model had no way to
+  say *this is part of you*.
+- **The engine's layering rule is finally a test.** `src/content/` is
+  forbidden to `src/engine/` and `src/session/`, mutation-verified. Four
+  MVP engine files violated it for the entire build and nothing caught it;
+  a rule is not real until a test fails on it.
+
+### Removed
+
+- The MVP engine, CLI, and content. The prologue survives as ported v2
+  content — a preserved secret with no canon weight.
+
+### Fixed
+
+- **The game opened on a blank screen.** Neither shell rendered the
+  opening: `initialState` deliberately doesn't, and every test and manual
+  script happened to begin with `LOOK`, which renders the room. So 726
+  passing tests, a clean validator and a clean build all coexisted with a
+  game that showed a player nothing until they guessed to type something.
+  Fixed once in the session layer rather than twice in two shells — a rule
+  living in shell code is one each new shell gets to forget, and a third
+  shell (the playtester) is coming. It fires on a new game and on
+  `RESTART`, never on `LOAD` or `UNDO`.
+- Removed the content workaround that had been compensating for the above,
+  which otherwise printed the opening three times.
+- Movement existed nowhere in the engine and the plan had lost it: exits
+  were defined, validated, mapped and routed over, but nothing traversed
+  one, and there was no `LOOK`. Recorded as its own task rather than
+  quietly patched.
+
+### Notes
+
+Three bugs in this release were found by **playing the game**, not by the
+729 tests: you couldn't leave the first room, the room claimed the door was
+shut after you opened it, and `I` didn't work. Tests construct the state
+they check; only playing finds what a player finds.
+
 ## [0.2.32] - 2026-08-30
 
 ### Added
