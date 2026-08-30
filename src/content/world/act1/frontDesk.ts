@@ -8,7 +8,7 @@ import type { Cond } from '../../../engine/cond';
 import type { HandlerDef, OnEnterRule, RoomDefSlice } from '../../../engine/world';
 import type { ProseRule } from '../../../engine/prose';
 import { LISTEN, WAIT, checkDateText, findNameText } from './verbs';
-import { CLUE_REGISTER_GAP, FLAG_MET_MARLOW, FLAG_REGISTER_GAP_SEEN, FRONT_DESK, LANDING, STREET_DOOR, V_CHECK_DATE, V_FIND_MY_NAME, V_LOOK_OUTSIDE, V_WHOAMI } from './ids';
+import { CLUE_REGISTER_GAP, FLAG_MET_MARLOW, FLAG_REGISTER_GAP_SEEN, LANDING, MAIN_STREET, STREET_DOOR, V_CHECK_DATE, V_FIND_MY_NAME, V_LOOK_OUTSIDE, V_WHOAMI } from './ids';
 
 const FIRST_SIGHT = [
   'The stairs come down into a lobby built for more people than are using it. Ten or eleven chairs stand around a low table with the magazines squared to the corner, and none of them are lit; all the light in this room comes off one green-shaded lamp at the front desk and gives out about four feet from where it starts.',
@@ -44,18 +44,16 @@ const waitText = 'The radio plays. Marlow does not fill the silence, and it turn
 const lookOutsideText =
   'Brick across the road, unlit. Further along, something tied to a rail shifts its weight from one foot to the other and settles.\n\nNo lights in any window you can see, which at this hour is either ordinary or the town telling you something.';
 
-// §9's build boundary, moved down from the Landing (same voice, same
-// system-chrome ruling as the Landing's own §15.2 — see `objects/landing.ts`
-// for the one open engine gap this leaves, `kind: 'system'` rendering,
-// reported there rather than reworked here).
-export const FRONT_DESK_BUILD_BOUNDARY_TEXT: ProseRule[] = [
-  {
-    text: [
-      'END OF BUILD\n\nThis version ends at the street door. The town on the other side of it is not in this build.',
-      'END OF BUILD\n\nThe door opens. The town does not. Everything past this lobby belongs to a later version.',
-    ],
-  },
-];
+// §9's own build boundary is REMOVED here (main-street-prose §8: "the
+// street is a real room now, and that door leads somewhere" — deleted
+// rather than kept-but-unreferenced like `LANDING_BOUNDARY_GATE`, since
+// `system.buildBoundary` must have exactly one copy in the game and its
+// copy now lives on `main_street`'s own `north`/`south`/`west` exits,
+// `mainStreet.ts`). `STREET_DOOR`'s outward `travelText` — front-desk-
+// prose §7's own already-authored line, "for whenever Main Street lands" —
+// is wired below instead.
+const streetDoorTravelText =
+  'The spring bell over the frame goes off, the loudest thing that has happened in this building tonight, and the cold arrives around you all at once.';
 
 /**
  * §4.2's "find my name" — bare, multi-word verb words (`V_FIND_MY_NAME`,
@@ -91,11 +89,11 @@ export const frontDeskRoom: RoomDefSlice = {
       travelText:
         "You take the stairs back up. The lamp's light gets six treads with you and then gives up, and the rest you do from memory of a house you have lived in for three weeks.",
     },
-    { dir: 'out', to: FRONT_DESK, door: STREET_DOOR, blockedText: FRONT_DESK_BUILD_BOUNDARY_TEXT },
+    { dir: 'out', to: MAIN_STREET, door: STREET_DOOR, travelText: streetDoorTravelText },
     // §9's fire list explicitly names NORTH alongside OUT/LEAVE/EXIT — a
-    // second exit sharing the same (never-open) door and text, since NORTH
-    // is `DIRECTION_VERB_IDS.n`, a separate verb id from OUT.
-    { dir: 'n', to: FRONT_DESK, door: STREET_DOOR, blockedText: FRONT_DESK_BUILD_BOUNDARY_TEXT },
+    // second exit sharing the same door and text, since NORTH is
+    // `DIRECTION_VERB_IDS.n`, a separate verb id from OUT.
+    { dir: 'n', to: MAIN_STREET, door: STREET_DOOR, travelText: streetDoorTravelText },
   ],
   handlers: roomHandlers,
 };

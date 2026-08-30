@@ -321,3 +321,69 @@ export const V_SIGN = V('act1_sign');
 export const V_FIND_MY_NAME = V('act1_find_my_name');
 /** §4.5/§6 "check date"/"look for date" (bare) and "turn over magazine" (dobj, via the existing room-1 V_TURN_OVER on `lobby_chairs`) share one line of text. */
 export const V_CHECK_DATE = V('act1_check_date');
+
+// ---------------------------------------------------------------------------
+// Main Street (`docs/superpowers/specs/2026-09-02-main-street-prose.md`) —
+// the fourth room, and the first exterior. Zone 1 room 3.
+// ---------------------------------------------------------------------------
+
+export const MAIN_STREET = R('act1_main_street');
+
+// Objects — §4's seven, plus one sub-part (`MAIN_STREET_PAVING`, the same
+// "which noun word resolved" gap `ids.ts`'s own header explains for
+// `FEDORA_BAND`/`DOOR_BOLT`/etc.: `main_street_road`'s own noun list mixes
+// "street"/"road" — EXAMINE gives the wide/empty description — with
+// "ground"/"floor"/"surface"/"pavement"/"paving"/"asphalt"/"tarmac"/"kerb"/
+// "curb"/"gutter" — EXAMINE gives the crouch-and-read-the-brick text — and
+// one handler can't tell which noun word resolved. `MAIN_STREET_ROAD`'s own
+// nouns keep "street"/"road"/"main street" plus "alley"/"alleyway" (the
+// alley refusal is a different *verb*, not a different noun on the same
+// EXAMINE, so no sub-part is needed for it); the ground/paving words move to
+// `MAIN_STREET_PAVING`) plus one always-closed gate object for the boundary
+// exits (mirrors `LANDING_BOUNDARY_GATE` — see that id's own comment).
+export const HORSES = O('act1_horses');
+export const BILLBOARD = O('act1_billboard');
+export const HORIZON_GLOW = O('act1_horizon_glow');
+export const BRICK_ROW = O('act1_brick_row');
+/** Sub-part — same "which noun word resolved" gap: `read wall sign`/`examine painted sign`/`examine advertisement` need text distinct from plain `examine buildings`, same verb (EXAMINE/READ) as the parent. */
+export const BRICK_ROW_SIGN = O('act1_brick_row_sign');
+/** Sub-part — same gap: `look in window`/`examine display`/`read price list`/`examine prices` need text distinct from the parent's own EXAMINE; folds "window"/"windows"/"glass" off the parent's noun list along with the new "display"/"price list"/"prices" words the doc's own handler section names but its noun-list header doesn't (see this task's report). */
+export const BRICK_ROW_WINDOW = O('act1_brick_row_window');
+export const MAIN_STREET_ROAD = O('act1_main_street_road');
+/** Sub-part — see this block's own header comment. */
+export const MAIN_STREET_PAVING = O('act1_main_street_paving');
+/** The gray-coveralled man — an object with handlers (§4.6's own wiring note), not an NPC: no `NpcDefSlice`, no topics, no schedule. */
+export const MAINTENANCE_MAN = O('act1_maintenance_man');
+export const BOARDING_HOUSE = O('act1_boarding_house');
+/** §8's build boundary — always-closed door target for `north`/`south`/`west`, mirroring `LANDING_BOUNDARY_GATE` (no `nouns`: never resolvable, never described). */
+export const MAIN_STREET_BOUNDARY_GATE = O('act1_main_street_boundary_gate');
+
+// Flags — §1's table.
+export const FLAG_VISITED_MAIN_STREET = F('act1_visited_main_street');
+export const FLAG_SEEN_MAINTENANCE_MAN = F('act1_seen_maintenance_man');
+export const FLAG_HORSE_TOUCHED = F('act1_horse_touched');
+export const FLAG_CROSSED_STREET = F('act1_crossed_street');
+
+// Clues — §1's table.
+export const CLUE_HORIZON_GLOW = C('act1_clue_horizon_glow');
+export const CLUE_SAME_DISTANCE = C('act1_clue_same_distance');
+
+// New verbs the doc needs beyond the existing global/room-1/front-desk set.
+// Words chosen by this builder where the doc doesn't specify them (matching
+// `verbs.ts`'s own established convention) — see this task's report.
+/** §4.2/§6 "go to billboard"/"approach billboard"/"walk to sign", and (§8) "any attempt to walk toward the glow" — also this task's own choice for a room-generic "go to <scenery>" verb, whose `default` is §8's generic build-boundary variant. */
+export const V_APPROACH = V('act1_approach');
+/** §6 "CROSS STREET" (the "cross" word; "go to horses"/"approach horses"/"go to rail" reach the same text via `V_APPROACH` on `horses` instead — see `objects/mainStreet.ts`). */
+export const V_CROSS = V('act1_cross');
+/** §4.3's note: "WATCH GLOW has no response of its own and should resolve to the examine above" — needs its own verb id since "watch" is not yet declared anywhere. */
+export const V_WATCH = V('act1_watch');
+/** §4.1 "count horses". */
+export const V_COUNT = V('act1_count');
+/** §4.1 "feed horse" (the `GIVE <item> TO HORSE` forms are a genuine engine gap — see this task's report). */
+export const V_FEED = V('act1_feed');
+/** §4.5 "crouch" (bare, room-level — same idiom as room 1's STAND/`V_TYPE_TERMINAL`: `examine paving`/`touch road`/`look at ground closely` reach the same text via object handlers). */
+export const V_CROUCH = V('act1_crouch');
+/** §4.6 "question man". */
+export const V_QUESTION = V('act1_question');
+/** §6 "WHAT YEAR IS IT"/"WHAT YEAR"/"WHAT'S THE DATE" — bare, this room only; no room-level handler needed (unlike STAND/V_CROUCH) since it sets no flag. */
+export const V_WHAT_YEAR = V('act1_what_year');

@@ -448,6 +448,14 @@ describe('Front Desk & Lobby — CLI playthrough (meeting Marlow)', () => {
     'ask marlow about visitor',
     'ask marlow about register',
     'ask marlow about key',
+    // "open entrance", not "open street door": `street_door`'s own noun
+    // list (front-desk-prose §4.6, pre-existing, out of this task's own
+    // module) has no bare "door" — the grammar's noun-phrase head is always
+    // the LAST word of the phrase (`grammar.ts`'s `toPhrase`), so "street
+    // door"/"front door" typed literally never resolve. Flagged in this
+    // task's report; "entrance" is one of the object's own single-word
+    // nouns and sidesteps it.
+    'open entrance',
     'out',
   ]);
   const { stdout, stderr, status } = play(['--world', worldPath, '--save-dir', saveDir, '--script', script, '--fast', '--diag']);
@@ -512,10 +520,11 @@ describe('Front Desk & Lobby — CLI playthrough (meeting Marlow)', () => {
     expect(stdout).toContain("Spare's on the board.");
   });
 
-  it('OUT tries the street and reaches the build boundary, not a crash', () => {
+  it('OPEN STREET DOOR then OUT reaches the real Main Street, not the old build boundary', () => {
     const afterOut = stdout.slice(stdout.lastIndexOf('> out'));
-    expect(afterOut).toContain('END OF BUILD');
-    expect(afterOut).toMatch(/This version ends at the street door\.|The door opens\. The town does not\./);
+    expect(afterOut).toContain('The spring bell over the frame goes off');
+    expect(afterOut).toContain('Main Street runs north and south');
+    expect(afterOut).not.toContain('END OF BUILD');
   });
 
   it('produces no unexpected diagnostics — in particular, no topicMiss on anything asked above', () => {

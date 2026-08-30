@@ -33,22 +33,31 @@ describe('validate — Act I room 1', () => {
   // of words across a verb and a noun — "key" (V_TYPE_TERMINAL's "press
   // key" vs. the key rack/room key's "key"), "outside" (V_LOOK_OUTSIDE and
   // the OUT direction verb vs. the street door's "outside"), and "tear"
-  // (the global CUT verb's own word vs. the register's torn page). Every
-  // one is content ambiguity a sentence's position resolves in practice,
-  // which is exactly what this warning class exists to flag and let stand
-  // — asserted exactly, so a genuinely new, unreviewed warning still fails
-  // this test.
-  it('produces exactly the five expected warnings, no others', () => {
+  // (the global CUT verb's own word vs. the register's torn page).
+  //
+  // Main Street task adds two more, both genuine, both deliberate: "sign"
+  // (V_SIGN, front desk's own "sign register" verb, vs. `billboard`'s and
+  // `boarding_house`'s own noun "sign" — main-street-prose §4.2/§4.7's own
+  // noun lists) and "north" (the compass verb's own word vs.
+  // `horizon_glow`'s own noun "north"/"north sky" — §4.3's own noun list).
+  //
+  // Every one is content ambiguity a sentence's position resolves in
+  // practice, which is exactly what this warning class exists to flag and
+  // let stand — asserted exactly, so a genuinely new, unreviewed warning
+  // still fails this test.
+  it('produces exactly the seven expected warnings, no others', () => {
     const warnings = validate(WORLD).filter((f) => f.severity === 'warning');
     const collisions = warnings.filter((f) => f.code === 'verb-noun-collision');
-    expect(warnings.length).toBe(5);
-    expect(collisions.length).toBe(4);
+    expect(warnings.length).toBe(7);
+    expect(collisions.length).toBe(6);
     expect(collisions.map((f) => f.message).sort()).toEqual(
       [
         'verb "act1_type_terminal"\'s word "key" is also an object/NPC noun or adjective — usually fine (sentence position disambiguates), but worth a second look',
         'verb "act1_look_outside"\'s word "outside" is also an object/NPC noun or adjective — usually fine (sentence position disambiguates), but worth a second look',
         'verb "cut"\'s word "tear" is also an object/NPC noun or adjective — usually fine (sentence position disambiguates), but worth a second look',
         'verb "out"\'s word "outside" is also an object/NPC noun or adjective — usually fine (sentence position disambiguates), but worth a second look',
+        'verb "act1_sign"\'s word "sign" is also an object/NPC noun or adjective — usually fine (sentence position disambiguates), but worth a second look',
+        'verb "n"\'s word "north" is also an object/NPC noun or adjective — usually fine (sentence position disambiguates), but worth a second look',
       ].sort(),
     );
   });

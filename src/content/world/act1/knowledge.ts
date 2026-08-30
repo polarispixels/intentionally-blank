@@ -13,16 +13,20 @@ import {
   CLUE_BOLT_THROWN,
   CLUE_CALM_SEARCH,
   CLUE_DRAWER_HELD,
+  CLUE_HORIZON_GLOW,
   CLUE_HOUSE_EMPTY,
   CLUE_NO_NAME_RECALLED,
   CLUE_NOTHING_NAMED,
   CLUE_PAGE_INDENTATION,
   CLUE_REGISTER_GAP,
   CLUE_REGISTER_IMPRESSION,
+  CLUE_SAME_DISTANCE,
   CLUE_TERMINAL_BURN,
   CLUE_VISITOR_UNREMARKABLE,
   CLUE_WINDOW_EXIT,
+  FLAG_CROSSED_STREET,
   FLAG_DOOR_BOLT_DRAWN,
+  FLAG_HORSE_TOUCHED,
   FLAG_LAMP_FIRST_OFF_DONE,
   FLAG_LAMP_FIRST_ON_DONE,
   FLAG_LAMP_RIGHTED,
@@ -34,10 +38,12 @@ import {
   FLAG_REGISTER_GAP_SEEN,
   FLAG_REGISTER_IMPRESSION_FOUND,
   FLAG_ROOM_SEARCHED,
+  FLAG_SEEN_MAINTENANCE_MAN,
   FLAG_SPARE_KEY_GIVEN,
   FLAG_STOOD_UP,
   FLAG_TERMINAL_TRIED,
   FLAG_TOWEL_TAKEN,
+  FLAG_VISITED_MAIN_STREET,
   FLAG_WINDOW_OPEN,
   FLAG_WOUND_EXAMINED,
   LANDING,
@@ -81,6 +87,14 @@ export const ACT1_FLAGS: WorldDef['flags'] = {
   [FLAG_MARLOW_TOLD_ABOUT_ROOM]: { default: false, doc: 'set by TELL MARLOW ABOUT ROOM' },
   [FLAG_SPARE_KEY_GIVEN]: { default: false, doc: 'set by marlow\'s key topic' },
   [FLAG_TOWEL_TAKEN]: { default: false, doc: 'set by TAKE TOWEL / USE TOWEL' },
+
+  // -------------------------------------------------------------------
+  // Main Street (main-street-prose §1's table)
+  // -------------------------------------------------------------------
+  [FLAG_VISITED_MAIN_STREET]: { default: false, doc: 'set by main_street\'s own onEnter (first entry) — gates room description rule 2' },
+  [FLAG_SEEN_MAINTENANCE_MAN]: { default: false, doc: 'set by EXAMINE MAN — read by nothing yet; P4 will read it (main-street-prose §9.1)' },
+  [FLAG_HORSE_TOUCHED]: { default: false, doc: 'set by TOUCH/PET/STROKE/PAT HORSE' },
+  [FLAG_CROSSED_STREET]: { default: false, doc: 'set by CROSS STREET / GO TO HORSES / APPROACH HORSES / GO TO RAIL' },
 };
 
 export const ACT1_CLUES: NonNullable<WorldDef['clues']> = {
@@ -139,6 +153,20 @@ export const ACT1_CLUES: NonNullable<WorldDef['clues']> = {
     title: "He saw the man and can't describe him",
     detail:
       'Pressed, Marlow allows that somebody came in late for the top floor and said he was there to see to something. Asked what the man looked like, he starts three times and stops.',
+  },
+
+  // -------------------------------------------------------------------
+  // Main Street (main-street-prose §1's table)
+  // -------------------------------------------------------------------
+  [CLUE_HORIZON_GLOW]: {
+    title: 'Something is lit north of town',
+    detail:
+      'Low along the north horizon, wide, flat along the bottom, and steady. It does not flicker, it has not changed since you came outside, and the stars go all the way down to the top of it. It is the only light out there.',
+  },
+  [CLUE_SAME_DISTANCE]: {
+    title: 'Two signs, the same thirty-two miles',
+    detail:
+      'The billboard at the edge of town says Wall Drug is 32 miles. So does a sign painted on a brick wall in the middle of town, a quarter mile nearer, and old enough to have been painted over once.',
   },
 };
 

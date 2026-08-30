@@ -31,15 +31,20 @@ import type { ProseRule } from '../../../engine/prose';
 import type { VerbDef } from '../../../engine/world';
 import { INVENTORY_VERB_ID } from '../../../engine/respond';
 import { VERB_DEFAULTS } from '../../responses';
-import { ACT1_DARK_REFUSAL_FAMILY } from './responses';
+import { ACT1_DARK_REFUSAL_FAMILY, ACT1_MAIN_STREET_BOUNDARY_GENERIC } from './responses';
 import {
   FLOOR_LAMP,
   TERMINAL,
   V_ABOUT,
+  V_APPROACH,
   V_CALL,
   V_CHECK_DATE,
   V_CLEAN,
+  V_COUNT,
+  V_CROSS,
+  V_CROUCH,
   V_DRINK,
+  V_FEED,
   V_FIND_MY_NAME,
   V_HELP,
   V_HOLD_TO_LAMP,
@@ -49,6 +54,7 @@ import {
   V_LOOK_OUTSIDE,
   V_LOOK_UP,
   V_POUR,
+  V_QUESTION,
   V_RIGHT,
   V_RING,
   V_ROLL_UP,
@@ -61,6 +67,8 @@ import {
   V_TURN_OVER,
   V_TYPE_TERMINAL,
   V_UNPLUG,
+  V_WATCH,
+  V_WHAT_YEAR,
   V_WHOAMI,
   V_XYZZY,
 } from './ids';
@@ -248,6 +256,17 @@ export const findNameText =
 export const checkDateText =
   'You turn one over. The mailing label has been torn off the back, the way people do, and what is left is an address that is half a name and a stripe of glue.';
 
+/** Main Street §6 — "WHAT YEAR IS IT"/"WHAT YEAR"/"WHAT'S THE DATE" — bare, this room only. */
+const whatYearText =
+  'Brick. Three horses at a rail. Poles and wire. Paint on a wall. A street you would have to crouch on to date, and a shop window with lamp oil and batteries on the same price list.\n\nYou could make a case for a good many different years, and nothing on this street is going to settle it.';
+
+/** Main Street §6 — "CROSS STREET"/"GO TO HORSES"/"APPROACH HORSES"/"GO TO RAIL" — shared by `main_street_road`'s own `V_CROSS` handler and `horses`' own `V_APPROACH` handler (`objects/mainStreet.ts`), so both phrasings render one string rather than two copies drifting apart. */
+export const crossStreetText = 'You cross. Eleven paces and no looking either way, and you are at the rail with the horses\' breath going up in front of you.';
+
+/** Main Street §4.5 — "examine paving"/"touch road"/"crouch"/"look at ground closely" — shared by `main_street_road`'s own `TOUCH` handler, `main_street_paving`'s own `EXAMINE` handler, and the room's own bare `V_CROUCH` handler (`objects/mainStreet.ts`/`mainStreet.ts`). */
+export const crouchText =
+  'You crouch. Under the patching, which is dark and poured and cracked across, the street is brick: laid in a herringbone, worn round at the edges, level enough that somebody knew the job.\n\nThe patches have been patched.';
+
 // ---------------------------------------------------------------------------
 // The full table.
 // ---------------------------------------------------------------------------
@@ -259,12 +278,14 @@ export const ACT1_VERBS: Record<string, VerbDef> = {
   // this table only supplies vocabulary + the §5 bare-safe `default`.
   [LOOK_VERB_ID]: { id: LOOK_VERB_ID, words: ['look', 'l', 'look around'], patterns: ['V'], class: null, default: 'You look around.' },
   // "steal" added (front-desk-prose §4.2's "STEAL REGISTER") — a general TAKE synonym, not register-specific vocabulary.
-  [TAKE]: { id: TAKE, words: ['take', 'get', 'pick up', 'steal'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.take },
+  // "untie"/"mount" added (main-street-prose §4.1's "TAKE HORSE"/"UNTIE HORSE"/"MOUNT HORSE" — shares one failure text with "RIDE HORSE" there) — general TAKE synonyms, not horse-specific vocabulary. "ride" is NOT added here: it already belongs to `V_SLIDE_DOWN` (the landing banister's own word) and `validate.ts`'s verb-word-collision check is a hard error — "RIDE HORSE" reaches `horses`' own `V_SLIDE_DOWN` handler instead (`objects/mainStreet.ts`), sharing the same text.
+  [TAKE]: { id: TAKE, words: ['take', 'get', 'pick up', 'steal', 'untie', 'mount'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.take },
   [DROP]: { id: DROP, words: ['drop', 'put down'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.drop },
   // "try handle" added (§15.1.5's landing_doors block: "open / unlock /
   // try handle") — a general OPEN synonym, not landing-specific vocabulary,
   // since "try the handle" reads naturally on any door.
-  [OPEN]: { id: OPEN, words: ['open', 'try handle'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.open },
+  // "try" added (main-street-prose §4.4's "TRY DOOR") — a general OPEN synonym, not brick-row-specific vocabulary.
+  [OPEN]: { id: OPEN, words: ['open', 'try handle', 'try'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.open },
   [CLOSE]: { id: CLOSE, words: ['close', 'shut'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.close },
   [LOCK]: { id: LOCK, words: ['lock'], patterns: ['V dobj', 'V dobj prep iobj'], preps: ['with'], class: 'direct', default: VERB_DEFAULTS.lock },
   [UNLOCK]: { id: UNLOCK, words: ['unlock'], patterns: ['V dobj', 'V dobj prep iobj'], preps: ['with'], class: 'direct', default: VERB_DEFAULTS.unlock },
@@ -284,7 +305,8 @@ export const ACT1_VERBS: Record<string, VerbDef> = {
   [SEARCH]: { id: SEARCH, words: ['search', 'look in', 'look through', 'rummage'], patterns: ['V dobj'], class: 'analytical', default: VERB_DEFAULTS.search },
   [LOOK_UNDER]: { id: LOOK_UNDER, words: ['look under', 'check under'], patterns: ['V dobj'], class: 'analytical', default: VERB_DEFAULTS.look_under },
   [LOOK_BEHIND]: { id: LOOK_BEHIND, words: ['look behind', 'check behind'], patterns: ['V dobj'], class: 'analytical', default: VERB_DEFAULTS.look_behind },
-  [TOUCH]: { id: TOUCH, words: ['touch', 'feel', 'stroke'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.touch },
+  // "pet"/"pat" added (main-street-prose §4.1's "TOUCH HORSE"/"PET HORSE"/"STROKE HORSE"/"PAT HORSE") — general TOUCH synonyms, not horse-specific vocabulary.
+  [TOUCH]: { id: TOUCH, words: ['touch', 'feel', 'stroke', 'pet', 'pat'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.touch },
   // 'V' added (gap 3): bare SMELL/LISTEN now resolves grammatically and
   // reaches room.ts's own handlers before ever touching `default` below —
   // see room.ts's header. `default` stays `{name}`-templated for the
@@ -319,11 +341,13 @@ export const ACT1_VERBS: Record<string, VerbDef> = {
   [STAND]: { id: STAND, words: ['stand', 'stand up', 'get up', 'sit up'], patterns: ['V', 'V dobj'], class: null, default: standDefault },
   [WAIT]: { id: WAIT, words: ['wait', 'z'], patterns: ['V'], class: null, default: waitDefault },
   [SLEEP]: { id: SLEEP, words: ['sleep', 'nap', 'rest', 'lie down'], patterns: ['V'], class: null, default: sleepDefault },
-  [YELL]: { id: YELL, words: ['yell', 'shout', 'scream', 'holler'], patterns: ['V'], class: 'direct', default: yellDefault },
+  // "call out" added (main-street-prose §6's "CALL OUT") — a general YELL synonym, not Main-Street-specific vocabulary.
+  [YELL]: { id: YELL, words: ['yell', 'shout', 'scream', 'holler', 'call out'], patterns: ['V'], class: 'direct', default: yellDefault },
   [PRAY]: { id: PRAY, words: ['pray'], patterns: ['V'], class: null, default: prayDefault },
   [JUMP]: { id: JUMP, words: ['jump', 'hop', 'leap'], patterns: ['V'], class: null, default: jumpDefault },
   [SING]: { id: SING, words: ['sing', 'hum', 'whistle'], patterns: ['V'], class: null, default: singDefault },
-  [HELLO]: { id: HELLO, words: ['hello', 'hi', 'hey', 'talk to'], patterns: ['V', 'V dobj'], class: 'social', default: helloDefault },
+  // "greet" added (main-street-prose §4.1's "GREET HORSE") — a general HELLO synonym, not horse-specific vocabulary.
+  [HELLO]: { id: HELLO, words: ['hello', 'hi', 'hey', 'talk to', 'greet'], patterns: ['V', 'V dobj'], class: 'social', default: helloDefault },
 
   // Front Desk & Lobby's first NPC (front-desk-prose §5) — ASK/TELL/SHOW.
   // SHOW already exists below under this table's own `SHOW` id, which is
@@ -411,6 +435,32 @@ export const ACT1_VERBS: Record<string, VerbDef> = {
   // room-level handler (front_desk's own `handlers`) to also run its effects.
   [V_FIND_MY_NAME]: { id: V_FIND_MY_NAME, words: ['find my name', 'find name'], patterns: ['V'], class: 'analytical', default: findNameText },
   [V_CHECK_DATE]: { id: V_CHECK_DATE, words: ['check date', 'look for date'], patterns: ['V'], class: 'analytical', default: checkDateText },
+
+  // Main Street (main-street-prose §4, §6, §8) — new verbs. `default`s are
+  // this builder's word choices/family reuse where the doc doesn't specify
+  // one; see this task's report.
+  // §4.2/§6/§8's "go to"/"approach"/"walk to" — a room-generic verb (not
+  // billboard- or glow-specific vocabulary): billboard/horizon_glow author
+  // their own handler (routes to the north boundary text); anything else in
+  // scope with no handler falls to this verb's own `default`, the generic
+  // boundary variant (§8) — "any GO TO <named place> that is not the
+  // boarding house".
+  [V_APPROACH]: { id: V_APPROACH, words: ['go to', 'approach', 'walk to'], patterns: ['V dobj'], class: 'direct', default: { ref: ACT1_MAIN_STREET_BOUNDARY_GENERIC } },
+  // §6's "CROSS STREET" — bare object-word, dobj resolves to `main_street_road`'s own noun "street".
+  [V_CROSS]: { id: V_CROSS, words: ['cross'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.move },
+  // §4.3's "WATCH GLOW" — resolves to `horizon_glow`'s own EXAMINE text via a handler; no bare form (nothing else in this room is watched).
+  [V_WATCH]: { id: V_WATCH, words: ['watch'], patterns: ['V dobj'], class: 'analytical', default: VERB_DEFAULTS.examine },
+  // §4.1's "COUNT HORSES".
+  [V_COUNT]: { id: V_COUNT, words: ['count'], patterns: ['V dobj'], class: 'analytical', default: VERB_DEFAULTS.examine },
+  // §4.1's "FEED HORSE" (the `GIVE <item> TO HORSE` forms are a genuine engine gap — see this task's report).
+  [V_FEED]: { id: V_FEED, words: ['feed'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.give },
+  // §4.5's bare "CROUCH" — same text as `examine paving`/`touch road` (`crouchText`, above); no room-level handler needed (sets no flag, and no other room declares this verb).
+  [V_CROUCH]: { id: V_CROUCH, words: ['crouch', 'kneel'], patterns: ['V'], class: 'analytical', default: crouchText },
+  // §4.6's "ASK MAN ABOUT <anything>"/"ASK MAN FOR HELP" — NOT wired: the word "ask" is already exclusively `NPC_VERB_IDS.ask`'s (`'V npc about topic'`, resolving only against `world.npcs`), and `validate.ts`'s verb-word-collision check is a hard error against claiming it a second time — the man, deliberately not an NPC (§4.6's own wiring note), has no way to reach it. See this task's report.
+  // §4.6's "QUESTION MAN".
+  [V_QUESTION]: { id: V_QUESTION, words: ['question'], patterns: ['V dobj'], class: 'social', default: VERB_DEFAULTS.talk_to },
+  // §6's "WHAT YEAR IS IT"/"WHAT YEAR"/"WHAT'S THE DATE" — bare, no room-level handler needed (sets no flag).
+  [V_WHAT_YEAR]: { id: V_WHAT_YEAR, words: ['what year is it', 'what year', "what's the date", 'what is the date'], patterns: ['V'], class: 'analytical', default: whatYearText },
   // §8 gap 2: the real reserved `INVENTORY_VERB_ID`, not a room-local id.
   // `default` refs the global `inventory.empty` family — `room.ts`'s own
   // handler overrides it for the empty-hands case (§8.9/§14.4).
