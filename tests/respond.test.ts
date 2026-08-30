@@ -10,16 +10,17 @@
 // wiring, not placeholder text.
 
 import { describe, expect, it } from 'vitest';
-import { V } from '../src/engine/ids';
+import { N, V } from '../src/engine/ids';
 import type { GameState, WorldDef } from '../src/engine/world';
 import { scope } from '../src/engine/world';
 import { BUILTIN_VERB_IDS, performAction } from '../src/engine/actions';
-import { INVENTORY_VERB_ID, respond } from '../src/engine/respond';
+import { EXAMINE_VERB_ID, INVENTORY_VERB_ID, respond } from '../src/engine/respond';
+import { NPC_VERB_IDS } from '../src/engine/npc';
 import { DeterministicParser } from '../src/engine/interpreter';
 import type { InterpretOutcome, ScopeView } from '../src/engine/interpreter';
 import { compileVocabulary } from '../src/engine/parser/vocabulary';
 import { RESPONSES, VERB_DEFAULTS } from '../src/content/responses';
-import { BOX, CHEST, FIXTURE_WORLD, HAT, JACK, KEY, LAMP, ROOM_A, ROOM_B, SHELF } from './fixtures/world';
+import { BOX, CHEST, FIXTURE_WORLD, FLAG_BOOL, HAT, JACK, KEY, LAMP, ROOM_A, ROOM_B, SHELF } from './fixtures/world';
 import type { ObjectId } from '../src/engine/ids';
 
 /** A non-built-in verb with a *real* approved default family (rung 2's `{name}`-templated branch), distinct from every fixture verb's words so it can't collide with `LOOK`'s "examine" synonym. */
@@ -115,11 +116,147 @@ describe('respond — rung 2: resolved, no handler', () => {
     expect(diagCodes(result.events)).toEqual(['defaultResponse']);
   });
 
-  it('an NPC target (no handler mechanism exists for NPCs) renders the default family too', () => {
+  it('an NPC target with neither a handler nor (for this verb) a description renders the default family too', () => {
     const outcome: InterpretOutcome = { kind: 'actions', actions: [{ verb: EXAMINE, dobj: JACK, raw: 'snurf jack' }] };
     const result = respond(WORLD, baseState(), vocab, outcome);
     expect(lineText(result.events)).toBe(VERB_DEFAULTS['examine'][0]!.replace(/\{name\}/g, 'jack'));
     expect(diagCodes(result.events)).toEqual(['defaultResponse']);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Task-1 fix (Ryan's playtest bug report — `X MARLOW`): `NpcDefSlice.
+// description` routed for the reserved `EXAMINE_VERB_ID`, `NpcDefSlice.
+// handlers` for rung-1 parity with `ObjectDefSlice.handlers`, and the
+// `{name}`/`{dobj}` display-name fix (`NpcDefSlice.name`/`npcDisplayName`)
+// — "the night marlow" was `candidateName`'s vocab-derived adjective+noun
+// guess standing in for a display name no NPC could actually author.
+// `NAMED_NPC` deliberately has both a noun ("clerk") a vocab-glued name
+// would pick up and an adjective ("old") it would prepend — the exact shape
+// of Marlow's own `nouns`/`adjectives` (`marlow`/`night`) that produced the
+// bug report.
+// ---------------------------------------------------------------------------
+
+const NAMED_NPC = N('fixture_named_npc');
+const GREET_VERB = V('fixture_greet_npc'); // a generic (non-EXAMINE) npc-targeted verb, for the handlers-parity tests
+
+const WORLD_WITH_NAMED_NPC: WorldDef = {
+  ...WORLD,
+  npcs: {
+    ...WORLD.npcs,
+    [NAMED_NPC]: {
+      nouns: ['clerk', 'man'],
+      adjectives: ['old', 'narrow'],
+      name: 'Corwin',
+      description: 'Corwin, described up close.',
+    },
+  },
+  verbs: {
+    ...WORLD.verbs,
+    [EXAMINE_VERB_ID]: { id: EXAMINE_VERB_ID, words: ['examine', 'x'], patterns: ['V dobj'], class: 'analytical', default: VERB_DEFAULTS['examine'] },
+    [GREET_VERB]: { id: GREET_VERB, words: ['greet'], patterns: ['V dobj'], class: 'social', default: 'You gesture at {name}, to no effect.' },
+  },
+};
+const vocabWithNamedNpc = compileVocabulary(WORLD_WITH_NAMED_NPC);
+
+describe('respond — NPC target: description (EXAMINE), handlers (rung 1), and the display-name fix', () => {
+  it('EXAMINE on an NPC with an authored description renders it, with no defaultResponse diag', () => {
+    const outcome: InterpretOutcome = { kind: 'actions', actions: [{ verb: EXAMINE_VERB_ID, dobj: NAMED_NPC, raw: 'examine clerk' }] };
+    const result = respond(WORLD_WITH_NAMED_NPC, baseState(), vocabWithNamedNpc, outcome);
+    expect(lineText(result.events)).toBe('Corwin, described up close.');
+    expect(diagCodes(result.events)).toEqual([]);
+  });
+
+  it('EXAMINE on an NPC with no description still falls to the generic {name}-templated default (regression)', () => {
+    const outcome: InterpretOutcome = { kind: 'actions', actions: [{ verb: EXAMINE_VERB_ID, dobj: JACK, raw: 'examine jack' }] };
+    const result = respond(WORLD_WITH_NAMED_NPC, baseState(), vocabWithNamedNpc, outcome);
+    expect(lineText(result.events)).toBe(VERB_DEFAULTS['examine'][0]!.replace(/\{name\}/g, 'jack'));
+    expect(diagCodes(result.events)).toEqual(['defaultResponse']);
+  });
+
+  it('a matched handler wins outright over an authored description (rung 1 before rung 2)', () => {
+    const worldWithExamineHandler: WorldDef = {
+      ...WORLD_WITH_NAMED_NPC,
+      npcs: {
+        ...WORLD_WITH_NAMED_NPC.npcs,
+        [NAMED_NPC]: {
+          ...WORLD_WITH_NAMED_NPC.npcs![NAMED_NPC]!,
+          handlers: [{ verbs: [EXAMINE_VERB_ID], effects: [{ say: 'A handler, overriding the description entirely.' }] }],
+        },
+      },
+    };
+    const outcome: InterpretOutcome = { kind: 'actions', actions: [{ verb: EXAMINE_VERB_ID, dobj: NAMED_NPC, raw: 'examine clerk' }] };
+    const result = respond(worldWithExamineHandler, baseState(), vocabWithNamedNpc, outcome);
+    expect(lineText(result.events)).toBe('A handler, overriding the description entirely.');
+    expect(diagCodes(result.events)).toEqual([]);
+  });
+
+  it('a generic npc-targeted verb handler runs at all (parity with ObjectDefSlice.handlers — ATTACK/FOLLOW-shaped)', () => {
+    const worldWithGreetHandler: WorldDef = {
+      ...WORLD_WITH_NAMED_NPC,
+      npcs: {
+        ...WORLD_WITH_NAMED_NPC.npcs,
+        [NAMED_NPC]: { ...WORLD_WITH_NAMED_NPC.npcs![NAMED_NPC]!, handlers: [{ verbs: [GREET_VERB], effects: [{ say: '{name} handles it personally.' }] }] },
+      },
+    };
+    const outcome: InterpretOutcome = { kind: 'actions', actions: [{ verb: GREET_VERB, dobj: NAMED_NPC, raw: 'greet clerk' }] };
+    const result = respond(worldWithGreetHandler, baseState(), vocabWithNamedNpc, outcome);
+    expect(lineText(result.events)).toBe('Corwin handles it personally.');
+    expect(diagCodes(result.events)).toEqual([]);
+  });
+
+  it('an npc handler gated by "when" is skipped until its condition holds, falling to the ordinary default meanwhile', () => {
+    const worldWithGatedHandler: WorldDef = {
+      ...WORLD_WITH_NAMED_NPC,
+      npcs: {
+        ...WORLD_WITH_NAMED_NPC.npcs,
+        [NAMED_NPC]: { ...WORLD_WITH_NAMED_NPC.npcs![NAMED_NPC]!, handlers: [{ verbs: [GREET_VERB], when: { flag: FLAG_BOOL }, effects: [{ say: 'Gated greeting.' }] }] },
+      },
+    };
+    const outcome: InterpretOutcome = { kind: 'actions', actions: [{ verb: GREET_VERB, dobj: NAMED_NPC, raw: 'greet clerk' }] };
+    const before = respond(worldWithGatedHandler, baseState(), vocabWithNamedNpc, outcome);
+    expect(lineText(before.events)).toBe('You gesture at Corwin, to no effect.');
+    expect(diagCodes(before.events)).toEqual(['defaultResponse']);
+    const after = respond(worldWithGatedHandler, baseState({ flags: { [FLAG_BOOL]: true } }), vocabWithNamedNpc, outcome);
+    expect(lineText(after.events)).toBe('Gated greeting.');
+    expect(diagCodes(after.events)).toEqual([]);
+  });
+
+  it('the default family\'s {name} comes from the authored "name" field, not the vocab-glued adjective+noun ("the night marlow" bug)', () => {
+    // This NPC's own nouns/adjectives (['clerk','man']/['old','narrow']) would
+    // glue to something like "old clerk" via the old candidateName-only path;
+    // the authored "name" now wins.
+    const outcome: InterpretOutcome = { kind: 'actions', actions: [{ verb: EXAMINE, dobj: NAMED_NPC, raw: 'snurf clerk' }] };
+    const result = respond(WORLD_WITH_NAMED_NPC, baseState(), vocabWithNamedNpc, outcome);
+    expect(lineText(result.events)).toBe(VERB_DEFAULTS['examine'][0]!.replace(/\{name\}/g, 'Corwin'));
+    expect(lineText(result.events)).not.toContain('old clerk');
+  });
+
+  it('SHOW\'s own default also uses the authored "name" for {iobj}, not the vocab-glued guess', () => {
+    const worldWithShow: WorldDef = {
+      ...WORLD_WITH_NAMED_NPC,
+      verbs: {
+        ...WORLD_WITH_NAMED_NPC.verbs,
+        [NPC_VERB_IDS.show]: {
+          id: NPC_VERB_IDS.show,
+          words: ['show'],
+          patterns: ['V dobj prep iobj'],
+          preps: ['to'],
+          class: 'social',
+          default: 'Showing the {name} to {iobj} accomplishes nothing.',
+        },
+      },
+    };
+    const outcome: InterpretOutcome = { kind: 'actions', actions: [{ verb: NPC_VERB_IDS.show, dobj: KEY, prep: 'to', iobj: NAMED_NPC, raw: 'show key to clerk' }] };
+    const result = respond(worldWithShow, baseState(), vocabWithNamedNpc, outcome);
+    expect(lineText(result.events)).toBe('Showing the brass key to Corwin accomplishes nothing.');
+    expect(diagCodes(result.events)).toEqual(['defaultResponse']);
+  });
+
+  it('an NPC without an authored "name" keeps the prior vocab-derived fallback unchanged', () => {
+    const outcome: InterpretOutcome = { kind: 'actions', actions: [{ verb: EXAMINE, dobj: JACK, raw: 'snurf jack' }] };
+    const result = respond(WORLD_WITH_NAMED_NPC, baseState(), vocabWithNamedNpc, outcome);
+    expect(lineText(result.events)).toBe(VERB_DEFAULTS['examine'][0]!.replace(/\{name\}/g, 'jack'));
   });
 });
 

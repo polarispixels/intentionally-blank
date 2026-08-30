@@ -8,7 +8,7 @@
 // MVP prologue's `mvp_prologue_*` ids (`src/content/scenes/mvp-prologue.ts`)
 // without collision, matching that file's own convention.
 
-import { C, F, M, O, R, V } from '../../../engine/ids';
+import { C, F, M, N, O, R, T, V } from '../../../engine/ids';
 
 // ---------------------------------------------------------------------------
 // Rooms
@@ -27,6 +27,15 @@ export const YOUR_ROOM = R('act1_your_room');
  * with the real room.
  */
 export const LANDING = R('act1_landing');
+
+/**
+ * Front Desk & Lobby (spec `docs/superpowers/specs/2026-09-01-front-desk-
+ * prose.md`, canon decision 20's other half) — the room the Landing's
+ * stairs were pointing at. Zone 1 room 2b, "boarding house front desk",
+ * not the motel (canon decision 24 — spec 03's roster line is corrected
+ * separately, not by this task; see this task's report).
+ */
+export const FRONT_DESK = R('act1_front_desk');
 
 // ---------------------------------------------------------------------------
 // Objects — the thirteen the task names, plus the sub-parts the prose
@@ -110,6 +119,42 @@ export const LANDING_CARPET = O('act1_landing_carpet');
 export const LANDING_BOUNDARY_GATE = O('act1_landing_boundary_gate');
 
 // ---------------------------------------------------------------------------
+// Front Desk & Lobby — the room's 7 objects (front-desk-prose §4), plus the
+// sub-parts the same "which noun word resolved" gap (this file's own header
+// comment on `FEDORA_BAND`/`DOOR_BOLT`/etc.) requires for the counter's bell/
+// telephone/coffee pot and the register's own torn page — see this task's
+// report — plus the one new inventory item (`room_key`, front-desk-prose
+// §8) and the build-boundary gate that now moves down to this room's own
+// street door (§9 there).
+// ---------------------------------------------------------------------------
+
+export const FRONT_DESK_COUNTER = O('act1_front_desk_counter');
+/** Sub-part (§4.1's "ring bell/press bell/hit bell" — its own EXAMINE/RING/BREAK text, distinct from the rest of the counter). */
+export const FRONT_DESK_BELL = O('act1_front_desk_bell');
+/** Sub-part (§4.1's "examine telephone/use telephone/call" — its own text). */
+export const FRONT_DESK_TELEPHONE = O('act1_front_desk_telephone');
+/** Sub-part (§4.1's "pour coffee/drink coffee/take coffee" — its own text). */
+export const FRONT_DESK_COFFEE_POT = O('act1_front_desk_coffee_pot');
+/** Sub-part (§6's "TAKE TOWEL"/"USE TOWEL" — its own text; behind the desk per §5.3's greeting). */
+export const FRONT_DESK_TOWEL = O('act1_front_desk_towel');
+export const GUEST_REGISTER = O('act1_guest_register');
+/** Sub-part (§4.2 — the torn page/stub/impression: distinct EXAMINE/TILT/READ/RUB text from plain "register"/"book"). */
+export const GUEST_REGISTER_PAGE = O('act1_guest_register_page');
+export const KEY_RACK = O('act1_key_rack');
+export const LOBBY_RADIO = O('act1_lobby_radio');
+export const LOBBY_CHAIRS = O('act1_lobby_chairs');
+export const STREET_DOOR = O('act1_street_door');
+export const FRONT_DESK_STAIRS = O('act1_front_desk_stairs');
+/** §8's new inventory item — granted by `topic_key` (marlow.ts). */
+export const ROOM_KEY = O('act1_room_key');
+
+// ---------------------------------------------------------------------------
+// Marlow — the game's first NPC (front-desk-prose §5).
+// ---------------------------------------------------------------------------
+
+export const MARLOW = N('act1_marlow');
+
+// ---------------------------------------------------------------------------
 // Flags — spec §1's table
 // ---------------------------------------------------------------------------
 
@@ -121,6 +166,19 @@ export const FLAG_POCKETS_CHECKED = F('act1_pockets_checked');
 export const FLAG_WOUND_EXAMINED = F('act1_wound_examined');
 export const FLAG_DOOR_BOLT_DRAWN = F('act1_door_bolt_drawn');
 export const FLAG_WINDOW_OPEN = F('act1_window_open');
+
+// ---------------------------------------------------------------------------
+// Front Desk & Lobby — flags (front-desk-prose §1's table).
+// ---------------------------------------------------------------------------
+
+export const FLAG_MET_MARLOW = F('act1_met_marlow');
+export const FLAG_REGISTER_GAP_SEEN = F('act1_register_gap_seen');
+export const FLAG_REGISTER_IMPRESSION_FOUND = F('act1_register_impression_found');
+export const FLAG_MARLOW_PRESSED = F('act1_marlow_pressed');
+export const FLAG_MARLOW_KNOWS_YOU_KNOW = F('act1_marlow_knows_you_know');
+export const FLAG_MARLOW_TOLD_ABOUT_ROOM = F('act1_marlow_told_about_room');
+export const FLAG_SPARE_KEY_GIVEN = F('act1_spare_key_given');
+export const FLAG_TOWEL_TAKEN = F('act1_towel_taken');
 
 /**
  * Not in the prose doc's own §1 table — a builder-added flag mirroring
@@ -154,6 +212,16 @@ export const CLUE_WINDOW_EXIT = C('act1_clue_window_exit');
 export const CLUE_NOTHING_NAMED = C('act1_clue_nothing_named');
 export const CLUE_PAGE_INDENTATION = C('act1_clue_page_indentation');
 export const CLUE_TERMINAL_BURN = C('act1_clue_terminal_burn');
+
+// ---------------------------------------------------------------------------
+// Front Desk & Lobby — clues (front-desk-prose §1's table).
+// ---------------------------------------------------------------------------
+
+export const CLUE_REGISTER_GAP = C('act1_clue_register_gap');
+export const CLUE_REGISTER_IMPRESSION = C('act1_clue_register_impression');
+export const CLUE_NO_NAME_RECALLED = C('act1_clue_no_name_recalled');
+export const CLUE_HOUSE_EMPTY = C('act1_clue_house_empty');
+export const CLUE_VISITOR_UNREMARKABLE = C('act1_clue_visitor_unremarkable');
 
 // ---------------------------------------------------------------------------
 // Memory — spec §6
@@ -218,3 +286,28 @@ export const V_LEAN_OVER = V('act1_lean_over');
 
 export const V_HELP = V('act1_help');
 export const V_ABOUT = V('act1_about');
+
+// ---------------------------------------------------------------------------
+// Front Desk & Lobby — new verbs (front-desk-prose §4, §5, §6). Words chosen
+// by this builder where the doc doesn't specify them (matching `verbs.ts`'s
+// own established convention for room 1) — see this task's report for the
+// vocabulary-collision calls made along the way (bell/telephone/coffee pot
+// each needed a sub-part rather than a shared verb on the whole counter,
+// same reasoning as `ids.ts`'s own header on `FEDORA_BAND`/`DOOR_BOLT`).
+// ---------------------------------------------------------------------------
+
+/** §4.1 "ring bell / press bell" — "hit bell" reuses the existing BREAK verb's own word "hit" on the bell sub-part instead (BREAK already claims "hit" globally). */
+export const V_RING = V('act1_ring');
+/** §4.1 "call" (bare — one telephone in the game, no dobj needed). */
+export const V_CALL = V('act1_call');
+/** §4.1 "pour coffee" ("drink coffee"/"take coffee" reuse the existing DRINK/TAKE words on the coffee pot sub-part). */
+export const V_POUR = V('act1_pour');
+export const V_DRINK = V('act1_drink');
+/** §4.2 "tilt register"/"tilt page" — the impression's sight route. */
+export const V_TILT = V('act1_tilt');
+/** §4.2 "sign register"/"write in register"/"write name"/"write my name" — pure flavor, no effects, both bare and dobj forms share one id (same shape as room 1's STAND). */
+export const V_SIGN = V('act1_sign');
+/** §4.2 "find my name" — bare, multi-word verb words (same idiom as room 1's V_WHOAMI), needs a room-level handler (front-desk's own `handlers`) to run its effects. */
+export const V_FIND_MY_NAME = V('act1_find_my_name');
+/** §4.5/§6 "check date"/"look for date" (bare) and "turn over magazine" (dobj, via the existing room-1 V_TURN_OVER on `lobby_chairs`) share one line of text. */
+export const V_CHECK_DATE = V('act1_check_date');

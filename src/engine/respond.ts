@@ -70,7 +70,9 @@
 
 import type { ActionClass, NpcId, ObjectId, VerbId } from './ids';
 import { V } from './ids';
-import type { GameEvent, GameState, WorldDef } from './world';
+import { evaluate } from './cond';
+import { apply } from './effects';
+import type { GameEvent, GameState, HandlerDef, NpcDefSlice, WorldDef } from './world';
 import { npcRoom } from './world';
 import { objectLocation, objectState } from './resolve';
 import type { Prose } from './prose';
@@ -81,8 +83,20 @@ import { GO_TO_VERB_ID } from './interpreter';
 import { DIRECTION_VERB_IDS, directionForVerb, executeGoTo, look, LOOK_VERB_ID, traverseDirection, traverseDoor, USE_VERB_ID } from './move';
 import type { CompiledVocabulary } from './parser';
 import { allEmptyFamilyKey, candidateName, isNpcId } from './parser';
-import { NPC_VERB_IDS, respondToAsk, respondToGreeting, respondToShow, respondToTell } from './npc';
+import { NPC_VERB_IDS, npcDisplayName, respondToAsk, respondToGreeting, respondToShow, respondToTell } from './npc';
 import { inventoryView } from './views';
+
+/**
+ * Reserved verb id for EXAMINE-on-NPC (task-1 fix, Ryan's playtest: `X
+ * MARLOW`) — the same "content declares the words/patterns/class in
+ * `world.verbs` exactly like any other verb; the engine recognizes it here
+ * by id" convention `LOOK_VERB_ID`/`USE_VERB_ID` (`move.ts`) already set.
+ * `respondToNpcTarget` renders `NpcDefSlice.description` for this verb id
+ * specifically, ahead of the generic `{name}`-templated default family —
+ * see that field's own doc comment (`world.ts`) for why EXAMINE needed a
+ * real authoring surface and every other npc-targeted verb still doesn't.
+ */
+export const EXAMINE_VERB_ID = V('examine');
 
 /**
  * Reserved verb id for `INVENTORY`/`I` (§8 gap 2). Content declares the
@@ -268,12 +282,43 @@ function respondToAction(world: WorldDef, state: GameState, vocab: CompiledVocab
   return { state: result.state, events: result.events, class: result.class };
 }
 
-/** Rung 2 for an NPC target (see file header): no handler mechanism exists for NPCs, so this always renders the verb's own `default` family. */
+/**
+ * NPC-targeted verb dispatch (task-1 fix). Three rungs, in order:
+ *   1. an authored `NpcDefSlice.handlers` match (parity with `actions.ts`'s
+ *      `findHandler`/`applyHandler` for objects — see that field's own doc
+ *      comment on the one gap, no `iobj`/instrument threaded through yet).
+ *   2. `EXAMINE_VERB_ID` with an authored `NpcDefSlice.description` — the
+ *      task-1 fix itself: `X MARLOW` used to always fall straight to rung 3
+ *      (no handler mechanism existed for NPCs at all), rendering the verb's
+ *      generic `{name}`-templated `default` family instead of anything
+ *      Marlow-specific.
+ *   3. the verb's own `default` family, `{name}`-templated — unchanged
+ *      rung-2 behavior for every other npc-targeted verb, and for EXAMINE
+ *      itself when the NPC authors no `description`.
+ * `{name}`/`{dobj}` now come from `npcDisplayName` (not bare `candidateName`
+ * — see that helper's doc comment for why the old call here is what
+ * actually produced "the night marlow").
+ */
 function respondToNpcTarget(world: WorldDef, state: GameState, vocab: CompiledVocabulary, verb: VerbId, npc: NpcId): RespondResult {
+  const npcDef = world.npcs?.[npc];
+  const handler = findNpcHandler(world, state, npcDef, verb);
+  if (handler !== undefined) return applyNpcHandler(world, state, vocab, verb, npc, handler);
+
+  if (verb === EXAMINE_VERB_ID && npcDef?.description !== undefined) {
+    const name = npcDisplayName(world, vocab, npc);
+    const path = `npc.${npc}.description`;
+    const rendered = render(world, state, path, npcDef.description, { name, dobj: name });
+    return {
+      state: rendered.state,
+      events: [{ type: 'line', kind: 'prose', text: rendered.text }],
+      class: world.verbs?.[verb]?.class ?? null,
+    };
+  }
+
   const verbDef = world.verbs?.[verb];
   if (verbDef === undefined) throw new Error(`respond: verb "${verb}" is not declared in world.verbs`);
   if (verbDef.default === null) throw new Error(`respond: verb "${verb}" has no default family`);
-  const name = candidateName(vocab, npc);
+  const name = npcDisplayName(world, vocab, npc);
   const rendered = render(world, state, verbDefaultPath(verb), verbDef.default, { name, dobj: name });
   return {
     state: rendered.state,
@@ -285,13 +330,31 @@ function respondToNpcTarget(world: WorldDef, state: GameState, vocab: CompiledVo
   };
 }
 
+/** Rung 1 for an NPC target — mirrors `actions.ts`'s `findHandler`, sourced from `NpcDefSlice.handlers` instead of `ObjectDefSlice.handlers`. No `iobj` to match `withInstrument` against yet (see `NpcDefSlice.handlers`'s own doc comment). */
+function findNpcHandler(world: WorldDef, state: GameState, npcDef: NpcDefSlice | undefined, verb: VerbId): HandlerDef | undefined {
+  const handlers = npcDef?.handlers ?? [];
+  return handlers.find((h) => h.verbs.includes(verb) && (h.when === undefined || evaluate(world, state, h.when)));
+}
+
+/** Runs a matched `NpcDefSlice.handlers` entry's effects — mirrors `actions.ts`'s `applyHandler`, with `npc.<id>.<verb>` as the rotation path base (the same per-NPC path convention `npc.ts`'s own topic/greeting/show handling already uses) and `{name}`/`{dobj}` from `npcDisplayName`. */
+function applyNpcHandler(world: WorldDef, state: GameState, vocab: CompiledVocabulary, verb: VerbId, npc: NpcId, handler: HandlerDef): RespondResult {
+  const name = npcDisplayName(world, vocab, npc);
+  const path = `npc.${npc}.${verb}`;
+  const { state: newState, events } = apply(world, state, handler.effects, { name, dobj: name, path });
+  return {
+    state: newState,
+    events,
+    class: handler.class ?? world.verbs?.[verb]?.class ?? null,
+  };
+}
+
 /** SHOW's own rung-2 default (see `respondToAction`'s SHOW note): `{name}`/`{dobj}` is the shown object, `{iobj}` the npc. */
 function respondToShowDefault(world: WorldDef, state: GameState, vocab: CompiledVocabulary, verb: VerbId, dobj: ObjectId, npc: NpcId): RespondResult {
   const verbDef = world.verbs?.[verb];
   if (verbDef === undefined) throw new Error(`respond: verb "${verb}" is not declared in world.verbs`);
   if (verbDef.default === null) throw new Error(`respond: verb "${verb}" has no default family`);
   const dobjName = world.objects?.[dobj]?.name ?? dobj;
-  const npcName = candidateName(vocab, npc);
+  const npcName = npcDisplayName(world, vocab, npc);
   const rendered = render(world, state, verbDefaultPath(verb), verbDef.default, { name: dobjName, dobj: dobjName, iobj: npcName });
   return {
     state: rendered.state,
@@ -403,7 +466,7 @@ function respondToNounMiss(world: WorldDef, state: GameState, vocab: CompiledVoc
   const candidates = candidatesForWords(vocab, knownNouns);
   const seen = candidates.find((id) => hasSeen(world, state, vocab, id));
   const key = seen !== undefined ? 'nounMiss.seen' : 'nounMiss.unseen';
-  const ctx = seen !== undefined ? { name: candidateName(vocab, seen), dobj: candidateName(vocab, seen) } : {};
+  const ctx = seen !== undefined ? { name: displayNameFor(world, vocab, seen), dobj: displayNameFor(world, vocab, seen) } : {};
   const rendered = render(world, state, key, family(world, key), ctx);
   return {
     state: rendered.state,
@@ -417,7 +480,7 @@ function respondToNounMiss(world: WorldDef, state: GameState, vocab: CompiledVoc
 
 /** Rung 4. */
 function respondToUnknownVerbKnownNoun(world: WorldDef, state: GameState, vocab: CompiledVocabulary, id: ObjectId | NpcId): RespondResult {
-  const name = candidateName(vocab, id);
+  const name = displayNameFor(world, vocab, id);
   const rendered = render(world, state, 'unknownVerbKnownNoun', family(world, 'unknownVerbKnownNoun'), { name, dobj: name });
   return {
     state: rendered.state,
@@ -445,6 +508,11 @@ function respondToUnknown(world: WorldDef, state: GameState): RespondResult {
 // ---------------------------------------------------------------------------
 // Shared: candidate lookup, the "has seen" spoiler boundary, family access
 // ---------------------------------------------------------------------------
+
+/** Rung 3/4's own naming: an NPC candidate goes through `npcDisplayName` (task-1 fix — same root cause as `respondToNpcTarget`'s, see that helper's own doc comment); an object candidate keeps the existing vocab-derived `candidateName` (objects have no equivalent "wrong to glue an adjective onto a proper name" problem — see `NpcDefSlice.name`'s doc comment). */
+function displayNameFor(world: WorldDef, vocab: CompiledVocabulary, id: ObjectId | NpcId): string {
+  return isNpcId(vocab, id) ? npcDisplayName(world, vocab, id) : candidateName(vocab, id);
+}
 
 /** Every object/NPC the vocabulary indexes any of `words` under — game-wide, not scope-restricted (mirrors `knownNounsIn`'s own four-map sweep). */
 function candidatesForWords(vocab: CompiledVocabulary, words: string[]): (ObjectId | NpcId)[] {

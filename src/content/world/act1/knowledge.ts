@@ -12,18 +12,31 @@ import {
   CLUE_BOLT_THROWN,
   CLUE_CALM_SEARCH,
   CLUE_DRAWER_HELD,
+  CLUE_HOUSE_EMPTY,
+  CLUE_NO_NAME_RECALLED,
   CLUE_NOTHING_NAMED,
   CLUE_PAGE_INDENTATION,
+  CLUE_REGISTER_GAP,
+  CLUE_REGISTER_IMPRESSION,
   CLUE_TERMINAL_BURN,
+  CLUE_VISITOR_UNREMARKABLE,
   CLUE_WINDOW_EXIT,
   FLAG_DOOR_BOLT_DRAWN,
   FLAG_LAMP_FIRST_OFF_DONE,
   FLAG_LAMP_FIRST_ON_DONE,
   FLAG_LAMP_RIGHTED,
+  FLAG_MARLOW_KNOWS_YOU_KNOW,
+  FLAG_MARLOW_PRESSED,
+  FLAG_MARLOW_TOLD_ABOUT_ROOM,
+  FLAG_MET_MARLOW,
   FLAG_POCKETS_CHECKED,
+  FLAG_REGISTER_GAP_SEEN,
+  FLAG_REGISTER_IMPRESSION_FOUND,
   FLAG_ROOM_SEARCHED,
+  FLAG_SPARE_KEY_GIVEN,
   FLAG_STOOD_UP,
   FLAG_TERMINAL_TRIED,
+  FLAG_TOWEL_TAKEN,
   FLAG_WINDOW_OPEN,
   FLAG_WOUND_EXAMINED,
   MEM_HAT,
@@ -40,6 +53,18 @@ export const ACT1_FLAGS: WorldDef['flags'] = {
   [FLAG_WINDOW_OPEN]: { default: false, doc: 'set by OPEN WINDOW — gates the room smell' },
   [FLAG_LAMP_FIRST_ON_DONE]: { default: false, doc: 'builder addition — §4.3\'s pull-chain first-light line, see ids.ts' },
   [FLAG_LAMP_FIRST_OFF_DONE]: { default: false, doc: 'builder addition — §4.3\'s pull-chain first-dark-again line, see ids.ts' },
+
+  // -------------------------------------------------------------------
+  // Front Desk & Lobby (front-desk-prose §1's table)
+  // -------------------------------------------------------------------
+  [FLAG_MET_MARLOW]: { default: false, doc: 'set by front_desk\'s own onEnter (first entry) — gates room description rule 2 and marlow\'s greeting rotation' },
+  [FLAG_REGISTER_GAP_SEEN]: { default: false, doc: 'set by EXAMINE/READ/SEARCH on the register — gates marlow\'s register topic variant 2' },
+  [FLAG_REGISTER_IMPRESSION_FOUND]: { default: false, doc: 'set by the impression discovery (sight or touch) — gates marlow\'s visitor and register topics' },
+  [FLAG_MARLOW_PRESSED]: { default: false, doc: 'set by the first visitor topic response while register_impression_found' },
+  [FLAG_MARLOW_KNOWS_YOU_KNOW]: { default: false, doc: 'set by the first register topic response while register_impression_found' },
+  [FLAG_MARLOW_TOLD_ABOUT_ROOM]: { default: false, doc: 'set by TELL MARLOW ABOUT ROOM' },
+  [FLAG_SPARE_KEY_GIVEN]: { default: false, doc: 'set by marlow\'s key topic' },
+  [FLAG_TOWEL_TAKEN]: { default: false, doc: 'set by TAKE TOWEL / USE TOWEL' },
 };
 
 export const ACT1_CLUES: NonNullable<WorldDef['clues']> = {
@@ -71,6 +96,34 @@ export const ACT1_CLUES: NonNullable<WorldDef['clues']> = {
   [CLUE_TERMINAL_BURN]: {
     title: 'The terminal has been asking a long time',
     detail: '`USER:` is burned into the phosphor.',
+  },
+
+  // -------------------------------------------------------------------
+  // Front Desk & Lobby (front-desk-prose §1's table)
+  // -------------------------------------------------------------------
+  [CLUE_REGISTER_GAP]: {
+    title: 'A page is missing from the register',
+    detail:
+      'The guest book has had a page pulled out along the gutter. The torn edge is still bright, so it came out recently — and the week it covered is the week you were in the house.',
+  },
+  [CLUE_REGISTER_IMPRESSION]: {
+    title: 'The missing page pressed through',
+    detail:
+      'Under where the page was: a time in the small hours, your room number, and a name column with one begun-and-abandoned pen stroke in it. Somebody called on your room that night and nobody wrote down who.',
+  },
+  [CLUE_NO_NAME_RECALLED]: {
+    title: "The clerk can't produce your name",
+    detail: 'Marlow wrote it in the book himself and cannot recall it without the book. He is not refusing. He is looking for it.',
+  },
+  [CLUE_HOUSE_EMPTY]: {
+    title: 'The house was nearly empty',
+    detail:
+      'Most hooks on the key board have a key on them, and a key on a hook is a room with nobody in it. Whatever happened upstairs happened in a mostly empty building.',
+  },
+  [CLUE_VISITOR_UNREMARKABLE]: {
+    title: "He saw the man and can't describe him",
+    detail:
+      'Pressed, Marlow allows that somebody came in late for the top floor and said he was there to see to something. Asked what the man looked like, he starts three times and stops.',
   },
 };
 

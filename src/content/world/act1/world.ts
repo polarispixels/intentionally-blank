@@ -7,11 +7,14 @@ import { RESPONSES } from '../../responses';
 import { RESTART_SCRIPTS } from '../../scripts';
 import { ACT1_CLUES, ACT1_FLAGS, ACT1_MEMORIES } from './knowledge';
 import { landingRoom } from './landing';
+import { frontDeskRoom } from './frontDesk';
+import { marlow } from './marlow';
 import { ACT1_OBJECTS } from './objects/index';
+import { FRONT_DESK_OBJECTS } from './objects/frontDesk';
 import { ACT1_RESPONSES } from './responses';
 import { yourRoom } from './room';
 import { ACT1_VERBS } from './verbs';
-import { LANDING, YOUR_ROOM } from './ids';
+import { FRONT_DESK, LANDING, MARLOW, YOUR_ROOM } from './ids';
 
 export const WORLD: WorldDef = {
   meta: {
@@ -23,8 +26,9 @@ export const WORLD: WorldDef = {
     minutesPerTurn: 1,
   },
   flags: ACT1_FLAGS,
-  rooms: { [YOUR_ROOM]: yourRoom, [LANDING]: landingRoom },
-  objects: ACT1_OBJECTS,
+  rooms: { [YOUR_ROOM]: yourRoom, [LANDING]: landingRoom, [FRONT_DESK]: frontDeskRoom },
+  objects: { ...ACT1_OBJECTS, ...FRONT_DESK_OBJECTS },
+  npcs: { [MARLOW]: marlow },
   verbs: ACT1_VERBS,
   clues: ACT1_CLUES,
   memories: ACT1_MEMORIES,

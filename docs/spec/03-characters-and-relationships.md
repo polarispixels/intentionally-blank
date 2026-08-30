@@ -1,6 +1,6 @@
 # 03 - Characters and Relationships
 
-**Spec version:** `0.2.9`
+**Spec version:** `0.3.4`
 
 # 1. The Protagonist
 
@@ -453,7 +453,7 @@ nothing.)*
 | Name | Role |
 |---|---|
 | **Nolan** | Jules's old manager at the facility. Canon already — he is named in the notebook ("Asked Nolan. Says there is no Sublevel 6."). |
-| **Marlow** | Night clerk at the motel. Saw who came upstairs. |
+| **Marlow** | Night clerk at the boarding house. Saw who came upstairs. |
 | **Sheriff Dana Whitlock** | Delivers, flatly and as an aside, that the records have no investigator either. |
 | **Pearl** | Runs the diner. The town's memory, such as it is. |
 | **Dot** | Wall Drug. Keeper of the claim-ticket counter. |

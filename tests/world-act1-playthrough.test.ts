@@ -62,8 +62,10 @@ function play(args: string[]): { stdout: string; stderr: string; status: number 
 // The whole opening slice: wake in the dark, feel the chain, pull it,
 // examine the lit room, take and wear the fedora (the memory fires),
 // search it, take page 7/8, read it, wake the terminal, open the door,
-// step out onto the landing, look back, and try to go down — reaching
-// §15.2's build boundary.
+// step out onto the landing, look back, and go down — now the real Front
+// Desk (front-desk-prose task), not §15.2's old build boundary; the
+// boundary moved down to the Front Desk's own street door (see the
+// describe block below this one).
 const SCRIPT = [
   'look',
   'pull chain',
@@ -162,10 +164,10 @@ describe('Act I room 1 — CLI playthrough', () => {
     expect(occurrences).toBe(2); // once on arrival (OUT), once on the explicit LOOK
   });
 
-  it('DOWN renders §15.2\'s build boundary in place of moving the player', () => {
-    expect(stdout).toContain('END OF BUILD');
-    expect(stdout).toContain('This version ends at the top of these stairs.');
-    expect(stdout).toContain('The rest of the house, and the town it stands in, are not in this build.');
+  it('DOWN now reaches the real Front Desk instead of §15.2\'s old build boundary', () => {
+    expect(stdout).toContain('You go down two flights, around the well, past a landing with no light on it.');
+    expect(stdout).toContain('The stairs come down into a lobby built for more people than are using it.');
+    expect(stdout).toContain('There is a man behind the desk.');
   });
 
   it('produces no unexpected diagnostics end to end', () => {
@@ -182,7 +184,10 @@ describe('Act I room 1 — CLI playthrough', () => {
 // separate tests.
 describe('Act I room 1 — door-open room description (§15.3)', () => {
   const saveDir = mkdtempSync(join(tmpdir(), 'ib-act1-saves-'));
-  const script = writeScript([...SCRIPT, 'in']);
+  // SCRIPT now ends at the Front Desk (one level below the landing) rather
+  // than the landing itself — 'up' then 'in' walks the rest of the way
+  // back into your_room.
+  const script = writeScript([...SCRIPT, 'up', 'in']);
   const { stdout } = play(['--world', worldPath, '--save-dir', saveDir, '--script', script, '--fast', '--diag']);
 
   it('re-entering the room after OPEN DOOR shows the door-open clause, not "The door is shut."', () => {
@@ -343,6 +348,46 @@ describe('Act I room 1 — traverse the door by naming it (fix 1)', () => {
 });
 
 // ---------------------------------------------------------------------------
+// Ryan's playtest bug: fix 1 above proves the door works naming it from
+// INSIDE (room -> landing). Nothing proved the return trip — from the
+// Landing, back into the room. `objects/landing.ts`'s `your_door_outside`
+// is a second object for the same physical door seen from the other side;
+// the Landing's own `in` exit used to key its `door` field to `act1_door`
+// (the inside-room object, never in scope from the Landing), so
+// `traverseDoor` could never match ENTER DOOR/USE DOOR/GO THROUGH DOOR —
+// only bare IN worked, since direction traversal resolves no noun at all.
+// Fixed by pointing the exit at `your_door_outside` and keeping its own
+// `open` overlay in sync with the real door's (`objects/door.ts`'s OPEN/
+// CLOSE handlers). "room" is also added to `your_door_outside`'s own nouns
+// (ENTER ROOM/X ROOM used to resolve to `objects/misc.ts`'s FLOOR_BOARDS,
+// never in scope from the Landing — a real nounMiss).
+// ---------------------------------------------------------------------------
+
+describe('Act I room 1 — the return trip, Landing back into the room (Ryan\'s playtest bug)', () => {
+  it.each([
+    ['in', 'in'],
+    ['enter door', 'enter door'],
+    ['use door', 'use door'],
+    ['go through door', 'go through door'],
+    ['enter room', 'enter room'],
+  ])('"%s" from the Landing walks the player back into the room', (_label, phrase) => {
+    const saveDir = mkdtempSync(join(tmpdir(), 'ib-act1-saves-'));
+    const script = writeScript(['pull chain', 'open door', 'out', phrase]);
+    const { stdout, stderr, status } = play(['--world', worldPath, '--save-dir', saveDir, '--script', script, '--fast', '--diag']);
+
+    expect(stderr).toBe('');
+    expect(status).toBe(0);
+
+    const afterPhrase = stdout.slice(stdout.lastIndexOf(`> ${phrase}`));
+    expect(afterPhrase).toContain('You step back into your room.');
+    expect(afterPhrase).toContain('The lamp lies on its side and burns anyway');
+
+    const diagLines = stdout.split('\n').filter((l) => l.startsWith('DIAG '));
+    expect(diagLines).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // Ryan's v0.3.2 playtest, fix 3: HELP/ABOUT are registered meta verbs and
 // their authored text (response-families spec §10) is wired into
 // `world.responses`. The original form of this test asserted the *absence*
@@ -375,5 +420,106 @@ describe('Act I room 1 — HELP/ABOUT registered as meta verbs (fix 3)', () => {
 
   it('the per-line error is caught, not fatal — the script still completes', () => {
     expect(status).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Front Desk & Lobby and Marlow (front-desk-prose task) — the room's own
+// "Then prove it" script: down to the landing, down again to the desk,
+// meet Marlow, greet him, ask about several things including one he is
+// protecting (the visitor), examine the register, find the impression by
+// tilting it into the lamp, and try the street.
+// ---------------------------------------------------------------------------
+
+describe('Front Desk & Lobby — CLI playthrough (meeting Marlow)', () => {
+  const saveDir = mkdtempSync(join(tmpdir(), 'ib-act1-saves-'));
+  const script = writeScript([
+    'pull chain',
+    'open door',
+    'out',
+    'down',
+    'hello marlow',
+    'ask marlow about name',
+    'ask marlow about room',
+    'ask marlow about house',
+    'ask marlow about visitor',
+    'examine register',
+    'tilt register',
+    'ask marlow about visitor',
+    'ask marlow about register',
+    'ask marlow about key',
+    'out',
+  ]);
+  const { stdout, stderr, status } = play(['--world', worldPath, '--save-dir', saveDir, '--script', script, '--fast', '--diag']);
+
+  it('runs cleanly to completion', () => {
+    expect(stderr).toBe('');
+    expect(status).toBe(0);
+  });
+
+  it('DOWN from the landing arrives at the Front Desk, first sight, with Marlow already there', () => {
+    expect(stdout).toContain('The stairs come down into a lobby built for more people than are using it.');
+    expect(stdout).toContain('There is a man behind the desk. He is awake');
+  });
+
+  it('HELLO MARLOW greets him', () => {
+    const afterHello = stdout.slice(stdout.indexOf('> hello marlow'));
+    expect(afterHello).toMatch(/"Still up," he says, which is not a question\.|He looks up, and waits, and is prepared to wait\./);
+  });
+
+  it('ASK MARLOW ABOUT NAME — he cannot produce it, and the clue is noted', () => {
+    expect(stdout).toContain("You paid a week, in advance, and I put it in the book.");
+    expect(stdout).toContain('◆ clue noted: The clerk can\'t produce your name');
+  });
+
+  it('ASK MARLOW ABOUT ROOM — the narrowness the doc marks once', () => {
+    expect(stdout).toContain('Top floor, back. Three weeks');
+    expect(stdout).toContain('Which is an answer about the door.');
+  });
+
+  it('ASK MARLOW ABOUT HOUSE — the house was nearly empty', () => {
+    expect(stdout).toContain('Eleven rooms. Four let, counting yours.');
+    expect(stdout).toContain('◆ clue noted: The house was nearly empty');
+  });
+
+  it('ASK MARLOW ABOUT VISITOR — the topic he is protecting: narrow before the impression, then pressed once it is found', () => {
+    const firstAsk = stdout.slice(stdout.indexOf('> ask marlow about visitor'), stdout.indexOf('> examine register'));
+    expect(firstAsk).toContain('Not while I was at the desk.');
+    const secondAsk = stdout.slice(stdout.lastIndexOf('> ask marlow about visitor'), stdout.indexOf('> ask marlow about register'));
+    expect(secondAsk).toContain('There was a fella came in for the top floor.');
+    expect(stdout).toContain('◆ clue noted: He saw the man and can\'t describe him');
+  });
+
+  it('EXAMINE REGISTER finds the torn page and notes the clue', () => {
+    expect(stdout).toContain('Between the open page and the next there is a stub.');
+    expect(stdout).toContain('The page underneath where it was is blank.');
+    expect(stdout).toContain('◆ clue noted: A page is missing from the register');
+  });
+
+  it('TILT REGISTER finds the impression by sight and notes the clue', () => {
+    expect(stdout).toContain('the blank sheet stops being blank');
+    expect(stdout).toContain('one short stroke of a pen, begun and set down, and nothing after it.');
+    expect(stdout).toContain('◆ clue noted: The missing page pressed through');
+  });
+
+  it('ASK MARLOW ABOUT REGISTER, once he knows you know, sits with it rather than confessing', () => {
+    const lastRegisterAsk = stdout.slice(stdout.lastIndexOf('> ask marlow about register'));
+    expect(lastRegisterAsk).toContain('You tell him what is pressed into the page under the one that is missing.');
+    expect(lastRegisterAsk).toContain("You'll want that towel");
+  });
+
+  it('ASK MARLOW ABOUT KEY hands over the spare', () => {
+    expect(stdout).toContain("Spare's on the board.");
+  });
+
+  it('OUT tries the street and reaches the build boundary, not a crash', () => {
+    const afterOut = stdout.slice(stdout.lastIndexOf('> out'));
+    expect(afterOut).toContain('END OF BUILD');
+    expect(afterOut).toMatch(/This version ends at the street door\.|The door opens\. The town does not\./);
+  });
+
+  it('produces no unexpected diagnostics — in particular, no topicMiss on anything asked above', () => {
+    const diagLines = stdout.split('\n').filter((l) => l.startsWith('DIAG '));
+    expect(diagLines).toEqual([]);
   });
 });

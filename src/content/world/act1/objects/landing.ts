@@ -83,7 +83,13 @@ const lockFromOutside =
 const yourDoorOutside: ObjectDefSlice = {
   location: LANDING,
   name: 'door',
-  nouns: ['door', 'keyhole'],
+  // "room" added (Ryan's playtest bug: from the Landing, ENTER ROOM/X
+  // ROOM resolved to `objects/misc.ts`'s FLOOR_BOARDS — a room-1-only
+  // noun collision that never surfaced before this room's own door
+  // could be a valid "room" target; FLOOR_BOARDS is never in scope from
+  // the Landing, so this is unambiguous in play) — the obvious phrasing
+  // for "go back to my room" now lands on this door, same as "door".
+  nouns: ['door', 'keyhole', 'room'],
   handlers: [
     { verbs: [EXAMINE], effects: [{ say: doorOutsideExamine }] },
     { verbs: [LOCK, CLOSE], effects: [{ say: lockFromOutside }] },

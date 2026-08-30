@@ -8,17 +8,21 @@
 // to switch off (also the fix for the "player leaves the room with the
 // lamp off and nothing in hand" stranding case constitution §10 forbids).
 //
-// §15.2's build boundary: `down`/`out` are declared exits (not omitted),
-// permanently blocked by `LANDING_BOUNDARY_GATE` (see `objects/landing.ts`
-// for why, and that file's own header for the one open engine gap this
-// leaves — `kind: 'system'` rendering — reported rather than worked
-// around). Looking/listening down the well (`V_LOOK_DOWN`/bare `LISTEN`,
-// below) are untouched: the boundary stops one verb, not the room.
+// UPDATED (front-desk-prose §7's own wiring note): §15.2's build boundary
+// used to sit here, permanently blocking `down`/`out` via
+// `LANDING_BOUNDARY_GATE`. Now that the Front Desk (`frontDesk.ts`) is real
+// content, both exits go there for real instead — the boundary moves down
+// to that room's own street door (§9 there). `LANDING_BOUNDARY_GATE`/
+// `BUILD_BOUNDARY_TEXT` (`objects/landing.ts`) stay declared/exported —
+// harmless, unreferenced — rather than deleted, since nothing in this task
+// requires removing them and a later room could still want the same
+// mechanism. Looking/listening down the well (`V_LOOK_DOWN`/bare `LISTEN`,
+// below) are unaffected either way.
 
 import type { HandlerDef, RoomDefSlice } from '../../../engine/world';
 import { LISTEN, SMELL } from './verbs';
-import { BUILD_BOUNDARY_TEXT, LOOK_DOWN_TEXT } from './objects/landing';
-import { DOOR, LANDING, LANDING_BOUNDARY_GATE, V_LOOK_DOWN, V_LOOK_UP, YOUR_ROOM } from './ids';
+import { LOOK_DOWN_TEXT } from './objects/landing';
+import { FRONT_DESK, LANDING, V_LOOK_DOWN, V_LOOK_UP, YOUR_DOOR_OUTSIDE, YOUR_ROOM } from './ids';
 import { ROOM_DARK } from './objects/common';
 import type { ProseRule } from '../../../engine/prose';
 
@@ -43,6 +47,10 @@ const landingHandlers: HandlerDef[] = [
   { verbs: [V_LOOK_DOWN], effects: [{ say: LOOK_DOWN_TEXT }] },
 ];
 
+// front-desk-prose §7's `exit.travelText` (landing → front_desk), replacing
+// the old §15.2 boundary text on `DOWN`.
+const travelTextToFrontDesk = 'You go down two flights, around the well, past a landing with no light on it. The smell of coffee gets stronger the whole way.';
+
 // §15.1.6 — no `firstVisit` (the doc's own note: `your_room`'s own
 // `exit.travelText` already covers arrival, a first-visit paragraph on top
 // would say the same thing twice in the same breath).
@@ -60,18 +68,23 @@ export const landingRoom: RoomDefSlice = {
   map: { x: 1, y: 0 },
   description,
   exits: [
-    { dir: 'in', to: YOUR_ROOM, door: DOOR, travelText: travelTextToYourRoom },
-    // §15.2 — permanently blocked by `LANDING_BOUNDARY_GATE` (never
-    // opens); `to` is inert (never actually traversed) and points back at
-    // this room rather than inventing a destination this build doesn't
-    // have. `blockedText` — not the generic `move.blocked`/`move.noExit`
-    // families — is what actually renders; see §15.2's own note on why
-    // both generic families would be dishonest here.
-    { dir: 'down', to: LANDING, door: LANDING_BOUNDARY_GATE, blockedText: BUILD_BOUNDARY_TEXT },
-    // §15.1.6's own note: "OUT on the landing should reach §15.2, not
-    // your_room. A player who types OUT in a stairwell wants to leave the
-    // building." — same boundary, same gate.
-    { dir: 'out', to: LANDING, door: LANDING_BOUNDARY_GATE, blockedText: BUILD_BOUNDARY_TEXT },
+    // Bug fix (Ryan's playtest): this exit's `door` must be the object
+    // that resolves for the noun "door" FROM THE LANDING
+    // (`your_door_outside`, `objects/landing.ts`) — not `act1_door`
+    // (`objects/door.ts`), which lives in `your_room` and is never in
+    // scope from here. `traverseDoor` (ENTER/USE/GO THROUGH <door>)
+    // matches an exit by comparing its `door` against the RESOLVED
+    // object, so the old wiring silently could never match, and bare
+    // `IN` only ever worked because direction traversal doesn't resolve
+    // a noun at all. `your_door_outside`'s own `open` overlay is kept in
+    // sync with the real door's by `objects/door.ts`'s OPEN/CLOSE
+    // handlers (see that file).
+    { dir: 'in', to: YOUR_ROOM, door: YOUR_DOOR_OUTSIDE, travelText: travelTextToYourRoom },
+    { dir: 'down', to: FRONT_DESK, travelText: travelTextToFrontDesk },
+    // §15.1.6's own note, still true now that there's a real destination:
+    // "OUT on the landing... a player who types OUT in a stairwell wants to
+    // leave the building" — routes to the Front Desk exactly like DOWN.
+    { dir: 'out', to: FRONT_DESK, travelText: travelTextToFrontDesk },
   ],
   handlers: landingHandlers,
 };

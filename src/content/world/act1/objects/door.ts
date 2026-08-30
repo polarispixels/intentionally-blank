@@ -4,7 +4,7 @@
 
 import type { ObjectDefSlice } from '../../../../engine/world';
 import type { ProseRule } from '../../../../engine/prose';
-import { CLUE_BOLT_THROWN, DOOR, DOOR_BOLT, FLAG_DOOR_BOLT_DRAWN, YOUR_ROOM } from '../ids';
+import { CLUE_BOLT_THROWN, DOOR, DOOR_BOLT, FLAG_DOOR_BOLT_DRAWN, YOUR_DOOR_OUTSIDE, YOUR_ROOM } from '../ids';
 import { BREAK, CLOSE, EXAMINE, KICK, LISTEN, LOCK, LOOK_UNDER, OPEN } from '../verbs';
 
 const examine: ProseRule[] = [
@@ -40,6 +40,15 @@ const door: ObjectDefSlice = {
         { set: [FLAG_DOOR_BOLT_DRAWN, true] },
         { grantClue: CLUE_BOLT_THROWN },
         { setState: [DOOR, 'open', true] },
+        // Landing-bug fix: `your_door_outside` (`objects/landing.ts`) is a
+        // second object for the same physical door, seen from the other
+        // side (ids.ts's own note on why) — its own `open` overlay has to
+        // be kept in sync here, or the Landing's `in` exit (now keyed to
+        // THIS object, not `DOOR` — see `landing.ts`) can never register
+        // as open, and ENTER DOOR/USE DOOR/GO THROUGH DOOR/ENTER ROOM from
+        // the Landing would stay blocked even after the player has drawn
+        // the bolt and stepped out.
+        { setState: [YOUR_DOOR_OUTSIDE, 'open', true] },
       ],
     },
     {
@@ -47,6 +56,7 @@ const door: ObjectDefSlice = {
       effects: [
         { say: 'You throw the bolt. The room is now exactly as secure as it was earlier this evening, which is a thought you decide not to follow any further tonight.' },
         { setState: [DOOR, 'open', false] },
+        { setState: [YOUR_DOOR_OUTSIDE, 'open', false] },
       ],
     },
     { verbs: [LISTEN], effects: [{ say: 'A house at night, being a house. A stair tread taking weight and giving it back. A radio somewhere below, turned down to the level where it is company rather than information. Nobody is coming up.' }] },

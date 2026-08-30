@@ -25,6 +25,7 @@
 import { BUILTIN_VERB_IDS } from '../../../engine/actions';
 import { V } from '../../../engine/ids';
 import { AGAIN_VERB_ID } from '../../../engine/interpreter';
+import { NPC_VERB_IDS } from '../../../engine/npc';
 import { DIRECTION_VERB_IDS, LOOK_VERB_ID, USE_VERB_ID } from '../../../engine/move';
 import type { ProseRule } from '../../../engine/prose';
 import type { VerbDef } from '../../../engine/world';
@@ -35,7 +36,11 @@ import {
   FLOOR_LAMP,
   TERMINAL,
   V_ABOUT,
+  V_CALL,
+  V_CHECK_DATE,
   V_CLEAN,
+  V_DRINK,
+  V_FIND_MY_NAME,
   V_HELP,
   V_HOLD_TO_LAMP,
   V_KNOCK,
@@ -43,11 +48,15 @@ import {
   V_LOOK_DOWN,
   V_LOOK_OUTSIDE,
   V_LOOK_UP,
+  V_POUR,
   V_RIGHT,
+  V_RING,
   V_ROLL_UP,
+  V_SIGN,
   V_SLIDE_DOWN,
   V_SUDO,
   V_SWEEP,
+  V_TILT,
   V_TIP,
   V_TURN_OVER,
   V_TYPE_TERMINAL,
@@ -88,7 +97,18 @@ export const YELL = V('yell');
 export const PRAY = V('pray');
 export const JUMP = V('jump');
 export const SING = V('sing');
-export const HELLO = V('hello');
+/**
+ * Front-desk-prose §5's first real NPC needs `TALK TO`/`HELLO <npc>` to
+ * reach `npc.ts`'s reserved `NPC_VERB_IDS.talk` special routing
+ * (`respond.ts`'s `respondToAction`) — which only fires for THIS exact id.
+ * Room 1's own bare "HELLO"/"HI"/"HEY" easter egg (`helloDefault`, below)
+ * already claimed the word "hello" globally (one act-wide verb table), so
+ * rather than a second, colliding verb id for the npc-targeted case, this
+ * id IS `NPC_VERB_IDS.talk` — bare `hello`/`hi`/`hey` (no dobj) still
+ * renders the exact same `helloDefault` text as before (unchanged), and
+ * `hello`/`talk to` with an npc dobj now also reaches greeting.
+ */
+export const HELLO = NPC_VERB_IDS.talk;
 
 // ---------------------------------------------------------------------------
 // §7 — room-specific bare verbs. Most of these have no schema slot other
@@ -198,6 +218,37 @@ const lookOutside: ProseRule[] = [
 ];
 
 // ---------------------------------------------------------------------------
+// Front Desk & Lobby — new bare/shared-text verbs (front-desk-prose §4, §6).
+// Shared between an object handler (dobj form) and a bare/room-level
+// fallback where the doc's own phrasing has no natural object (§4.2's "find
+// my name", §6's "check date"/"look for date") — same idiom as room 1's
+// `standDefault`/`terminalTypeDefault` above.
+// ---------------------------------------------------------------------------
+
+/** §4.1 "ring bell"/"press bell"/"hit bell" — shared by V_RING and (on the bell sub-part only) BREAK's existing "hit". */
+export const ringBellText =
+  "You put a finger on the plunger. The bell is nine inches from Marlow's ear and Marlow is looking directly at you.\n\nYou take the finger back off.";
+
+/** §4.1 "examine telephone"/"use telephone"/"call". */
+export const telephoneText = 'Black, heavy, bolted through the counter, with a dial. Marlow does not offer it and does not move it out of reach.';
+
+/** §4.1 "pour coffee"/"drink coffee"/"take coffee". */
+export const coffeeText =
+  'You pour a cup off the ring. It is terrible in an entirely familiar way, which is the first familiar thing that has happened to you tonight.';
+
+/** §4.2 "sign register"/"write in register"/"write name"/"write my name". */
+export const signRegisterText =
+  'There is a pen in the inkstand and a book on the counter and a line waiting at the bottom of the page.\n\nYou do not know what to put on it.';
+
+/** §4.2 "read register"/"look through register"/"find my name"/"search register". */
+export const findNameText =
+  'You turn back through the weeks looking for yourself. The hand is the same all the way down, the entries are unremarkable all the way down, and the week you would be in is the week that is no longer in the book.';
+
+/** §6 "turn over magazine"/"check date"/"look for date". */
+export const checkDateText =
+  'You turn one over. The mailing label has been torn off the back, the way people do, and what is left is an address that is half a name and a stripe of glue.';
+
+// ---------------------------------------------------------------------------
 // The full table.
 // ---------------------------------------------------------------------------
 
@@ -207,7 +258,8 @@ export const ACT1_VERBS: Record<string, VerbDef> = {
   // grammar to recognize it at all; `performAction` supplies the physics,
   // this table only supplies vocabulary + the §5 bare-safe `default`.
   [LOOK_VERB_ID]: { id: LOOK_VERB_ID, words: ['look', 'l', 'look around'], patterns: ['V'], class: null, default: 'You look around.' },
-  [TAKE]: { id: TAKE, words: ['take', 'get', 'pick up'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.take },
+  // "steal" added (front-desk-prose §4.2's "STEAL REGISTER") — a general TAKE synonym, not register-specific vocabulary.
+  [TAKE]: { id: TAKE, words: ['take', 'get', 'pick up', 'steal'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.take },
   [DROP]: { id: DROP, words: ['drop', 'put down'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.drop },
   // "try handle" added (§15.1.5's landing_doors block: "open / unlock /
   // try handle") — a general OPEN synonym, not landing-specific vocabulary,
@@ -224,7 +276,11 @@ export const ACT1_VERBS: Record<string, VerbDef> = {
   [TURN_ON]: { id: TURN_ON, words: ['turn on', 'switch on'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.turn_on },
   [TURN_OFF]: { id: TURN_OFF, words: ['turn off', 'switch off'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.turn_off },
 
-  [EXAMINE]: { id: EXAMINE, words: ['examine', 'x', 'inspect', 'study', 'look at'], patterns: ['V dobj'], class: 'analytical', default: VERB_DEFAULTS.examine },
+  // "look closely at" added (front-desk-prose §4.2's "LOOK CLOSELY AT PAGE") —
+  // a distinct 3-word phrase from "look at" (the word "closely" sits between
+  // them, so it wouldn't otherwise match); a general EXAMINE synonym, not
+  // register-specific vocabulary.
+  [EXAMINE]: { id: EXAMINE, words: ['examine', 'x', 'inspect', 'study', 'look at', 'look closely at'], patterns: ['V dobj'], class: 'analytical', default: VERB_DEFAULTS.examine },
   [SEARCH]: { id: SEARCH, words: ['search', 'look in', 'look through', 'rummage'], patterns: ['V dobj'], class: 'analytical', default: VERB_DEFAULTS.search },
   [LOOK_UNDER]: { id: LOOK_UNDER, words: ['look under', 'check under'], patterns: ['V dobj'], class: 'analytical', default: VERB_DEFAULTS.look_under },
   [LOOK_BEHIND]: { id: LOOK_BEHIND, words: ['look behind', 'check behind'], patterns: ['V dobj'], class: 'analytical', default: VERB_DEFAULTS.look_behind },
@@ -267,7 +323,20 @@ export const ACT1_VERBS: Record<string, VerbDef> = {
   [PRAY]: { id: PRAY, words: ['pray'], patterns: ['V'], class: null, default: prayDefault },
   [JUMP]: { id: JUMP, words: ['jump', 'hop', 'leap'], patterns: ['V'], class: null, default: jumpDefault },
   [SING]: { id: SING, words: ['sing', 'hum', 'whistle'], patterns: ['V'], class: null, default: singDefault },
-  [HELLO]: { id: HELLO, words: ['hello', 'hi', 'hey'], patterns: ['V'], class: 'social', default: helloDefault },
+  [HELLO]: { id: HELLO, words: ['hello', 'hi', 'hey', 'talk to'], patterns: ['V', 'V dobj'], class: 'social', default: helloDefault },
+
+  // Front Desk & Lobby's first NPC (front-desk-prose §5) — ASK/TELL/SHOW.
+  // SHOW already exists below under this table's own `SHOW` id, which is
+  // ALREADY `NPC_VERB_IDS.show` (both are `V('show')` — see `npc.ts`'s
+  // `NPC_VERB_IDS`), so no change is needed there. ASK/TELL are new: no
+  // room 1 content ever needed them. `default` reuses the existing,
+  // already-approved `talk_to` family (response-families doc §0 note 3:
+  // "Ask about something in particular") rather than inventing new prose —
+  // it is the closest existing family to "you tried to converse and it
+  // didn't land," and is the same shape `tests/npc.test.ts`'s own fixture
+  // reuses for exactly this rung-2 fallback.
+  [NPC_VERB_IDS.ask]: { id: NPC_VERB_IDS.ask, words: ['ask'], patterns: ['V npc about topic'], class: 'social', default: VERB_DEFAULTS.talk_to },
+  [NPC_VERB_IDS.tell]: { id: NPC_VERB_IDS.tell, words: ['tell'], patterns: ['V npc about topic'], class: 'social', default: VERB_DEFAULTS.talk_to },
 
   [V_RIGHT]: { id: V_RIGHT, words: ['right', 'lift'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.move },
   [V_TIP]: { id: V_TIP, words: ['tip', 'lay down'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.move },
@@ -327,6 +396,21 @@ export const ACT1_VERBS: Record<string, VerbDef> = {
   [V_LOOK_OUTSIDE]: { id: V_LOOK_OUTSIDE, words: ['look outside'], patterns: ['V'], class: 'analytical', default: lookOutside },
   [V_CLEAN]: { id: V_CLEAN, words: ['clean up', 'sweep up'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.rub },
   [V_UNPLUG]: { id: V_UNPLUG, words: ['unplug'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.pull },
+
+  // Front Desk & Lobby (front-desk-prose §4, §6) — see this file's own
+  // "shared-text" section above for the strings these `default`s reuse.
+  [V_RING]: { id: V_RING, words: ['ring', 'press'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.push },
+  // Bare-only — one telephone in the game, no dobj needed (same idiom as V_TYPE_TERMINAL).
+  [V_CALL]: { id: V_CALL, words: ['call'], patterns: ['V'], class: 'social', default: telephoneText },
+  [V_POUR]: { id: V_POUR, words: ['pour'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.push },
+  [V_DRINK]: { id: V_DRINK, words: ['drink'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.drink },
+  [V_TILT]: { id: V_TILT, words: ['tilt'], patterns: ['V dobj'], class: 'analytical', default: VERB_DEFAULTS.move },
+  // Bare and dobj forms share one id and one text (same shape as room 1's STAND).
+  [V_SIGN]: { id: V_SIGN, words: ['sign', 'write in', 'write name', 'write my name'], patterns: ['V', 'V dobj'], class: null, default: signRegisterText },
+  // Bare-only, multi-word verb words (same idiom as V_WHOAMI) — needs a
+  // room-level handler (front_desk's own `handlers`) to also run its effects.
+  [V_FIND_MY_NAME]: { id: V_FIND_MY_NAME, words: ['find my name', 'find name'], patterns: ['V'], class: 'analytical', default: findNameText },
+  [V_CHECK_DATE]: { id: V_CHECK_DATE, words: ['check date', 'look for date'], patterns: ['V'], class: 'analytical', default: checkDateText },
   // §8 gap 2: the real reserved `INVENTORY_VERB_ID`, not a room-local id.
   // `default` refs the global `inventory.empty` family — `room.ts`'s own
   // handler overrides it for the empty-hands case (§8.9/§14.4).

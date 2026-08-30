@@ -386,6 +386,53 @@ export interface NpcDefSlice {
   adjectives?: string[];
   /** §3.4's `him`/`her`/`them` resolution reads this — see `parser/vocabulary.ts`'s `npcPronouns`. Absent ⇒ this NPC never participates in pronoun fallback/antecedent-tracking (no guessing a gender the content never declared). */
   pronoun?: 'he' | 'she' | 'they';
+  /**
+   * The authored display name (mirrors `ObjectDefSlice.name`) — §2.6's
+   * `NpcDef` doesn't specify a separate display-name field, but objects
+   * have had one since task 8, read by `actions.ts`'s `objectName` for
+   * every rung-2 `{name}` templating, precisely to avoid vocab-derived
+   * naming in prose. NPCs had no equivalent, so every `{name}`/`{dobj}`
+   * context this module's readers (`npc.ts`, `respond.ts`) built for an NPC
+   * fell back to `parser/resolver.ts`'s `candidateName` — a *disambiguation*
+   * helper (§3.3), never designed as a display name: it glues an NPC's
+   * first-indexed adjective to its first-indexed noun ("night marlow" for
+   * Marlow, whose `adjectives` lists "night" before `nouns` lists "marlow"
+   * — correct for "which lamp did you mean," wrong for "who is this
+   * person"). That is the single root cause of Ryan's `X MARLOW` bug
+   * report (fixed here, not per-NPC): `npcDisplayName` (`npc.ts`) now reads
+   * this field first and only falls back to `candidateName` when an NPC
+   * doesn't author one — existing fixture/content NPCs with no `name` keep
+   * their prior (still vocab-derived) rendering unchanged.
+   */
+  name?: string;
+  /**
+   * EXAMINE's authored text (§2.6: "the personality lives here") — mirrors
+   * `ObjectDefSlice.description`, though an NPC has no READ fallback (people
+   * aren't read). `respond.ts`'s NPC-target rung 2 renders this — ahead of
+   * the verb's own generic `default` family — for the reserved EXAMINE verb
+   * id only (`respond.ts`'s `EXAMINE_VERB_ID`, the same "content declares
+   * the words/patterns under this exact id" convention `LOOK_VERB_ID`/
+   * `USE_VERB_ID` already use), the same way `handlers` below is checked
+   * first for every npc-targeted verb. Absent ⇒ EXAMINE on this NPC falls
+   * through exactly as any other unhandled npc-targeted verb always has.
+   */
+  description?: Prose;
+  /**
+   * Generic npc-targeted verb handlers — parity with `ObjectDefSlice.
+   * handlers` (rung 1), added alongside `description` per this task's
+   * report (ATTACK MARLOW/FOLLOW MARLOW had no authoring surface at all).
+   * Matched by `respond.ts`'s `respondToNpcTarget` the same way
+   * `actions.ts`'s `findHandler` matches an object's own — first handler
+   * whose `verbs` includes the resolved verb and whose `when` (if any)
+   * holds wins, and its effects run via `apply()`, overriding the verb's
+   * default family entirely. `withInstrument` is accepted by the type for
+   * parity but is never actually matched against a real `iobj` today —
+   * `respondToNpcTarget`'s own call site (`respond.ts`) doesn't thread one
+   * through (ATTACK/FOLLOW aren't declared verbs anywhere in this world
+   * yet, so nothing exercises it) — flagged here rather than silently
+   * pretended-working.
+   */
+  handlers?: HandlerDef[];
   /** ASK <npc> ABOUT <topic>. */
   topics?: TopicDef[];
   /**

@@ -93,6 +93,20 @@ function requireNpc(world: WorldDef, npc: NpcId): NpcDefSlice {
   return def;
 }
 
+/**
+ * The display name for `{name}`/`{dobj}` prose templating on an NPC —
+ * `NpcDefSlice.name` (the task-1 fix, see that field's own doc comment on
+ * why `candidateName` alone was the root cause of "the night marlow")
+ * first, falling back to `candidateName`'s vocab-derived guess only when an
+ * NPC authors no `name` of its own. `respond.ts` uses this same helper for
+ * its own two NPC-naming call sites (`respondToNpcTarget`/
+ * `respondToShowDefault`) so the fix is one function, not four call sites
+ * independently patched.
+ */
+export function npcDisplayName(world: WorldDef, vocab: CompiledVocabulary, npc: NpcId): string {
+  return world.npcs?.[npc]?.name ?? candidateName(vocab, npc);
+}
+
 // ---------------------------------------------------------------------------
 // ASK / TELL — topic matching, knowledge gating, unknownTopic
 // ---------------------------------------------------------------------------
@@ -132,7 +146,7 @@ function respondToTopic(world: WorldDef, state: GameState, vocab: CompiledVocabu
   const topic = findTopic(world, state, topicsFor(def, tell), rawTopic);
   if (topic === undefined) return respondToUnknownTopic(world, state, vocab, npc, def, rawTopic);
 
-  const name = candidateName(vocab, npc);
+  const name = npcDisplayName(world, vocab, npc);
   const path = `npc.${npc}.topic.${topic.id}`;
   const { state: newState, events } = apply(world, state, [{ say: topic.response }, ...(topic.effects ?? [])], {
     name,
@@ -148,7 +162,7 @@ function respondToUnknownTopic(world: WorldDef, state: GameState, vocab: Compile
   if (def.unknownTopic === undefined) {
     throw new Error(`npc: "${npc}" has topics/tellTopics but no unknownTopic authored`);
   }
-  const name = candidateName(vocab, npc);
+  const name = npcDisplayName(world, vocab, npc);
   const rendered = render(world, state, `npc.${npc}.unknownTopic`, def.unknownTopic, { name, dobj: name, topic: rawTopic });
   return {
     state: rendered.state,
@@ -192,7 +206,7 @@ export function respondToShow(world: WorldDef, state: GameState, vocab: Compiled
   if (entry === undefined) return undefined;
 
   const objectName = world.objects?.[object]?.name ?? object;
-  const npcName = candidateName(vocab, npc);
+  const npcName = npcDisplayName(world, vocab, npc);
   const path = `npc.${npc}.show.${object}`;
   const { state: newState, events } = apply(world, state, [{ say: entry.response }, ...(entry.effects ?? [])], {
     name: objectName,
@@ -218,7 +232,7 @@ export function respondToGreeting(world: WorldDef, state: GameState, vocab: Comp
   const def = requireNpc(world, npc);
   if (def.greeting === undefined) return undefined;
 
-  const name = candidateName(vocab, npc);
+  const name = npcDisplayName(world, vocab, npc);
   const rendered = render(world, state, `npc.${npc}.greeting`, def.greeting, { name, dobj: name });
   return {
     state: rendered.state,

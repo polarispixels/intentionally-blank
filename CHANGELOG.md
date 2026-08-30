@@ -12,6 +12,68 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.4.0] - 2026-09-01
+
+**The Front Desk, and the first person in the game.** Act I begins.
+
+### Added
+
+- **The Front Desk & Lobby** — the boarding house's ground floor, seven
+  objects, at standard density rather than the opening room's hero tier.
+- **Marlow**, the night clerk: a description, a greeting, twelve topics,
+  TELL and SHOW responses, and his own `unknownTopic`.
+
+  He **withholds without lying**. Every line he says is literally true; the
+  omission lives in the qualifier — *"Not while I was at the desk"* — and
+  the narrator marks the narrowness exactly three times before trusting the
+  player to notice. His fear is never a sentence he says: pressed to
+  describe a face, he starts three times and gets nowhere, and the not
+  getting anywhere is plainly worse for him than the question.
+
+  His `unknownTopic` is deliberately flat, and the tell it *could* have
+  carried is defused by being established on ordinary topics first — so a
+  topic he is protecting and one he simply has nothing on are
+  indistinguishable. Every topic stays reachable in every state; what
+  changes is what he says, never whether he's there to be asked.
+
+- **The register.** A page torn out along the gutter, the tear still bright,
+  and the sheet beneath it blank. Tilt it into the desk lamp — or feel it —
+  and the impression comes up: a time in the small hours, a room number you
+  recognise, and in the name column **one stroke of a pen, begun and set
+  down**. Not an unsigned line. The clerk started to write it and stopped,
+  which points the evidence at the man standing in front of you and turns
+  the register into leverage in a conversation.
+
+- Canon entries 24–26: Marlow is the boarding house's clerk, not the
+  motel's (an error in the roster I wrote); the register stays on the
+  counter and the evidence is the impression, not the book's location; and
+  what the missing page shows.
+
+### Fixed — from Ryan's playtest
+
+- **You could not get back into your room from the landing.** Only bare
+  `IN` worked. The cause: a door between two rooms is *two objects*, and
+  the landing's exit pointed at the one inside the room, which is never in
+  scope from outside — so traverse-by-door had nothing to match. All five
+  phrasings now work, with a regression test over them.
+- `ENTER ROOM` answered about the floorboards, which owned the noun `room`.
+- **`X MARLOW` returned "the night marlow… stubbornly itself."** `NpcDefSlice`
+  had no `description` field, so the authored description had nowhere to
+  live, and the fallback name came from `candidateName` — a *disambiguation*
+  helper repurposed as a display name, gluing an NPC's first adjective to
+  its first noun. Wrong for every character in the game, not just this one.
+  NPCs now have `name`, `description`, and `handlers`.
+
+### Notes
+
+The first NPC exposed three holes in the type it was built on, which is why
+it was built before batching more rooms. Density ran ~20% over budget before
+trimming — worth watching across the next few rooms.
+
+Still open: the landing door's description leads with a keyhole and no key,
+which reads as a lockout now that the door opens. Needs an authored variant;
+a builder correctly declined to invent one.
+
 ## [0.3.3] - 2026-08-31
 
 Everything Ryan hit in his second playtest.

@@ -19,7 +19,7 @@ Maintenance rules:
 |---|---|---|---|
 | A | Story + engine architecture: five-act causal spine, puzzle network, room list, NPC agendas, memory system, save/undo design; canon decisions registered in `docs/spec/09` | docs site | ✅ **complete v0.2.9** — story architecture (41 rooms, 28 puzzles, 5 acts) + engine v2 architecture + ADRs 0008–0010; 15 canon decisions promoted (register entries 3–17) |
 | B | Engine v2 (world model, parser v2, save/undo/autosave, map + open-questions UI) + the opening room (M1) | 0.3.0 | ✅ **shipped v0.3.0** — 23 tasks, 729 tests; the live URL is now the real game |
-| C | Act I: town, client, missing sibling, notebook trail (M2–M4) | 0.4–0.6 | 🎯 next up |
+| C | Act I: town, client, missing sibling, notebook trail (M2–M4) | 0.4–0.6 | 🚧 in progress — Front Desk & Marlow shipped v0.4.0 (3 of 32 rooms; first NPC) |
 | D | Acts II–III: data center, underground, Dad on the USB, contradictions | 0.7–0.8 | queued |
 | E | Acts IV–V: reality travel, identity, the recursive ending | 0.9 | queued |
 | F | Hints, playtester sweeps, replay content, polish | 1.0.0 | queued |
