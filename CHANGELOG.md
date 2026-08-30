@@ -12,6 +12,54 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.2.29] - 2026-08-30
+
+**The opening room is written.** The first thing any player will read.
+
+### Added
+
+- `docs/superpowers/specs/2026-08-30-opening-room-prose.md` — six opening
+  paragraphs, four room states, thirteen objects carrying ~115 authored
+  responses, the first memory fragment, sixteen room-specific
+  reasonable-action responses, seven clues, and a two-step secret. Written
+  by `narrative-writer`, voice-reviewed. It clears every line of the
+  first-playable quality bar in handoff §9.
+- The recurring terminal's `USER NOT RECOGNIZED` is built to carry two
+  readings at once (constitution §31). The message never varies with the
+  input — right, wrong, blank, identical text at identical speed — and one
+  variant has the player press ENTER on an empty line and watch the machine
+  reject nothing. The narrator names the grammar and stops: *"It does not
+  say incorrect. It does not say no such user. Not recognized is a
+  different sort of remark."* Act I hears a cranky login. Act V has a
+  memory of a terminal refusing an empty field.
+
+  The section carries an authoring note forbidding any future editor from
+  supplying the Act I reading. The player supplies it.
+
+### Changed — canon
+
+- **Register entry 18: page 7/8 is in the fedora's hatband, not the desk
+  drawer.** A real conflict between the story architecture and the M1 brief,
+  surfaced by the writer rather than silently resolved. The hatband wins on
+  three counts: it explains *why this page survived* a methodical search —
+  they went through the room, not the hat on the floor — it keeps the Act I
+  spine deliverable in M1, where the drawer has no pry tool yet, and it
+  gives the fedora a function beyond noir costume.
+- **Register entry 19: the drawer stays locked through M1**, as handoff §3's
+  one locked object. An unopened drawer is an open thread, not a dead end —
+  visibly locked and visibly waiting, which is the distinction constitution
+  §10 actually draws.
+
+### Notes
+
+Left for Ryan: the fedora memory has an alternate version in which the
+voice two steps ahead is Dad's. The faceless version is written so the slot
+isn't occupied.
+
+Quarantined as proposals in `BACKLOG.md` rather than written in: the chair
+and its loose leg, the mirror, and the door bolt as a mechanic — all Act I,
+none M1.
+
 ## [0.2.28] - 2026-08-30
 
 ### Added

@@ -74,6 +74,13 @@ Version targets follow the ladder in `docs/spec/README.md` and may shift.
 
 ## Prose gaps to batch into the next `narrative-writer` pass
 
+- **Act I content beyond M1, quarantined by `narrative-writer` as proposals
+  rather than written in.** The chair and its loose leg (canon 02 §2; the
+  pry tool that opens the drawer), the mirror (architecture L11, the
+  tattoo-removal ghost's staging), and the door bolt as a mechanic. All are
+  Act I, none are M1, and all were flagged rather than silently included —
+  which is the escalate-never-guess rule working on the prose side.
+
 - **No authored line for acting after death or an ending.** The turn loop
   refuses non-meta actions once `phase` is `'dead'` or `'ended'` (meta verbs
   still work, since UNDO and RESTART ENCOUNTER are exactly what a player

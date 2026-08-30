@@ -1,6 +1,7 @@
 # Stage A — Story Architecture
 
-**Status:** proposed by `game-architect` (Fable) 2026-08-29 · awaiting main-session review and Ryan's read on the docs site
+**Status:** accepted; canon promoted as register entries 3–17. **Amended 2026-08-30:** page 7/8 is in the fedora's hatband, not the desk drawer (register entry 18) — §3 and ledger L1 below are superseded on that point.
+**Originally:** proposed by `game-architect` (Fable) 2026-08-29 · awaiting main-session review and Ryan's read on the docs site
 **Covers:** full-game build Stages B–F (see `docs/DEVELOPMENT.md`, "Full-game build protocol")
 **Canon inputs:** `docs/spec/00`–`04`, `06`–`09` at spec `0.2.x`. Everything marked **CANON** in those docs is treated as binding here. Everything this document invents is marked **[PROPOSED]** and appears again in §8 in the `09-canon-decisions.md` column format. Nothing in this file changes a canon label by itself.
 
