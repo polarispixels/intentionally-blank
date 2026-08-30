@@ -1,44 +1,47 @@
-// v2 world/state types (spec §1.2, §2.1).
+// `WorldDef` (spec §2.1) and the overlay-resolution helpers (§0's directory
+// map: "scope, visibility, light, movement, resolution helpers") — §8 task 6.
 //
-// Collision note (task 3 → task 6): the architecture doc's directory map
-// puts `GameState` in `state.ts` and the rest of `WorldDef` in `world.ts`.
-// `src/engine/state.ts` is still the MVP's file (stays untouched until task
-// 22 retires it), so both narrow types land here for now. Task 6 ("State +
-// world resolution") owns turning this into the real split — moving
-// `GameState` into a new `state.ts` once that's possible — and extending
-// `WorldDef` with `rooms`/`objects`/`npcs`/etc. This file only declares the
-// slices task 3 needs; it deliberately does not stub `RoomDef`, `ObjectDef`,
-// `NpcDef`, or any other content-schema type those later tasks own.
+// SPLIT NOTE (task 3 → task 6): task 3 parked a narrow slice of the v2
+// `GameState`/`Clock`/overlay types here alongside `WorldDef`, documented in
+// this file's previous header, because `src/engine/state.ts` was (and still
+// is) the live MVP file. Task 6 finishes that split: the full `GameState`
+// and `initialState(world)` now live in `gamestate.ts` (see that file's
+// header for why not `state.ts`). This file re-exports every type that
+// moved so `cond.ts`, `clock.ts`, `prose.ts`, `effects.ts`, and their tests
+// — all of which import `GameState`/`Clock`/etc. from `'./world'` — keep
+// compiling with zero changes to their own source.
 //
-// Task 5 (`effects.ts`) additions below follow the same "narrow slice, grow
-// later" pattern: `objects`/`memories`/`clues`/`questions`/`scripts` are
-// **not** the full §2.1/§2.5/§2.7 authoring schemas (those bring in
-// `RoomDef`/handlers/etc. and are task 6/7/15/16's to design) — they carry
-// only the fields the `Effect` DSL's runtime needs (e.g. `plotCritical` for
-// the move guard, `lines`/`title`/`text` for the events a grant/open/answer
-// emits). All new `WorldDef` fields are optional so `tests/prose.test.ts`'s
-// already-shipped inline `WorldDef` literal (which predates this task and
-// isn't task 5's to touch) keeps compiling untouched. Likewise `GameState`
-// gains `phase`/`ending` (needed by `die`/`end`) as optional, not required
-// as §1.2 has them, for the same reason: `tests/cond.test.ts` and
-// `tests/prose.test.ts` build `GameState` object literals that omit them,
-// and those files belong to tasks 3/4.
+// SEAM NOTE (task 6 follow-up, found in review): `objectLocation` and
+// `objectState` — the overlay-with-authored-fallback resolvers — now live
+// in `resolve.ts`, not here, because `cond.ts`'s `objectAt`/`objectState`/
+// `has` arms need them too and a plain `world.ts` → `cond.ts` → `world.ts`
+// wiring would cycle (`cond.ts` needs `WorldDef`; `world.ts`'s `isDark`
+// needs `cond.ts`'s `evaluate`). `resolve.ts` is a types-only leaf both
+// modules import from at runtime with no cycle. Likewise `npcRoom` now
+// lives in `cond.ts` (its schedule fallback needs `evaluate`, and the two
+// are mutually recursive), re-exported from here so existing callers of
+// `world.ts`'s `npcRoom` keep working unchanged. This file re-exports both
+// kinds of import for that reason — see `resolve.ts` and `cond.ts` for the
+// full explanation.
+//
+// This file's own job now is: `WorldDef` (still a growing narrow slice —
+// later tasks add the rest of §2.1's rooms/objects/npcs authoring surface),
+// `isDark` (§2.4's sole darkness authority), and `scope` (what the player
+// can currently see) — the two resolvers that *do* need `Cond` evaluation
+// (a room's `dark` baseline can be a `Cond`) but don't need to live beside
+// `evaluate` itself the way `npcRoom` does.
 
-import type {
-  ActionClass,
-  ClueId,
-  DayPhase,
-  FlagId,
-  FlagValue,
-  MemoryId,
-  NpcId,
-  ObjectId,
-  PlaceId,
-  QuestionId,
-  RoomId,
-  ScriptId,
-} from './ids';
+import type { Cond } from './cond';
+import { evaluate } from './cond';
+import type { DayPhase, FlagId, FlagValue, MemoryId, ClueId, NpcId, ObjectId, PlaceId, QuestionId, RoomId, ScriptId } from './ids';
 import type { Prose } from './prose';
+import { objectLocation, objectState } from './resolve';
+import type { GameEvent, GameState } from './gamestate';
+
+export type { Clock, GameEvent, GameState, NpcOverlay, ObjectOverlay, Phase } from './gamestate';
+export { initialState } from './gamestate';
+export { objectLocation, objectState } from './resolve';
+export { npcRoom } from './cond';
 
 /**
  * The day/week scheduling surface (canon A9). `phases` gives the start
@@ -50,22 +53,80 @@ import type { Prose } from './prose';
 export interface WorldMeta {
   phases: Record<DayPhase, number>;
   weekLength: number;
+  /**
+   * Where `initialState()` places the player. Optional only because the
+   * task 3–5 fixture/test `WorldDef` literals (not this task's to touch)
+   * predate it and don't declare one; `initialState()` throws if it's
+   * missing rather than guessing a room.
+   */
+  startRoom?: RoomId;
 }
 
-/** Narrow slice of §2.1's `WorldDef` — just what `cond.ts` reads today. */
+/**
+ * Minimal container-authoring slice of §2.5's `ObjectDef.container` — just
+ * the fields `objectState`/`isDark`/`scope` below read.
+ */
+export interface ContainerDef {
+  open?: boolean;
+  locked?: boolean;
+  transparent?: boolean;
+}
+
+/**
+ * Minimal object-authoring slice of §2.5's `ObjectDef` — `location` (the
+ * authored fallback the §1.1 prime rule resolves to when state has no
+ * overlay entry), plus the fields darkness/scope/the plot-critical guard
+ * need. Not yet `name`/`nouns`/`adjectives`/`handlers`/etc. — those are
+ * later tasks' (8: actions, 9–11: parser) to add.
+ */
+export interface ObjectDefSlice {
+  location: PlaceId;
+  hidden?: boolean;
+  container?: ContainerDef;
+  supporter?: boolean;
+  lightSource?: boolean; // while `on` and in scope, defeats baseline darkness (isDark, §2.4)
+  plotCritical?: boolean;
+}
+
+/**
+ * Minimal room-authoring slice of §2.4's `RoomDef` — just `dark`, the
+ * baseline `isDark` reads. Not yet `name`/`exits`/`description`/etc. —
+ * those are later tasks' to add.
+ */
+export interface RoomDefSlice {
+  dark?: true | Cond;
+}
+
+/**
+ * Minimal schedule-authoring slice of §2.6. `ScheduleRule.room` is where an
+ * NPC is when `when` holds (or unconditionally, if `when` is omitted);
+ * rules are tried in order, first match wins — the same convention
+ * `prose.ts`'s `ProseRule` selection uses. This is deliberately not full
+ * derivation (no `activity` text, no interaction with `tick`'s per-turn
+ * recompute, no witnessed-event awareness) — task 13 owns that; see
+ * `cond.ts`'s `npcRoom` doc comment for the precise boundary, and its file
+ * header for why a rule's `when` must not depend on `npcAt` for its own npc.
+ */
+export interface ScheduleRule {
+  when?: Cond;
+  room: RoomId | 'offstage';
+}
+
+/**
+ * Minimal npc-authoring slice of §2.6 — just `schedule`, which `npcRoom`'s
+ * fallback reads. Not yet `topics`/`handlers`/etc. — those are tasks 13–14's.
+ */
+export interface NpcDefSlice {
+  schedule?: ScheduleRule[];
+}
+
+/** Narrow, still-growing slice of §2.1's `WorldDef`. */
 export interface WorldDef {
   meta: WorldMeta;
   flags: Record<FlagId, { default: FlagValue; doc: string }>;
-  /**
-   * Minimal object-authoring slice (§2.5's full `ObjectDef` is later tasks'
-   * to add): today only `plotCritical`, which `effects.ts`'s `move()` reads
-   * for its runtime guard, and membership itself, which `effects.ts`'s
-   * `setProp` uses to tell an `ObjectId` from an `NpcId` target (both are
-   * plain strings at runtime — see that module for the disambiguation
-   * rule). A world need not declare every object here yet; one it omits
-   * simply never guards or disambiguates as an object.
-   */
-  objects?: Record<ObjectId, { plotCritical?: boolean }>;
+  rooms?: Record<RoomId, RoomDefSlice>;
+  objects?: Record<ObjectId, ObjectDefSlice>;
+  npcs?: Record<NpcId, NpcDefSlice>;
   /** Minimal slice of §2.7's `MemoryDef` — just what a `grantMemory` event needs. */
   memories?: Record<MemoryId, { lines: string[] }>;
   /** Minimal slice of §2.7's `ClueDef` — just what a `grantClue` event needs. */
@@ -77,10 +138,8 @@ export interface WorldDef {
   /**
    * Global response families the §3.6 ladder falls back to (`unknown`,
    * `nounMiss`, `unknownVerbKnownNoun`, …). A handler reaches one via
-   * `{ say: { ref: 'familyName' } }` (§2.2) rather than duplicating it
-   * inline; `prose.ts`'s `render` resolves the ref. Optional per this
-   * file's narrow-slice pattern (see header note) — a world that hasn't
-   * authored global families yet simply has no `responses` to ref.
+   * `{ say: { ref: 'familyName' } }` (§2.2) rather than duplicating a
+   * shared family inline; `prose.ts`'s `render` resolves the ref.
    */
   responses?: Record<string, Prose>;
 }
@@ -97,96 +156,87 @@ export type ScriptFn = (
   args?: Record<string, FlagValue>,
 ) => { state: GameState; events: GameEvent[] };
 
-export interface Clock {
-  day: number; // 1-based story day
-  minute: number; // 0..1439, minute of day
-}
+// ---------------------------------------------------------------------------
+// Darkness and scope (§2.4, §0) — the two resolvers that need `Cond`
+// evaluation (a room's `dark` baseline can be a `Cond`) but aren't part of
+// `cond.ts`'s own mutually-recursive `npcRoom`/`evaluate` pair.
+// ---------------------------------------------------------------------------
 
-export interface ObjectOverlay {
-  location?: PlaceId;
-  open?: boolean;
-  locked?: boolean;
-  on?: boolean; // powered / lit
-  hidden?: boolean; // still concealed in its location
-  props?: Record<string, FlagValue>; // object-scoped custom state
-}
-
-export interface NpcOverlay {
-  /** Pinned position (scripted). Absent ⇒ position derives from schedule. */
-  room?: RoomId | 'offstage';
-  /** Position is the player's room. Precedence: following > pin > schedule. */
-  following?: boolean;
-  met?: boolean;
-  props?: Record<string, FlagValue>;
+function isTransparent(world: WorldDef, id: ObjectId): boolean {
+  return world.objects?.[id]?.container?.transparent === true;
 }
 
 /**
- * Narrow slice of §1.2's `GameState` — the fields `cond.ts`'s `evaluate`
- * and (as of task 4) `prose.ts`'s `render` read. Deliberately still omits
- * `turn`, `phase`, `hintsUsed`, `firedEvents`, `parser`, and `ending`:
- * `parser: ParserContext` forward references `StructuredAction`, which
- * belongs to the parser tasks (9–11) and doesn't exist yet, and the rest
- * simply aren't read by `evaluate` or `render`. `counters` was added back
- * here by task 4 — prose rotation (§2.2) reads and writes it, and per
- * §1.2's prime rule it has to live on `GameState` (not a module-level
- * variable) for rotation to survive serialize/deserialize. Task 6 adds the
- * remaining fields back when it moves this into the real `state.ts`.
+ * Whether `id` is somewhere the player could presently reach/perceive *if*
+ * they were standing in `room` — directly in `room`, on a supporter in
+ * `room`, inside an open-or-transparent container that is itself in scope
+ * of `room` (recursively), or (only when `room` is where the player
+ * actually is) carried in `inventory`/`worn`. Shared by `scope()` (always
+ * called with `state.location`) and `isDark()`'s light-source check (called
+ * with the room being tested for darkness, which in real play is always
+ * `state.location` too — the parameter exists so both can be unit-tested
+ * against an arbitrary room without moving the player there).
  */
-export interface GameState {
-  clock: Clock;
-  location: RoomId;
-  objects: Partial<Record<ObjectId, ObjectOverlay>>;
-  npcs: Partial<Record<NpcId, NpcOverlay>>;
-  flags: Partial<Record<FlagId, FlagValue>>; // sparse overlay (§1.2.1)
-  counters: Record<string, number>; // per-prose-node rotation counters (§2.2)
-  visited: Record<RoomId, number>; // roomId → turn of first entry
-  memories: MemoryId[]; // in recovery order
-  clues: ClueId[]; // in discovery order
-  questions: Partial<Record<QuestionId, 'open' | 'answered'>>; // sparse (§1.2.1)
-  profile: Record<ActionClass, number>; // behavioral tallies (spec 04 §3)
-  /** Optional per the file-header note above; task 6's `initialState()` always sets it. */
-  phase?: Phase;
-  /** Set by `die`/`end` (§2.3); optional for the same reason as `phase`. */
-  ending?: { id: string };
+function inScopeAt(world: WorldDef, state: GameState, room: RoomId, id: ObjectId): boolean {
+  const loc = objectLocation(world, state, id);
+  if (loc === 'inventory' || loc === 'worn') return room === state.location;
+  if (typeof loc === 'string') return loc === room;
+  if ('in' in loc) {
+    if (!inScopeAt(world, state, room, loc.in)) return false;
+    return objectState(world, state, loc.in, 'open') || isTransparent(world, loc.in);
+  }
+  if ('on' in loc) return inScopeAt(world, state, room, loc.on);
+  return false; // { npc } or 'nowhere'
 }
 
-/** §1.2's phase enum. Full `GameState` also has `turn`/`hintsUsed`/`firedEvents`/`parser` — not this task's to add (see file header). */
-export type Phase = 'playing' | 'dead' | 'ended';
+/**
+ * §2.4's sole darkness authority. `RoomDef.dark` is baseline only ("this
+ * room has no ambient light of its own"); a room is actually dark when the
+ * baseline holds **and** no `lightSource` object that is `on` is in scope
+ * (in the room, held, or worn — containers must be open or transparent).
+ * The baseline cond must never itself mention a light source — that's what
+ * makes a lit lamp defeat darkness through this function, not through the
+ * room's own cond.
+ */
+export function isDark(world: WorldDef, state: GameState, room: RoomId): boolean {
+  if (!baselineDark(world, state, room)) return false;
+  return !hasActiveLightSourceInScope(world, state, room);
+}
+
+function baselineDark(world: WorldDef, state: GameState, room: RoomId): boolean {
+  const dark = world.rooms?.[room]?.dark;
+  if (dark === undefined) return false;
+  if (dark === true) return true;
+  return evaluate(world, state, dark);
+}
+
+function hasActiveLightSourceInScope(world: WorldDef, state: GameState, room: RoomId): boolean {
+  const ids = Object.keys(world.objects ?? {}) as ObjectId[];
+  return ids.some((id) => {
+    if (world.objects![id]!.lightSource !== true) return false;
+    if (!objectState(world, state, id, 'on')) return false;
+    return inScopeAt(world, state, room, id);
+  });
+}
 
 /**
- * §1.4's event union — the shell-facing output of every engine reducer.
- * Defined here (not in `effects.ts`) so `ScriptFn` above can reference it
- * without a circular import between `world.ts` and `effects.ts`.
- *
- * One addition beyond §1.4's literal text: `diag`'s `code` enum there lists
- * `'parserMiss' | 'defaultResponse' | 'nounMiss' | 'topicMiss'`, all parser
- * concerns — but §2.5 requires the plot-critical `move` guard to "leave
- * state unchanged and emit a diag event," and none of those four codes fit
- * a refused move. Adding `'plotCriticalGuard'` closes that gap; it's
- * additive only; the CLI's diag dump (task 20) already handles the code
- * generically.
+ * Everything the player can currently see and reach: room contents,
+ * supporters, open-or-transparent containers (recursively), inventory, and
+ * worn items — excluding `hidden` objects and, when the room is dark,
+ * excluding everything except what's carried (`inventory`/`worn`), which
+ * stays reachable by touch (the classic IF convention: `INVENTORY` and
+ * dropping/taking your own gear still work in the dark; you just can't see
+ * the room around you).
  */
-export type GameEvent =
-  | { type: 'echo'; text: string }
-  | { type: 'line'; kind: 'prose' | 'beat' | 'system'; text: string }
-  | { type: 'memory'; id: MemoryId; lines: string[] }
-  | { type: 'clue'; id: ClueId; title: string }
-  | { type: 'question'; id: QuestionId; status: 'open' | 'answered'; text: string }
-  | { type: 'clarify'; question: string; options: string[] }
-  | {
-      type: 'prompt';
-      id: string;
-      title: string;
-      body: string;
-      fields: { name: string; placeholder?: string; secret?: boolean }[];
+export function scope(world: WorldDef, state: GameState): ObjectId[] {
+  const ids = Object.keys(world.objects ?? {}) as ObjectId[];
+  const dark = isDark(world, state, state.location);
+  return ids.filter((id) => {
+    if (objectState(world, state, id, 'hidden')) return false;
+    if (dark) {
+      const loc = objectLocation(world, state, id);
+      return loc === 'inventory' || loc === 'worn';
     }
-  | { type: 'promptClosed'; id: string }
-  | { type: 'checkpoint'; id: string }
-  | { type: 'died'; deathId: string }
-  | { type: 'ended'; endingId: string }
-  | { type: 'restarted' }
-  | {
-      type: 'diag';
-      code: 'parserMiss' | 'defaultResponse' | 'nounMiss' | 'topicMiss' | 'plotCriticalGuard';
-      detail: string;
-    };
+    return inScopeAt(world, state, state.location, id);
+  });
+}

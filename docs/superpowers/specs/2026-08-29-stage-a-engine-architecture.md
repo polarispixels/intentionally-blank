@@ -54,12 +54,14 @@ Directory target:
 src/engine/
   ids.ts           branded id types, PlaceId, ActionClass
   state.ts         GameState, overlays, initialState(world)
-  cond.ts          Cond DSL + evaluate
+  cond.ts          Cond DSL + evaluate; also npcRoom (mutually recursive
+                   with evaluate via schedule `when` conds, so same module)
   effects.ts       Effect DSL + apply
   prose.ts         Prose rules, rotation counters, templating
   world.ts         scope, visibility, light, movement, resolution helpers
   actions.ts       built-in verb semantics (take/drop/open/…)
   respond.ts       the §14 response ladder
+  resolve.ts       leaf: overlay-with-authored-default readers (no Cond eval)
   clock.ts         phase()/weekday() — leaf; imported by cond and tick
   tick.ts          clock, schedules, world events, triggers, puzzles
   npc.ts           topics, ASK/TELL/SHOW
@@ -102,6 +104,20 @@ authored default. Consequences:
   structurally impossible: `revealHint`-style values are selectors
   (`loginAttempts(state) >= 2`), recomputed on every render, correct after
   any load.
+- **Every read of overlaid state goes through a resolver — `Cond`
+  evaluation included.** This is the rule the overlay principle actually
+  lives or dies on, and it is easy to half-implement: during task 6 the
+  `objectAt` / `objectState` / `prop` Cond arms were reading overlays
+  directly with no authored-default fallback, so a condition about an
+  object sitting exactly where content placed it evaluated **false** until
+  something moved it. Conditions express nearly all game logic, so that
+  defect would have been everywhere and silent. Resolvers live in
+  `resolve.ts` (a leaf, no `Cond` evaluation) and are used by `cond.ts`,
+  `world.ts`, and `effects.ts` alike. `npcRoom` is the exception that
+  proves the rule: resolving a schedule needs `evaluate`, so it lives in
+  `cond.ts` beside it. **A schedule rule's `when` may therefore not
+  reference `npcAt`** — `validate` enforces this, or resolution recurses
+  forever.
 
 ### 1.2 State schema
 

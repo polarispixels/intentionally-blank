@@ -9,6 +9,17 @@
 // here), `SCRIPT_1` (a registered `ScriptFn`, for script-dispatch tests),
 // and minimal `objects`/`memories`/`clues`/`questions` entries so every
 // grant/open/answer/setProp/move effect has real data to read.
+//
+// Task 6 (`world.ts`) additions: `meta.startRoom` (for `initialState`);
+// `rooms` with one of each `dark` baseline (`true`, a `Cond`, and absent —
+// ROOM_A/ROOM_C/ROOM_B respectively) for the `isDark` matrix; `LAMP` (a
+// `lightSource`), `CHEST` (an opaque container) and `GLASS_CASE` (a
+// transparent one) so tests can relocate them via a state overlay to cover
+// "in the room / carried / inside a closed opaque container / inside a
+// closed transparent container" without needing more fixture objects;
+// `HIDDEN_COIN` for scope's hidden-object exclusion; `supporter: true` on
+// `SHELF` (already used as a supporter target in `tests/cond.test.ts`); and
+// a `schedule` on `GUIDE` for `npcRoom`'s schedule-fallback case.
 
 import { C, F, M, N, O, Q, R, S } from '../../src/engine/ids';
 import type { GameEvent, ScriptFn, WorldDef } from '../../src/engine/world';
@@ -22,6 +33,14 @@ export const BOX = O('fixture_box');
 export const SHELF = O('fixture_shelf');
 /** plotCritical: true — exercises the runtime move guard (spec §2.5). */
 export const NOTEBOOK = O('fixture_notebook');
+/** lightSource: true — exercises `isDark`'s light-source-in-scope check. */
+export const LAMP = O('fixture_lamp');
+/** An opaque container (closed and locked by default). */
+export const CHEST = O('fixture_chest');
+/** A transparent container (closed by default) — sight passes through even closed. */
+export const GLASS_CASE = O('fixture_glass_case');
+/** hidden: true — exercises `scope`'s hidden-object exclusion. */
+export const HIDDEN_COIN = O('fixture_hidden_coin');
 
 export const GUIDE = N('fixture_guide');
 
@@ -52,16 +71,35 @@ export const FIXTURE_WORLD: WorldDef = {
     // wraps past midnight and covers 22:00..05:59.
     phases: { morning: 360, afternoon: 720, evening: 1080, night: 1320 },
     weekLength: 7,
+    startRoom: ROOM_A,
   },
   flags: {
     [FLAG_BOOL]: { default: false, doc: 'fixture boolean flag, defaults off' },
     [FLAG_NUM]: { default: 2, doc: 'fixture numeric flag, defaults to 2' },
   },
+  rooms: {
+    [ROOM_A]: { dark: true }, // baseline dark
+    [ROOM_B]: {}, // baseline lit (no `dark` entry)
+    [ROOM_C]: { dark: { flag: FLAG_BOOL } }, // baseline dark only while FLAG_BOOL holds
+  },
   objects: {
-    [KEY]: {},
-    [BOX]: {},
-    [SHELF]: {},
-    [NOTEBOOK]: { plotCritical: true },
+    [KEY]: { location: ROOM_A },
+    [BOX]: { location: ROOM_A },
+    [SHELF]: { location: ROOM_A, supporter: true },
+    [NOTEBOOK]: { location: ROOM_A, plotCritical: true },
+    [LAMP]: { location: ROOM_A, lightSource: true },
+    [CHEST]: { location: ROOM_A, container: { open: false, locked: false, transparent: false } },
+    [GLASS_CASE]: { location: ROOM_A, container: { open: false, transparent: true } },
+    [HIDDEN_COIN]: { location: ROOM_A, hidden: true },
+  },
+  npcs: {
+    [GUIDE]: {
+      schedule: [
+        { when: { clockPhase: 'morning' }, room: ROOM_B },
+        { when: { clockPhase: 'night' }, room: 'offstage' },
+        { room: ROOM_C }, // unconditional fallback: afternoon/evening
+      ],
+    },
   },
   memories: {
     [MEMORY_1]: { lines: ['You remember the fixture.', 'It was, in fact, a fixture.'] },

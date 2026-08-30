@@ -20,6 +20,8 @@ import {
 
 function baseState(overrides: Partial<GameState> = {}): GameState {
   return {
+    phase: 'playing',
+    turn: 0,
     clock: { day: 1, minute: 600 },
     location: ROOM_A,
     objects: {},
@@ -30,7 +32,9 @@ function baseState(overrides: Partial<GameState> = {}): GameState {
     memories: [],
     clues: [],
     questions: {},
+    hintsUsed: {},
     profile: { analytical: 0, social: 0, direct: 0 },
+    firedEvents: [],
     ...overrides,
   };
 }
@@ -129,8 +133,18 @@ describe('evaluate(): objectAt arm', () => {
     expect(evaluate(FIXTURE_WORLD, nowhere, { objectAt: [KEY, 'nowhere'] })).toBe(true);
   });
 
-  it('is false for an object with no recorded location', () => {
-    expect(evaluate(FIXTURE_WORLD, baseState(), { objectAt: [KEY, ROOM_A] })).toBe(false);
+  it('falls back to the authored default location when there is no overlay entry', () => {
+    // KEY's authored default (tests/fixtures/world.ts) is ROOM_A. Before the
+    // task 6 review fix, this arm read `state.objects[id]?.location` with no
+    // fallback, so this was `false` for an object sitting exactly where
+    // content placed it — see tests/world.test.ts's "cond.ts / resolve.ts
+    // seam" block for the fuller regression coverage.
+    expect(evaluate(FIXTURE_WORLD, baseState(), { objectAt: [KEY, ROOM_A] })).toBe(true);
+  });
+
+  it('throws for an object with no overlay and no authored declaration', () => {
+    const undeclared = 'fixture_key_never_declared' as typeof KEY;
+    expect(() => evaluate(FIXTURE_WORLD, baseState(), { objectAt: [undeclared, ROOM_A] })).toThrow();
   });
 });
 

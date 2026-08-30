@@ -25,6 +25,8 @@ const WORLD: WorldDef = {
 
 function baseState(overrides: Partial<GameState> = {}): GameState {
   return {
+    phase: 'playing',
+    turn: 0,
     clock: { day: 1, minute: 600 },
     location: R('test_room'),
     objects: {},
@@ -35,7 +37,9 @@ function baseState(overrides: Partial<GameState> = {}): GameState {
     memories: [],
     clues: [],
     questions: {},
+    hintsUsed: {},
     profile: { analytical: 0, social: 0, direct: 0 },
+    firedEvents: [],
     ...overrides,
   };
 }

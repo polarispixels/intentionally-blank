@@ -12,6 +12,51 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.2.13] - 2026-08-29
+
+### Added
+
+- **Architecture task 6: state and world resolution.**
+  `src/engine/gamestate.ts` (the full v2 `GameState` and
+  `initialState(world)`), `src/engine/resolve.ts`, and the resolvers in
+  `src/engine/world.ts`: `objectLocation`, `objectState`, `isDark`,
+  `scope`, `npcRoom`. 48 new tests; 265 green.
+- `isDark` is now the single darkness authority: `RoomDef.dark` is
+  baseline only, and a room is actually dark when the baseline holds *and*
+  no active light source is in scope — tested across the matrix of source
+  in-room / carried / in a closed container / in an open transparent one.
+  A player can still check their inventory in the dark, which is the
+  classic convention and stops a dark room reading as a broken game.
+
+### Fixed
+
+- **The overlay principle was only half-implemented, in the half where
+  nearly all game logic lives.** `cond.ts`'s `objectAt`, `objectState`,
+  `prop`, and `has` arms read state overlays directly with no fallback to
+  the authored default, while the new resolvers did fall back. So a
+  condition asking whether an object was where content had placed it
+  evaluated **false** until something moved it and created an overlay
+  entry. Conditions express every handler guard, puzzle completion, and
+  prose variant, so this would have been wrong nearly everywhere and
+  silent.
+
+  Fixed structurally: a leaf `resolve.ts` that both `cond.ts` and
+  `world.ts` import, with `npcRoom` moved beside `evaluate` because
+  schedule resolution is genuinely mutually recursive with it. The
+  regression tests were confirmed to fail against the old behavior before
+  the fix was restored. A pre-existing assertion that had *encoded* the
+  bug as correct was split into two honest ones.
+
+  Consequence recorded for the validator: a schedule rule's `when` may not
+  reference `npcAt`, or resolution recurses forever.
+
+### Changed
+
+- `turn`, `phase`, `hintsUsed`, and `firedEvents` are required on
+  `GameState` as §1.2 specifies, rather than optional to spare earlier
+  tasks' test helpers. Optional would have meant every later task writing
+  `state.turn ?? 0`, and one of them forgetting.
+
 ## [0.2.12] - 2026-08-29
 
 ### Added

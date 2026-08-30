@@ -7,16 +7,34 @@
 // — `evaluate` included — must go through them rather than indexing
 // `state.flags[id]` / `state.questions[id]` directly.
 //
-// The other `Cond` arms (has/at/objectAt/objectState/prop/npcAt/met/…)
-// read only from `GameState`'s overlays as recorded — this module does not
-// fall back to a `WorldDef`-authored default location/state for objects or
-// NPCs, and does not derive NPC position from a schedule. That overlay
-// resolution ("scope, visibility, light, movement" per §0's directory map)
-// is task 6's (`world.ts`) job; giving it here would preempt that task.
+// `has`/`objectAt`/`objectState`/`prop` read through `resolve.ts`'s
+// overlay-with-authored-default resolvers rather than indexing
+// `state.objects`/`state.npcs` directly (§8 task 6 follow-up, found in
+// review): before this, an object with no overlay entry yet — i.e. exactly
+// where content placed it — failed every `objectAt`/`objectState`/`has`
+// check against its own authored default, because there was no fallback.
+// Since conditions are how nearly all game logic is expressed, that was a
+// silent, everywhere bug. `resolve.ts` is a leaf (types only) specifically
+// so this module can import real functions from it without risking a cycle
+// back through `world.ts` (which needs `evaluate`, from here, for `isDark`).
+//
+// `npcRoom` (full: following > pin > schedule, §2.6) lives here rather than
+// in `resolve.ts` or `world.ts` because schedule resolution needs `Cond`
+// evaluation and the two are genuinely mutually recursive: a
+// `ScheduleRule.when` can itself be an `npcAt` cond, which calls back into
+// `npcRoom`. **Validation note for task 7**: a schedule rule's `when` must
+// never (transitively) depend on `npcAt` for the *same* npc it belongs to,
+// or `scheduledRoom` recurses forever — `evaluate` has no cycle guard here
+// (unlike `prose.ts`'s `ProseRef` chains), so this is a content-authoring
+// rule `validate.ts` should enforce, not a runtime protection this module
+// provides. `world.ts` re-exports `npcRoom` so callers that only know it as
+// a `world.ts` export (this task's own `isDark`/`scope` callers included)
+// keep working unchanged.
 
 import type { ActionClass, ClueId, DayPhase, FlagId, FlagValue, MemoryId, NpcId, ObjectId, PlaceId, QuestionId, RoomId } from './ids';
 import { samePlace } from './ids';
 import { phase, weekday } from './clock';
+import { npcOverlayPosition, objectLocation, objectState, prop as readProp } from './resolve';
 import type { GameState, WorldDef } from './world';
 
 export type Cond =
@@ -57,11 +75,32 @@ export function questionStatus(_world: WorldDef, state: GameState, id: QuestionI
   return state.questions[id] ?? 'unopened';
 }
 
-/** Resolved NPC room: following > pin (schedule fallback is task 6/13's). */
-function npcRoom(state: GameState, id: NpcId): RoomId | 'offstage' | undefined {
-  const overlay = state.npcs[id];
-  if (overlay?.following) return state.location;
-  return overlay?.room;
+/**
+ * Resolved NPC room (§2.6): **following > pin > schedule**. The first two
+ * are `resolve.ts`'s `npcOverlayPosition` (no `Cond` evaluation needed);
+ * the schedule fallback evaluates `NpcDefSlice.schedule` rules in order,
+ * first match wins (or the first rule with no `when` at all) — the same
+ * "first match, unconditional last rule" convention `prose.ts`'s
+ * `ProseRule` selection uses. Deliberately the simple half of §4.2/§4.3's
+ * scheduling: no `activity` text, no per-turn `tick` recompute hook, no
+ * `onlyIfWitnessed` interaction, no interruption of a `following` npc
+ * across multi-room `GO TO` travel — task 13 owns wiring this into the tick
+ * loop and the richer scheduling rules; this is what it calls once per npc
+ * per turn.
+ */
+export function npcRoom(world: WorldDef, state: GameState, id: NpcId): RoomId | 'offstage' {
+  const pinned = npcOverlayPosition(state, id);
+  if (pinned !== undefined) return pinned;
+  return scheduledRoom(world, state, id);
+}
+
+function scheduledRoom(world: WorldDef, state: GameState, id: NpcId): RoomId | 'offstage' {
+  const rules = world.npcs?.[id]?.schedule;
+  if (rules === undefined || rules.length === 0) return 'offstage';
+  for (const rule of rules) {
+    if (rule.when === undefined || evaluate(world, state, rule.when)) return rule.room;
+  }
+  throw new Error(`npcRoom: no schedule rule for "${id}" matched, and none is unconditional`);
 }
 
 export function evaluate(world: WorldDef, state: GameState, cond: Cond): boolean {
@@ -76,7 +115,7 @@ export function evaluate(world: WorldDef, state: GameState, cond: Cond): boolean
   }
 
   if ('has' in cond) {
-    const location = state.objects[cond.has]?.location;
+    const location = objectLocation(world, state, cond.has);
     return location === 'inventory' || location === 'worn';
   }
 
@@ -84,21 +123,17 @@ export function evaluate(world: WorldDef, state: GameState, cond: Cond): boolean
 
   if ('objectAt' in cond) {
     const [id, place] = cond.objectAt;
-    const location = state.objects[id]?.location;
-    return location !== undefined && samePlace(location, place);
+    return samePlace(objectLocation(world, state, id), place);
   }
 
   if ('objectState' in cond) {
     const [id, key, expected] = cond.objectState;
-    const overlay = state.objects[id];
-    const value = overlay?.[key] ?? false;
-    return value === expected;
+    return objectState(world, state, id, key) === expected;
   }
 
   if ('prop' in cond) {
     const [id, key, expected] = cond.prop;
-    const value = state.objects[id as ObjectId]?.props?.[key] ?? state.npcs[id as NpcId]?.props?.[key];
-    return value === expected;
+    return readProp(world, state, id, key) === expected;
   }
 
   if ('visited' in cond) return cond.visited in state.visited;
@@ -113,7 +148,7 @@ export function evaluate(world: WorldDef, state: GameState, cond: Cond): boolean
 
   if ('npcAt' in cond) {
     const [id, room] = cond.npcAt;
-    return npcRoom(state, id) === room;
+    return npcRoom(world, state, id) === room;
   }
 
   if ('met' in cond) return state.npcs[cond.met]?.met === true;
