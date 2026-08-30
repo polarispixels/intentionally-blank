@@ -72,6 +72,32 @@ Version targets follow the ladder in `docs/spec/README.md` and may shift.
   separate import-specifier check. Mutation-tested against an injected
   `window.location` and an injected `vue` import.
 
+## Grammar gap: no free-text pattern (found in task 21)
+
+v2's grammar has four pattern shapes, all noun-phrase-resolved, and none
+captures free text — so `SAY <anything>` could not be ported from the MVP
+and its `SAY_SPECIAL` table is re-exported but unwired. Confirmed **not**
+blocking 0.3.0: the opening room needs no free-text command (its terminal
+runs on ordinary verbs, and `SAY HELLO` is a plain verb). Needed before
+any scene where the player composes text — a `'V text'` pattern in
+`parser/grammar.ts`, plus §2.9's pattern list in the architecture spec.
+Note the censor puzzles (P13, P22) compose through *prompt scripts*, not
+the verb grammar, so they are unaffected.
+
+## Fast-follows for 0.3.1 (proposed by `narrative-writer`, both sound)
+
+- **Add a `{dir}` template variable to the movement families.** With no way
+  to name the direction, `move.noExit` and `move.blocked` both have to say
+  "that direction". Naming it — "There is no way north" — reads tighter, and
+  this is the single most-typed failure in the genre. Small engine change in
+  `move.ts`'s template context, then the writer tightens four variants.
+- **Add a `move.locked` family, distinct from `move.blocked`.** The
+  narrator can currently only say a way is *shut*; saying **locked** is a
+  materially stronger clue (constitution §9 — failure produces
+  information), and `open.locked` already makes that distinction for
+  containers. Per-exit `blockedText` covers authored cases, so this is
+  about the generic fallback.
+
 ## Prose gaps to batch into the next `narrative-writer` pass
 
 - **Act I content beyond M1, quarantined by `narrative-writer` as proposals

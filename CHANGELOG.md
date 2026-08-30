@@ -12,6 +12,47 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.2.32] - 2026-08-30
+
+### Added
+
+- **Architecture task 21: the MVP prologue ported to v2 content.** One
+  room, the computer, Jeeves, the account prompt as a content script, the
+  arrest, the ending. Every player-visible string is *imported from* the
+  MVP's own content modules rather than retyped, so the port cannot drift
+  from what shipped. `validate()` comes back clean. 5 new tests; 746 green.
+
+  Its story disposition stands: a preserved secret with no canon weight. It
+  is not the opening of the real game and commits nothing about the story.
+- The last five response families — `move.noExit`, `move.blocked`,
+  `bareVerb`, `dead.refused`, `ended.refused`.
+
+  `bareVerb` has to survive substitution across ~47 verbs, so the obvious
+  frame ("{verb} what?") was unusable — fine for SEARCH, nonsense for PRAY.
+  Every variant quotes the verb as a word instead of making it the head of a
+  clause. The two post-phase families are deliberately different in tone:
+  death gets the administrative joke, an ending gets none at all and the
+  narrator steps aside.
+
+### Notes
+
+The golden-transcript test records **six deliberate differences** between
+the MVP transcript and v2's, each with a stated reason, rather than
+loosening assertions until it passed. Most are v2 being better: a parser
+miss no longer consumes a turn, death renders a real menu instead of a
+line. One is a genuine gap, below.
+
+**Grammar gap, recorded in `BACKLOG.md`:** v2 has no free-text pattern, so
+`SAY <anything>` could not port and its response table is re-exported but
+unwired. Confirmed not blocking 0.3.0 — the opening room needs no
+free-text command — and the censor puzzles compose through prompt scripts
+rather than verb grammar, so they are unaffected.
+
+Two fast-follows for 0.3.1, both the writer's suggestions and both sound: a
+`{dir}` template so the movement families can name the direction rather
+than saying "that direction", and a `move.locked` family so the narrator
+can say *locked* rather than *shut* — a materially stronger clue.
+
 ## [0.2.31] - 2026-08-30
 
 ### Added

@@ -576,3 +576,93 @@ collected on `VerbDef.words`).
 
 **`pray`** *(pray)* — no direct object
 1. You pray. The ceiling, being the nearest available authority, does not respond.
+
+---
+
+## 7. Later additions — movement, bare verbs, and the two stopped phases
+
+**Added:** 2026-08-30, second pass · **Author:** `narrative-writer`
+**Status:** authored prose, awaiting voice review and Ryan's spot-check
+
+Five families that were gaps after the first pass. The five craft constraints
+in §0 apply here unchanged, plus three specific to this set:
+
+- **Rotation for these is per-family, not per-node.** Every player walks all
+  the variants of each family in order within a few minutes of play, so all
+  of them get read, not just variant 1. They are still ordered plainest-first.
+- **No template variables are available except `{verb}` in `bareVerb`.**
+  In particular there is no `{dir}` and no `{name}`, so the movement families
+  say "that direction" rather than naming north or naming a door. If a
+  direction template is added later these can be tightened; they are written
+  to stand without one.
+- **These fire in every room in all five acts**, indoors and out, so no line
+  assumes walls, a ceiling, or an interior.
+
+### `move.noExit`
+
+**Fires:** the player goes a direction with no exit at all, or one whose
+condition is unmet so the exit is not present. The player must come away
+believing *there is no way here*, and be able to draw that on their map.
+
+1. There is no way out in that direction. This place ends there, and goes on ending for as long as you look at it.
+2. Nothing leads that way. You establish this the way everyone establishes it: by looking, and then by looking again with more hope.
+3. That is not one of the ways out of here. Whatever is over there arrived by some other route.
+4. You consider that direction. It is not on offer, and the geography settled that long before you got here.
+
+### `move.blocked`
+
+**Fires:** an exit **exists** in that direction and will not yield right now —
+closed, locked, or otherwise held. **Clue.** Distinct from `move.noExit` on
+purpose: this one must read as *there is a way here and it is shut*, because
+the player's map is built out of the difference. Nothing here implies the
+obstacle changed state.
+
+1. There is a way through here, and it is shut. Whatever is closing it will have to be opened first.
+2. The way exists. It is simply not open, and it does not open by being walked at.
+3. Something stands between you and that direction, closed, and content to stay closed until somebody does something about it.
+4. You get as far as the way out and no further. The route is there; the opening is not, yet.
+
+### `bareVerb`
+
+**Fires:** a bare non-built-in verb with no direct object — `SEARCH`, `PUSH`,
+`LISTEN`, `PRAY`, `SING`, `WAVE`, and the rest of the ~47. Replaces the
+`nounMiss` answer, which asked about a noun the player never typed.
+
+**Template:** `{verb}` — the verb word as the player typed it.
+
+**Substitution note.** Every variant quotes `{verb}` as a *word* rather than
+setting it as the head of a transitive clause, so intransitive and odd verbs
+survive: "Half a command: the half that says pray" reads as well as "…that
+says search." Avoid the obvious "{verb} what?" frame — it is fine for SEARCH
+and unusable for PRAY. **Do not move `{verb}` to the start of a line**;
+nothing capitalizes it, and a sentence would open lowercase.
+
+1. You have a verb, {verb}, and nothing to aim it at. Name something and try again.
+2. The word {verb} hangs there on its own, waiting for a noun. Supply one and it will get to work.
+3. Half a command: the half that says {verb}, without the half that says to what.
+4. As intentions go, {verb} is a perfectly good one. As sentences go, it is unfinished.
+
+### `dead.refused`
+
+**Fires:** an ordinary command after death. The engine refuses it; no time
+passes and nothing changes. Meta commands still work and the shell already
+offers UNDO / RESTART ENCOUNTER / RESTART, so **none of these explains the
+menu** — they say only that the world has stopped accepting input.
+
+Constitution §11: death is cheap and may be funny. It is never a scolding and
+never a time tax, and this is the one place where smugness about the player's
+failure would be unforgivable. Nothing below blames them for dying.
+
+1. You are dead. The dead are poor at taking instructions, and worse at carrying them out.
+2. Nothing you say reaches the world from here. Whatever was going on in that room is going on without you.
+3. The intention is sound. The body it was addressed to has resigned the position.
+
+### `ended.refused`
+
+**Fires:** an ordinary command after an ending. Same refusal, deliberately a
+different tone from `dead.refused`: the player finished something, so this is
+quiet rather than funny, and it does not explain the menu either.
+
+1. The story is over. Nothing entered here changes what it was.
+2. It has finished. The world stops taking instructions at the end — no hard feelings, simply nothing further to do with them.
+3. Whatever this is, it happens after the last page, in the quiet part, where nothing gets written down.
