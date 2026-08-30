@@ -128,9 +128,10 @@ describe('purity', () => {
   });
   it('rotates variants by turn', () => {
     // Guard: if a second variant exists for `look`, turn 1 must pick it.
-    if (RESPONSES.look.length > 1) {
+    const look: readonly string[] = RESPONSES.look;
+    if (look.length > 1) {
       const second = run(start().state, 'look', 'look');
-      expect(texts(second.events)[1]).toBe(RESPONSES.look[1]);
+      expect(texts(second.events)[1]).toBe(look[1]);
     }
     expect(OPENING.length).toBeGreaterThan(0);
   });
