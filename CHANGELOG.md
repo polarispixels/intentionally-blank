@@ -12,6 +12,20 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.2.19] - 2026-08-30
+
+### Fixed
+
+- Typecheck break in `tests/validate.test.ts`, shipped in 0.2.18. The NPC
+  adjective test I appended used a bare `as NpcId` cast instead of the
+  `N()` id constructor the file already imports, so `vue-tsc` failed while
+  Vitest passed. My error: I read the test result and committed without
+  reading the typecheck result in the same output.
+
+  `npm test` and `npm run typecheck` are separate gates and both have to
+  be read before a release, which is exactly what hard rule 6 says. 474
+  green, typecheck clean.
+
 ## [0.2.18] - 2026-08-30
 
 The parser group is complete.

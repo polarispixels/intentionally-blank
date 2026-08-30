@@ -433,8 +433,8 @@ describe('noise-word-vocabulary: NPC adjectives', () => {
       ...FIXTURE_WORLD,
       npcs: {
         ...FIXTURE_WORLD.npcs,
-        ['noisy_npc' as NpcId]: {
-          id: 'noisy_npc' as NpcId,
+        [N('noisy_npc')]: {
+          id: N('noisy_npc'),
           nouns: ['clerk'],
           adjectives: ['the'],
         },
