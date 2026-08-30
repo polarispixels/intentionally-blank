@@ -308,8 +308,14 @@ function setProp(world: WorldDef, state: GameState, id: ObjectId | NpcId, key: s
   return { ...state, npcs: { ...state.npcs, [nid]: { ...overlay, props } } };
 }
 
-/** Adds `minutes` to `clock`, rolling over into following days (or back, for a negative amount). */
-function addMinutes(clock: Clock, minutes: number): Clock {
+/**
+ * Adds `minutes` to `clock`, rolling over into following days (or back, for
+ * a negative amount). Exported (not just used by the `advanceClock` effect
+ * arm above) because `tick.ts` (task 13) needs the identical rollover
+ * arithmetic to advance the clock by `world.meta.minutesPerTurn` each turn
+ * — one clock-arithmetic primitive, not two copies that could drift apart.
+ */
+export function addMinutes(clock: Clock, minutes: number): Clock {
   const totalFromDayOne = (clock.day - 1) * MINUTES_PER_DAY + clock.minute + minutes;
   const day = Math.floor(totalFromDayOne / MINUTES_PER_DAY) + 1;
   const minute = ((totalFromDayOne % MINUTES_PER_DAY) + MINUTES_PER_DAY) % MINUTES_PER_DAY;

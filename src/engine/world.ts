@@ -67,6 +67,15 @@ export interface WorldMeta {
    * missing rather than guessing a room.
    */
   startRoom?: RoomId;
+  /**
+   * Minutes a non-meta turn advances the clock by (§4.1: "Non-meta actions
+   * advance it `minutesPerTurn` (default 1)"). `tick.ts` (task 13) reads
+   * this; optional, defaulting to 1, so every fixture/test `WorldMeta`
+   * literal that predates task 13 keeps compiling unchanged. Travel and
+   * scripted `advanceClock` effects add *more* minutes on top of this base
+   * — that addition happens in `effects.ts`, before `tick` ever runs.
+   */
+  minutesPerTurn?: number;
 }
 
 /**
@@ -227,6 +236,50 @@ export interface NpcDefSlice {
   pronoun?: 'he' | 'she' | 'they';
 }
 
+/**
+ * §2.8's world events, verbatim plus one task-13 addition. `when` is
+ * typically clock + flags; `once` (default true) records `id` in
+ * `state.firedEvents` the first time `when` holds and never fires again —
+ * the ordinary shape for a one-time story beat (§4.2's "evaluate `EventDef`s
+ * (fire matching, record `once` in `firedEvents`)"). `once: false` fires
+ * every tick `when` holds, with no dedup — content's tool for something
+ * that should keep re-applying for as long as a condition is true, not the
+ * mechanism recurring weekly windows use (those are NPC schedules, §4.3
+ * rule 1 — a schedule's `when` is re-evaluated fresh every tick with no
+ * stored state to go stale, so "poker night" needs no `EventDef` at all).
+ *
+ * **`witnessedWhen` (task 13 addition, spec §4.3.3).** The spec's
+ * `onlyIfWitnessed` flag says only "fire only when its effects are
+ * observable" — it doesn't say *how* observability is determined, and
+ * `EventDef` as specified carries no room to check the player against.
+ * Reusing the `Cond` DSL for the perceivability check itself (rather than
+ * inventing a bespoke `room`/`observedBy` field) keeps this expressive
+ * without a new mechanism: an author writes `{ at: R('lobby') }` for "the
+ * player must be in the room," or `{ all: [{ at: … }, { npcAt: […] }] }` for
+ * "player and NPC in the same room," or anything else `Cond` can already
+ * say. Required when `onlyIfWitnessed` is true — `tick.ts` throws rather
+ * than silently treating a missing `witnessedWhen` as "never witnessed"
+ * (which would quietly and permanently strand a `once: true` beat, exactly
+ * the silent-doom failure mode §4.3.4/constitution §10 exists to prevent).
+ * `when` and `witnessedWhen` are independent conditions, both re-evaluated
+ * every tick: `when` says *whether* the beat is due; `witnessedWhen` says
+ * whether the player can currently perceive it. A beat can become due while
+ * unwitnessed and simply wait — every tick after that re-checks both, so it
+ * fires the instant the player is in position, never missing the window
+ * outright.
+ */
+export interface EventDef {
+  id: string;
+  when: Cond;
+  /** Default true. */
+  once?: boolean;
+  /** Fire only when `witnessedWhen` also holds (§4.3.3). */
+  onlyIfWitnessed?: boolean;
+  /** The perceivability check (task 13 addition) — required iff `onlyIfWitnessed`. */
+  witnessedWhen?: Cond;
+  effects: Effect[];
+}
+
 /** Narrow, still-growing slice of §2.1's `WorldDef`. */
 export interface WorldDef {
   meta: WorldMeta;
@@ -234,6 +287,8 @@ export interface WorldDef {
   rooms?: Record<RoomId, RoomDefSlice>;
   objects?: Record<ObjectId, ObjectDefSlice>;
   npcs?: Record<NpcId, NpcDefSlice>;
+  /** §2.8's world events (§8 task 13). Content is not required to declare any. */
+  events?: Record<string, EventDef>;
   /** §2.9's verb table (§8 task 8). Content seeds this; the engine ships none. */
   verbs?: Record<VerbId, VerbDef>;
   /** Minimal slice of §2.7's `MemoryDef` — just what a `grantMemory` event needs. */

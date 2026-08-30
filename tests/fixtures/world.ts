@@ -58,6 +58,13 @@
 // families, for AGAIN's fallback-with-nothing-to-repeat case and WAIT's
 // ordinary-turn-pass case (§3.5).
 
+// Task 13 (`tests/tick.test.ts`) additions: `FLAG_EVENT_TRIGGER`/
+// `FLAG_EVENT_FIRED` and `FLAG_WITNESS_TRIGGER`/`FLAG_WITNESSED_FIRED` (two
+// trigger/fired flag pairs, doc'd at their declarations below) and
+// `world.events`: `fixture_event_once` (a plain once-only `EventDef`) and
+// `fixture_event_witnessed` (`onlyIfWitnessed: true`, `witnessedWhen: {
+// at: ROOM_B }`) — real data for `tick.ts`'s `EventDef` evaluation.
+
 import { C, F, M, N, O, Q, R, S, V } from '../../src/engine/ids';
 import { BUILTIN_VERB_IDS } from '../../src/engine/actions';
 import { AGAIN_VERB_ID } from '../../src/engine/interpreter';
@@ -134,6 +141,20 @@ export const QUESTION_1 = Q('fixture_question_1');
 export const FLAG_BOOL = F('fixture_flag_bool');
 export const FLAG_NUM = F('fixture_flag_num');
 
+/**
+ * Task 13 (`tests/tick.test.ts`) additions: two trigger/fired flag pairs so
+ * `world.events` below has real conditions to gate on and real state to
+ * assert against, without repurposing `FLAG_BOOL` (which already carries
+ * unrelated meaning for `ROOM_C`'s darkness and `LETTER`'s handler).
+ * `EVENT_TRIGGER`/`EVENT_FIRED` back a plain once-only event;
+ * `WITNESS_TRIGGER`/`WITNESSED_FIRED` back an `onlyIfWitnessed` one whose
+ * `witnessedWhen` requires the player in `ROOM_B`.
+ */
+export const FLAG_EVENT_TRIGGER = F('fixture_flag_event_trigger');
+export const FLAG_EVENT_FIRED = F('fixture_flag_event_fired');
+export const FLAG_WITNESS_TRIGGER = F('fixture_flag_witness_trigger');
+export const FLAG_WITNESSED_FIRED = F('fixture_flag_witnessed_fired');
+
 export const SCRIPT_1 = S('fixture_script_1');
 
 /**
@@ -159,6 +180,10 @@ export const FIXTURE_WORLD: WorldDef = {
   flags: {
     [FLAG_BOOL]: { default: false, doc: 'fixture boolean flag, defaults off' },
     [FLAG_NUM]: { default: 2, doc: 'fixture numeric flag, defaults to 2' },
+    [FLAG_EVENT_TRIGGER]: { default: false, doc: 'task 13: gates fixture_event_once' },
+    [FLAG_EVENT_FIRED]: { default: false, doc: 'task 13: set by fixture_event_once when it fires' },
+    [FLAG_WITNESS_TRIGGER]: { default: false, doc: 'task 13: gates fixture_event_witnessed' },
+    [FLAG_WITNESSED_FIRED]: { default: false, doc: 'task 13: set by fixture_event_witnessed when it fires' },
   },
   // Task 9 (`parser/vocabulary.ts`) additions below: `name`/`aliases` on
   // every room, `nouns`/`adjectives` on every object and on `GUIDE` — the
@@ -412,5 +437,21 @@ export const FIXTURE_WORLD: WorldDef = {
   },
   scripts: {
     [SCRIPT_1]: fixtureScript,
+  },
+  // Task 13 (`tests/tick.test.ts`) additions: one plain once-only event and
+  // one `onlyIfWitnessed` event, exercising §2.8/§4.2/§4.3.3.
+  events: {
+    fixture_event_once: {
+      id: 'fixture_event_once',
+      when: { flag: FLAG_EVENT_TRIGGER },
+      effects: [{ set: [FLAG_EVENT_FIRED, true] }],
+    },
+    fixture_event_witnessed: {
+      id: 'fixture_event_witnessed',
+      when: { flag: FLAG_WITNESS_TRIGGER },
+      onlyIfWitnessed: true,
+      witnessedWhen: { at: ROOM_B },
+      effects: [{ set: [FLAG_WITNESSED_FIRED, true] }],
+    },
   },
 };

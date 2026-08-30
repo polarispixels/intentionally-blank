@@ -50,6 +50,7 @@ export function validate(world: WorldDef): Finding[] {
   checkVocabularyCollisions(world, findings);
   checkRoomExits(world, findings);
   checkNoiseWordVocabulary(world, findings);
+  checkWitnessedEvents(world, findings);
 
   return findings;
 }
@@ -654,5 +655,25 @@ function checkNoiseWordVocabulary(world: WorldDef, findings: Finding[]): void {
     // NPC adjectives are checked for the same reason object adjectives are:
     // an adjective the tokenizer strips can never narrow a disambiguation.
     for (const adj of def!.adjectives ?? []) checkPhraseForNoiseWords(`npc.${id}.adjectives`, adj, findings);
+  }
+}
+
+/**
+ * An event declaring `onlyIfWitnessed` must say how witnessing is decided
+ * (§4.3.3). `tick` throws on a malformed one at runtime, but a content
+ * mistake belongs in the build, not in a play session — an authored beat
+ * the player was meant to overhear should not be discovered as a crash
+ * three acts in.
+ */
+function checkWitnessedEvents(world: WorldDef, findings: Finding[]): void {
+  for (const [id, def] of Object.entries(world.events ?? {})) {
+    if (def!.onlyIfWitnessed === true && def!.witnessedWhen === undefined) {
+      findings.push(
+        error(
+          'event-witnessed-without-condition',
+          `event.${id} sets onlyIfWitnessed but declares no witnessedWhen — there is no way to decide whether the player can perceive it`,
+        ),
+      );
+    }
   }
 }

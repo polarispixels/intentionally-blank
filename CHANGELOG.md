@@ -12,6 +12,41 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.2.22] - 2026-08-30
+
+### Added
+
+- **Architecture task 13: the tick pipeline.** `src/engine/tick.ts` — clock
+  advance, world events, and schedule-derived NPC positions, in the exact
+  order §4.2 specifies, with clean insertion points for the memory, question,
+  puzzle, and profile steps that tasks 15–16 own. 19 new tests; 512 green.
+- **Meta verbs cost nothing.** SAVE, MAP, HINT, and VERSION no-op the tick
+  entirely rather than running it partially, so checking the map twice can
+  never consume the window an event was waiting in. Tested explicitly —
+  this is the kind of rule that is obviously right and silently violated.
+- **`witnessedWhen: Cond`** on `EventDef`. `onlyIfWitnessed` had no way to
+  decide whether the player could actually perceive a beat — an event has
+  no room of its own to infer from. Perceivability is now authored as an
+  ordinary condition, reusing the DSL rather than inventing a bespoke
+  field. Both conditions re-evaluate every tick, so an authored beat that
+  comes due while nobody is there waits and fires the moment the player
+  walks in.
+- `validate` rejects `onlyIfWitnessed` without a `witnessedWhen`. The
+  engine also throws at runtime, but a content mistake belongs in the
+  build: an overheard beat should not be discovered as a crash three acts
+  in.
+
+### Notes
+
+Two findings recorded in `tick.ts`'s header so a later builder does not
+reinvent them. Recurring windows — poker night, trash day — belong to NPC
+schedules, not events: a schedule's condition is re-evaluated fresh every
+tick with no stored state, so recurrence needs no once-or-edge machinery
+at all. And a foreclosing event needs no new mechanism either; it is an
+ordinary once-event whose effects open with a line, which is what makes it
+announce itself at the moment it fires rather than leaving the player to
+discover the loss hours later (constitution §10).
+
 ## [0.2.21] - 2026-08-30
 
 ### Added

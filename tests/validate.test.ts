@@ -446,3 +446,34 @@ describe('noise-word-vocabulary: NPC adjectives', () => {
     ).toBe(true);
   });
 });
+
+describe('validate — witnessed events (§4.3.3)', () => {
+  it('flags onlyIfWitnessed with no witnessedWhen', () => {
+    const world = {
+      ...FIXTURE_WORLD,
+      events: {
+        ...FIXTURE_WORLD.events,
+        blind_beat: { when: { flag: F('fixture_flag_bool') }, onlyIfWitnessed: true, effects: [] },
+      },
+    } as unknown as WorldDef;
+    const findings = validate(world).filter((f) => f.code === 'event-witnessed-without-condition');
+    expect(findings.length).toBe(1);
+    expect(findings[0]!.message).toContain('blind_beat');
+  });
+
+  it('accepts onlyIfWitnessed when witnessedWhen is present', () => {
+    const world = {
+      ...FIXTURE_WORLD,
+      events: {
+        ...FIXTURE_WORLD.events,
+        seen_beat: {
+          when: { flag: F('fixture_flag_bool') },
+          onlyIfWitnessed: true,
+          witnessedWhen: { at: ROOM_A },
+          effects: [],
+        },
+      },
+    } as unknown as WorldDef;
+    expect(validate(world).some((f) => f.code === 'event-witnessed-without-condition')).toBe(false);
+  });
+});

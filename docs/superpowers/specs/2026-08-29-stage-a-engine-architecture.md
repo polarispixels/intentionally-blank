@@ -678,6 +678,7 @@ export interface EventDef {
   when: Cond;                   // typically clock + flags
   once?: boolean;               // default true
   onlyIfWitnessed?: boolean;    // fire only when its effects are observable (§4.3)
+  witnessedWhen?: Cond;         // *how* witnessing is decided; required by the above
   effects: Effect[];
 }
 ```
@@ -986,7 +987,14 @@ Rules that keep Deadline's life without its cruelty:
    loaded save is always consistent.
 3. **Unwitnessed events wait when they can.** `onlyIfWitnessed` lets an
    authored beat (an argument the player should overhear) defer until the
-   player can actually perceive it; hard world changes (a train leaving) may
+   player can actually perceive it. **Perceivability is authored as
+   `witnessedWhen: Cond`** — usually `{ at: room }` — rather than inferred:
+   an `EventDef` has no room of its own, so there is nothing to infer from,
+   and reusing the `Cond` DSL keeps one vocabulary instead of a bespoke
+   perceivability field. Both conditions are re-evaluated every tick, so a
+   beat that comes due while unwitnessed simply waits and fires the moment
+   the player is in position. `validate` rejects `onlyIfWitnessed` without
+   a `witnessedWhen` (`event-witnessed-without-condition`); hard world changes (a train leaving) may
    fire unwitnessed but must obey rule 4.
 4. **Missing an event is never silent doom** (constitution §10). Validation
    enforces: every `PuzzleDef` must have at least one solution route whose
