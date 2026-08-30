@@ -31,7 +31,7 @@ function stripQuotes(s: string): string {
 /** Lowercase, collapse whitespace, straighten apostrophes, strip wrapping quotes and trailing .!? */
 export function normalize(input: string): string {
   let s = input.trim().toLowerCase().replace(/\s+/g, ' ').replace(/['']/g, "'");
-  s = s.replace(/[.!?]+$/, '').trim();
+  s = s.replace(/(\S)[.!?]+$/, '$1').trim();
   const q = s.match(QUOTES);
   if (q) s = q[1]!.trim();
   return s;
