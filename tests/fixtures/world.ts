@@ -70,6 +70,12 @@ export const GUIDE = N('fixture_guide');
 export const SMELL = V('fixture_smell'); // no built-in semantics: rung-2b verb-default path
 export const WAVE = V('fixture_wave'); // meta: true — consumesTurn:false at rung 2b
 
+/** Verb ids used across `tests/parser-grammar.test.ts` (task 9) beyond the above. */
+export const BREAK = V('fixture_break'); // 'V dobj prep iobj', preps: ['with'] — the instrument case
+export const THROW = V('fixture_throw'); // 'V dobj prep iobj', preps: ['at'] — "at" as a real preposition, not noise
+export const LOOK = V('fixture_look'); // 'V'/'V dobj', no preps — "look at lamp": "at" must be dropped as noise
+export const ASK = V('fixture_ask'); // 'V npc about topic' — the only pattern needing the literal "about" separator
+
 export const MEMORY_1 = M('fixture_memory_1');
 export const CLUE_1 = C('fixture_clue_1');
 export const QUESTION_1 = Q('fixture_question_1');
@@ -103,15 +109,22 @@ export const FIXTURE_WORLD: WorldDef = {
     [FLAG_BOOL]: { default: false, doc: 'fixture boolean flag, defaults off' },
     [FLAG_NUM]: { default: 2, doc: 'fixture numeric flag, defaults to 2' },
   },
+  // Task 9 (`parser/vocabulary.ts`) additions below: `name`/`aliases` on
+  // every room, `nouns`/`adjectives` on every object and on `GUIDE` — the
+  // vocabulary compiler's data source. Chosen so no noun/adjective word
+  // collides with any fixture verb word (`checkVocabularyCollisions`
+  // would flag it if one did).
   rooms: {
-    [ROOM_A]: { dark: true }, // baseline dark
-    [ROOM_B]: {}, // baseline lit (no `dark` entry)
-    [ROOM_C]: { dark: { flag: FLAG_BOOL } }, // baseline dark only while FLAG_BOOL holds
+    [ROOM_A]: { name: 'Fixture Room A', aliases: ['room a'], dark: true }, // baseline dark
+    [ROOM_B]: { name: 'Fixture Room B', aliases: ['room b'] }, // baseline lit (no `dark` entry)
+    [ROOM_C]: { name: 'Fixture Room C', aliases: ['room c'], dark: { flag: FLAG_BOOL } }, // baseline dark only while FLAG_BOOL holds
   },
   objects: {
     [KEY]: {
       location: ROOM_A,
       name: 'brass key',
+      nouns: ['key'],
+      adjectives: ['brass'],
       portable: true,
       // Unconditional handler-overrides-builtin case (§8 task 8): TAKE KEY
       // always runs this instead of the take.* built-in, even though KEY
@@ -124,21 +137,45 @@ export const FIXTURE_WORLD: WorldDef = {
         },
       ],
     },
-    [BOX]: { location: ROOM_A, name: 'wooden box', description: 'A plain wooden box.' },
-    [SHELF]: { location: ROOM_A, name: 'wooden shelf', supporter: true },
-    [NOTEBOOK]: { location: ROOM_A, name: 'leather notebook', portable: true, plotCritical: true },
-    [LAMP]: { location: ROOM_A, name: 'floor lamp', lightSource: true, switchable: true },
+    [BOX]: { location: ROOM_A, name: 'wooden box', nouns: ['box'], adjectives: ['wooden'], description: 'A plain wooden box.' },
+    [SHELF]: { location: ROOM_A, name: 'wooden shelf', nouns: ['shelf'], adjectives: ['wooden'], supporter: true },
+    [NOTEBOOK]: {
+      location: ROOM_A,
+      name: 'leather notebook',
+      nouns: ['notebook'],
+      adjectives: ['leather'],
+      portable: true,
+      plotCritical: true,
+    },
+    [LAMP]: {
+      location: ROOM_A,
+      name: 'floor lamp',
+      nouns: ['lamp', 'light'],
+      adjectives: ['floor'],
+      lightSource: true,
+      switchable: true,
+    },
     [CHEST]: {
       location: ROOM_A,
       name: 'iron chest',
+      nouns: ['chest'],
+      adjectives: ['iron'],
       container: { open: false, locked: false, transparent: false, key: KEY },
     },
-    [GLASS_CASE]: { location: ROOM_A, name: 'glass case', container: { open: false, transparent: true } },
-    [HIDDEN_COIN]: { location: ROOM_A, name: 'hidden coin', hidden: true },
-    [HAT]: { location: ROOM_A, name: 'wool hat', portable: true, wearable: true },
+    [GLASS_CASE]: {
+      location: ROOM_A,
+      name: 'glass case',
+      nouns: ['case'],
+      adjectives: ['glass'],
+      container: { open: false, transparent: true },
+    },
+    [HIDDEN_COIN]: { location: ROOM_A, name: 'hidden coin', nouns: ['coin'], adjectives: ['hidden'], hidden: true },
+    [HAT]: { location: ROOM_A, name: 'wool hat', nouns: ['hat'], adjectives: ['wool'], portable: true, wearable: true },
     [LETTER]: {
       location: ROOM_A,
       name: 'folded letter',
+      nouns: ['letter'],
+      adjectives: ['folded'],
       portable: true,
       description: 'A folded letter, sealed shut.',
       text: 'Meet me at noon. -M',
@@ -158,6 +195,7 @@ export const FIXTURE_WORLD: WorldDef = {
   },
   npcs: {
     [GUIDE]: {
+      nouns: ['guide'],
       schedule: [
         { when: { clockPhase: 'morning' }, room: ROOM_B },
         { when: { clockPhase: 'night' }, room: 'offstage' },
@@ -223,6 +261,33 @@ export const FIXTURE_WORLD: WorldDef = {
     [SMELL]: { id: SMELL, words: ['smell'], patterns: ['V dobj'], class: 'analytical', default: 'You smell nothing special about the {name}.' },
     // meta: true — exercises rung 2b's consumesTurn:false path.
     [WAVE]: { id: WAVE, words: ['wave'], patterns: ['V'], class: null, meta: true, default: 'You wave at nothing in particular.' },
+    // Task 9 (`tests/parser-grammar.test.ts`) additions: verbs exercising
+    // grammar shapes `actions.ts`'s built-ins don't need. `THROW` and
+    // `BREAK` both declare `preps: ['at'|'with']` — the instrument/`V dobj
+    // prep iobj` case (§3.7's "throw chair at window"/"break window with
+    // chair" convergence; the synonym-table half of that convergence is
+    // content's job, not this fixture's). `LOOK` has no `preps` at all —
+    // the "look at lamp" case, where "at" must be dropped as noise rather
+    // than sought as a preposition. `ASK` is the only `'V npc about
+    // topic'` verb in the fixture.
+    [BREAK]: {
+      id: BREAK,
+      words: ['break', 'smash'],
+      patterns: ['V dobj', 'V dobj prep iobj'],
+      preps: ['with'],
+      class: 'direct',
+      default: 'Nothing worth breaking there.',
+    },
+    [THROW]: {
+      id: THROW,
+      words: ['throw'],
+      patterns: ['V dobj prep iobj'],
+      preps: ['at'],
+      class: 'direct',
+      default: "You'd rather not throw that.",
+    },
+    [LOOK]: { id: LOOK, words: ['look', 'examine', 'x'], patterns: ['V', 'V dobj'], class: null, default: 'You see nothing special.' },
+    [ASK]: { id: ASK, words: ['ask'], patterns: ['V npc about topic'], class: 'social', default: "They don't know anything about that." },
   },
   responses: {
     'take.success': 'You take the {name}.',

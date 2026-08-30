@@ -21,9 +21,10 @@
 
 import type { Cond } from './cond';
 import type { Effect } from './effects';
-import type { ClueId, DayPhase, FlagId, MemoryId, NpcId, ObjectId, PlaceId, QuestionId, RoomId } from './ids';
+import type { ClueId, DayPhase, FlagId, MemoryId, NpcId, ObjectId, PlaceId, QuestionId, RoomId, VerbId } from './ids';
+import { compileVocabulary } from './parser/vocabulary';
 import type { Prose, ProseRef, ProseRule } from './prose';
-import type { WorldDef } from './world';
+import type { VerbDef, WorldDef } from './world';
 
 export interface Finding {
   /** Stable short id, e.g. `'unknown-room-ref'` — never renamed once shipped (content tests key off it). */
@@ -45,6 +46,7 @@ export function validate(world: WorldDef): Finding[] {
   checkPhaseTable(world, findings);
   checkVerbDefaults(world, findings);
   checkPlotCriticalStrandEffects(world, findings);
+  checkVocabularyCollisions(world, findings);
 
   return findings;
 }
@@ -471,5 +473,110 @@ function checkPlotCriticalStrandEffects(world: WorldDef, findings: Finding[]): v
         }
       });
     });
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Vocabulary collision report (§3.2, §8 task 9). Two kinds of collision,
+// deliberately treated differently:
+//
+//   - Two different verbs claiming the exact same surface-form word/phrase
+//     is an ERROR — UNLESS the collision is provably safe, in which case
+//     it is not reported at all (see below). `grammar.ts` tries every
+//     same-word candidate in table order and keeps the first whose own
+//     pattern/preposition actually fits the remaining tokens (real
+//     fixture content needs this: PUT_IN and PUT_ON both declare the word
+//     "put", told apart only by "in" vs. "on"). That trial only reliably
+//     disambiguates when every colliding verb requires `'V dobj prep
+//     iobj'` (so a preposition is always present in the input) AND no two
+//     colliding verbs share a preposition (so whichever one appears
+//     always picks exactly one verb) — `isSafelyDisjointByPreposition`
+//     below. When that holds, the collision produces no finding at all:
+//     PUT_IN/PUT_ON is exactly this case, and it is correct, intentional
+//     content, not something to flag on every `npm test`. Any other shape
+//     (either verb accepts `'V'`/`'V dobj'` with no prep to go on, or the
+//     two share a preposition) is a genuine, silent ambiguity — grammar's
+//     table-order tie-break permanently hides whichever candidate loses —
+//     and is reported as an ERROR.
+//   - A verb word colliding with an object/NPC noun or adjective (e.g. a
+//     verb WATCH and a wristwatch noun "watch") is only a WARNING. Verb
+//     words are matched at the start of input against `VerbDef.words`;
+//     noun/adjective words are matched inside a noun-phrase span the
+//     grammar has already carved out. Sentence position disambiguates the
+//     two in the overwhelming majority of real inputs, so this is a smell
+//     worth an author's second look, not a guaranteed misparse.
+//
+// Two objects sharing a noun with no distinguishing adjective is
+// deliberately NOT reported here at all — the task brief is explicit that
+// this is ordinary content (task 10's disambiguation handles it at
+// resolve-time), not a collision to warn about.
+// ---------------------------------------------------------------------------
+
+/**
+ * Whether `grammar.ts`'s same-word trial-by-pattern can always tell `defs`
+ * apart: every one of them must require a preposition (`'V dobj prep
+ * iobj'` only, no bare `'V'`/`'V dobj'` pattern), and no two of them may
+ * declare an overlapping `preps` word — see the block comment above.
+ */
+function isSafelyDisjointByPreposition(defs: VerbDef[]): boolean {
+  if (defs.some((d) => d.patterns.some((p) => p !== 'V dobj prep iobj'))) return false;
+  for (let a = 0; a < defs.length; a++) {
+    const prepsA = new Set(defs[a]!.preps ?? []);
+    for (let b = a + 1; b < defs.length; b++) {
+      if ((defs[b]!.preps ?? []).some((p) => prepsA.has(p))) return false;
+    }
+  }
+  return true;
+}
+
+function checkVocabularyCollisions(world: WorldDef, findings: Finding[]): void {
+  const vocab = compileVocabulary(world);
+
+  // Verb/verb: group by the exact phrase (not per-word) so "turn on" vs.
+  // "turn" never collide with each other, only an exact duplicate phrase
+  // claimed by two different verb ids does.
+  const phraseOwners = new Map<string, Set<VerbId>>();
+  for (const form of vocab.verbForms) {
+    const phrase = form.words.join(' ');
+    const owners = phraseOwners.get(phrase) ?? new Set<VerbId>();
+    owners.add(form.id);
+    phraseOwners.set(phrase, owners);
+  }
+  for (const [phrase, owners] of phraseOwners) {
+    if (owners.size <= 1) continue;
+    const ownerIds = [...owners];
+    const defs = ownerIds.map((id) => world.verbs![id]!);
+    if (isSafelyDisjointByPreposition(defs)) continue; // provably safe (e.g. PUT_IN/PUT_ON) — not worth flagging
+    findings.push(
+      error(
+        'verb-word-collision',
+        `verb word "${phrase}" is claimed by more than one verb (${ownerIds.join(', ')}) — the parser's table-order tie-break permanently hides whichever candidate loses, and no preposition reliably separates them`,
+      ),
+    );
+  }
+
+  // Verb/noun: check each individual word of every verb surface form
+  // (so "turn"/"on" are each checked, not just the phrase "turn on")
+  // against the object/NPC noun and adjective vocabulary.
+  const nounLikeWords = new Set<string>([
+    ...vocab.objectNouns.keys(),
+    ...vocab.objectAdjectives.keys(),
+    ...vocab.npcNouns.keys(),
+    ...vocab.npcAdjectives.keys(),
+  ]);
+  const reported = new Set<string>();
+  for (const form of vocab.verbForms) {
+    for (const word of form.words) {
+      if (!nounLikeWords.has(word)) continue;
+      const key = `${form.id}:${word}`;
+      if (reported.has(key)) continue;
+      reported.add(key);
+      findings.push(
+        warning(
+          'verb-noun-collision',
+          `verb "${form.id}"'s word "${word}" is also an object/NPC noun or adjective — usually fine (sentence position disambiguates), but worth a second look`,
+        ),
+      );
+    }
   }
 }

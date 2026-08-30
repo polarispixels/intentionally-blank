@@ -89,10 +89,19 @@ export interface ContainerDef {
  * `portable`/`wearable`/`switchable` (the built-in verb gates), `text` and
  * `description` (READ's fallback, §2.5), and `handlers` (rung 1). Still not
  * `nouns`/`adjectives` — those are the parser's (tasks 9–11) to add.
+ *
+ * Task 9 (`parser/vocabulary.ts`) adds `nouns`/`adjectives` themselves —
+ * the words the vocabulary compiler indexes an object under (§2.5).
+ * Optional, not required as §2.5's full `ObjectDef` has them, so existing
+ * fixture objects that predate the parser tasks keep compiling; an object
+ * with neither contributes no vocabulary and can only ever be referred to
+ * by pronoun (task 10) or not at all.
  */
 export interface ObjectDefSlice {
   location: PlaceId;
   name?: string;
+  nouns?: string[];
+  adjectives?: string[];
   hidden?: boolean;
   container?: ContainerDef;
   supporter?: boolean;
@@ -153,11 +162,17 @@ export interface VerbDef {
 }
 
 /**
- * Minimal room-authoring slice of §2.4's `RoomDef` — just `dark`, the
- * baseline `isDark` reads. Not yet `name`/`exits`/`description`/etc. —
- * those are later tasks' to add.
+ * Minimal room-authoring slice of §2.4's `RoomDef` — `dark`, the baseline
+ * `isDark` reads, plus (task 9) `name`/`aliases` (§2.4), what the
+ * vocabulary compiler indexes a room under for `GO TO`/bare-room-word
+ * resolution (task 11). Both optional, like `ObjectDefSlice`'s `nouns`/
+ * `adjectives`, so existing fixture rooms that predate the parser tasks
+ * keep compiling. Not yet `exits`/`description`/etc. — those are later
+ * tasks' to add.
  */
 export interface RoomDefSlice {
+  name?: string;
+  aliases?: string[];
   dark?: true | Cond;
 }
 
@@ -177,11 +192,17 @@ export interface ScheduleRule {
 }
 
 /**
- * Minimal npc-authoring slice of §2.6 — just `schedule`, which `npcRoom`'s
- * fallback reads. Not yet `topics`/`handlers`/etc. — those are tasks 13–14's.
+ * Minimal npc-authoring slice of §2.6 — `schedule`, which `npcRoom`'s
+ * fallback reads, plus (task 9) `nouns`/`adjectives` (§2.6), what the
+ * vocabulary compiler indexes an NPC under. Not yet `topics`/`handlers`/
+ * `pronoun`/etc. — those are tasks 13–14's (see `vocabulary.ts`'s
+ * `topicWords` doc comment: topic vocabulary has no data source until
+ * `NpcDef.topics` lands).
  */
 export interface NpcDefSlice {
   schedule?: ScheduleRule[];
+  nouns?: string[];
+  adjectives?: string[];
 }
 
 /** Narrow, still-growing slice of §2.1's `WorldDef`. */

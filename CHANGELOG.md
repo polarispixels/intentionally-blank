@@ -12,6 +12,45 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.2.16] - 2026-08-30
+
+### Added
+
+- **Architecture task 9: parser tokenizer, grammar, and vocabulary.**
+  `src/engine/parser/` (normalization, vocabulary compilation, pattern
+  matching) and `src/engine/interpreter.ts`. 41 new tests; 390 green.
+- **The `IntentInterpreter` seam is real** (ADR 0004). `DeterministicParser`
+  implements it and is the only implementation v1 will ship. The interface
+  exists so that a future local or remote model adapter could only ever
+  produce the same `actions` / `clarify` / `miss` outcome shape — it can
+  interpret what the player meant, and it structurally cannot change what
+  the world does.
+- Multi-word verbs resolve by longest match, so `turn on lamp` parses as
+  `turn on` rather than `turn` with a stray preposition. Instruments work:
+  `break window with chair` yields the verb, object, preposition, and
+  instrument the handler layer already expects.
+- Vocabulary collision reporting in `validate`. Two verbs claiming the same
+  word is an error *unless* they are told apart by disjoint prepositions —
+  which is real content, not a hypothetical: `put in` and `put on` both
+  claim "put", and the grammar resolves them by which preposition fits.
+
+### Fixed
+
+- **Pattern specificity now beats declaration order.** A verb declaring
+  both `V dobj` and `V dobj prep iobj` would have had the looser pattern
+  shadow the specific one permanently, because `V dobj` matches any
+  non-empty span — so `break window with chair` would have parsed as
+  breaking a thing called "window with chair" and the instrument would
+  never have reached a handler. Patterns are now tried most-specific-first
+  regardless of how content declares them. Found by the builder during TDD.
+
+### Notes
+
+Noun resolution against scope, disambiguation, and pronouns are task 10;
+ALL / AND / BUT / GO TO / AGAIN and implicit take are task 11. The
+vocabulary compiler carries an empty topic seam until NPC topics exist in
+task 14.
+
 ## [0.2.15] - 2026-08-30
 
 The core engine stack is complete. Parser next.
