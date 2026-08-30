@@ -103,6 +103,7 @@ import type { ActionClass } from './ids';
 import type { GameEvent, GameState, WorldDef } from './world';
 import type { InterpretOutcome } from './interpreter';
 import { nextParserContext } from './interpreter';
+import { renderArrival } from './move';
 import type { CompiledVocabulary } from './parser/vocabulary';
 import { render } from './prose';
 import { respond } from './respond';
@@ -140,7 +141,19 @@ export function step(world: WorldDef, state: GameState, vocab: CompiledVocabular
   }
 
   const responded = respond(world, state, vocab, outcome);
-  const ticked = tick(world, responded.state, { consumesTurn, class: responded.class });
+  // §8 task 20b: "arrival, with look" (effects.ts's own `goto` doc comment
+  // calls this "the step loop's job"). Any effect list this turn ran —
+  // `move.ts`'s own direction/GO-TO traversal included, which deliberately
+  // does NOT render arrival itself (see that module's header) — that left
+  // the player somewhere new is rendered exactly once, here, by comparing
+  // location before and after `respond()`. This is the single choke point:
+  // nothing else in the engine calls `renderArrival`, so a relocation is
+  // never rendered twice no matter which path produced it.
+  const arrived =
+    responded.state.location !== state.location
+      ? renderArrival(world, responded.state)
+      : { state: responded.state, events: [] as GameEvent[] };
+  const ticked = tick(world, arrived.state, { consumesTurn, class: responded.class });
   const parser = nextParserContext(state.parser, outcome, vocab);
   // `state.turn` ("accepted world turns," gamestate.ts's own gloss) is
   // nowhere incremented by any shipped module — `tick()` only advances the
@@ -153,7 +166,7 @@ export function step(world: WorldDef, state: GameState, vocab: CompiledVocabular
   const turn = consumesTurn ? ticked.state.turn + 1 : ticked.state.turn;
   return {
     state: { ...ticked.state, parser, turn },
-    events: [...responded.events, ...ticked.events],
+    events: [...responded.events, ...arrived.events, ...ticked.events],
     class: responded.class,
     consumesTurn,
   };

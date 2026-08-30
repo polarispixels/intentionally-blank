@@ -81,6 +81,7 @@ import { C, F, M, N, O, P, Q, R, S, V } from '../../src/engine/ids';
 import { flag } from '../../src/engine/cond';
 import { BUILTIN_VERB_IDS } from '../../src/engine/actions';
 import { AGAIN_VERB_ID } from '../../src/engine/interpreter';
+import { DIRECTION_VERB_IDS, LOOK_VERB_ID } from '../../src/engine/move';
 import type { GameEvent, ScriptFn, WorldDef } from '../../src/engine/world';
 
 export const ROOM_A = R('fixture_room_a');
@@ -263,6 +264,22 @@ export const FIXTURE_PROMPT_ID = 'fixture_login_prompt';
 export const FIXTURE_PROMPT_USERNAME = 'player';
 export const FIXTURE_PROMPT_PASSWORD = 'letmein';
 
+/**
+ * Task 20b (`tests/move.test.ts`) additions: `dir`/`description`/
+ * `firstVisit`/`onEnter`/`blockedText`/`travelText`/`minutes` on the
+ * existing three-room exit graph (task 11's A<->B always-passable, B<->C
+ * gated by `DOOR`) — everything `move.ts` needs to traverse an exit and
+ * render arrival. `FLAG_ONENTER_ONCE`/`FLAG_ONENTER_GATED`/
+ * `FLAG_ONENTER_GATE_TRIGGER`/`FLAG_ONENTER_REPEAT_COUNT` back ROOM_B/
+ * ROOM_C's `onEnter` rules (once-default, `when`-gated, and `once: false`
+ * respectively) — dedicated flags, not `FLAG_BOOL`, so these tests don't
+ * couple to ROOM_C's own darkness cond or LETTER's handler.
+ */
+export const FLAG_ONENTER_ONCE = F('fixture_flag_onenter_once');
+export const FLAG_ONENTER_GATED = F('fixture_flag_onenter_gated');
+export const FLAG_ONENTER_GATE_TRIGGER = F('fixture_flag_onenter_gate_trigger');
+export const FLAG_ONENTER_REPEAT_COUNT = F('fixture_flag_onenter_repeat_count');
+
 const promptOpenScript: ScriptFn = (_world, state) => ({
   state,
   events: [
@@ -316,6 +333,10 @@ export const FIXTURE_WORLD: WorldDef = {
     [FLAG_PUZZLE_SOLVED]: { default: false, doc: 'task 16: set once by PUZZLE_1.onSolved' },
     [FLAG_PROMPT_ATTEMPTS]: { default: 0, doc: 'task 18: fixture login-prompt failed-attempt counter' },
     [FLAG_PROMPT_SOLVED]: { default: false, doc: 'task 18: set once the fixture prompt is answered correctly' },
+    [FLAG_ONENTER_ONCE]: { default: false, doc: 'task 20b: set by ROOM_B onEnter (default once:true)' },
+    [FLAG_ONENTER_GATED]: { default: false, doc: 'task 20b: set by ROOM_B onEnter, gated on FLAG_ONENTER_GATE_TRIGGER' },
+    [FLAG_ONENTER_GATE_TRIGGER]: { default: false, doc: 'task 20b: gates the ROOM_B onEnter above' },
+    [FLAG_ONENTER_REPEAT_COUNT]: { default: 0, doc: 'task 20b: incremented every ROOM_C entry (onEnter once:false)' },
   },
   // Task 9 (`parser/vocabulary.ts`) additions below: `name`/`aliases` on
   // every room, `nouns`/`adjectives` on every object and on `GUIDE` — the
@@ -325,10 +346,61 @@ export const FIXTURE_WORLD: WorldDef = {
   rooms: {
     // Task 11 `exits`: A <-> B always passable; B <-> C gated by DOOR
     // (closed by default, so that edge starts blocked — GO TO's BFS only
-    // ever uses currently-passable edges).
-    [ROOM_A]: { name: 'Fixture Room Alpha', aliases: ['room alpha'], area: 'fixture-wing', map: { x: 0, y: 0 }, dark: true, exits: [{ to: ROOM_B }] }, // baseline dark
-    [ROOM_B]: { name: 'Fixture Room B', aliases: ['room b'], area: 'fixture-wing', map: { x: 1, y: 0 }, exits: [{ to: ROOM_A }, { to: ROOM_C, door: DOOR }] }, // baseline lit (no `dark` entry)
-    [ROOM_C]: { name: 'Fixture Room C', aliases: ['room c'], area: 'fixture-annex', map: { x: 2, y: 0 }, dark: { flag: FLAG_BOOL }, exits: [{ to: ROOM_B, door: DOOR }] }, // baseline dark only while FLAG_BOOL holds
+    // ever uses currently-passable edges). Task 20b adds `dir` (so
+    // direction verbs/GO TO's hop-lookup can find these exits at all),
+    // `description`/`firstVisit` on every room, and `onEnter` on ROOM_B/
+    // ROOM_C. ROOM_A's `firstVisit` is deliberately never observed under
+    // normal play — `initialState` seeds `visited[startRoom]` directly
+    // (task 6), bypassing `renderArrival` entirely — `tests/move.test.ts`
+    // exercises that directly.
+    [ROOM_A]: {
+      name: 'Fixture Room Alpha',
+      aliases: ['room alpha'],
+      area: 'fixture-wing',
+      map: { x: 0, y: 0 },
+      dark: true, // baseline dark
+      description: 'fixture room alpha — description',
+      firstVisit: 'fixture room alpha — firstVisit (never shown at game start)',
+      exits: [
+        { dir: 'n', to: ROOM_B, travelText: 'fixture travelText: you head north into room b' },
+        // `when`-gated, false by default and never toggled by any existing
+        // test (`FLAG_ONENTER_GATE_TRIGGER` is a task 20b addition) — an
+        // exit that "does not currently exist at all" (this task's own
+        // distinction from a closed door), safe to add here: `cli/scope.ts`'s
+        // `travelGraph`/`tests/parser-multi.test.ts`'s own BFS-graph helper
+        // both already exclude a `when`-false edge, so no existing GO TO
+        // route assertion changes.
+        { dir: 'up', to: ROOM_C, when: { flag: FLAG_ONENTER_GATE_TRIGGER } },
+      ],
+    },
+    [ROOM_B]: {
+      name: 'Fixture Room B',
+      aliases: ['room b'],
+      area: 'fixture-wing',
+      map: { x: 1, y: 0 },
+      // baseline lit (no `dark` entry)
+      description: 'fixture room b — description',
+      firstVisit: 'fixture room b — firstVisit',
+      onEnter: [
+        { effects: [{ set: [FLAG_ONENTER_ONCE, true] }] }, // once defaults true
+        { when: { flag: FLAG_ONENTER_GATE_TRIGGER }, effects: [{ set: [FLAG_ONENTER_GATED, true] }] },
+      ],
+      exits: [
+        { dir: 's', to: ROOM_A },
+        { dir: 'e', to: ROOM_C, door: DOOR, blockedText: 'fixture blockedText: the oak door is shut', minutes: 5 },
+      ],
+    },
+    [ROOM_C]: {
+      name: 'Fixture Room C',
+      aliases: ['room c'],
+      area: 'fixture-annex',
+      map: { x: 2, y: 0 },
+      dark: { flag: FLAG_BOOL }, // baseline dark only while FLAG_BOOL holds
+      description: 'fixture room c — description',
+      firstVisit: 'fixture room c — firstVisit',
+      onEnter: [{ once: false, effects: [{ inc: FLAG_ONENTER_REPEAT_COUNT }] }],
+      exits: [{ dir: 'w', to: ROOM_B, door: DOOR }],
+    },
   },
   objects: {
     [KEY]: {
@@ -547,6 +619,43 @@ export const FIXTURE_WORLD: WorldDef = {
     // WAIT's for the ordinary turn-pass case.
     [AGAIN_VERB_ID]: { id: AGAIN_VERB_ID, words: ['again', 'g'], patterns: ['V'], class: null, default: "There's nothing to repeat." },
     [WAIT]: { id: WAIT, words: ['wait', 'z'], patterns: ['V'], class: null, default: 'Time passes.' },
+    // Task 20b additions: the twelve direction verbs (`DIRECTION_VERB_IDS`,
+    // reserved by `move.ts` the same way `BUILTIN_VERB_IDS` reserves
+    // TAKE/DROP/etc.) plus `LOOK`. Each direction's `words` carries its
+    // short and long forms, plus the two-word "go <direction>" surface
+    // form (`vocabulary.ts` splits any `words` entry on spaces, so one
+    // string can be a multi-word verb form — the same mechanism `turn on`
+    // already uses); `in`/`out` additionally carry `enter`/`exit` as
+    // synonyms (this task's brief lists ENTER/EXIT alongside IN/OUT — see
+    // `move.ts`'s header for why they're synonyms rather than separate
+    // ids). `class: null` (movement itself isn't tallied into the
+    // behavioral profile — a content decision, not an engine one; flagged
+    // in this task's report). Every `default` here is dead prose in
+    // practice — `respond.ts` intercepts these ids before `performAction`
+    // ever renders a verb default — but `validate.ts`'s "every non-meta
+    // verb needs a `default`" rule still requires one.
+    [DIRECTION_VERB_IDS.n]: { id: DIRECTION_VERB_IDS.n, words: ['n', 'north', 'go north'], patterns: ['V'], class: null, default: 'fixture: go what now.' },
+    [DIRECTION_VERB_IDS.s]: { id: DIRECTION_VERB_IDS.s, words: ['s', 'south', 'go south'], patterns: ['V'], class: null, default: 'fixture: go what now.' },
+    [DIRECTION_VERB_IDS.e]: { id: DIRECTION_VERB_IDS.e, words: ['e', 'east', 'go east'], patterns: ['V'], class: null, default: 'fixture: go what now.' },
+    [DIRECTION_VERB_IDS.w]: { id: DIRECTION_VERB_IDS.w, words: ['w', 'west', 'go west'], patterns: ['V'], class: null, default: 'fixture: go what now.' },
+    [DIRECTION_VERB_IDS.ne]: { id: DIRECTION_VERB_IDS.ne, words: ['ne', 'northeast', 'go northeast'], patterns: ['V'], class: null, default: 'fixture: go what now.' },
+    [DIRECTION_VERB_IDS.nw]: { id: DIRECTION_VERB_IDS.nw, words: ['nw', 'northwest', 'go northwest'], patterns: ['V'], class: null, default: 'fixture: go what now.' },
+    [DIRECTION_VERB_IDS.se]: { id: DIRECTION_VERB_IDS.se, words: ['se', 'southeast', 'go southeast'], patterns: ['V'], class: null, default: 'fixture: go what now.' },
+    [DIRECTION_VERB_IDS.sw]: { id: DIRECTION_VERB_IDS.sw, words: ['sw', 'southwest', 'go southwest'], patterns: ['V'], class: null, default: 'fixture: go what now.' },
+    [DIRECTION_VERB_IDS.up]: { id: DIRECTION_VERB_IDS.up, words: ['up', 'u', 'go up'], patterns: ['V'], class: null, default: 'fixture: go what now.' },
+    [DIRECTION_VERB_IDS.down]: { id: DIRECTION_VERB_IDS.down, words: ['down', 'd', 'go down'], patterns: ['V'], class: null, default: 'fixture: go what now.' },
+    [DIRECTION_VERB_IDS.in]: { id: DIRECTION_VERB_IDS.in, words: ['in', 'enter', 'go in'], patterns: ['V'], class: null, default: 'fixture: go what now.' },
+    [DIRECTION_VERB_IDS.out]: { id: DIRECTION_VERB_IDS.out, words: ['out', 'exit', 'go out'], patterns: ['V'], class: null, default: 'fixture: go what now.' },
+    // Word list deliberately omits "look" itself: the pre-existing `LOOK`
+    // fixture const above (id `fixture_look`, task 9's grammar-shape
+    // fixture — an examine-style verb, not real room-description LOOK)
+    // already claims that exact word. Two different verb ids sharing one
+    // surface form isn't itself invalid (`matchGrammar` tries same-length
+    // candidates in table order), but it would make `fixture_look` — the
+    // earlier-declared, unrelated verb — win every bare "look", silently
+    // shadowing this one. `tests/move.test.ts` covers the real word via a
+    // small standalone `WorldDef` that doesn't declare `fixture_look`.
+    [LOOK_VERB_ID]: { id: LOOK_VERB_ID, words: ['l'], patterns: ['V'], class: null, default: 'fixture: look at what.' },
   },
   responses: {
     'take.success': 'You take the {name}.',
@@ -591,6 +700,14 @@ export const FIXTURE_WORLD: WorldDef = {
     'turnOff.success': 'The {name} goes off.',
     'turnOff.notSwitchable': "The {name} doesn't switch on.",
     'turnOff.alreadyOff': 'The {name} is already off.',
+    // Task 20b additions: the two global movement-refusal families
+    // `move.ts` renders when no exit exists at all (`move.noExit`) versus
+    // when one exists but a closed door refuses it and the exit itself
+    // authored no `blockedText` (`move.blocked`) — see this task's report
+    // for the exact keys a `narrative-writer` still needs to author for
+    // real content.
+    'move.noExit': 'fixture: you cannot go that way.',
+    'move.blocked': 'fixture: something blocks the way.',
   },
   // Task 17 (`tests/views.test.ts`) additions: `title` on both memories,
   // `detail` on CLUE_1, and `answer` on QUESTION_2 — the fields

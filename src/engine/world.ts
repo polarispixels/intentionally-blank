@@ -33,7 +33,7 @@
 
 import type { Cond } from './cond';
 import { evaluate } from './cond';
-import type { ActionClass, DayPhase, FlagId, FlagValue, MemoryId, ClueId, NpcId, ObjectId, PlaceId, PuzzleId, QuestionId, RoomId, ScriptId, TopicId, VerbId } from './ids';
+import type { ActionClass, DayPhase, Direction, FlagId, FlagValue, MemoryId, ClueId, NpcId, ObjectId, PlaceId, PuzzleId, QuestionId, RoomId, ScriptId, TopicId, VerbId } from './ids';
 // Type-only: `Effect` is only referenced in `HandlerDef`'s type signature
 // below, never called at runtime from this module, so this stays a
 // compile-time-only edge even though `effects.ts` itself imports `WorldDef`
@@ -182,29 +182,70 @@ export interface VerbDef {
  * optional, like `ObjectDefSlice`'s `nouns`/`adjectives`, so existing
  * fixture rooms that predate these fields keep compiling.
  */
+/**
+ * §2.4's `onEnter` entry — no `id` of its own (unlike `EventDef`), so
+ * `move.ts`'s once-dedup key is derived from the room id + the rule's own
+ * index in the array (`room.<roomId>.onEnter[i]`), mirroring `effects.ts`'s
+ * own index-derived rotation paths. `once` defaults to `true`, matching
+ * `EventDef`'s own default (§2.8) — the two shapes are otherwise identical,
+ * and nothing in §2.4 states a different default for this one.
+ */
+export interface OnEnterRule {
+  when?: Cond;
+  /** Default true, matching `EventDef.once` (§2.8). */
+  once?: boolean;
+  effects: Effect[];
+}
+
+/**
+ * §8 task 20b additions: `description` (full LOOK text, state-dependent —
+ * `move.ts`'s `renderArrival`/`look` render this), `firstVisit` (prepended
+ * exactly once, the first turn `state.visited[id]` is set), and `onEnter`
+ * (run on every entry, `once`-gated per rule) — the room-authoring fields
+ * task 6 left for "later tasks [...] to add" (see this interface's own
+ * earlier header note). Both `description` and `firstVisit` are optional
+ * here like every other `*DefSlice` field, but `move.ts`'s `renderArrival`
+ * throws at runtime if a room it actually enters has no `description` — the
+ * same "missing authored data is a content bug" convention `actions.ts`'s
+ * `builtinRead` and `respond.ts`'s `family()` already use.
+ */
 export interface RoomDefSlice {
   name?: string;
   aliases?: string[];
   area?: string;
   map?: { x: number; y: number; z?: number };
   dark?: true | Cond;
+  description?: Prose;
+  firstVisit?: Prose;
+  onEnter?: OnEnterRule[];
   exits?: ExitDefSlice[];
 }
 
 /**
- * Minimal exit-authoring slice of §2.4's full `ExitDef` (task 11, §3.5's
- * `GO TO`). The full spec shape also has `dir`, `blockedText`, `travelText`,
- * `minutes` — content-authoring/room-description fields a later task adds;
- * this is a minimal slice, like every other `*DefSlice` in this file, of
- * just what `GO TO`'s BFS needs to know an exit exists and is currently
- * passable: `to` (always), and optionally a `door` that must be open
- * (`objectState(world, state, door, 'open')`) or a `when` `Cond` that must
- * hold for the exit to be passable right now.
+ * Exit-authoring slice of §2.4's full `ExitDef` (task 11's `GO TO`, §8 task
+ * 20b's direction traversal). `to`/`door`/`when` are task 11's (GO TO's BFS
+ * graph needs only whether an exit exists and is currently passable).
+ * Task 20b adds the rest: `dir` (which direction verb reaches this exit —
+ * optional, like every other `*DefSlice` field, so an exit meant only for
+ * `GO TO` routing needn't declare one, though `move.ts`'s direction
+ * traversal can then never reach it directly), `blockedText` (exit-specific
+ * prose for "exists but a closed door won't yield" — distinct from the
+ * global "no exit that way" family, per this task's own brief), `travelText`
+ * (shown on successful use, before the destination's arrival render), and
+ * `minutes` (extra clock time this specific exit's travel costs, applied via
+ * the same `advanceClock` mechanism `effects.ts` already defines — "beyond
+ * the per-turn default", not a replacement of it; see `move.ts`'s header for
+ * why that reading was chosen over the field's own doc-comment word
+ * "override").
  */
 export interface ExitDefSlice {
+  dir?: Direction;
   to: RoomId;
   door?: ObjectId;
   when?: Cond;
+  blockedText?: Prose;
+  travelText?: Prose;
+  minutes?: number;
 }
 
 /**

@@ -18,6 +18,15 @@ export type FlagValue = boolean | number | string;
 export type ActionClass = 'analytical' | 'social' | 'direct';
 export type DayPhase = 'morning' | 'afternoon' | 'evening' | 'night';
 
+/**
+ * Compass/vertical/in-out exit directions (spec §2.4's `ExitDef.dir`).
+ * Lives here rather than `move.ts` (§8 task 20b) so `world.ts`'s
+ * `ExitDefSlice.dir` can reference it without depending on the module that
+ * *walks* exits — the same reason `DayPhase` lives here instead of
+ * `clock.ts`.
+ */
+export type Direction = 'n' | 's' | 'e' | 'w' | 'ne' | 'nw' | 'se' | 'sw' | 'up' | 'down' | 'in' | 'out';
+
 /** Where a thing can be (spec §1.2). */
 export type PlaceId =
   | RoomId

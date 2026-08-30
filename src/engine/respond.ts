@@ -69,6 +69,8 @@ import type { Prose } from './prose';
 import { render } from './prose';
 import { hasBuiltinSemantics, performAction, verbDefaultPath } from './actions';
 import type { InterpretOutcome, StructuredAction } from './interpreter';
+import { GO_TO_VERB_ID } from './interpreter';
+import { directionForVerb, executeGoTo, look, LOOK_VERB_ID, traverseDirection } from './move';
 import type { CompiledVocabulary } from './parser/vocabulary';
 import { candidateName, isNpcId } from './parser/resolver';
 import { allEmptyFamilyKey } from './parser/multi';
@@ -166,6 +168,24 @@ function respondToActions(world: WorldDef, state: GameState, vocab: CompiledVoca
 function respondToAction(world: WorldDef, state: GameState, vocab: CompiledVocabulary, action: StructuredAction): RespondResult {
   const dobj = action.dobj;
   const iobj = action.iobj;
+
+  // Movement and LOOK (§8 task 20b): checked before anything else in this
+  // function — `GO_TO_VERB_ID` is never in `world.verbs` (it would throw
+  // reaching `performAction`'s `fallbackToVerbDefault`, per this task's own
+  // brief), and the twelve direction verbs are always a bare `'V'` match
+  // (no `dobj`), so neither would ever hit the NPC-target checks below
+  // anyway — this is purely about reaching `move.ts` before the generic
+  // `performAction` dispatch, which has no movement semantics of its own.
+  if (action.verb === GO_TO_VERB_ID) {
+    return executeGoTo(world, state, action.route ?? []);
+  }
+  const dir = directionForVerb(action.verb);
+  if (dir !== undefined) {
+    return traverseDirection(world, state, action.verb, dir);
+  }
+  if (action.verb === LOOK_VERB_ID) {
+    return look(world, state, action.verb);
+  }
 
   if (action.verb === NPC_VERB_IDS.ask && dobj !== undefined && isNpcId(vocab, dobj) && action.topic !== undefined) {
     return respondToAsk(world, state, vocab, dobj, action.topic);

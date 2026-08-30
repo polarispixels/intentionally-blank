@@ -12,6 +12,36 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.2.31] - 2026-08-30
+
+### Added
+
+- **Task 20b: movement and looking** — the gap the plan lost.
+  `src/engine/move.ts`: the twelve direction verbs and their long forms,
+  `GO <direction>`, `ENTER`/`EXIT`, `LOOK`, exit traversal, room rendering
+  on arrival, `firstVisit` once, `onEnter`, and `visited`. 40 new tests;
+  741 green.
+- **An exit that won't yield is never reported as no exit.** A `when`-gated
+  or absent exit gets one family; a closed door gets a different one, or the
+  exit's own authored `blockedText`. Telling a player there is no door when
+  there is a locked one makes the map worthless and the world unreasonable.
+- `GO TO` finally executes. It walks its route hop by hop, **re-checking
+  passability at each hop** because the world may have moved since the route
+  was planned, costs one turn per hop so the clock stays honest, and on a
+  block says why and leaves the player where the successful hops put them.
+- Arrival renders from **one choke point**: `step` compares location before
+  and after, so a direction move, a `GO TO` hop, and a scripted `goto`
+  effect all describe the room exactly once, and none of them can forget to.
+- `firstVisit` fires once ever, across save and load — `visited` is ordinary
+  persisted state with no UI-side shadow, which is the same hazard class the
+  MVP shipped and ADR 0009 exists to prevent.
+
+### Notes
+
+Family keys now owed to `narrative-writer`: `move.noExit` and
+`move.blocked`, joining `bareVerb`, `dead.refused`, and `ended.refused` in
+the batch.
+
 ## [0.2.30] - 2026-08-30
 
 ### Added
