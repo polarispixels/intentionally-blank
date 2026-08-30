@@ -49,6 +49,11 @@ Version targets follow the ladder in `docs/spec/README.md` and may shift.
 - A command typed during the paced beat sequence is discarded after
   flushing (the input clears before the flush check). Either run it after
   the flush or keep the text.
+- `tests/purity.test.ts` strips string literals with a regex that has no
+  token context, so a regex literal containing a quote character (e.g.
+  `QUOTES` in `parser.ts`) blinds it to the span up to the next matching
+  quote. It still catches imports at file top. Replace with a tokenizer
+  (or strip `/regex/` literals first) before relying on it for M1.
 
 ## Notes carried into the M1 design
 
