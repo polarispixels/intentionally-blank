@@ -193,16 +193,20 @@ export interface ScheduleRule {
 
 /**
  * Minimal npc-authoring slice of §2.6 — `schedule`, which `npcRoom`'s
- * fallback reads, plus (task 9) `nouns`/`adjectives` (§2.6), what the
- * vocabulary compiler indexes an NPC under. Not yet `topics`/`handlers`/
- * `pronoun`/etc. — those are tasks 13–14's (see `vocabulary.ts`'s
- * `topicWords` doc comment: topic vocabulary has no data source until
- * `NpcDef.topics` lands).
+ * fallback reads, `nouns`/`adjectives` (task 9), what the vocabulary
+ * compiler indexes an NPC under, and (task 10) `pronoun` — §2.6's `NpcDef`
+ * already specifies it; it was simply unplumbed until the parser's
+ * `him`/`her`/`them` resolution (§3.4) needed a real data source instead of
+ * guessing. Not yet `topics`/`handlers`/etc. — those are tasks 13–14's (see
+ * `vocabulary.ts`'s `topicWords` doc comment: topic vocabulary has no data
+ * source until `NpcDef.topics` lands).
  */
 export interface NpcDefSlice {
   schedule?: ScheduleRule[];
   nouns?: string[];
   adjectives?: string[];
+  /** §3.4's `him`/`her`/`them` resolution reads this — see `parser/vocabulary.ts`'s `npcPronouns`. Absent ⇒ this NPC never participates in pronoun fallback/antecedent-tracking (no guessing a gender the content never declared). */
+  pronoun?: 'he' | 'she' | 'they';
 }
 
 /** Narrow, still-growing slice of §2.1's `WorldDef`. */

@@ -859,8 +859,24 @@ normalize (MVP rules kept) → tokenize → match verb + pattern
 stores `pending` in `ParserContext`. The next input is first tried as an
 answer (adjective, noun, or ordinal — "brass", "the first one"); if it
 doesn't match any candidate it is parsed as a fresh command and the pending
-question is dropped. Never nests: an ambiguous answer re-asks once, then
-gives up gracefully.
+question is dropped — a player who changes their mind mid-question is never
+trapped. Never nests: an ambiguous answer re-asks once (tracked by
+`pending.reask`), then gives up gracefully.
+
+**Both slots clarify, in order, and neither is ever guessed.** `put key in
+box` with two keys and two boxes asks about the direct object, then — once
+that is answered and resolution re-runs — about the indirect one. Silently
+picking a first candidate for the unasked slot would act on an object the
+player did not mean, which is worse than asking (constitution §9: failure
+produces information). A fresh command at any point drops the entire
+pending chain rather than leaving half an action stranded.
+
+**Pronoun slots are keyed by the NPC's declared `pronoun`** (§2.6). `him`
+resolves only to `he` NPCs, `her` only to `she`, `them` to `they` NPCs and
+to plural sets; referring to one NPC never clobbers a differently-gendered
+slot. This is not hypothetical bookkeeping — the cast is four brothers and
+a sister who share scenes, and "ask her about the notebook" resolving to a
+brother is exactly the failure constitution §12 forbids.
 
 ### 3.4 Pronouns
 
@@ -1289,6 +1305,12 @@ green + `npm test` green.
 22. **Shell switch + old-engine deletion.** `src/ui/` on Session; remove
     MVP `step/state/parser/types` **and `text.ts`**; full playthrough test
     via CLI. (Merges with M1 content in Stage B; version 0.3.0.)
+
+    Note for whoever does this: while the MVP `src/engine/parser.ts` still
+    exists, the specifier `'../src/engine/parser'` resolves to *it* rather
+    than to the `parser/` directory's `index.ts`. Tasks 9 and 10 both
+    worked around it by importing submodules directly. Deleting the file
+    fixes it; switch the imports back to the barrel in the same change.
 
     **Acceptance includes enforcing §0 layering rule 1 with a test.** Today
     four MVP files import from `src/content/` — `state.ts`, `step.ts` (two

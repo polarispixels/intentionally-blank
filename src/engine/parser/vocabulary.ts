@@ -31,6 +31,15 @@ export interface CompiledVocabulary {
   objectAdjectives: Map<string, ObjectId[]>;
   npcNouns: Map<string, NpcId[]>;
   npcAdjectives: Map<string, NpcId[]>;
+  /**
+   * `NpcDefSlice.pronoun` (§2.6/§3.4), reindexed by id for the parser's
+   * `him`/`her`/`them` resolution (task 10) — the fallback-in-scope and
+   * antecedent-tracking both need "which pronoun bucket does this NPC
+   * belong to", not just "is this id an NPC at all" (`npcNouns`/
+   * `npcAdjectives` alone can't answer that). Absent entry ⇒ the NPC
+   * declared no `pronoun`, so it never participates in pronoun resolution.
+   */
+  npcPronouns: Map<NpcId, 'he' | 'she' | 'they'>;
   /** Full normalized alias phrase (e.g. "hotel room") → room id. Consumed by task 11's GO TO. */
   roomAliases: Map<string, RoomId>;
   /**
@@ -79,15 +88,17 @@ function compileObjectVocabulary(
   return { objectNouns, objectAdjectives };
 }
 
-function compileNpcVocabulary(world: WorldDef): Pick<CompiledVocabulary, 'npcNouns' | 'npcAdjectives'> {
+function compileNpcVocabulary(world: WorldDef): Pick<CompiledVocabulary, 'npcNouns' | 'npcAdjectives' | 'npcPronouns'> {
   const npcNouns = new Map<string, NpcId[]>();
   const npcAdjectives = new Map<string, NpcId[]>();
+  const npcPronouns = new Map<NpcId, 'he' | 'she' | 'they'>();
   for (const [id, def] of Object.entries(world.npcs ?? {})) {
     const npcId = id as NpcId;
     for (const noun of def!.nouns ?? []) addTo(npcNouns, noun, npcId);
     for (const adj of def!.adjectives ?? []) addTo(npcAdjectives, adj, npcId);
+    if (def!.pronoun !== undefined) npcPronouns.set(npcId, def!.pronoun);
   }
-  return { npcNouns, npcAdjectives };
+  return { npcNouns, npcAdjectives, npcPronouns };
 }
 
 function compileRoomAliases(world: WorldDef): Map<string, RoomId> {

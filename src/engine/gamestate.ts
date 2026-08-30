@@ -10,12 +10,15 @@
 // their tests) keeps compiling unchanged. A later rename to `state.ts` is a
 // trivial, mechanical change once task 22 deletes the MVP file.
 //
-// FIELD COMPLETENESS: this is §1.2's `GameState` verbatim, with one
-// exception — `parser: ParserContext` is left out entirely.
-// `ParserContext.pending` and `.last` forward-reference `StructuredAction`,
-// which is parser tasks 9–11's type and does not exist yet; task 3 hit the
-// same wall and documented it in `world.ts`, and that reasoning still holds
-// today. Tasks 9–11 add `parser` back when `StructuredAction` exists.
+// FIELD COMPLETENESS: this is §1.2's `GameState` verbatim. `parser:
+// ParserContext` was left out through task 6 — `ParserContext.pending` and
+// `.last` forward-reference `StructuredAction`, which didn't exist until
+// task 9 — but task 9's own header named this file's task as "whichever of
+// task 10/11 first needs `pending`/`last` to persist turn-to-turn" to add
+// it back; task 10 is that task (disambiguation and pronouns both need
+// antecedents to survive save/load/undo exactly, per spec §3.4). The type
+// itself stays owned by `interpreter.ts` (imported here, not redefined) —
+// only `import type`, so this file gains no runtime dependency on it.
 //
 // `turn`/`phase`/`hintsUsed`/`firedEvents` are **required**, matching §1.2
 // (only `ending` is optional there, and stays optional here). An earlier
@@ -42,6 +45,7 @@ import type {
   RoomId,
 } from './ids';
 import type { WorldDef } from './world';
+import type { ParserContext } from './interpreter';
 
 export interface Clock {
   day: number; // 1-based story day
@@ -86,7 +90,7 @@ export interface GameState {
   firedEvents: string[]; // once-only EventDef / trigger ids
   /** Set when `phase !== 'playing'` (die/end effects). Optional per §1.2 itself. */
   ending?: { id: string };
-  // parser: ParserContext — deliberately omitted; see file header.
+  parser: ParserContext;
 }
 
 /**
@@ -158,5 +162,6 @@ export function initialState(world: WorldDef): GameState {
     phase: 'playing',
     hintsUsed: {},
     firedEvents: [],
+    parser: {},
   };
 }

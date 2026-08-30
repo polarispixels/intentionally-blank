@@ -21,6 +21,7 @@ import {
   ASK,
   BREAK,
   CHEST,
+  DOOR_KEY,
   FIXTURE_WORLD,
   GUIDE,
   HAT,
@@ -29,6 +30,7 @@ import {
   LOOK,
   ROOM_A,
   SMELL,
+  SPARE_KEY,
   THROW,
 } from './fixtures/world';
 
@@ -79,7 +81,9 @@ describe('tokenize — normalization (case, punctuation, articles, noise)', () =
 
 describe('compileVocabulary', () => {
   it('indexes object nouns and adjectives', () => {
-    expect(vocab.objectNouns.get('key')).toEqual([KEY]);
+    // 'key' is shared by KEY/DOOR_KEY/SPARE_KEY as of task 10's fixture
+    // additions (disambiguation fixtures) — 'brass' still names only KEY.
+    expect(vocab.objectNouns.get('key')).toEqual([KEY, DOOR_KEY, SPARE_KEY]);
     expect(vocab.objectAdjectives.get('brass')).toEqual([KEY]);
   });
 
@@ -391,9 +395,12 @@ describe('validate — vocabulary collision report', () => {
 });
 
 // ---------------------------------------------------------------------------
-// DeterministicParser — the seam (§3.1). This task's skeleton: 'V'-pattern
-// verbs resolve fully; anything needing a resolved dobj/iobj/npc reports a
-// miss (task 10 replaces that branch), never a fabricated resolution.
+// DeterministicParser — the seam (§3.1). 'V'-pattern verbs resolve fully
+// with no noun phrase to touch; a pattern with an unrecognized verb, or one
+// whose noun phrase matches nothing in `view.visible`, reports a miss.
+// Noun-phrase RESOLUTION itself (ranking, disambiguation, pronouns) is task
+// 10's and is exercised in depth in `tests/parser-resolve.test.ts` — this
+// file stays at the grammar/vocabulary layer.
 // ---------------------------------------------------------------------------
 
 describe('DeterministicParser — seam skeleton', () => {
@@ -408,13 +415,9 @@ describe('DeterministicParser — seam skeleton', () => {
     expect(outcome).toEqual({ kind: 'actions', actions: [{ verb: V('fixture_wave'), raw: 'wave' }] });
   });
 
-  it('reports a miss carrying the recognized verb for a pattern needing noun resolution (task 10 territory)', () => {
+  it('resolves a dobj-bearing pattern against `view.visible` (task 10; full disambiguation/pronoun coverage lives in tests/parser-resolve.test.ts)', () => {
     const outcome = parser.interpret('take the brass key', view());
-    expect(outcome.kind).toBe('miss');
-    expect(outcome.kind === 'miss' && outcome.verb).toBe(BUILTIN_VERB_IDS.take);
-    expect(outcome.kind === 'miss' && outcome.raw).toBe('take the brass key');
-    expect(outcome.kind === 'miss' && outcome.knownNouns).toContain('brass');
-    expect(outcome.kind === 'miss' && outcome.knownNouns).toContain('key');
+    expect(outcome).toEqual({ kind: 'actions', actions: [{ verb: BUILTIN_VERB_IDS.take, dobj: KEY, raw: 'take the brass key' }] });
   });
 
   it('reports a miss with no verb for a totally unrecognized command, but still surfaces known nouns', () => {

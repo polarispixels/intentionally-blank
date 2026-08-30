@@ -40,6 +40,7 @@ function baseState(overrides: Partial<GameState> = {}): GameState {
     hintsUsed: {},
     profile: { analytical: 0, social: 0, direct: 0 },
     firedEvents: [],
+    parser: {},
     ...overrides,
   };
 }

@@ -37,6 +37,12 @@
 // built-in outcome (`take.success`, `take.notPortable`, …) — see
 // `tests/actions.test.ts` for the full list this task's `validate` rule
 // depends on staying non-null.
+//
+// Task 10 (`tests/parser-resolve.test.ts`) additions: `DOOR_KEY` and
+// `SPARE_KEY`, two more objects sharing `KEY`'s bare noun `key`; `METAL_BOX`,
+// a second `box` for simultaneous dobj+iobj ambiguity; `JACK`/`MARA`/`RIVER`,
+// NPCs with a declared `pronoun` (§2.6/§3.4) for real gender-aware `him`/
+// `her`/`them` resolution — see their own doc comments below for why.
 
 import { C, F, M, N, O, Q, R, S, V } from '../../src/engine/ids';
 import { BUILTIN_VERB_IDS } from '../../src/engine/actions';
@@ -64,7 +70,31 @@ export const HAT = O('fixture_hat');
 /** portable, `text` distinct from `description` — READ's text-over-description case, plus a conditional TAKE handler gated on `FLAG_BOOL`. */
 export const LETTER = O('fixture_letter');
 
+/**
+ * Task 10 (`tests/parser-resolve.test.ts`) additions: two more objects
+ * sharing KEY's bare noun `key` so `take key` alone is genuinely ambiguous
+ * among three, `take brass key` still resolves to `KEY` uniquely (§3.2's
+ * "full adjective+noun match outranks a bare noun match"), and
+ * `SPARE_KEY` — with no adjectives at all — proves that ranking excludes
+ * bare-noun-only candidates from the pool once a full match exists,
+ * without needing a shared adjective to set up the contrast.
+ */
+export const DOOR_KEY = O('fixture_door_key'); // nouns: ['key'], adjectives: ['door']
+export const SPARE_KEY = O('fixture_spare_key'); // nouns: ['key'], no adjectives
+/** A second "box" (nouns: ['box'], adjectives: ['metal']) — with BOX, exercises simultaneous dobj+iobj ambiguity ("put key in box": both slots have >1 candidate). */
+export const METAL_BOX = O('fixture_metal_box');
+
 export const GUIDE = N('fixture_guide');
+/**
+ * Task 10 fix-2 additions (coordinator review): NPCs with a declared
+ * `pronoun` (§2.6/§3.4), so `him`/`her`/`them` resolution can be tested
+ * against real per-NPC gender data instead of `GUIDE`'s ungendered
+ * fallback. `JACK`/`MARA` mirror the coordinator's own example
+ * ("ask her about the notebook" must never resolve to Jack).
+ */
+export const JACK = N('fixture_jack'); // pronoun: 'he'
+export const MARA = N('fixture_mara'); // pronoun: 'she'
+export const RIVER = N('fixture_river'); // pronoun: 'they'
 
 /** Verb ids used across `tests/actions.test.ts` beyond `BUILTIN_VERB_IDS`. */
 export const SMELL = V('fixture_smell'); // no built-in semantics: rung-2b verb-default path
@@ -192,6 +222,9 @@ export const FIXTURE_WORLD: WorldDef = {
         },
       ],
     },
+    [DOOR_KEY]: { location: ROOM_A, name: 'door key', nouns: ['key'], adjectives: ['door'], portable: true },
+    [SPARE_KEY]: { location: ROOM_A, name: 'spare key', nouns: ['key'], portable: true },
+    [METAL_BOX]: { location: ROOM_A, name: 'metal box', nouns: ['box'], adjectives: ['metal'] },
   },
   npcs: {
     [GUIDE]: {
@@ -202,6 +235,9 @@ export const FIXTURE_WORLD: WorldDef = {
         { room: ROOM_C }, // unconditional fallback: afternoon/evening
       ],
     },
+    [JACK]: { nouns: ['jack'], pronoun: 'he' },
+    [MARA]: { nouns: ['mara'], pronoun: 'she' },
+    [RIVER]: { nouns: ['river'], pronoun: 'they' },
   },
   verbs: {
     [BUILTIN_VERB_IDS.take]: { id: BUILTIN_VERB_IDS.take, words: ['take', 'get'], patterns: ['V dobj'], class: 'direct', default: "You can't do that." },

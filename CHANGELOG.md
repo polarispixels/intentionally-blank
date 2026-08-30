@@ -12,6 +12,40 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.2.17] - 2026-08-30
+
+### Added
+
+- **Architecture task 10: noun resolution, disambiguation, pronouns.**
+  38 new tests; 428 green.
+- Candidate ranking: a full adjective+noun match outranks a bare noun
+  match, and an adjective that matches nothing degrades gracefully rather
+  than hard-failing (constitution §12).
+- Disambiguation's three-way next-input behavior: the reply is tried as an
+  answer first (adjective, noun, or ordinal); an unrelated input is treated
+  as a fresh command and the question is dropped, so a player who changes
+  their mind is never trapped; an ambiguous answer re-asks exactly once and
+  then gives up. It never nests.
+- **`ParserContext` now lives in `GameState`**, so pronouns and any pending
+  question survive save/load and rewind exactly with undo. Proven by a test
+  that resolves an object, round-trips the whole state through JSON, and
+  confirms `it` still means the same thing.
+
+### Fixed
+
+- **`him` and `her` shared one antecedent slot.** The `pronoun` field was
+  already specified on `NpcDef`; it simply had not been plumbed into the
+  type the parser sees, so referring to any NPC updated every pronoun. With
+  a cast of four brothers and a sister who share scenes, "ask her about the
+  notebook" could silently resolve to Jack — the exact failure constitution
+  §12 exists to prevent. Slots are now keyed by declared pronoun and tested
+  with a `he`, a `she`, a `they`, and an undeclared NPC.
+- **Simultaneous direct- and indirect-object ambiguity silently guessed.**
+  `put key in box` with three keys and two boxes clarified one slot and
+  took the first candidate for the other — acting on an object the player
+  never chose. Both slots now clarify in order, and a fresh command
+  mid-sequence drops the entire chain rather than stranding half an action.
+
 ## [0.2.16] - 2026-08-30
 
 ### Added
