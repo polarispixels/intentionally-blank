@@ -1371,6 +1371,26 @@ green + `npm test` green.
 20. **CLI v2.** `src/cli/`; extend `tests/cli.test.ts`: session-backed
     REPL, `--script --fast`, `--diag` flag dumping diag events (the
     playtester hook), meta commands.
+20b. **Movement and looking — a gap in this plan, found during task 20.**
+    `src/engine/move.ts`; `tests/move.test.ts`. The v2 engine could not
+    move the player between rooms: exits are defined (§2.4), validated
+    (task 7), drawn on the map (task 17), and routed over (task 11's
+    `GO TO`), but nothing ever *traverses* one. There is no direction verb,
+    no `GO`, and no `LOOK`. Movement fell through because four tasks each
+    touched exits for a different reason and none owned walking through
+    one — the most fundamental verb in the genre, missing from a 22-task
+    breakdown. Recorded here rather than quietly patched, because a plan
+    that can lose `GO NORTH` can lose other things.
+
+    Owns: the direction verbs and `GO <direction>`; `ENTER`/`EXIT`/`IN`/
+    `OUT`; executing an `ExitDef` (the `when` gate, the `door` open check,
+    `blockedText` for an exit that exists but won't yield versus no exit at
+    all, `travelText`, `minutes`); `LOOK`; rendering a room on entry with
+    `firstVisit` prepended once; marking `visited`; running `onEnter`; and
+    honouring `isDark` so a dark room describes itself as dark. Also wires
+    task 11's `GO TO` route to actually execute, one room per turn, and
+    the `goto` effect to re-render on arrival.
+
 21. **MVP prologue port.** `src/content/` scene + golden-transcript test
     against `tests/fixtures/playthrough.txt` equivalent output.
 22. **Shell switch + old-engine deletion.** `src/ui/` on Session; remove

@@ -12,6 +12,36 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.2.30] - 2026-08-30
+
+### Added
+
+- **Architecture task 20: CLI v2.** A session-backed REPL on
+  `createSession`, with the production `ScopeView` builder, a disk-backed
+  `SaveStore`, and rendering for every event variant. 16 new tests; 701
+  green. It lands beside the MVP CLI rather than replacing it — the MVP is
+  still the shipped game until task 22.
+- Memories, clues, and questions render distinctly from ordinary prose. A
+  recovered memory should not look like a room description.
+- **`--diag`**, the `playtester` agent's hook: one greppable line per
+  diagnostic — `DIAG parserMiss turn=0 input="..." detail="..."`. A scripted
+  playthrough plus this flag turns "did the game answer every reasonable
+  action well?" into a report rather than an impression, which is how
+  constitution §14 stays honest across 41 rooms.
+
+### Notes
+
+**A gap in the 22-task plan, found by this task and recorded as task 20b:
+the engine cannot move the player between rooms.** Exits are defined,
+validated, drawn on the map, and routed over by `GO TO` — but nothing
+traverses one, and there is no direction verb and no `LOOK`. Movement fell
+through because four separate tasks touched exits for other reasons and
+none owned walking through one.
+
+It is written into the architecture spec as its own task rather than
+quietly patched. A plan that can lose `GO NORTH` can lose other things, and
+the useful artifact is the record of how.
+
 ## [0.2.29] - 2026-08-30
 
 **The opening room is written.** The first thing any player will read.
