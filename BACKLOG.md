@@ -101,6 +101,22 @@ any scene where the player composes text — a `'V text'` pattern in
 Note the censor puzzles (P13, P22) compose through *prompt scripts*, not
 the verb grammar, so they are unaffected.
 
+## Known defect in 0.3.0: reload shows a blank transcript
+
+The Vue shell autosaves every turn and resumes session state on reload —
+but the **visible transcript is not persisted**, so refreshing mid-game
+gives a blank page with a live game behind it. Typing works and the world
+is intact, but a player will reasonably think it broke.
+
+Architecture §5.4 already calls for this: the transcript is a session/shell
+concern, "rebuilt from rendered events and persisted separately (bounded)
+for scrollback". That persistence was never built. Top item for 0.3.1.
+
+Note this is also what made the opening look broken during verification —
+a browser profile holding an autosave from a previous run took the resume
+branch and rendered nothing. A first-time player sees the opening
+correctly; confirmed on a clean profile.
+
 ## Fast-follows for 0.3.1 (proposed by `narrative-writer`, both sound)
 
 - **Add a `{dir}` template variable to the movement families.** With no way
