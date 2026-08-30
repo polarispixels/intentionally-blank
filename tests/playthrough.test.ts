@@ -7,7 +7,7 @@ export const SCRIPT = [
   'say hello world',
   'ask jeeves the weather',
   'dig a tunnel',
-  'help',              // turn 4 → prompt opens
+  'help',              // turn 4 -> prompt opens
   'look',              // refused
   'login admin admin', // fail 1
   'login user password',

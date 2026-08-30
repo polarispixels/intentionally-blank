@@ -17,7 +17,7 @@ function describeAction(a: Action): string {
     case 'say': return `say ${a.text}`;
     case 'ask': return `ask ${a.who} about ${a.topic}`;
     case 'unknown': return a.raw;
-    case 'submitCredentials': return `login ${a.username} ${'•'.repeat(a.password.length)}`;
+    case 'submitCredentials': return `login ${a.username} ${'\u2022'.repeat(a.password.length)}`;
     default: return a.type;
   }
 }
