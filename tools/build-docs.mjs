@@ -34,13 +34,35 @@ const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)
 const fileId = (f) => 'f-' + slug(f.replace(/\.md$/, ''));
 const escape = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
+let currentFileId = '';
+
+// Disambiguates heading ids that collide within the same file (e.g. the repeated
+// "CANON" / "Added" section-label headings the spec and changelog reuse by design).
+const usedIds = new Set();
+function uniqueId(id) {
+  if (!usedIds.has(id)) {
+    usedIds.add(id);
+    return id;
+  }
+  let n = 2;
+  while (usedIds.has(`${id}-${n}`)) n++;
+  const dedup = `${id}-${n}`;
+  usedIds.add(dedup);
+  return dedup;
+}
+
 /** Title = first H1, else the filename. Body = everything after it, headings demoted one level. */
 function section(file) {
   const src = readFileSync(join(ROOT, file), 'utf8');
   const m = /^# (.+)$/m.exec(src);
   const title = m ? m[1].trim() : basename(file, '.md');
   let body = m ? src.replace(m[0], '') : src;
-  body = body.replace(/^(#{1,5}) /gm, (_, h) => '#'.repeat(h.length + 1) + ' ');
+  let inFence = false;
+  body = body.split('\n').map((line) => {
+    if (/^\s*(```|~~~)/.test(line)) { inFence = !inFence; return line; }
+    if (inFence) return line;
+    return line.replace(/^(#{1,5}) /, (_, h) => '#'.repeat(h.length + 1) + ' ');
+  }).join('\n');
   return { file, title, body };
 }
 
@@ -54,16 +76,16 @@ function rewriteLinks(html, fromFile) {
     const [path, hash] = href.split('#');
     const target = path === '' ? fromFile : join(dirname(fromFile), path).replace(/\\/g, '/');
     const id = known.get(target);
-    if (id) return `href="#${hash ? slug(hash) : id}"`;
+    if (id) return `href="#${hash ? `${id}-${slug(hash)}` : id}"`;
     return `href="${REPO}/blob/main/${target}"`;
   });
 }
 
 marked.use({
   renderer: {
-    heading({ text, depth }) {
-      const id = slug(text);
-      return `<h${depth} id="${id}">${text}</h${depth}>\n`;
+    heading({ text, depth, tokens }) {
+      const id = uniqueId(`${currentFileId}-${slug(text)}`);
+      return `<h${depth} id="${id}">${this.parser.parseInline(tokens)}</h${depth}>\n`;
     },
     table(token) {
       const header = token.header.map((c) => `<th>${this.parser.parseInline(c.tokens)}</th>`).join('');
@@ -75,6 +97,7 @@ marked.use({
 
 const toc = sections.map((s) => `<li><a href="#${fileId(s.file)}">${escape(s.title)}</a></li>`).join('\n');
 const body = sections.map((s) => {
+  currentFileId = fileId(s.file);
   const html = rewriteLinks(marked.parse(s.body), s.file);
   return `<section id="${fileId(s.file)}">
 <h1>${escape(s.title)} <a class="src" href="${REPO}/blob/main/${s.file}" title="View source">${escape(s.file)}</a></h1>
