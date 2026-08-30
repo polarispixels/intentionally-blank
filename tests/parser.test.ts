@@ -45,7 +45,7 @@ const cases: ReadonlyArray<[string, Action]> = [
   ['what year is it', { type: 'time' }],
   ['weather', { type: 'weather' }],
   ["what's the weather", { type: 'weather' }],
-  ['what\'s the weather', { type: 'weather' }],
+  ['what’s the weather', { type: 'weather' }],
   ["how's the weather?", { type: 'weather' }],
   ['what is the weather like', { type: 'weather' }],
   ['version', { type: 'version' }],
@@ -62,7 +62,7 @@ describe('parse', () => {
 describe('normalize', () => {
   it('trims, lowercases, collapses whitespace, strips quotes and trailing punctuation', () => {
     expect(normalize('  Say   "Hello"!! ')).toBe('say "hello"');
-    expect(normalize('"hello world"')).toBe('hello world');
-    expect(normalize("what's up?")).toBe("what's up");
+    expect(normalize('“hello world”')).toBe('hello world');
+    expect(normalize('what’s up?')).toBe('what\'s up');
   });
 });

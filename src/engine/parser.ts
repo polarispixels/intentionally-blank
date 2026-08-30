@@ -21,7 +21,7 @@ export const RULES: readonly Rule[] = [
   [/^version$/, () => ({ type: 'version' })],
 ];
 
-const QUOTES = /^["'""''](.*)["'""'']$/;
+const QUOTES = /^["'\u201C\u201D\u2018\u2019](.*)["'\u201C\u201D\u2018\u2019]$/;
 
 function stripQuotes(s: string): string {
   const m = s.match(QUOTES);
@@ -30,7 +30,7 @@ function stripQuotes(s: string): string {
 
 /** Lowercase, collapse whitespace, straighten apostrophes, strip wrapping quotes and trailing .!? */
 export function normalize(input: string): string {
-  let s = input.trim().toLowerCase().replace(/\s+/g, ' ').replace(/['']/g, "'");
+  let s = input.trim().toLowerCase().replace(/\s+/g, ' ').replace(/[\u2018\u2019]/g, "'");
   s = s.replace(/(\S)[.!?]+$/, '$1').trim();
   const q = s.match(QUOTES);
   if (q) s = q[1]!.trim();
