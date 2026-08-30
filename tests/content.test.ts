@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
   GAME_OVER_ASIDE, LOGIN_FAIL, LOGIN_SUCCESS, OPENING, PROMPT, RESPONSES, SEQUENCE,
-  fill, formatSay, pick,
 } from '../src/content';
+import { fill, formatSay, pick } from '../src/engine';
 
 const REQUIRED_IDS = [
   'ask.jeeves.weather', 'ask.generic', 'look', 'help', 'hello', 'whoami', 'time',

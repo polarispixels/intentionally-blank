@@ -22,7 +22,7 @@ Dakota town, with a headache and no name.
 
 ```sh
 npm install
-npm run dev       # Vite dev server
+npm run dev       # Vite dev server at http://localhost:5173/intentionally-blank/
 npm test          # Vitest — must be green before any change is "done"
 npm run typecheck # vue-tsc
 npm run play      # headless CLI REPL (add -- --script tests/fixtures/playthrough.txt --fast)

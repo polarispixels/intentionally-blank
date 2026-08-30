@@ -1,9 +1,9 @@
 import {
   CREDENTIALS, GAME_OVER_ASIDE, LOGIN_FAIL, LOGIN_SUCCESS, PROMPT, RESPONSES, SEQUENCE,
-  fill, formatSay, pick,
 } from '../content';
 import type { ResponseId } from '../content';
 import { record, start } from './state';
+import { fill, formatSay, pick } from './text';
 import type { Action, GameEvent, GameState, StepResult } from './types';
 import { TRIGGER_TURN } from './types';
 

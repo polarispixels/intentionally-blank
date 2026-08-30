@@ -45,16 +45,20 @@ const cases: ReadonlyArray<[string, Action]> = [
   ['what year is it', { type: 'time' }],
   ['weather', { type: 'weather' }],
   ["what's the weather", { type: 'weather' }],
-  ['what’s the weather', { type: 'weather' }],
+  ['what\u2019s the weather', { type: 'weather' }],
   ["how's the weather?", { type: 'weather' }],
   ['what is the weather like', { type: 'weather' }],
   ['version', { type: 'version' }],
   ['dig a tunnel', { type: 'unknown', raw: 'dig a tunnel' }],
   ['Lick the statue!!', { type: 'unknown', raw: 'lick the statue' }],
+  ['"good grief"', { type: 'say', text: 'good grief' }],
+  ['\u201cno thank you\u201d', { type: 'say', text: 'no thank you' }],
+  ['""', { type: 'noop' }],
+  ['dig a "tunnel"', { type: 'unknown', raw: 'dig a "tunnel"' }],
 ];
 
 describe('parse', () => {
-  it.each(cases)('%j → %j', (input, expected) => {
+  it.each(cases)('%j \u2192 %j', (input, expected) => {
     expect(parse(input)).toEqual(expected);
   });
 });
@@ -62,7 +66,7 @@ describe('parse', () => {
 describe('normalize', () => {
   it('trims, lowercases, collapses whitespace, strips quotes and trailing punctuation', () => {
     expect(normalize('  Say   "Hello"!! ')).toBe('say "hello"');
-    expect(normalize('“hello world”')).toBe('hello world');
-    expect(normalize('what’s up?')).toBe('what\'s up');
+    expect(normalize('\u201chello world\u201d')).toBe('hello world');
+    expect(normalize('what\u2019s up?')).toBe('what\'s up');
   });
 });

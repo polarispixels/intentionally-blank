@@ -11,6 +11,6 @@ export const CREDENTIALS = { username: 'user', password: 'password' } as const;
 /** Indexed by failed attempt number (1-based); the last entry repeats. */
 export const LOGIN_FAIL: readonly string[] = [
   'Incorrect. The system notes, without judgment, that you appear to be trying.',
-  'Incorrect again. The system has taken the liberty of filling in a suggestion. It would rather you did not ask how it came by one.',
+  'Incorrect again. The system has taken the liberty of posting a suggestion below. It would rather you did not ask how it came by one.',
   'Still incorrect. At this point the system is less a gatekeeper than a spectator.',
 ];

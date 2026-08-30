@@ -19,6 +19,8 @@ Sonnet builders, which is only safe if every behavior is provable headlessly.
 - `src/ui/` (Vue) and `src/cli/` (Node) are thin adapters that drive the
   engine and render its output. Persistence adapters live outside the engine.
 - `code-reviewer` blocks any engine import from a browser or Vue module.
+- Pure text helpers (variant selection, templating, tidy-casing) live in
+  `src/engine/text.ts`, not in content.
 
 ## Consequences
 

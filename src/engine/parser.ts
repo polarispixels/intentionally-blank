@@ -38,6 +38,11 @@ export function normalize(input: string): string {
 }
 
 export function parse(input: string): Action {
+  const quoted = input.trim().match(QUOTES);
+  if (quoted) {
+    const said = normalize(quoted[1]!);
+    if (said !== '') return { type: 'say', text: said };
+  }
   const s = normalize(input);
   if (s === '') return { type: 'noop' };
   for (const [re, build] of RULES) {
