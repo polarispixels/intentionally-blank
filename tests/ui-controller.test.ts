@@ -25,6 +25,7 @@ import { MemoryStore } from '../src/session/store';
 import { WORLD as ACT1_WORLD } from '../src/content/world/act1';
 import { WORLD as PROLOGUE_WORLD, PROMPT_SCRIPTS } from '../src/content/scenes/mvp-prologue';
 import { CREDENTIALS } from '../src/content/scenes/mvp-prologue-prompt';
+import { RESTART_PROMPT_SCRIPTS } from '../src/session/session';
 import {
   chooseDeathOption,
   createUiState,
@@ -134,20 +135,117 @@ describe('browser-facing path: a real act1 playthrough slice', () => {
     }
   });
 
-  it('resuming from an existing "auto" save continues the same session (browser-reload continuity)', () => {
+  it('resuming from an existing "auto" save continues the same session (browser-reload continuity) and re-describes the current room instead of rendering a blank screen', () => {
     const store = new MemoryStore();
     const o = opts(ACT1_WORLD, store);
     let ui: UiState = createUiState(o);
     ui = submitCommand(ui, 'pull chain', o);
+    ui = flushAllBeats(ui);
     const turnAfterFirstCommand = ui.session.state.turn;
+    const clockAfterFirstCommand = ui.session.state.clock;
 
     // A fresh UiState, as if the page reloaded — same store, same world.
     const resumed = createUiState(o);
     expect(resumed.session.state.turn).toBe(turnAfterFirstCommand);
+    expect(resumed.session.state.clock).toEqual(clockAfterFirstCommand); // no turn/clock advance from resuming
     expect(resumed.session.state.location).toBe(ui.session.state.location);
-    // The visible transcript does not replay — only the session resumes
-    // (this file's header, and controller.ts's own doc comment).
-    expect(resumed.lines).toEqual([]);
+    // The visible transcript does not replay from history — only the
+    // session resumes (this file's header, and controller.ts's own doc
+    // comment) — but a blank screen is exactly the bug this fixes: the
+    // current room is re-described as a plain LOOK (the room is lit by
+    // now, from 'pull chain' above, so this is the ordinary description,
+    // not the dark-room text).
+    expect(resumed.lines.length).toBeGreaterThan(0);
+    expect(resumed.lines.every((l) => l.kind === 'prose' || l.kind === 'system')).toBe(true);
+  });
+
+  it('resuming with nothing carried/lit yet re-describes the dark starting room, not a blank screen', () => {
+    const store = new MemoryStore();
+    const o = opts(ACT1_WORLD, store);
+    createUiState(o); // renders + autosaves the opening arrival, nothing else done
+
+    const resumed = createUiState(o);
+    expect(resumed.lines.some((l) => l.kind === 'prose' && l.text.includes('Darkness.'))).toBe(true);
+  });
+});
+
+describe('browser-facing path: typed meta commands (Ryan\'s v0.3.2 playtest — RESTART/UNDO/SAVE/etc. reachable by typing, not just buttons)', () => {
+  function actOpts(store: MemoryStore): ControllerOpts {
+    return opts(ACT1_WORLD, store, RESTART_PROMPT_SCRIPTS);
+  }
+
+  it('typed UNDO reverts the last turn, matching the CLI', () => {
+    const store = new MemoryStore();
+    const o = actOpts(store);
+    let ui: UiState = createUiState(o);
+    ui = submitCommand(ui, 'pull chain', o);
+    ui = flushAllBeats(ui);
+    const turnAfterFirst = ui.session.state.turn;
+
+    ui = submitCommand(ui, 'undo', o);
+    expect(ui.session.state.turn).toBeLessThan(turnAfterFirst);
+    expect(ui.lines.some((l) => l.kind === 'system' && l.text === '(undone)')).toBe(true);
+  });
+
+  it('typed SAVE (no name) and LOAD round-trip through the store, the same slot the "save now" button uses', () => {
+    const store = new MemoryStore();
+    const o = actOpts(store);
+    let ui: UiState = createUiState(o);
+    ui = submitCommand(ui, 'save', o);
+    expect(ui.lines.some((l) => l.text === '(saved as "manual")')).toBe(true);
+    expect(store.get('manual')).toBeDefined();
+
+    ui = submitCommand(ui, 'load', o);
+    expect(ui.lines.some((l) => l.text === '(loaded "manual")')).toBe(true);
+  });
+
+  it('typed RESTART opens a confirm prompt instead of restarting immediately', () => {
+    const store = new MemoryStore();
+    const o = actOpts(store);
+    let ui: UiState = createUiState(o);
+    ui = submitCommand(ui, 'pull chain', o); // some progress worth losing
+    ui = flushAllBeats(ui);
+
+    ui = submitCommand(ui, 'restart', o);
+    expect(ui.prompt).toBeDefined();
+    expect(ui.prompt!.body).toBe('This ends the current playthrough and begins again from the start. Restart?');
+    expect(ui.session.state.turn).toBeGreaterThan(0); // nothing destroyed yet
+  });
+
+  it('typed RESET is a synonym for RESTART, and a decline leaves the game exactly as it was', () => {
+    const store = new MemoryStore();
+    const o = actOpts(store);
+    let ui: UiState = createUiState(o);
+    ui = submitCommand(ui, 'pull chain', o);
+    ui = flushAllBeats(ui);
+    const sessionBefore = ui.session;
+
+    ui = submitCommand(ui, 'reset', o);
+    expect(ui.prompt).toBeDefined();
+    ui = submitPrompt(ui, { confirm: 'no' }, o);
+    expect(ui.prompt).toBeUndefined();
+    expect(ui.session).toEqual(sessionBefore); // untouched
+    expect(ui.lines.some((l) => l.text === 'Nothing has changed. The game is where you left it.')).toBe(true);
+  });
+
+  it('a confirmed RESTART clears the transcript and starts a fresh playthrough, exactly like the death-menu button', () => {
+    const store = new MemoryStore();
+    const o = actOpts(store);
+    let ui: UiState = createUiState(o);
+    ui = submitCommand(ui, 'pull chain', o);
+    ui = flushAllBeats(ui);
+    ui = submitCommand(ui, 'restart', o);
+    expect(ui.prompt).toBeDefined();
+
+    ui = submitPrompt(ui, { confirm: 'yes' }, o);
+    expect(ui.prompt).toBeUndefined();
+    expect(ui.session.state.turn).toBe(0);
+    expect(ui.session.undoRing).toEqual([]);
+    // No banner, no "Restarting." line — the opening beats are the only
+    // thing that follows a confirmed restart (response-families doc §10's
+    // own ruling).
+    expect(ui.lines.every((l) => l.text !== 'RESTARTED')).toBe(true);
+    expect(ui.lines.some((l) => l.kind === 'prose' && l.text.includes('Darkness.'))).toBe(true);
   });
 });
 

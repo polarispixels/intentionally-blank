@@ -25,7 +25,7 @@
 import { BUILTIN_VERB_IDS } from '../../../engine/actions';
 import { V } from '../../../engine/ids';
 import { AGAIN_VERB_ID } from '../../../engine/interpreter';
-import { DIRECTION_VERB_IDS, LOOK_VERB_ID } from '../../../engine/move';
+import { DIRECTION_VERB_IDS, LOOK_VERB_ID, USE_VERB_ID } from '../../../engine/move';
 import type { ProseRule } from '../../../engine/prose';
 import type { VerbDef } from '../../../engine/world';
 import { INVENTORY_VERB_ID } from '../../../engine/respond';
@@ -34,7 +34,9 @@ import { ACT1_DARK_REFUSAL_FAMILY } from './responses';
 import {
   FLOOR_LAMP,
   TERMINAL,
+  V_ABOUT,
   V_CLEAN,
+  V_HELP,
   V_HOLD_TO_LAMP,
   V_KNOCK,
   V_LEAN_OVER,
@@ -251,7 +253,12 @@ export const ACT1_VERBS: Record<string, VerbDef> = {
   // "hand" dropped (collides with SELF_HANDS' own doc-mandated noun).
   [GIVE]: { id: GIVE, words: ['give', 'offer'], patterns: ['V dobj prep iobj'], preps: ['to'], class: 'social', default: VERB_DEFAULTS.give },
   [SHOW]: { id: SHOW, words: ['show', 'present'], patterns: ['V dobj prep iobj'], preps: ['to'], class: 'social', default: VERB_DEFAULTS.show },
-  [CLIMB]: { id: CLIMB, words: ['climb', 'climb on', 'scale', 'climb out', 'go through', 'exit'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.climb },
+  // "go through"/"exit" removed (Ryan's v0.3.2 playtest, fix 2: CLIMB is
+  // for climbing things — "exit" was swallowing bare EXIT before it ever
+  // reached the `out` direction verb, and "go through" now belongs to IN,
+  // alongside "enter", for the door-by-name case — see this table's IN/OUT
+  // entries below and `move.ts`'s `traverseDoor`).
+  [CLIMB]: { id: CLIMB, words: ['climb', 'climb on', 'scale', 'climb out'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.climb },
   [SIT]: { id: SIT, words: ['sit', 'sit on', 'sit down'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.sit },
   [STAND]: { id: STAND, words: ['stand', 'stand up', 'get up', 'sit up'], patterns: ['V', 'V dobj'], class: null, default: standDefault },
   [WAIT]: { id: WAIT, words: ['wait', 'z'], patterns: ['V'], class: null, default: waitDefault },
@@ -358,11 +365,62 @@ export const ACT1_VERBS: Record<string, VerbDef> = {
     class: 'direct',
     default: { ref: 'move.noExit' },
   },
-  // §15.1.6's own note: "back" also returns through the door. "enter room"/
-  // "enter door" are NOT added — same `verb-noun-collision` reason as
-  // DOWN's dropped synonyms above ("room"/"door" are both real nouns).
-  [DIRECTION_VERB_IDS.in]: { id: DIRECTION_VERB_IDS.in, words: ['in', 'inside', 'enter', 'back'], patterns: ['V'], class: 'direct', default: { ref: 'move.noExit' } },
-  [DIRECTION_VERB_IDS.out]: { id: DIRECTION_VERB_IDS.out, words: ['out', 'outside', 'leave'], patterns: ['V'], class: 'direct', default: { ref: 'move.noExit' } },
+  // §15.1.6's own note: "back" also returns through the door. Literal
+  // "enter room"/"enter door" PHRASES are still not added — same
+  // `verb-noun-collision` reason as DOWN's dropped synonyms above
+  // ("room"/"door" are both real nouns) — but that reasoning is about
+  // baking a noun into the verb's own `words`, not about a real `V dobj`
+  // pattern where the noun is resolved by the grammar/scope machinery
+  // like any other object. Ryan's v0.3.2 playtest, fix 1: `'V dobj'` added
+  // so "ENTER DOOR"/"GO THROUGH DOOR" reach `respond.ts`'s door-traversal
+  // dispatch (`traverseDoor`) before ever falling to this verb's own
+  // `default` — bare "in"/"enter" etc. (no dobj) are unaffected, still
+  // handled entirely by `traverseDirection`, never touching `default`
+  // (this table's header). "go through" moves here from CLIMB (see that
+  // entry's own comment) — direction-agnostic in practice, since
+  // `traverseDoor` finds the named door's exit regardless of which
+  // direction id the player's chosen phrasing happens to be registered
+  // under. `default` is no longer dead prose for the dobj case: a resolved
+  // non-door object (e.g. "enter lamp") now falls through to this
+  // already-authored, `{name}`-templated family instead of the movement-
+  // only `move.noExit`.
+  [DIRECTION_VERB_IDS.in]: {
+    id: DIRECTION_VERB_IDS.in,
+    words: ['in', 'inside', 'enter', 'back', 'go through'],
+    patterns: ['V', 'V dobj'],
+    class: 'direct',
+    default: VERB_DEFAULTS.enter,
+  },
+  // "exit" added (fix 2: EXIT was captured by CLIMB and required an
+  // object it could never get bare) — bare EXIT/LEAVE/OUT/OUTSIDE all
+  // reach this verb's own `'V'` pattern, unchanged. "'V dobj'" added for
+  // the same door-by-name reason as IN, above ("EXIT DOOR"/"USE DOOR" via
+  // USE_VERB_ID both resolve through the same `traverseDoor` call).
+  [DIRECTION_VERB_IDS.out]: {
+    id: DIRECTION_VERB_IDS.out,
+    words: ['out', 'outside', 'leave', 'exit'],
+    patterns: ['V', 'V dobj'],
+    class: 'direct',
+    default: VERB_DEFAULTS.exit,
+  },
+  // Ryan's v0.3.2 playtest, fix 2: USE didn't exist at all before (any
+  // "USE X" fell to `unknownVerbKnownNoun`). At minimum it reaches fix 1
+  // for a door (`respond.ts`'s `DOOR_TRAVERSAL_VERB_IDS`); a resolved
+  // non-door object falls to `default` below, which is not yet authored —
+  // `use.default` needs a `narrative-writer` pass (see this task's
+  // report); `render()` throws loudly rather than printing nothing if that
+  // path is ever actually reached before it's authored.
+  [USE_VERB_ID]: { id: USE_VERB_ID, words: ['use'], patterns: ['V dobj'], class: 'direct', default: { ref: 'use.default' } },
+
+  // Ryan's v0.3.2 playtest, fix 3: HELP/ABOUT, registered as meta verbs
+  // (no turn, no clock, no profile tally — `VerbDef.meta: true`, the same
+  // mechanism `mvp-prologue.ts`'s VERSION already uses). Words and family
+  // keys transcribed from `docs/superpowers/specs/2026-08-30-response-
+  // families.md` §10 (`meta.help`/`meta.about`, already authored there,
+  // "awaiting voice review and Ryan's spot-check" as of this task — not
+  // wired into `world.responses` here; see this task's report for why).
+  [V_HELP]: { id: V_HELP, words: ['help', '?', 'commands', 'what can i do'], patterns: ['V'], class: null, meta: true, default: { ref: 'meta.help' } },
+  [V_ABOUT]: { id: V_ABOUT, words: ['about', 'credits', 'info'], patterns: ['V'], class: null, meta: true, default: { ref: 'meta.about' } },
 
   // AGAIN/G (response-families doc §9's `again.nothing`, now authored):
   // `interpreter.ts`'s `resolveAgain` special-cases the resolved match to

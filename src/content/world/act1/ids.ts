@@ -207,3 +207,14 @@ export const V_SLIDE_DOWN = V('act1_slide_down');
  * world's own `validate(WORLD)` must stay at zero warnings).
  */
 export const V_LEAN_OVER = V('act1_lean_over');
+
+// ---------------------------------------------------------------------------
+// Ryan's v0.3.2 playtest fix 3: `HELP`/`ABOUT`, registered as meta verbs
+// (§8's `docs/superpowers/specs/2026-08-30-response-families.md` §10
+// already names the exact family keys these need: `meta.help`/
+// `meta.about` — not yet wired into `world.responses`, see `verbs.ts`'s
+// own doc comment on these ids).
+// ---------------------------------------------------------------------------
+
+export const V_HELP = V('act1_help');
+export const V_ABOUT = V('act1_about');

@@ -24,12 +24,15 @@
 // session-executed," which in the shipped game means content registers
 // them as ordinary (reserved-id) verbs the way `GO_TO_VERB_ID`/
 // `AGAIN_VERB_ID` are — but that wiring lives in `src/engine/interpreter.ts`
-// and no `WorldDef` (fixture or otherwise) declares them today, and this
-// task owns `src/cli/` only. So this shell recognizes them itself, by
-// matching the raw input before it ever reaches `DeterministicParser` —
-// CLI chrome around a session-layer call, not a parser change. Ordinary
-// verbs (LOOK, TAKE, GO TO, …) are never intercepted this way; only the
-// fixed set below is.
+// and no `WorldDef` (fixture or otherwise) declares them today. So this
+// shell recognizes them by matching the raw input before it ever reaches
+// `DeterministicParser` — CLI chrome around a session-layer call, not a
+// parser change — using `../session/meta`'s `parseMetaCommand`, shared
+// with the browser shell (`src/ui/controller.ts`) so there is exactly one
+// place that knows this raw-text shape (a second copy is how the browser
+// lost RESTART/UNDO/SAVE/etc. entirely until this task). Ordinary verbs
+// (LOOK, TAKE, GO TO, …) are never intercepted this way; only the fixed
+// set `parseMetaCommand` recognizes is.
 //
 // PROMPT ROUND-TRIP: `respondToPrompt(world, session, scriptId, values)`
 // needs a `ScriptId` to dispatch to, but the `prompt` `GameEvent` (§1.4)
@@ -62,14 +65,18 @@ import {
   importSave,
   listSaves,
   load,
+  requestRestart,
   respondToPrompt,
   restartEncounter,
+  RESTART_PROMPT_SCRIPTS,
   save,
   startSession,
   takeTurn,
   undo,
 } from '../session/session';
 import type { DeathOption, SessionState } from '../session/session';
+import { parseMetaCommand } from '../session/meta';
+import type { MetaCommand } from '../session/meta';
 import { GAME_VERSION } from '../version';
 import { formatDiag, renderEvent } from './render';
 import { buildScopeView } from './scope';
@@ -173,54 +180,10 @@ async function renderEvents(events: readonly GameEvent[], input: string): Promis
 }
 
 // ---------------------------------------------------------------------------
-// Meta commands (§5.3) — see this file's header for why they're recognized
-// here rather than by the parser.
+// Meta commands (§5.3) — recognized by `../session/meta`'s
+// `parseMetaCommand` (shared with the browser shell, `src/ui/controller.ts`
+// — see that module's header for why); executed here.
 // ---------------------------------------------------------------------------
-
-type MetaCommand =
-  | { kind: 'save'; slot: string }
-  | { kind: 'load'; slot: string }
-  | { kind: 'saves' }
-  | { kind: 'undo' }
-  | { kind: 'restart' }
-  | { kind: 'restartEncounter' }
-  | { kind: 'export' }
-  | { kind: 'import'; path: string }
-  | { kind: 'hint'; n?: number }
-  | { kind: 'map' }
-  | { kind: 'questions' }
-  | { kind: 'notebook' }
-  | { kind: 'memories' };
-
-/** No name given to `SAVE`/`LOAD` — a documented CLI choice (spec §5.3 leaves the no-name case open); a single fixed slot, distinct from the session's own reserved `'auto'`/`'undo'`/`'checkpoint'` bookkeeping slots. */
-const DEFAULT_SLOT = 'manual';
-
-function parseMeta(input: string): MetaCommand | undefined {
-  const trimmed = input.trim();
-  const lower = trimmed.toLowerCase();
-
-  if (lower === 'saves') return { kind: 'saves' };
-  if (lower === 'undo') return { kind: 'undo' };
-  if (lower === 'restart encounter') return { kind: 'restartEncounter' };
-  if (lower === 'restart') return { kind: 'restart' };
-  if (lower === 'export') return { kind: 'export' };
-  if (lower === 'map') return { kind: 'map' };
-  if (lower === 'questions') return { kind: 'questions' };
-  if (lower === 'notebook') return { kind: 'notebook' };
-  if (lower === 'memories') return { kind: 'memories' };
-  if (lower === 'hint') return { kind: 'hint' };
-
-  let m = trimmed.match(/^save(?:\s+(\S+))?$/i);
-  if (m !== null) return { kind: 'save', slot: m[1] ?? DEFAULT_SLOT };
-  m = trimmed.match(/^load(?:\s+(\S+))?$/i);
-  if (m !== null) return { kind: 'load', slot: m[1] ?? DEFAULT_SLOT };
-  m = trimmed.match(/^import\s+(\S+)$/i);
-  if (m !== null) return { kind: 'import', path: m[1]! };
-  m = trimmed.match(/^hint\s+(\d+)$/i);
-  if (m !== null) return { kind: 'hint', n: Number(m[1]) };
-
-  return undefined;
-}
 
 async function handleMeta(cmd: MetaCommand): Promise<void> {
   switch (cmd.kind) {
@@ -250,10 +213,14 @@ async function handleMeta(cmd: MetaCommand): Promise<void> {
       return;
     }
     case 'restart': {
-      const started = startSession(WORLD);
-      session = started.session;
-      for (const line of renderEvent({ type: 'restarted' }).lines) out(line);
-      await renderEvents(started.events, '[restart]');
+      // Opens the confirm prompt (`requestRestart`'s own doc comment,
+      // `session.ts`) rather than restarting immediately — constitution
+      // §9/§11: a typo here must not cost a whole playthrough. The actual
+      // restart, if confirmed, happens in `feed()`'s prompt-answering
+      // branch below, which is where the round trip closes.
+      const result = requestRestart(WORLD, session);
+      session = result.session;
+      await renderEvents(result.events, '[restart]');
       return;
     }
     case 'restartEncounter': {
@@ -352,6 +319,19 @@ async function feed(line: string): Promise<void> {
     const { id: promptId, scriptId, values } = pendingPrompt;
     pendingPrompt = undefined;
     const result = respondToPrompt(WORLD, session, scriptId, values);
+    // A confirmed RESTART/RESET: `RESTART_CONFIRM_RESPOND_SCRIPT` is the
+    // only script that ever emits a bare `restarted` event (`scripts.ts`'s
+    // own doc comment). Discard everything the round trip touched — the
+    // undo ring and history included — and start over exactly like the
+    // death menu's own RESTART does, rather than let `renderEvent`'s
+    // generic 'restarted' handling (a "RESTARTED" rule) print in front of
+    // the opening beats the doc says must be the only thing that follows.
+    if (result.events.some((e) => e.type === 'restarted')) {
+      const started = startSession(WORLD);
+      session = started.session;
+      await renderEvents(started.events, `[prompt ${promptId}]`);
+      return;
+    }
     session = result.session;
     await renderEvents(result.events, `[prompt ${promptId}]`);
     return;
@@ -360,7 +340,7 @@ async function feed(line: string): Promise<void> {
   const trimmed = line.trim();
   if (trimmed === '') return;
 
-  const meta = parseMeta(trimmed);
+  const meta = parseMetaCommand(trimmed);
   if (meta !== undefined) {
     await handleMeta(meta);
     return;
@@ -381,11 +361,15 @@ async function main(): Promise<void> {
   if (worldPath === undefined) {
     // No --world flag: the real shipped game (task 22's default-world wiring).
     WORLD = ACT1_WORLD;
-    PROMPT_SCRIPTS = {};
+    PROMPT_SCRIPTS = RESTART_PROMPT_SCRIPTS;
   } else {
     const mod = await loadWorldModule(worldPath);
     WORLD = mod.WORLD;
-    PROMPT_SCRIPTS = mod.PROMPT_SCRIPTS ?? {};
+    // RESTART_PROMPT_SCRIPTS first so a --world module's own PROMPT_SCRIPTS
+    // (if it ever wants to reuse the same prompt id for something else)
+    // wins — matches "shell chrome, content wins" nowhere else in this
+    // file needs stating because nothing else collides today.
+    PROMPT_SCRIPTS = { ...RESTART_PROMPT_SCRIPTS, ...(mod.PROMPT_SCRIPTS ?? {}) };
   }
   vocab = compileVocabulary(WORLD);
   const started = startSession(WORLD);

@@ -780,3 +780,280 @@ tutorial voice.
 > stored command and renders whatever that command renders; it should not
 > print a frame line of its own before it. That is a wiring decision, not
 > prose.
+
+---
+
+## 10. Later additions — `HELP`, `ABOUT`, and the restart confirmation
+
+**Added:** 2026-08-30, fifth pass · **Author:** `narrative-writer`
+**Status:** authored prose, awaiting voice review and Ryan's spot-check
+**Occasioned by:** Ryan's v0.3.2 playtest — `HELP` and `ABOUT` were never
+registered as verbs and returned the `unknown` rung; `RESTART`/`RESET` were
+unreachable in the browser shell.
+**Authored against:** constitution §9, §11, §12, §14, §20, §21, §22 and
+writing guide §19.
+
+Four families. The §0 craft constraints apply, plus four specific to this set:
+
+- **This is chrome, not the narrator.** See the ruling below. None of these
+  four families is in the narrator's voice, and none of them should be
+  edited toward it.
+- **They fire in every room, in all five acts.** No line names a room, an
+  act, a chapter, an object, a character, or how far along the player is.
+  Nothing here is canon and nothing here goes stale as rooms are added — the
+  one exception is flagged inline in `meta.about`.
+- **No template variables.** None are available and none are wanted.
+- **Fixed text, not rotations.** A player who types `HELP` twice wants the
+  same answer twice. Variety here is a bug.
+
+### The voice ruling
+
+> **`HELP`, `ABOUT`, and the restart confirmation are chrome. They speak
+> from outside the fiction, like `END OF BUILD`.**
+
+Four reasons, in order of weight:
+
+1. **A player types `HELP` because the fiction has stopped working for
+   them.** Answering in the voice of the thing that just failed them is a
+   second failure. Clarity is the whole job.
+2. **The narrator is *slightly adversarial* (guide §3).** An adversarial
+   help screen is the definition of pointlessly cruel, and guide §5 already
+   requires the narrator to step aside when the moment needs it. A stuck
+   player is that moment.
+3. **Constitution §22: logistics should disappear.** Putting a persona on
+   logistics is how you make them appear.
+4. **The restart prompt asks the player to confirm destroying something.**
+   A joke landing there is not dry, it is careless.
+
+Chrome does not mean careless prose. These are written plainly, in short
+declarative sentences, with nothing in them reaching for a laugh — guide §19
+applied by simply never starting. One sentence at the end of `HELP` tells
+the player the game rewards ridiculous input, because that is *information*
+about how to play (constitution §8, §14), and a player who does not have it
+plays the game far too carefully.
+
+### `meta.help`
+
+**Fires:** `HELP`, `?`, `COMMANDS`, `WHAT CAN I DO`. Meta — costs no turn.
+Static; no rotation, no state, no context sensitivity. Context-sensitive
+help may come later and would be a different family.
+
+```text
+INTENTIONALLY BLANK is a parser game. You type what you want to do, in
+plain English, and the game works out what you meant. Most commands are a
+verb and a thing:
+
+    OPEN THE DESK        READ THE LETTER        LOOK UNDER THE BED
+
+The things you can name are the things the writing names. If a description
+mentions a lamp, a window, a stain on the ceiling, you can EXAMINE it — and
+examining something usually names more things worth examining. Reading the
+room and then looking at the nouns in it is most of how this game is played.
+
+Verbs worth knowing:
+
+  LOOK, EXAMINE (X), SEARCH, READ
+  LOOK UNDER, LOOK BEHIND, TOUCH, SMELL, LISTEN
+  TAKE, DROP, OPEN, CLOSE, PUSH, PULL, TURN, MOVE, CLIMB
+  NORTH, SOUTH, EAST, WEST, UP, DOWN, IN, OUT
+  (abbreviated N, S, E, W, U, D)
+
+Commands that stand on their own:
+
+  LOOK (L)        describe where you are again
+  INVENTORY (I)   what you are carrying
+  AGAIN (G)       repeat your last command
+  WAIT (Z)        let a moment pass
+  SAVE            store your progress
+  UNDO            take back the last turn
+  RESTART         begin again from the start (it will ask first)
+  ABOUT           what this game is
+
+Phrasing is forgiving. Articles are optional, abbreviations work, and
+several wordings usually reach the same action. When a command does not
+work, the response will normally tell you why rather than only refusing.
+
+Try odd things. A good deal of the writing in this game exists only for
+players who tried something unreasonable first.
+```
+
+> **Wiring preconditions — cut lines, do not rewrite them.** This text names
+> only commands verified against `src/content/world/act1/verbs.ts`, with four
+> exceptions that are being added in the same change as this family. If any
+> of them is not registered when `HELP` ships, **delete that one line** from
+> the "stand on their own" block and change nothing else; each is a whole
+> line and removing one leaves the text intact.
+>
+> - `SAVE` — not a registered verb. The browser shell exposes save as a
+>   button only (`src/ui/controller.ts` `saveNow`); typed `SAVE` reaches the
+>   parser and returns `unknown`. Works in the CLI REPL.
+> - `UNDO` — same: a button in the browser, typed-only in the CLI.
+> - `RESTART` — being wired in this change, with the confirmation below.
+> - `ABOUT` — being wired in this change.
+>
+> **Deliberately absent, and why.** `HINT` is *not* listed: `availableHints`
+> currently returns nothing anywhere in Act I, so a player who typed it
+> would be told there is nothing to hint at, which teaches the wrong thing
+> about a feature that will matter later. `TALK TO` / `ASK … ABOUT` are not
+> listed either: no NPC and no such verb exists in `act1`. Both lines are
+> authored below and should be inserted the moment their precondition holds.
+>
+> - `  HINT            a nudge toward what you are stuck on, one step at a time`
+>   — insert after `WAIT (Z)` once any puzzle in the current build declares
+>   hints. Wording matches constitution §21: progressive, player-controlled.
+> - `  TALK TO, ASK … ABOUT, SHOW … TO, GIVE … TO` — insert as a fifth line
+>   in the verb block the first time a room ships with somebody in it.
+>
+> **`MAP` and `OPEN QUESTIONS`** (constitution §20) are absent for the same
+> reason and should join the "stand on their own" block when they exist.
+
+### `meta.about`
+
+**Fires:** `ABOUT`, `CREDITS`, `INFO`. Meta — costs no turn. Static.
+
+No story canon: no year, no place, no names from the fiction, nothing about
+who the player is. This is about the artifact.
+
+```text
+INTENTIONALLY BLANK
+A text adventure by Ryan Grissinger.
+
+A parser, a world that behaves the same way twice, prose written by hand,
+and a mystery that gives up its answers slowly — built in the tradition of
+the Infocom games.
+
+This is a build in progress rather than a finished game. It ends at the top
+of the stairs; everything past that is still being written.
+
+Type HELP for how to play.
+```
+
+> **The one line here that will go stale**, on purpose and with permission:
+> *"It ends at the top of the stairs; everything past that is still being
+> written."* It is currently true (`objects/landing.ts`'s `END OF BUILD`
+> text says the same thing from inside the world) and a player who walks
+> into the boundary deserves the context. It is its own sentence so it can
+> be replaced or deleted in one edit. **Whoever extends the world past the
+> landing owns deleting it.**
+>
+> The build number is deliberately not printed here — the browser footer
+> already shows `v{GAME_VERSION}`, and the CLI has `VERSION`. Naming a
+> version in prose is a second place to forget to bump.
+
+### `restart.confirm`
+
+**Fires:** `RESTART` or `RESET`. The engine has **not** restarted anything
+yet; this is the question, and the game is waiting on the answer.
+
+Constitution §9 separates failure from punishment and §11 refuses to make a
+player pay a time tax. Typing four letters and losing a session is exactly
+that tax. The consequence has to be unmistakable in one sentence, and then
+the question has to get out of the way — a player is either sure or they
+are not, and a paragraph does not change which.
+
+```text
+This ends the current playthrough and begins again from the start. Restart?
+```
+
+> Nothing about how far along they are — this fires in every act, and it
+> cannot know. Nothing about saves either: whether a save survives a restart
+> is a save-system fact, and stating it in prose would be a promise the
+> prose cannot keep. "Ends the current playthrough" is true regardless.
+
+### `restart.declined`
+
+**Fires:** the player answers no. Nothing happened; no turn passes.
+
+```text
+Nothing has changed. The game is where you left it.
+```
+
+> Changing your mind is not a failure and this does not treat it as one:
+> no "very well", no "as you wish", no relief, no joke. The second sentence
+> exists because the player's live worry at that instant is *did I just
+> break something* — answering it is the entire job of the line.
+
+### The confirmed case — no line
+
+**Ruling: the confirmed restart prints nothing of its own.** The opening
+beat fires immediately and it opens with `Darkness. Your head hurts.`
+Anything in front of that — "Restarting.", "Very well.", a rule of dashes —
+is chrome standing between the player and the first line of the game, and
+the game beginning again *is* the confirmation. A player who just answered
+yes to "Restart?" and sees the opening does not need to be told which of the
+two things happened.
+
+The one exception, and it is the shell's, not prose: if the restart is not
+instantaneous, the shell may show its own progress indicator. That is not a
+response family and nothing is authored for it here.
+
+> **Not authored here:** registering `help`, `?`, `commands`, `what can i
+> do`, `about`, `credits`, `info`, `restart`, `reset` as verb words; marking
+> them `meta: true` so they cost no turn; the yes/no mechanism the
+> confirmation uses; and whether the browser death menu's existing RESTART
+> *button* should route through the same confirmation. Those are wiring
+> decisions. Note that `ids.ts` will need ids for these and that
+> `validate.ts` requires a non-null `default` on each.
+
+---
+
+## 11. Later additions — `USE`
+
+**Added:** 2026-08-30, sixth pass · **Author:** `narrative-writer`
+**Status:** authored prose, awaiting voice review and Ryan's spot-check
+**Occasioned by:** Ryan's playtest — `USE DOOR` in the opening room reached
+no verb at all. `USE` is being registered; for doors it walks the player
+through (`USE DOOR` = `ENTER DOOR` = `GO THROUGH DOOR`). This family answers
+everything else.
+**Authored against:** constitution §8, §9, §14 and writing guide §3, §5, §19.
+
+One family. The five craft constraints in §0 apply unchanged, plus three
+specific to it:
+
+- **`USE` is a request for a hint wearing the clothes of an action.** A
+  player types it when they are sure the thing matters and unsure what the
+  game wants done to it. The most useful thing the line can do is get them
+  to picture a specific motion — so the teaching is real, and it has to
+  survive being read as prose rather than as a tooltip. Every variant below
+  puts the missing piece in the player's *intention*, where it actually is,
+  rather than in their grammar. Nothing here says "be more specific,"
+  because that sentence is correct and unbearable.
+- **`{name}` may be anything, including a person.** Not one of these assumes
+  the thing is a tool, has moving parts, or can be operated. They work for a
+  lamp, a page, a staircase, and Eli.
+- **No state change**, per §0 note 2. Nothing is picked up, switched, or
+  approached; the attempt stops at the point where it would have had to
+  become a particular action.
+
+### `use.default`
+
+**Fires:** `USE <thing>` where the thing is not a door and no authored
+handler covers the pair. Rung 2.
+
+Variant 1 carries the teaching, since rotation is per-node
+(`action.use.<objectId>`) and a player who uses `USE` across a room's
+contents will read it several times before reaching the others. It is the
+only variant with no imperative in it — an order is what turns a nudge into
+a scolding, and the player has not done anything wrong.
+
+1. You intend to use the {name}. Intention is the easy half; the other half is deciding what using it would involve.
+2. The {name} is willing. It is the nature of the service that remains unspecified.
+3. Using is not itself an activity. It is the category the activities go in, and you will have to pick one out of it.
+4. You use the {name} in the general sense, which is the sense in which nothing ever happens. Name the particular thing and something might.
+
+> **Note.** Variant 2 is the same bureaucratic register as guide §14's
+> running humor and lands equally on an object and on a person — "the nature
+> of the service" is funnier about Eli than about a lamp, and cruel about
+> neither. Variant 3 is the philosophical reading and is the closest this
+> family comes to stating the rule outright; it is placed third because a
+> player only reaches it by poking the same thing repeatedly, which is
+> exactly the curiosity constitution §8 says to reward. Variant 4 is for the
+> player who has decided to find out how long this goes on, and it stops
+> short of smug: the joke is on the word, not on them.
+>
+> **Not authored here:** the door case, which is engine behavior, not prose —
+> `USE DOOR` performs the movement and renders whatever the movement
+> renders, with no framing line of its own in front of it. Also not
+> authored: the verb id and word list. **PROPOSED, not canon:** id `use`,
+> words *use, utilize, operate, employ, apply, work*. `ENTER` and
+> `GO THROUGH` are movement-side and belong to the mover, not to this family.

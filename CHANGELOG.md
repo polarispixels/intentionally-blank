@@ -12,6 +12,72 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.3.3] - 2026-08-31
+
+Everything Ryan hit in his second playtest.
+
+### Added
+
+- **`HELP` and `ABOUT`.** Neither was a registered verb; both returned the
+  generic "I don't understand". Both are now meta verbs costing no turn.
+
+  They are deliberately **chrome rather than the narrator**. The writer's
+  argument: a player types `HELP` because the fiction has stopped working
+  for them, and answering in the voice of the thing that just failed them
+  is a second failure. This narrator is *slightly adversarial* by design,
+  which is exactly the wrong register for someone who is stuck.
+
+  The load-bearing line: *"The things you can name are the things the
+  writing names"* — with examining named as the way to find more. That is
+  the single most useful thing a parser player can be told. It closes by
+  inviting ridiculous input, which this game rewards and a cautious player
+  would never discover.
+
+  `HELP` lists only commands verified against the real verb table, with the
+  writer's standing rule that if a promise can't be kept the line is **cut,
+  never softened** — a help screen that lies is worse than a short one.
+  `HINT`, `MAP` and NPC verbs are authored and held out until they do
+  something.
+
+- **Going through a door by naming it.** `USE DOOR`, `ENTER DOOR`, and
+  `GO THROUGH DOOR` now traverse the exit that door belongs to, in any room,
+  reusing the same open-check and refusals as walking into it. Ryan's note
+  was that `OUT` wasn't discoverable on its own; the real answer is that a
+  door you can see should be a door you can name.
+
+- **Typed meta commands in the browser**, at parity with the CLI: `SAVE`,
+  `LOAD`, `SAVES`, `UNDO`, `RESTART`, `RESTART ENCOUNTER`, `EXPORT`, `HINT`,
+  `MAP`, `QUESTIONS`, `NOTEBOOK`, `MEMORIES`. Recognition now lives in one
+  shared module rather than being implemented twice — two divergent lists is
+  how a shell quietly loses a command later.
+
+- `RESET` as a synonym for `RESTART`, and a **confirmation prompt** before
+  either destroys a playthrough. Typing four letters and losing hours is the
+  punishment constitution §9 and §11 forbid. The death menu's button is
+  exempt: a labeled choice among three is already a confirmation.
+
+- `use.default`, since `USE` now exists and players will aim it at
+  everything. It teaches without scolding by putting the missing piece in
+  the player's *intention* rather than their grammar — no variant mentions
+  verbs or specificity, and the most-seen one has no imperative at all.
+
+### Fixed
+
+- **Reloading the page showed a blank screen.** The shell restored session
+  state but rendered nothing. Ryan's suggestion — describe the room on
+  resume — is better and cheaper than the transcript persistence previously
+  recorded, and it is what the classics do after a restore. Implemented in
+  the session layer so the CLI and any future shell get it too; it is a
+  plain re-description, with no turn, no clock, and no re-firing of
+  `firstVisit` or `onEnter`.
+
+- **`EXIT` answered with a message about a verb the player never typed.**
+  The CLIMB verb had claimed the words `exit` and `go through`, so bare
+  `EXIT` produced *"You have a verb, climb, and nothing to aim it at"* and
+  `GO THROUGH DOOR` produced *"not designed with your ascent in mind"*.
+  Both words now reach the movement verbs, and two already-authored prose
+  families that nothing had ever pointed at are finally reachable.
+
 ## [0.3.2] - 2026-08-31
 
 Both notes from Ryan's playtest, fixed.

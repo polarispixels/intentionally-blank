@@ -9,6 +9,7 @@ import { onBeforeUnmount, ref, watch } from 'vue';
 import { DeterministicParser } from '../engine/interpreter';
 import { compileVocabulary } from '../engine/parser';
 import type { DeathOption } from '../session/session';
+import { RESTART_PROMPT_SCRIPTS } from '../session/session';
 import { WORLD } from '../content/world/act1';
 import { GAME_VERSION } from '../version';
 import {
@@ -41,7 +42,10 @@ const opts: ControllerOpts = {
   store,
   now: () => new Date().toISOString(),
   gameVersion: GAME_VERSION,
-  promptScripts: {}, // act1 uses no generic-prompt content yet
+  // RESTART_PROMPT_SCRIPTS (`../session/session`): the RESTART/RESET
+  // confirmation's own prompt id -> respond-script table. Act1 authors no
+  // other generic-prompt content yet.
+  promptScripts: RESTART_PROMPT_SCRIPTS,
 };
 
 const deathLabels: Record<DeathOption, string> = {

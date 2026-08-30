@@ -25,10 +25,15 @@
 import type { ScriptId } from '../engine/ids';
 import type { DeterministicParser } from '../engine/interpreter';
 import type { CompiledVocabulary } from '../engine/parser';
+import { availableHints, mapView, memoriesView, notebookView, questionsView, revealHint } from '../engine/views';
 import type { GameEvent, WorldDef } from '../engine/world';
 import {
   deathOptions,
+  exportSave,
+  listSaves,
   load,
+  requestRestart,
+  resumeSession,
   respondToPrompt,
   restartEncounter,
   save,
@@ -37,6 +42,8 @@ import {
   undo,
 } from '../session/session';
 import type { DeathOption, SessionState } from '../session/session';
+import { parseMetaCommand } from '../session/meta';
+import type { MetaCommand } from '../session/meta';
 import type { SaveStore } from '../session/store';
 import { buildScopeView } from '../cli/scope';
 import type { Line } from './lines';
@@ -93,8 +100,19 @@ export interface ControllerOpts {
  * about what rendering an arbitrary event stream actually requires.
  */
 export function createUiState(opts: ControllerOpts): UiState {
-  const loaded = load(opts.store, 'auto');
-  if (loaded !== undefined) return { session: loaded, lines: [], pending: [] };
+  // A resumed autosave re-describes the current room as a plain `LOOK`
+  // (`resumeSession`'s own doc comment, `session.ts`) instead of rendering
+  // nothing — the fix for the blank-screen-on-reload defect. Session state
+  // resumes exactly either way; only what a fresh page paints differs.
+  const resumed = resumeSession(opts.world, opts.store, 'auto');
+  if (resumed !== undefined) {
+    let ui: UiState = { session: resumed.session, lines: [], pending: [] };
+    for (const e of resumed.events) {
+      if (e.type === 'diag') continue;
+      ui = applyOneEvent(ui, e, opts);
+    }
+    return ui;
+  }
 
   const started = startSession(opts.world);
   let ui: UiState = { session: started.session, lines: [], pending: [] };
@@ -174,12 +192,125 @@ function persistOpts(opts: ControllerOpts) {
   return { store: opts.store, now: opts.now(), gameVersion: opts.gameVersion };
 }
 
-/** One player command, start to finish: local echo, parse, `takeTurn`, then every resulting event applied in order. Mirrors `repl.ts`'s `feed()`. */
+function pushSystemLine(ui: UiState, text: string): UiState {
+  return pushLine(ui, { kind: 'system', text });
+}
+
+/**
+ * One meta command (`../session/meta`'s `MetaCommand`), executed — the
+ * browser twin of `repl.ts`'s `handleMeta`, `Line`-tagged instead of
+ * printed straight to stdout, over `ui` instead of a REPL's module-level
+ * `session`/`store` variables. Parity with the CLI's own handling is the
+ * point (Ryan's v0.3.2 playtest: none of these reached the browser at all).
+ *
+ * `import` is the one command that doesn't translate: the CLI's reads a
+ * local file path, and this shell has no such filesystem to read from.
+ */
+function handleMetaCommand(ui: UiState, cmd: MetaCommand, opts: ControllerOpts): UiState {
+  switch (cmd.kind) {
+    case 'save':
+      save(ui.session, { ...persistOpts(opts), slot: cmd.slot });
+      return pushSystemLine(ui, `(saved as "${cmd.slot}")`);
+    case 'load': {
+      const loaded = load(opts.store, cmd.slot);
+      if (loaded === undefined) return pushSystemLine(ui, `(no such save: "${cmd.slot}")`);
+      return pushSystemLine({ ...ui, session: loaded }, `(loaded "${cmd.slot}")`);
+    }
+    case 'saves': {
+      const slots = listSaves(opts.store);
+      return pushSystemLine(ui, slots.length === 0 ? '(no saves)' : slots.join(', '));
+    }
+    case 'undo': {
+      const before = ui.session;
+      const session = undo(ui.session, opts.store);
+      return pushSystemLine({ ...ui, session }, session === before ? '(nothing to undo)' : '(undone)');
+    }
+    case 'restart': {
+      // Opens the confirm prompt (`requestRestart`'s own doc comment,
+      // `session.ts`) rather than restarting immediately — constitution
+      // §9/§11: a typo here must not cost a whole playthrough. The actual
+      // restart, if confirmed, happens in `submitPrompt`'s restart
+      // detection below, which is where the round trip closes. (The
+      // death-menu RESTART *button* is `chooseDeathOption`, unaffected —
+      // a labeled menu choice is already a deliberate confirmation.)
+      const result = requestRestart(opts.world, ui.session);
+      let next: UiState = { ...ui, session: result.session };
+      for (const e of result.events) {
+        if (e.type === 'diag') continue;
+        next = applyOneEvent(next, e, opts);
+      }
+      return next;
+    }
+    case 'restartEncounter': {
+      const restored = restartEncounter(opts.store);
+      if (restored === undefined) return pushSystemLine(ui, '(no checkpoint yet)');
+      return pushSystemLine({ ...ui, session: restored }, '(restarted from checkpoint)');
+    }
+    case 'export':
+      return pushSystemLine(ui, exportSave(ui.session, { gameVersion: opts.gameVersion, now: opts.now() }));
+    case 'import':
+      return pushSystemLine(ui, '(IMPORT is not available in the browser — there is no local file to read)');
+    case 'hint': {
+      const entries = availableHints(opts.world, ui.session.state);
+      if (cmd.n === undefined) {
+        if (entries.length === 0) return pushSystemLine(ui, '(nothing to hint at right now)');
+        return pushLines(ui, entries.map((e, i): Line => ({ kind: 'system', text: `${i + 1}. ${e.questionText} (used ${e.used}/${e.total})` })));
+      }
+      const entry = entries[cmd.n - 1];
+      if (entry === undefined) return pushSystemLine(ui, `(no hint numbered ${cmd.n})`);
+      const result = revealHint(opts.world, ui.session.state, entry.puzzle);
+      let next: UiState = { ...ui, session: { ...ui.session, state: result.state } };
+      for (const e of result.events) {
+        if (e.type === 'diag') continue;
+        next = applyOneEvent(next, e, opts);
+      }
+      return next;
+    }
+    case 'map': {
+      const { rooms, edges } = mapView(opts.world, ui.session.state);
+      const lines: Line[] = [
+        ...rooms.map((r): Line => ({ kind: 'system', text: `${r.current ? '*' : ' '} ${r.name} [${r.area}] (${r.x},${r.y})` })),
+        ...edges.map((e): Line => ({ kind: 'system', text: `  ${e.from} -> ${e.to.known ? e.to.room : '????'}` })),
+      ];
+      return pushLines(ui, lines);
+    }
+    case 'questions': {
+      const { open, settled } = questionsView(opts.world, ui.session.state);
+      const lines: Line[] = [
+        { kind: 'system', text: 'OPEN:' },
+        ...open.map((q): Line => ({ kind: 'system', text: `  - ${q.text}` })),
+        { kind: 'system', text: 'SETTLED:' },
+        ...settled.map((q): Line => ({ kind: 'system', text: `  - ${q.text} -- ${q.answer}` })),
+      ];
+      return pushLines(ui, lines);
+    }
+    case 'notebook': {
+      const entries = notebookView(opts.world, ui.session.state);
+      if (entries.length === 0) return pushSystemLine(ui, '(notebook is empty)');
+      return pushLines(ui, entries.map((c): Line => ({ kind: 'system', text: `◆ ${c.title} -- ${c.detail}` })));
+    }
+    case 'memories': {
+      const entries = memoriesView(opts.world, ui.session.state);
+      if (entries.length === 0) return pushSystemLine(ui, '(no memories recovered yet)');
+      const lines: Line[] = [];
+      entries.forEach((mem) => {
+        lines.push({ kind: 'system', text: `── ${mem.title} ──` });
+        mem.lines.forEach((l) => lines.push({ kind: 'system', text: l }));
+      });
+      return pushLines(ui, lines);
+    }
+  }
+}
+
+/** One player command, start to finish: local echo, then either a meta command (`../session/meta`, executed by `handleMetaCommand` above) or the ordinary parse/`takeTurn`/apply-every-event path. Mirrors `repl.ts`'s `feed()`. */
 export function submitCommand(ui: UiState, text: string, opts: ControllerOpts): UiState {
   let next = flushAllBeats(ui);
   const trimmed = text.trim();
   if (trimmed === '') return next;
   next = pushLine(next, { kind: 'player', text: trimmed });
+
+  const meta = parseMetaCommand(trimmed);
+  if (meta !== undefined) return handleMetaCommand(next, meta, opts);
 
   try {
     const view = buildScopeView(opts.world, next.session.state, opts.vocab);
@@ -208,9 +339,27 @@ export function submitCommand(ui: UiState, text: string, opts: ControllerOpts): 
 export function submitPrompt(ui: UiState, values: Record<string, string>, opts: ControllerOpts): UiState {
   if (ui.prompt === undefined) return ui;
   const scriptId = ui.prompt.scriptId;
-  let next: UiState = { session: ui.session, lines: ui.lines, pending: ui.pending };
-  const result = respondToPrompt(opts.world, next.session, scriptId, values);
-  next = { ...next, session: result.session };
+  const result = respondToPrompt(opts.world, ui.session, scriptId, values);
+
+  // A confirmed RESTART/RESET: `RESTART_CONFIRM_RESPOND_SCRIPT` is the only
+  // script that ever emits a bare `restarted` event (`scripts.ts`'s own doc
+  // comment). Discard everything the round trip touched and start over
+  // exactly like `chooseDeathOption`'s own RESTART button does — a fresh
+  // transcript, not one more line appended to the old one — rather than
+  // let `applyOneEvent`'s generic 'restarted' handling run here, which
+  // clears lines but keeps whatever stale `session` the round trip left
+  // behind.
+  if (result.events.some((e) => e.type === 'restarted')) {
+    const started = startSession(opts.world);
+    let next: UiState = { session: started.session, lines: [], pending: [] };
+    for (const e of started.events) {
+      if (e.type === 'diag') continue;
+      next = applyOneEvent(next, e, opts);
+    }
+    return next;
+  }
+
+  let next: UiState = { session: result.session, lines: ui.lines, pending: ui.pending };
 
   let buffered: string[] = [];
   for (const e of result.events) {
@@ -262,7 +411,7 @@ export function chooseDeathOption(ui: UiState, opts: ControllerOpts, option: Dea
   return restored === undefined ? ui : { ...ui, session: restored };
 }
 
-/** `SAVE` to slot `'manual'` — the one meta command this shell wires as a direct action (a "save now" button) rather than typed text; see this task's report for the rest of §5.3's meta commands (SAVE-by-name, LOAD, SAVES, HINT, MAP, …), not yet surfaced in the browser shell. */
+/** `SAVE` to slot `'manual'` as a direct action (the "save now" button) — the same slot typed `SAVE` with no name also writes to (`DEFAULT_SLOT`, `../session/meta`), so the button and the typed command agree. */
 export function saveNow(ui: UiState, opts: ControllerOpts): void {
   save(ui.session, { ...persistOpts(opts), slot: 'manual' });
 }

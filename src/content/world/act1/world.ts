@@ -4,6 +4,7 @@
 
 import type { WorldDef } from '../../../engine/world';
 import { RESPONSES } from '../../responses';
+import { RESTART_SCRIPTS } from '../../scripts';
 import { ACT1_CLUES, ACT1_FLAGS, ACT1_MEMORIES } from './knowledge';
 import { landingRoom } from './landing';
 import { ACT1_OBJECTS } from './objects/index';
@@ -28,4 +29,5 @@ export const WORLD: WorldDef = {
   clues: ACT1_CLUES,
   memories: ACT1_MEMORIES,
   responses: { ...RESPONSES, ...ACT1_RESPONSES },
+  scripts: RESTART_SCRIPTS,
 };

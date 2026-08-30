@@ -23,7 +23,7 @@
 // `The door is shut.` going stale once the door was actually open, and
 // `AGAIN`/`G` being unregistered.
 
-import { execFileSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -42,17 +42,21 @@ function writeScript(lines: string[]): string {
 }
 
 function play(args: string[]): { stdout: string; stderr: string; status: number } {
-  try {
-    const stdout = execFileSync('npx', ['tsx', 'src/cli/repl.ts', ...args], {
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'pipe'],
-      timeout: 60_000,
-    });
-    return { stdout, stderr: '', status: 0 };
-  } catch (error) {
-    const e = error as { stdout?: string; stderr?: string; status?: number };
-    return { stdout: e.stdout ?? '', stderr: e.stderr ?? '', status: e.status ?? -1 };
-  }
+  // `spawnSync`, not `execFileSync`: a per-line error inside `feed()`
+  // (`repl.ts`) is caught and written to stderr without changing the exit
+  // code (§8 gap 6's own "one line on stderr and a non-zero exit — never a
+  // stack trace at a player" convention doesn't apply to a per-line
+  // in-script error, only to a genuine CLI misuse). `execFileSync` only
+  // returns stdout at all on a zero exit and discards stderr entirely in
+  // that case (§8 fix 3's HELP/ABOUT tests need exactly that stream, on a
+  // process that still exits 0) — `spawnSync` returns both streams
+  // unconditionally, with no throw/catch needed.
+  const result = spawnSync('npx', ['tsx', 'src/cli/repl.ts', ...args], {
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe'],
+    timeout: 60_000,
+  });
+  return { stdout: result.stdout ?? '', stderr: result.stderr ?? '', status: result.status ?? -1 };
 }
 
 // The whole opening slice: wake in the dark, feel the chain, pull it,
@@ -274,5 +278,102 @@ describe("Act I room 1 — the player's body follows the player ('self' PlaceId)
     // 'head' is also SELF_HEAD's own name, but "head" isn't a substring of
     // the actual authored item names above, so no separate check is needed
     // beyond the loop.
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Ryan's v0.3.2 playtest, fix 1: "GO THROUGH DOOR"/"ENTER DOOR"/"USE DOOR"
+// all traverse the door the player already knows about (`DOOR`, opened
+// earlier in `SCRIPT` above), the same way `OUT`/`IN` already do — reusing
+// real, already-authored content (`move.blocked`, the door's own OPEN
+// handler, `your_room`'s `travelText`), no placeholder prose needed.
+// ---------------------------------------------------------------------------
+
+describe('Act I room 1 — traverse the door by naming it (fix 1)', () => {
+  it.each([
+    ['go through door', 'go through door'],
+    ['enter door', 'enter door'],
+    ['use door', 'use door'],
+  ])('"%s" is blocked while the door is shut, then traverses to the Landing once it is open', (_label, phrase) => {
+    const saveDir = mkdtempSync(join(tmpdir(), 'ib-act1-saves-'));
+    const script = writeScript(['pull chain', phrase, 'open door', phrase]);
+    const { stdout, stderr, status } = play(['--world', worldPath, '--save-dir', saveDir, '--script', script, '--fast', '--diag']);
+
+    expect(stderr).toBe('');
+    expect(status).toBe(0);
+
+    // Before OPEN DOOR: the same generic "blocked" family OUT/walking into
+    // it would render — not a nonsense CLIMB answer, not "no exit at all".
+    const beforeOpen = stdout.slice(0, stdout.indexOf('> open door'));
+    expect(beforeOpen).toMatch(/(There is a way through here|The way exists\.|Something stands between you|You get as far as)/);
+
+    // After OPEN DOOR: the exit's own travelText and the real Landing.
+    const afterOpen = stdout.slice(stdout.indexOf('> open door'));
+    expect(afterOpen).toContain('You step out onto the landing and pull the door to behind you.');
+    expect(afterOpen).toContain('A landing two floors up, no wider than it needs to be.');
+
+    const diagLines = stdout.split('\n').filter((l) => l.startsWith('DIAG '));
+    expect(diagLines).toEqual([]);
+  });
+
+  it('naming a non-door object no longer falls to CLIMB\'s "go through"/"exit" words — CLIMB is for climbing things now', () => {
+    const saveDir = mkdtempSync(join(tmpdir(), 'ib-act1-saves-'));
+    const script = writeScript(['pull chain', 'go through window']);
+    const { stdout } = play(['--world', worldPath, '--save-dir', saveDir, '--script', script, '--fast']);
+    // Old CLIMB text ("You get a knee up on the sill...") no longer fires for this phrasing.
+    expect(stdout).not.toContain('You get a knee up on the sill');
+    // Falls through to IN's own (already-authored) {name}-templated default instead.
+    expect(stdout).toContain('There is no getting inside the window, and the window shows no sign of having an inside.');
+  });
+
+  it('CLIMB itself (climb window) is unaffected — only "go through"/"exit" moved off it', () => {
+    const saveDir = mkdtempSync(join(tmpdir(), 'ib-act1-saves-'));
+    const script = writeScript(['pull chain', 'climb window']);
+    const { stdout } = play(['--world', worldPath, '--save-dir', saveDir, '--script', script, '--fast']);
+    expect(stdout).toContain('You get a knee up on the sill and stop there.');
+  });
+
+  it('bare EXIT reaches the OUT direction verb (was previously captured by CLIMB, which needs an object)', () => {
+    const saveDir = mkdtempSync(join(tmpdir(), 'ib-act1-saves-'));
+    const script = writeScript(['pull chain', 'open door', 'exit']);
+    const { stdout } = play(['--world', worldPath, '--save-dir', saveDir, '--script', script, '--fast']);
+    expect(stdout).toContain('You step out onto the landing and pull the door to behind you.');
+    expect(stdout).toContain('A landing two floors up, no wider than it needs to be.');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Ryan's v0.3.2 playtest, fix 3: HELP/ABOUT are registered meta verbs and
+// their authored text (response-families spec §10) is wired into
+// `world.responses`. The original form of this test asserted the *absence*
+// of that text — it checked that HELP failed loudly on an unauthored family,
+// which was correct while the prose was in flight and became a false premise
+// the moment it landed. Now it asserts what the player actually gets.
+//
+// Both are chrome rather than narrator voice, per §10's ruling: a player
+// types HELP because the fiction stopped working for them.
+// ---------------------------------------------------------------------------
+
+describe('Act I room 1 — HELP/ABOUT registered as meta verbs (fix 3)', () => {
+  const saveDir = mkdtempSync(join(tmpdir(), 'ib-act1-saves-'));
+  const script = writeScript(['help', 'about']);
+  const { stdout, stderr, status } = play(['--world', worldPath, '--save-dir', saveDir, '--script', script, '--fast']);
+
+  it('HELP prints the authored help, including the line that teaches how to find nouns', () => {
+    expect(stdout).toContain('INTENTIONALLY BLANK is a parser game.');
+    expect(stdout).toContain('The things you can name are the things the writing names.');
+    expect(stdout).toContain('Try odd things.');
+  });
+
+  it('ABOUT prints the authored about text', () => {
+    expect(stdout).toContain('A text adventure by Ryan Grissinger.');
+  });
+
+  it('neither renders an error', () => {
+    expect(stderr).not.toContain('unknown family');
+  });
+
+  it('the per-line error is caught, not fatal — the script still completes', () => {
+    expect(status).toBe(0);
   });
 });

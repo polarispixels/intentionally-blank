@@ -33,6 +33,8 @@ import {
   LOOK_VERB_ID,
   renderArrival,
   traverseDirection,
+  traverseDoor,
+  USE_VERB_ID,
 } from '../src/engine/move';
 import { compileVocabulary } from '../src/engine/parser/vocabulary';
 import { step } from '../src/engine/turn';
@@ -54,6 +56,7 @@ import {
   ROOM_B,
   ROOM_C,
   SHELF,
+  SMELL,
 } from './fixtures/world';
 
 const WORLD: WorldDef = { ...FIXTURE_WORLD, responses: { ...FIXTURE_WORLD.responses, ...RESPONSES } };
@@ -158,6 +161,49 @@ describe('traverseDirection', () => {
     const state = baseState();
     const result = traverseDirection(WORLD, state, DIRECTION_VERB_IDS.n, 'n');
     expect(result.class).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// traverseDoor — Ryan's v0.3.2 playtest, fix 1: "GO THROUGH DOOR"/"ENTER
+// DOOR"/"USE DOOR", found by the door object itself rather than by
+// direction (so it works "in every room, not just this one" — this task's
+// own brief).
+// ---------------------------------------------------------------------------
+
+describe('traverseDoor', () => {
+  it('returns undefined when the named object is not the door of any exit in the current room', () => {
+    const state = baseState(); // ROOM_A: no door exits at all
+    expect(traverseDoor(WORLD, state, BUILTIN_VERB_IDS.take, KEY)).toBeUndefined();
+  });
+
+  it('a closed door with authored blockedText renders that text — identical to traversing the same exit by direction', () => {
+    const state = baseState({ location: ROOM_B }); // DOOR closed by default
+    const byDoor = traverseDoor(WORLD, state, BUILTIN_VERB_IDS.take, DOOR)!;
+    expect(byDoor).toBeDefined();
+    expect(byDoor.state.location).toBe(ROOM_B);
+    expect(lineTexts(byDoor.events)).toEqual(['fixture blockedText: the oak door is shut']);
+  });
+
+  it('an open door traverses to the destination, applying the same travelText/minutes as the direction path', () => {
+    const state = baseState({ location: ROOM_B, objects: { [DOOR]: { open: true } } });
+    const before = state.clock.minute;
+    const result = traverseDoor(WORLD, state, BUILTIN_VERB_IDS.take, DOOR)!;
+    expect(result.state.location).toBe(ROOM_C);
+    expect(result.state.clock.minute).toBe(before + 5); // ROOM_B "e" exit: minutes: 5
+  });
+
+  it('the same door reached from the far side (no authored blockedText there) falls back to the generic "blocked" family, not the near side\'s blockedText', () => {
+    const state = baseState({ location: ROOM_C }); // ROOM_C -> ROOM_B via DOOR, no blockedText authored on this exit
+    const result = traverseDoor(WORLD, state, BUILTIN_VERB_IDS.take, DOOR)!;
+    expect(result.state.location).toBe(ROOM_C);
+    expect(lineTexts(result.events)).toEqual([(WORLD.responses!['move.blocked'] as string[])[0]]);
+  });
+
+  it("class comes from the verb passed in, exactly like traverseDirection", () => {
+    const state = baseState({ location: ROOM_B, objects: { [DOOR]: { open: true } } });
+    expect(traverseDoor(WORLD, state, BUILTIN_VERB_IDS.take, DOOR)!.class).toBe('direct'); // BUILTIN_VERB_IDS.take: class 'direct'
+    expect(traverseDoor(WORLD, state, SMELL, DOOR)!.class).toBe('analytical'); // fixture SMELL: class 'analytical'
   });
 });
 
@@ -569,5 +615,72 @@ describe('step() — full turn loop, real parser', () => {
     expect(lineTexts(result.events)).toContain(WORLD.rooms![ROOM_B]!.description);
     // exactly one description line — no double-render from a second code path
     expect(lineTexts(result.events).filter((t) => t === WORLD.rooms![ROOM_B]!.description)).toHaveLength(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// respond.ts's door-traversal dispatch (Ryan's v0.3.2 playtest, fix 1),
+// through the real parser + step() — proves the mechanism is
+// content-driven (any world, any room), not act1-specific. IN/OUT gain a
+// `'V dobj'` pattern here as a fixture-local override, mirroring
+// act1/verbs.ts's own real wiring for this task; the engine-reserved
+// `USE_VERB_ID` needs no fixture id of its own.
+// ---------------------------------------------------------------------------
+
+describe('GO THROUGH / ENTER / EXIT / USE a named door — through the real parser + step()', () => {
+  const WORLD_WITH_DOOR_VERBS: WorldDef = {
+    ...WORLD,
+    verbs: {
+      ...WORLD.verbs,
+      [DIRECTION_VERB_IDS.in]: {
+        ...WORLD.verbs![DIRECTION_VERB_IDS.in]!,
+        words: [...WORLD.verbs![DIRECTION_VERB_IDS.in]!.words, 'go through'],
+        patterns: ['V', 'V dobj'],
+      },
+      [DIRECTION_VERB_IDS.out]: { ...WORLD.verbs![DIRECTION_VERB_IDS.out]!, patterns: ['V', 'V dobj'] },
+      [USE_VERB_ID]: { id: USE_VERB_ID, words: ['use'], patterns: ['V dobj'], class: 'direct', default: 'fixture: use what now.' },
+    },
+  };
+  const doorVocab = compileVocabulary(WORLD_WITH_DOOR_VERBS);
+
+  function doorOutcome(input: string, state: GameState): InterpretOutcome {
+    const view = buildScopeView(WORLD_WITH_DOOR_VERBS, state, doorVocab);
+    return new DeterministicParser().interpret(input, view);
+  }
+
+  it.each(['go through door', 'enter door', 'use door', 'exit door'])(
+    '"%s" traverses the closed door\'s exit exactly like walking it, rendering the exit\'s own blockedText',
+    (input) => {
+      const state = { ...initialState(WORLD_WITH_DOOR_VERBS), location: ROOM_B, visited: { [ROOM_A]: 0, [ROOM_B]: 1 } };
+      const out = doorOutcome(input, state);
+      expect(out.kind).toBe('actions');
+      const result = step(WORLD_WITH_DOOR_VERBS, state, doorVocab, out);
+      expect(result.state.location).toBe(ROOM_B);
+      expect(lineTexts(result.events)).toContain('fixture blockedText: the oak door is shut');
+    },
+  );
+
+  it.each(['go through door', 'enter door', 'use door', 'exit door'])('"%s" traverses the open door to the destination', (input) => {
+    const state = {
+      ...initialState(WORLD_WITH_DOOR_VERBS),
+      location: ROOM_B,
+      visited: { [ROOM_A]: 0, [ROOM_B]: 1, [ROOM_C]: 2 },
+      objects: { [DOOR]: { open: true } },
+    };
+    const out = doorOutcome(input, state);
+    const result = step(WORLD_WITH_DOOR_VERBS, state, doorVocab, out);
+    expect(result.state.location).toBe(ROOM_C);
+  });
+
+  it('naming a non-door object falls through to ordinary dispatch instead of moving the player', () => {
+    const litRoomA: WorldDef = { ...WORLD_WITH_DOOR_VERBS, rooms: { ...WORLD_WITH_DOOR_VERBS.rooms, [ROOM_A]: { ...WORLD_WITH_DOOR_VERBS.rooms![ROOM_A]!, dark: undefined } } };
+    const litVocab = compileVocabulary(litRoomA);
+    const state = initialState(litRoomA); // ROOM_A — KEY in scope, not a door of anything
+    const view = buildScopeView(litRoomA, state, litVocab);
+    const out = new DeterministicParser().interpret('use brass key', view);
+    expect(out.kind).toBe('actions');
+    const result = step(litRoomA, state, litVocab, out);
+    expect(result.state.location).toBe(ROOM_A); // did not move
+    expect(lineTexts(result.events)).toEqual(['fixture: use what now.']); // fell through to USE's own default
   });
 });

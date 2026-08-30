@@ -8,9 +8,10 @@
 // persists takes a `SaveStore` rather than assuming `localStorage`.
 
 import { apply } from '../engine/effects';
+import { S } from '../engine/ids';
 import type { ActionClass, ScriptId } from '../engine/ids';
 import type { InterpretOutcome } from '../engine/interpreter';
-import { renderArrival } from '../engine/move';
+import { look, LOOK_VERB_ID, renderArrival } from '../engine/move';
 import type { CompiledVocabulary } from '../engine/parser';
 import { step } from '../engine/turn';
 import { initialState } from '../engine/world';
@@ -84,6 +85,36 @@ export function startSession(world: WorldDef): NewSessionResult {
   const unarrived: GameState = { ...seeded, visited: {} };
   const { state, events } = renderArrival(world, unarrived);
   return { session: { state, undoRing: [], history: [], historyTruncated: false }, events };
+}
+
+export interface ResumeSessionResult {
+  session: SessionState;
+  events: GameEvent[];
+}
+
+/**
+ * `slot` restored (typically `'auto'` — a browser reload's autosave; a
+ * spawned CLI process has no equivalent today) with the current room
+ * re-described as a plain `LOOK` — the fix for the blank-screen-on-reload
+ * defect (top of the 0.3.1 backlog): Ryan's own proposal was "at the very
+ * least it should say something like: you are in a strange room," the same
+ * thing the classics print after a `RESTORE`, and it needs no new
+ * persistence layer.
+ *
+ * Deliberately `move.ts`'s `look()`, not `renderArrival`: a resumed session
+ * is not an arrival. `firstVisit` fires once, ever, on genuine first entry,
+ * and re-entering the room this way must run neither it nor `onEnter`, and
+ * must not advance the clock — arriving nowhere is not a turn, and this
+ * isn't even an arrival. `undefined` when there is nothing at `slot` to
+ * resume (mirrors `load`); a caller with nothing to resume falls back to
+ * `startSession` instead (a fresh playthrough's opening arrival is a real
+ * one).
+ */
+export function resumeSession(world: WorldDef, store: SaveStore, slot = 'auto'): ResumeSessionResult | undefined {
+  const session = load(store, slot);
+  if (session === undefined) return undefined;
+  const { state, events } = look(world, session.state, LOOK_VERB_ID);
+  return { session: { ...session, state }, events };
 }
 
 /** What every persisting call needs and nothing it doesn't (ADR 0010's `now()`/`SaveStore` seams). */
@@ -283,4 +314,55 @@ export interface RespondToPromptResult {
 export function respondToPrompt(world: WorldDef, session: SessionState, scriptId: ScriptId, values: Record<string, string>): RespondToPromptResult {
   const result = apply(world, session.state, [{ script: { id: scriptId, args: values } }]);
   return { session: { ...session, state: result.state }, events: result.events };
+}
+
+// ---------------------------------------------------------------------------
+// RESTART/RESET confirmation (response-families doc "Later additions" §10,
+// Ryan's v0.3.2 playtest: "Reset and Restart don't work as I would expect
+// them to" — constitution §9/§11 forbid a typo costing a whole playthrough,
+// so the typed command must ask first).
+//
+// The doc authors `restart.confirm`/`restart.declined`'s wording but
+// deliberately leaves "the yes/no mechanism the confirmation uses" as a
+// wiring decision. This is that decision: a prompt/script round trip like
+// any other (§5.7), built from `src/content/scripts.ts`'s two `ScriptFn`s
+// registered under the ids below. The ids live here, not in content,
+// because `requestRestart` (below) needs to check whether a world has
+// wired them *before* asking — and this file must stay content-free (the
+// purity rule) — so `scripts.ts` imports these three back rather than the
+// reverse.
+// ---------------------------------------------------------------------------
+
+export const RESTART_CONFIRM_PROMPT_ID = 'restart_confirm';
+export const RESTART_CONFIRM_OPEN_SCRIPT = S('restart_confirm_open');
+export const RESTART_CONFIRM_RESPOND_SCRIPT = S('restart_confirm_respond');
+
+/** A `PROMPT_SCRIPTS`-shaped table (`repl.ts`'s own convention) a shell merges into whichever one it already builds, so the confirm prompt's answer reaches `RESTART_CONFIRM_RESPOND_SCRIPT` through the ordinary prompt round trip. */
+export const RESTART_PROMPT_SCRIPTS: Record<string, ScriptId> = { [RESTART_CONFIRM_PROMPT_ID]: RESTART_CONFIRM_RESPOND_SCRIPT };
+
+/**
+ * `RESTART`/`RESET` typed. Opens the confirm prompt when the active world
+ * has wired it (`world.scripts[RESTART_CONFIRM_OPEN_SCRIPT]` — act1's
+ * `world.ts` does); a world that hasn't (every test fixture today) gets the
+ * pre-confirmation behavior, an immediate `startSession`, rather than a
+ * thrown "script not registered" error.
+ *
+ * The confirmed answer is detected by the caller, not here: the respond
+ * script signals it by emitting a bare `{ type: 'restarted' }` event
+ * (nothing else does), which a shell's prompt-answering code checks for
+ * *before* rendering — see `repl.ts`'s `feed()` and `controller.ts`'s
+ * `submitPrompt`, both of which discard the round trip's own state and
+ * call `startSession` fresh on seeing it, exactly like the death-menu
+ * RESTART button already does. Deliberately not handled here: this
+ * function only ever *opens* the prompt, so it never itself observes that
+ * event.
+ *
+ * The death-menu RESTART *button* deliberately does not call this —
+ * `chooseDeathOption`/`repl.ts`'s own death-menu handling call
+ * `startSession` directly, per the family-key doc's ruling that a labeled
+ * menu choice among three is already a deliberate confirmation.
+ */
+export function requestRestart(world: WorldDef, session: SessionState): RespondToPromptResult {
+  if (world.scripts?.[RESTART_CONFIRM_OPEN_SCRIPT] === undefined) return startSession(world);
+  return respondToPrompt(world, session, RESTART_CONFIRM_OPEN_SCRIPT, {});
 }

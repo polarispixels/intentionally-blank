@@ -39,6 +39,23 @@ import type { Prose } from '../engine/prose';
 
 /** §3.6's global response families — `world.responses`. */
 export const RESPONSES = {
+
+  // Chrome, not the narrator (response-families.md §10's ruling): a player
+  // types HELP because the fiction stopped working for them, and answering
+  // in the voice of the thing that just failed them is a second failure.
+  'meta.help': 'INTENTIONALLY BLANK is a parser game. You type what you want to do, in\nplain English, and the game works out what you meant. Most commands are a\nverb and a thing:\n\n    OPEN THE DESK        READ THE LETTER        LOOK UNDER THE BED\n\nThe things you can name are the things the writing names. If a description\nmentions a lamp, a window, a stain on the ceiling, you can EXAMINE it — and\nexamining something usually names more things worth examining. Reading the\nroom and then looking at the nouns in it is most of how this game is played.\n\nVerbs worth knowing:\n\n  LOOK, EXAMINE (X), SEARCH, READ\n  LOOK UNDER, LOOK BEHIND, TOUCH, SMELL, LISTEN\n  TAKE, DROP, OPEN, CLOSE, PUSH, PULL, TURN, MOVE, CLIMB\n  NORTH, SOUTH, EAST, WEST, UP, DOWN, IN, OUT\n  (abbreviated N, S, E, W, U, D)\n\nCommands that stand on their own:\n\n  LOOK (L)        describe where you are again\n  INVENTORY (I)   what you are carrying\n  AGAIN (G)       repeat your last command\n  WAIT (Z)        let a moment pass\n  SAVE            store your progress\n  UNDO            take back the last turn\n  RESTART         begin again from the start (it will ask first)\n  ABOUT           what this game is\n\nPhrasing is forgiving. Articles are optional, abbreviations work, and\nseveral wordings usually reach the same action. When a command does not\nwork, the response will normally tell you why rather than only refusing.\n\nTry odd things. A good deal of the writing in this game exists only for\nplayers who tried something unreasonable first.',
+  'meta.about': 'INTENTIONALLY BLANK\nA text adventure by Ryan Grissinger.\n\nA parser, a world that behaves the same way twice, prose written by hand,\nand a mystery that gives up its answers slowly — built in the tradition of\nthe Infocom games.\n\nThis is a build in progress rather than a finished game. It ends at the top\nof the stairs; everything past that is still being written.\n\nType HELP for how to play.',
+
+  // USE is half action, half request for a hint. These put the missing
+  // piece in the player's intention rather than their grammar — no variant
+  // mentions verbs or specificity, and variant 1 has no imperative at all.
+  'use.default': [
+    'You intend to use the {name}. Intention is the easy half; the other half is deciding what using it would involve.',
+    'The {name} is willing. It is the nature of the service that remains unspecified.',
+    'Using is not itself an activity. It is the category the activities go in, and you will have to pick one out of it.',
+    'You use the {name} in the general sense, which is the sense in which nothing ever happens. Name the particular thing and something might.',
+  ],
+
   // ---------------------------------------------------------------------
   // §1 — the ladder, rungs 3/4/5
   // ---------------------------------------------------------------------
@@ -254,6 +271,16 @@ export const RESPONSES = {
     'There is {name} on the floor.',
     'There is {name} lying where it was put down.',
   ],
+
+  // ---------------------------------------------------------------------
+  // §10 (2026-08-30, fifth pass) — the RESTART/RESET confirmation. Chrome,
+  // not the narrator (docs §10's own voice ruling: it speaks from outside
+  // the fiction, like `END OF BUILD`) — fixed text, not a rotation, and
+  // fires from every room in every act. WIRED: `src/content/scripts.ts`'s
+  // `RESTART_SCRIPTS`, via `render()`.
+  // ---------------------------------------------------------------------
+  'restart.confirm': 'This ends the current playthrough and begins again from the start. Restart?',
+  'restart.declined': 'Nothing has changed. The game is where you left it.',
 } satisfies Record<string, Prose>;
 
 /**

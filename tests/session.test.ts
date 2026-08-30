@@ -39,15 +39,20 @@ import {
   importSave,
   listSaves,
   load,
+  requestRestart,
   respondToPrompt,
   restart,
+  RESTART_CONFIRM_PROMPT_ID,
+  RESTART_CONFIRM_RESPOND_SCRIPT,
   restartEncounter,
+  resumeSession,
   save,
   startSession,
   takeTurn,
   undo,
 } from '../src/session/session';
 import type { PersistOptions, SessionState } from '../src/session/session';
+import { RESTART_SCRIPTS } from '../src/content/scripts';
 import {
   FIXTURE_CHECKPOINT_ID,
   FIXTURE_PROMPT_ID,
@@ -254,6 +259,67 @@ describe('RESTART', () => {
 });
 
 // ---------------------------------------------------------------------------
+// RESTART/RESET confirmation (response-families doc "Later additions" §10;
+// Ryan's v0.3.2 playtest — constitution §9/§11 forbid a typo costing a whole
+// playthrough). `RESTART_CONFIRM_WORLD` layers `src/content/scripts.ts`'s
+// `RESTART_SCRIPTS` onto `WORLD` — `WORLD` already carries the real
+// `restart.confirm`/`restart.declined` families via `src/content/responses.ts`
+// (merged in at this file's own top), so this is the actual shipped
+// mechanism, not a test-only stand-in.
+// ---------------------------------------------------------------------------
+
+const RESTART_CONFIRM_WORLD: WorldDef = { ...WORLD, scripts: RESTART_SCRIPTS };
+
+describe('requestRestart / the confirm round trip', () => {
+  it('opens the confirm prompt with the authored family text when the world has wired it', () => {
+    const session = createSession(RESTART_CONFIRM_WORLD);
+    const result = requestRestart(RESTART_CONFIRM_WORLD, session);
+    expect(result.events).toEqual([
+      {
+        type: 'prompt',
+        id: RESTART_CONFIRM_PROMPT_ID,
+        title: 'RESTART',
+        body: 'This ends the current playthrough and begins again from the start. Restart?',
+        fields: [{ name: 'confirm' }],
+      },
+    ]);
+    expect(result.session.state.turn).toBe(session.state.turn); // opening the prompt is not a turn
+  });
+
+  it('falls back to an immediate restart when the world has not wired the confirm script (no crash on an unregistered script id)', () => {
+    const session = createSession(WORLD); // WORLD has no `scripts` at all
+    const result = requestRestart(WORLD, session);
+    expect(result.session.state.turn).toBe(0);
+    expect(result.session.undoRing).toEqual([]);
+    expect(result.session.history).toEqual([]);
+  });
+
+  it('a decline ("no") leaves the game untouched: same state, the declined family rendered, no restarted marker', () => {
+    const session = createSession(RESTART_CONFIRM_WORLD);
+    const before = session.state;
+    const answered = respondToPrompt(RESTART_CONFIRM_WORLD, session, RESTART_CONFIRM_RESPOND_SCRIPT, { confirm: 'no' });
+    expect(answered.session.state).toEqual(before); // untouched
+    expect(answered.events.some((e) => e.type === 'restarted')).toBe(false);
+    expect(answered.events).toContainEqual({ type: 'line', kind: 'system', text: 'Nothing has changed. The game is where you left it.' });
+  });
+
+  it('a blank/garbage answer also declines (erring toward not destroying a playthrough)', () => {
+    const session = createSession(RESTART_CONFIRM_WORLD);
+    const answered = respondToPrompt(RESTART_CONFIRM_WORLD, session, RESTART_CONFIRM_RESPOND_SCRIPT, { confirm: '' });
+    expect(answered.events.some((e) => e.type === 'restarted')).toBe(false);
+  });
+
+  it('a confirm ("yes") emits a bare restarted marker and no line of its own', () => {
+    const session = createSession(RESTART_CONFIRM_WORLD);
+    const answered = respondToPrompt(RESTART_CONFIRM_WORLD, session, RESTART_CONFIRM_RESPOND_SCRIPT, { confirm: 'yes' });
+    expect(answered.events).toEqual([
+      { type: 'promptClosed', id: RESTART_CONFIRM_PROMPT_ID },
+      { type: 'restarted' },
+    ]);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // startSession — the opening arrival (bug fix: neither shell ever rendered
 // it; `createSession` alone deliberately doesn't, per `gamestate.ts`'s own
 // doc comment on `initialState`). `startSession` is a companion to
@@ -310,6 +376,50 @@ describe('LOAD does not re-render', () => {
     expect(loaded).toBeDefined();
     expect(loaded!.state).toEqual(state);
     expect(loaded!.state.flags[FLAG_ONENTER_REPEAT_COUNT]).toBe(3); // not incremented by a phantom re-arrival
+  });
+});
+
+// ---------------------------------------------------------------------------
+// resumeSession (blank-screen-on-reload fix, top of the 0.3.1 backlog): a
+// restored session re-describes the current room as a plain LOOK — never
+// firstVisit (which fires once, ever), never onEnter, never a turn/clock
+// advance. Reuses ROOM_C's `once: false` onEnter (`FLAG_ONENTER_REPEAT_COUNT`)
+// the same way "LOAD does not re-render" does, above, so a wrongly re-run
+// onEnter would be caught even though `visited[ROOM_C]` already suppresses a
+// re-fired firstVisit on its own.
+// ---------------------------------------------------------------------------
+
+describe('resumeSession', () => {
+  it('re-describes the current room (description only, never firstVisit) with no onEnter, no turn, no clock advance', () => {
+    const store = new MemoryStore();
+    const o = opts(store);
+    const state: GameState = {
+      ...initialState(WORLD),
+      location: ROOM_C,
+      turn: 5,
+      visited: { [ROOM_A]: 0, [ROOM_C]: 1 },
+      flags: { [FLAG_ONENTER_REPEAT_COUNT]: 3 },
+    };
+    const session: SessionState = { state, undoRing: [], history: [{ turn: 5, input: 'up' }], historyTruncated: false };
+    save(session, { ...o, slot: 'auto' });
+
+    const resumed = resumeSession(WORLD, store, 'auto');
+    expect(resumed).toBeDefined();
+    const roomC = WORLD.rooms![ROOM_C]!;
+    const lineTexts = resumed!.events.filter((e): e is Extract<GameEvent, { type: 'line' }> => e.type === 'line').map((e) => e.text);
+    expect(lineTexts).toEqual([roomC.description]); // description only — never firstVisit's text
+    expect(lineTexts).not.toContain(roomC.firstVisit);
+
+    expect(resumed!.session.state.turn).toBe(5); // no turn consumed
+    expect(resumed!.session.state.clock).toEqual(state.clock); // no clock advance
+    expect(resumed!.session.state.flags[FLAG_ONENTER_REPEAT_COUNT]).toBe(3); // onEnter did not re-run
+    expect(resumed!.session.undoRing).toEqual([]);
+    expect(resumed!.session.history).toEqual(session.history); // untouched
+  });
+
+  it('returns undefined when nothing is at the given slot, mirroring load', () => {
+    const store = new MemoryStore();
+    expect(resumeSession(WORLD, store, 'auto')).toBeUndefined();
   });
 });
 

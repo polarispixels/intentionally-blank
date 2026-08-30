@@ -78,7 +78,7 @@ import { render } from './prose';
 import { hasBuiltinSemantics, performAction, verbDefaultPath } from './actions';
 import type { InterpretOutcome, StructuredAction } from './interpreter';
 import { GO_TO_VERB_ID } from './interpreter';
-import { directionForVerb, executeGoTo, look, LOOK_VERB_ID, traverseDirection } from './move';
+import { DIRECTION_VERB_IDS, directionForVerb, executeGoTo, look, LOOK_VERB_ID, traverseDirection, traverseDoor, USE_VERB_ID } from './move';
 import type { CompiledVocabulary } from './parser';
 import { allEmptyFamilyKey, candidateName, isNpcId } from './parser';
 import { NPC_VERB_IDS, respondToAsk, respondToGreeting, respondToShow, respondToTell } from './npc';
@@ -101,6 +101,17 @@ import { inventoryView } from './views';
  * room renders.
  */
 export const INVENTORY_VERB_ID = V('inventory');
+
+/**
+ * Ryan's v0.3.2 playtest, fix 1: the verbs whose resolved `dobj` is worth
+ * checking against `move.ts`'s `traverseDoor` before anything else — IN/OUT
+ * (now also `'V dobj'`-capable — "ENTER DOOR"/"EXIT DOOR"/"GO THROUGH
+ * DOOR" all reach one of the two via their own registered words) and
+ * `USE_VERB_ID` ("USE DOOR"). Content-agnostic by design: any world with
+ * any room and any `ExitDefSlice.door` gets this for free, not just act1's
+ * `your_room` — see `respondToAction`'s own use of this set below.
+ */
+const DOOR_TRAVERSAL_VERB_IDS: ReadonlySet<VerbId> = new Set([DIRECTION_VERB_IDS.in, DIRECTION_VERB_IDS.out, USE_VERB_ID]);
 
 export interface RespondResult {
   state: GameState;
@@ -205,8 +216,21 @@ function respondToAction(world: WorldDef, state: GameState, vocab: CompiledVocab
   if (action.verb === GO_TO_VERB_ID) {
     return executeGoTo(world, state, action.route ?? []);
   }
+  // Fix 1 (see DOOR_TRAVERSAL_VERB_IDS's own doc comment): a resolved
+  // `dobj` on one of these verbs names a specific door, not "whichever
+  // exit this direction id normally leads to" — checked, and given
+  // priority, before the bare-direction dispatch just below (IN/OUT are
+  // both direction ids AND door-traversal-eligible; the dobj always wins
+  // when present). `traverseDoor` returns `undefined` when `dobj` isn't
+  // the `door` of any exit in the current room — falls through (note the
+  // lack of a `return`) to ordinary dispatch for whatever it actually is
+  // (a window, a lamp, anything else named).
+  if (dobj !== undefined && !isNpcId(vocab, dobj) && DOOR_TRAVERSAL_VERB_IDS.has(action.verb)) {
+    const doorResult = traverseDoor(world, state, action.verb, dobj as ObjectId);
+    if (doorResult !== undefined) return doorResult;
+  }
   const dir = directionForVerb(action.verb);
-  if (dir !== undefined) {
+  if (dir !== undefined && dobj === undefined) {
     return traverseDirection(world, state, action.verb, dir);
   }
   if (action.verb === LOOK_VERB_ID) {

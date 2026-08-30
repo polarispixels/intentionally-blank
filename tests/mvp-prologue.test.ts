@@ -154,9 +154,15 @@ describe('golden transcript: MVP prologue via the v2 CLI', () => {
     // Post-death refusal (the MVP's `over.refused`, ported as `dead.refused`).
     expect(stdout).toContain(MVP_RESPONSES['over.refused'][0]);
 
-    // Death menu, then RESTART.
+    // Death menu, then RESTART. This world has not wired the RESTART
+    // confirm script (`requestRestart`'s own fallback, `session.ts`), so
+    // it restarts immediately, same as before — but with no "RESTARTED"
+    // banner in front of the fresh opening (response-families doc "Later
+    // additions" §10: nothing should stand between the player and the
+    // first line of the game, confirmed or not).
     expect(stdout).toMatch(/you may:.*RESTART/);
-    expect(stdout).toContain('RESTARTED');
+    expect(stdout).not.toMatch(/RESTARTED/);
+    expect(stdout.split('you may:').at(-1)).toContain(OPENING[0]);
   });
 
   it('the correct credentials really are CREDENTIALS.username/CREDENTIALS.password (sanity, not a duplicate of the golden test)', () => {

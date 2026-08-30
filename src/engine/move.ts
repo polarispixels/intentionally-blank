@@ -62,7 +62,7 @@
 // attempt itself, ticked by `turn.ts`. A route that completes all `N` hops
 // costs exactly `N`: `N - 1` here, `1` from `turn.ts`.
 
-import type { ActionClass, Direction, RoomId, VerbId } from './ids';
+import type { ActionClass, Direction, ObjectId, RoomId, VerbId } from './ids';
 import { V } from './ids';
 import { evaluate } from './cond';
 import type { Effect } from './effects';
@@ -108,6 +108,17 @@ export function directionForVerb(verb: VerbId): Direction | undefined {
 }
 
 export const LOOK_VERB_ID = V('look');
+
+/**
+ * Reserved verb id for USE (Ryan's v0.3.2 playtest, fix 2: "OUT was not
+ * clear on its own"). USE has no built-in semantics of its own beyond
+ * `traverseDoor` below — content authors words/class/default like any
+ * other verb, and an authored handler on a non-door object still wins
+ * outright (this id only gets engine-level precedence over a *door*
+ * object, the same precedence the direction verbs already have — see
+ * `respond.ts`'s door-traversal dispatch).
+ */
+export const USE_VERB_ID = V('use');
 
 /** The two global families this module renders when no exit-specific prose is authored (see this task's report for the exact keys). */
 const NO_EXIT_FAMILY = 'move.noExit';
@@ -218,6 +229,29 @@ function applyExitTraversal(world: WorldDef, state: GameState, exit: ExitDefSlic
 }
 
 /**
+ * The shared tail of exit traversal, once a specific `ExitDefSlice` has
+ * already been found — by direction (`traverseDirection`) or by the door
+ * object named (`traverseDoor`, below): the `when` gate, the door-open
+ * check with its distinct blocked family, then `applyExitTraversal`
+ * (`travelText`/`goto`/`minutes`). `pathBase` is this exit's own
+ * family-key prefix — the same node whichever way the player named the
+ * exit, so a door named by direction and by naming the door itself share
+ * one rotation/blockedText state rather than two independent ones.
+ */
+function traverseFoundExit(world: WorldDef, state: GameState, cls: ActionClass | null, roomId: RoomId, exit: ExitDefSlice, pathBase: string): MoveOutcome {
+  if (!exitCurrentlyExists(world, state, exit)) {
+    const { state: s, events } = renderFamily(world, state, NO_EXIT_FAMILY);
+    return { state: s, events, class: cls };
+  }
+  if (!exitIsOpen(world, state, exit)) {
+    const { state: s, events } = renderBlocked(world, state, `${pathBase}.blockedText`, exit);
+    return { state: s, events, class: cls };
+  }
+  const applied = applyExitTraversal(world, state, exit, pathBase);
+  return { state: applied.state, events: applied.events, class: cls };
+}
+
+/**
  * `N`/`S`/.../`GO <direction>` (§2.4, §3.5). Finds the exit declared with
  * `dir` in the player's current room and, if it's currently passable,
  * applies `travelText`/`goto`/`minutes` and stops — arrival (firstVisit,
@@ -228,17 +262,36 @@ export function traverseDirection(world: WorldDef, state: GameState, verb: VerbI
   const roomId = state.location;
   const exit = (world.rooms?.[roomId]?.exits ?? []).find((e) => e.dir === dir);
 
-  if (exit === undefined || !exitCurrentlyExists(world, state, exit)) {
+  if (exit === undefined) {
     const { state: s, events } = renderFamily(world, state, NO_EXIT_FAMILY);
     return { state: s, events, class: cls };
   }
-  if (!exitIsOpen(world, state, exit)) {
-    const { state: s, events } = renderBlocked(world, state, `room.${roomId}.exit.${dir}.blockedText`, exit);
-    return { state: s, events, class: cls };
-  }
+  return traverseFoundExit(world, state, cls, roomId, exit, `room.${roomId}.exit.${dir}`);
+}
 
-  const applied = applyExitTraversal(world, state, exit, `room.${roomId}.exit.${dir}`);
-  return { state: applied.state, events: applied.events, class: cls };
+/**
+ * Ryan's v0.3.2 playtest, fix 1: "GO THROUGH DOOR"/"ENTER DOOR"/"USE DOOR"
+ * — traverses whichever exit in the player's CURRENT room declares
+ * `doorId` as its `door`, found by the door itself rather than by
+ * direction, so it works "in every room, not just this one" (this task's
+ * own brief) with no per-room wiring. `undefined` when `doorId` is not the
+ * `door` of any exit here — the caller's signal to fall through to
+ * ordinary dispatch (an authored handler, or the verb's own default) for
+ * whatever `doorId` actually names (a window, a lamp, anything else).
+ * Reuses `traverseFoundExit` exactly like `traverseDirection` — same
+ * `when` gate, same open check and its distinct blocked family, same
+ * `travelText`/`minutes` — so a door behaves identically whichever way the
+ * player names it. `exit.dir` is optional on `ExitDefSlice` (a GO-TO-only
+ * exit needn't declare one); falls back to `doorId` itself for the
+ * family-key prefix so this never collides with another exit's own path.
+ */
+export function traverseDoor(world: WorldDef, state: GameState, verb: VerbId, doorId: ObjectId): MoveOutcome | undefined {
+  const roomId = state.location;
+  const exit = (world.rooms?.[roomId]?.exits ?? []).find((e) => e.door === doorId);
+  if (exit === undefined) return undefined;
+
+  const cls = verbClass(world, verb);
+  return traverseFoundExit(world, state, cls, roomId, exit, `room.${roomId}.exit.${exit.dir ?? doorId}`);
 }
 
 // ---------------------------------------------------------------------------

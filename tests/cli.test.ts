@@ -183,6 +183,31 @@ describe('CLI v2 (session-backed REPL)', () => {
     expect(stdout).toContain('Darkness.'); // act1's opening room, canon-locked (tests/world-act1-playthrough.test.ts)
   });
 
+  it('RESTART typed against the real shipped game asks for confirmation, and a decline leaves play untouched (Ryan\'s v0.3.2 playtest)', () => {
+    const saveDir = mkdtempSync(join(tmpdir(), 'ib-cli-v2-'));
+    const script = writeScript(dir, 'restart-decline.txt', ['pull chain', 'restart', 'no', 'look']);
+    const { stdout, status } = playV2(['--save-dir', saveDir, '--script', script, '--fast']);
+    expect(status).toBe(0);
+    expect(stdout).toContain('This ends the current playthrough and begins again from the start. Restart?');
+    expect(stdout).toContain('Nothing has changed. The game is where you left it.');
+    expect(stdout).not.toMatch(/RESTARTED/);
+    // Play continues from where it was — the pulled chain, not a fresh
+    // dark-room opening — proving the decline didn't restart anything.
+    expect(stdout.split('Nothing has changed.')[1]).not.toContain('Darkness.');
+  });
+
+  it('RESET (a synonym) typed against the real shipped game, confirmed, actually restarts with no banner in front of the opening beats', () => {
+    const saveDir = mkdtempSync(join(tmpdir(), 'ib-cli-v2-'));
+    const script = writeScript(dir, 'reset-confirm.txt', ['pull chain', 'reset', 'yes']);
+    const { stdout, status } = playV2(['--save-dir', saveDir, '--script', script, '--fast']);
+    expect(status).toBe(0);
+    expect(stdout).toContain('This ends the current playthrough and begins again from the start. Restart?');
+    expect(stdout).not.toMatch(/RESTARTED/); // response-families doc §10: no banner, only the opening beats
+    // The opening room's first-visit text appears again — a genuine fresh
+    // arrival, not a resume — right after the confirm round trip closes.
+    expect(stdout.split('Restart?')[1]).toContain('Darkness.');
+  });
+
   it('reports a --world module that does not export WORLD', () => {
     const badWorld = join(dir, 'bad-world.mjs');
     writeFileSync(badWorld, 'export const NOT_WORLD = {};\n');
