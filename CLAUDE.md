@@ -52,6 +52,12 @@ mystery. Spec v0.1.0 — see `docs/spec/`.
    any spec doc touched, update the `BACKLOG.md` board if a milestone moved,
    `git tag vX.Y.Z`. A test enforces that the version strings match. In-game
    `VERSION` prints it. Ryan's rule: *always update the version number.*
+8. **Process stays proportional.** Full ceremony for architecture, state
+   and save schemas, the parser, and canon; lighter paths for content and
+   small reversible changes; docs and one-file fixes go straight to `main`
+   with a version bump. Add no agent, gate, ADR, or document without a
+   demonstrated problem. Ask: *is this helping make a better playable game,
+   or managing the machinery?* Paths table in `docs/DEVELOPMENT.md`.
 
 ## Model routing
 

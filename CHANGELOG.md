@@ -12,6 +12,16 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.2.3] - 2026-08-29
+
+### Changed
+
+- Process discipline guardrail (Ryan): "Avoid process obesity" added to
+  `docs/DEVELOPMENT.md` with the content-vs-machinery metric and a
+  calibration table of light and full paths by change type; CLAUDE.md rule
+  8 summarizes it. Docs, tuning, and one-file fixes now commit straight to
+  `main` with a version bump.
+
 ## [0.2.2] - 2026-08-29
 
 ### Fixed

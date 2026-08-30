@@ -153,6 +153,58 @@ check.
 The public docs site at `/docs/` is generated from these files at build time
 (ADR 0006). Markdown is the only source of truth.
 
+## Avoid process obesity
+
+The engineering, review, documentation, testing, and agent-specialization
+practices above are useful — particularly while foundational architecture
+is being established. But process must stay proportional to the risk and
+complexity of the work. As the foundation stabilizes, keep asking:
+
+> **Is this process helping us produce a better playable game, or are we
+> creating machinery to manage the machinery?**
+
+Guidelines:
+
+- Preserve rigor for high-blast-radius decisions: architecture, the state
+  model, the save system, the parser, and canon.
+- Use lighter process for small, reversible content and implementation
+  changes.
+- Do not add new agents, review stages, ADRs, documents, approval gates, or
+  abstractions unless they solve a demonstrated problem.
+- Prefer improving playable content over expanding project-management
+  infrastructure.
+- Do not duplicate information across documentation systems.
+- Periodically remove obsolete processes and documentation.
+- Optimize for fast iteration once architectural risk has declined.
+
+The internal metric:
+
+> **How much effort is going into creating and improving playable game
+> content versus managing the system that creates playable game content?**
+
+There is no required ratio. If process overhead begins materially slowing
+delivery of rooms, puzzles, interactions, story, testing, or player
+feedback, simplify the process. The objective is disciplined development,
+not maximal process.
+
+### Current calibration (v0.2.3)
+
+The MVP ran the full ceremony — ten planned tasks, a two-stage review per
+task, a whole-branch review — for a five-minute prototype. That was the
+right cost for laying the engine seam, the deploy path, and the roster.
+It is not the default from here:
+
+| Change | Path |
+|---|---|
+| Engine contract, state/save schema, parser grammar, canon promotion, anything an ADR covers | Full: brainstorm → spec → plan → builder + review → whole-branch review |
+| A new room, puzzle, or interaction on the existing engine | Plan task → one builder → one review → merge. No separate whole-branch pass unless the plan spans modules. |
+| Prose and content data only | Writer → main-session voice/canon review → commit. No code reviewer. |
+| Docs, tuning, one-file fixes | Edit → tests → commit to `main` with the version bump. No branch, no reviewer. |
+
+Every path still bumps the version and writes the changelog entry — that is
+bookkeeping, not process. Revisit this table when it starts to feel wrong
+in either direction.
+
 ## Adding an agent
 
 Add a file to `.claude/agents/` with `name`, `description` (this is what the
