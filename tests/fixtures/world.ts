@@ -77,7 +77,7 @@
 // `validate.ts`. `MEMORY_1`/`QUESTION_1` stay untouched — the existing
 // explicit-effect-only fixtures other tasks' tests already depend on.
 
-import { C, F, M, N, O, Q, R, S, V } from '../../src/engine/ids';
+import { C, F, M, N, O, P, Q, R, S, V } from '../../src/engine/ids';
 import { BUILTIN_VERB_IDS } from '../../src/engine/actions';
 import { AGAIN_VERB_ID } from '../../src/engine/interpreter';
 import type { GameEvent, ScriptFn, WorldDef } from '../../src/engine/world';
@@ -165,6 +165,19 @@ export const QUESTION_2 = Q('fixture_question_2');
 /** Ambient open via flag, ambient answer via MEMORY_2 — the cross-stage chaining case. */
 export const QUESTION_3 = Q('fixture_question_3');
 
+/**
+ * Task 16 (`tests/puzzles.test.ts`) additions: `PUZZLE_1`, a three-route
+ * puzzle (one flag per route, ORed together in `solvedWhen`) exercising
+ * multi-route convergence — each route's own handler/effect sets its own
+ * flag; none of them knows or cares about the others, and `solvedWhen`
+ * fires `onSolved` exactly once regardless of which route (or how many)
+ * end up true. `QUESTION_PUZZLE` is its HINT anchor (explicit-effect-only,
+ * like `QUESTION_1` — a test opens it directly via a state overlay rather
+ * than an ambient trigger, since the hint-ladder tests don't need one).
+ */
+export const PUZZLE_1 = P('fixture_puzzle_1');
+export const QUESTION_PUZZLE = Q('fixture_question_puzzle');
+
 export const FLAG_BOOL = F('fixture_flag_bool');
 export const FLAG_NUM = F('fixture_flag_num');
 
@@ -185,6 +198,12 @@ export const FLAG_WITNESSED_FIRED = F('fixture_flag_witnessed_fired');
 /** Task 15 additions: gate QUESTION_2/QUESTION_3's ambient openWhen/answerWhen. */
 export const FLAG_QUESTION_OPEN = F('fixture_flag_question_open');
 export const FLAG_QUESTION_ANSWER = F('fixture_flag_question_answer');
+
+/** Task 16 additions: PUZZLE_1's three independent solution routes, and the flag its onSolved sets. */
+export const FLAG_PUZZLE_ROUTE_A = F('fixture_flag_puzzle_route_a');
+export const FLAG_PUZZLE_ROUTE_B = F('fixture_flag_puzzle_route_b');
+export const FLAG_PUZZLE_ROUTE_C = F('fixture_flag_puzzle_route_c');
+export const FLAG_PUZZLE_SOLVED = F('fixture_flag_puzzle_solved');
 
 export const SCRIPT_1 = S('fixture_script_1');
 
@@ -217,6 +236,10 @@ export const FIXTURE_WORLD: WorldDef = {
     [FLAG_WITNESSED_FIRED]: { default: false, doc: 'task 13: set by fixture_event_witnessed when it fires' },
     [FLAG_QUESTION_OPEN]: { default: false, doc: 'task 15: gates QUESTION_2/QUESTION_3 openWhen' },
     [FLAG_QUESTION_ANSWER]: { default: false, doc: 'task 15: gates QUESTION_2 answerWhen' },
+    [FLAG_PUZZLE_ROUTE_A]: { default: false, doc: 'task 16: PUZZLE_1 route A (direct)' },
+    [FLAG_PUZZLE_ROUTE_B]: { default: false, doc: 'task 16: PUZZLE_1 route B (analytical)' },
+    [FLAG_PUZZLE_ROUTE_C]: { default: false, doc: 'task 16: PUZZLE_1 route C (social)' },
+    [FLAG_PUZZLE_SOLVED]: { default: false, doc: 'task 16: set once by PUZZLE_1.onSolved' },
   },
   // Task 9 (`parser/vocabulary.ts`) additions below: `name`/`aliases` on
   // every room, `nouns`/`adjectives` on every object and on `GUIDE` — the
@@ -473,6 +496,32 @@ export const FIXTURE_WORLD: WorldDef = {
     [QUESTION_1]: { text: 'Is this a fixture question?' },
     [QUESTION_2]: { text: 'Does this fixture open and answer ambiently?', openWhen: { flag: FLAG_QUESTION_OPEN }, answerWhen: { flag: FLAG_QUESTION_ANSWER } },
     [QUESTION_3]: { text: 'Does a granted memory answer this fixture question?', openWhen: { flag: FLAG_QUESTION_OPEN }, answerWhen: { memory: MEMORY_2 } },
+    [QUESTION_PUZZLE]: { text: 'How do you get through the fixture door?' },
+  },
+  /**
+   * Task 16 addition: one puzzle, three independent routes ORed together
+   * in `solvedWhen` (multi-route convergence, §2.7 — no special machinery,
+   * just three flags any one of which satisfies the condition). Every
+   * `solutions` entry's `route` is flag-only (no `clock`/`clockPhase`/
+   * `weekday` term), so this puzzle satisfies `validate.ts`'s clock-free-
+   * solution rule (§4.3.4) without needing `missedRecovery`. `hints` are
+   * deliberately fixture-ish placeholder strings, never real prose (hard
+   * rule 5).
+   */
+  puzzles: {
+    [PUZZLE_1]: {
+      id: PUZZLE_1,
+      name: 'fixture puzzle: three routes through the fixture door',
+      question: QUESTION_PUZZLE,
+      solvedWhen: { any: [{ flag: FLAG_PUZZLE_ROUTE_A }, { flag: FLAG_PUZZLE_ROUTE_B }, { flag: FLAG_PUZZLE_ROUTE_C }] },
+      solutions: [
+        { id: 'route_a_direct', class: 'direct', note: 'force it', route: { flag: FLAG_PUZZLE_ROUTE_A } },
+        { id: 'route_b_analytical', class: 'analytical', note: 'work it out', route: { flag: FLAG_PUZZLE_ROUTE_B } },
+        { id: 'route_c_social', class: 'social', note: 'talk your way through', route: { flag: FLAG_PUZZLE_ROUTE_C } },
+      ],
+      hints: ['fixture hint level 1 (nudge)', 'fixture hint level 2 (clue id)', 'fixture hint level 3 (explicit)'],
+      onSolved: [{ set: [FLAG_PUZZLE_SOLVED, true] }, { say: 'The fixture door gives.' }],
+    },
   },
   scripts: {
     [SCRIPT_1]: fixtureScript,

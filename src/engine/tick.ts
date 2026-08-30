@@ -12,11 +12,9 @@
 // trigger and question-recompute steps too, by calling straight through to
 // `knowledge.ts`'s `evaluateMemoryTriggers`/`recomputeQuestions` — this file
 // owns *when* they run in the pipeline, `knowledge.ts` owns *what* they do.
-// The last two steps still belong to task 16 (`puzzles.ts` — `solvedWhen`
-// and profile tallying); `tick()` below still calls a documented no-op stub
-// for each so the ordering is real and load-bearing today, not a comment
-// promising it later. Task 16 replaces exactly those two stubs, never
-// touching the pipeline's shape.
+// The last two steps (as of task 16) call straight through to
+// `puzzles.ts`'s `checkSolvedPuzzles`/`tallyProfile` the same way — this
+// file still owns only the ordering, never the logic.
 //
 // Meta verbs (SAVE, MAP, HINT, VERSION, …) "cost nothing" (§4.1): they
 // don't advance the clock, and — just as important, per §4.3.4's no-silent-
@@ -32,6 +30,7 @@ import type { ActionClass, NpcId, RoomId } from './ids';
 import { evaluate, npcRoom } from './cond';
 import { addMinutes, apply } from './effects';
 import { evaluateMemoryTriggers, recomputeQuestions } from './knowledge';
+import { checkSolvedPuzzles, tallyProfile } from './puzzles';
 import type { GameEvent, GameState, WorldDef } from './world';
 
 const DEFAULT_MINUTES_PER_TURN = 1;
@@ -46,9 +45,9 @@ export interface TickInput {
    */
   consumesTurn: boolean;
   /**
-   * The action's class, for the profile tally (§4.2's last step, stubbed
-   * here — task 16 owns the real tally). `null`/omitted for neutral or meta
-   * actions, matching `ActionResult.class`.
+   * The action's class, for the profile tally (§4.2's last step,
+   * `puzzles.ts`'s `tallyProfile`). `null`/omitted for neutral or meta
+   * actions, matching `ActionResult.class` — neither tallies.
    */
   class?: ActionClass | null;
 }
@@ -99,9 +98,17 @@ export function tick(world: WorldDef, state: GameState, input: TickInput): TickR
   current = questions.state;
   events.push(...questions.events);
 
-  // 6. STUB (task 16, puzzles.ts): check every `PuzzleDef.solvedWhen` for a
-  //    first-time (edge) transition to true and run its `onSolved` once.
-  // 7. STUB (task 16, puzzles.ts): tally `input.class` into `state.profile`.
+  // 6. Check every `PuzzleDef.solvedWhen` for a first-time (edge) transition
+  //    to true and run its `onSolved` once (`puzzles.ts`, task 16). Runs
+  //    after steps 4-5 so a memory/question granted earlier this same tick
+  //    can already satisfy a puzzle's `solvedWhen` (§4.2's own ordering).
+  const puzzles = checkSolvedPuzzles(world, current);
+  current = puzzles.state;
+  events.push(...puzzles.events);
+
+  // 7. Tally `input.class` into `state.profile` (`puzzles.ts`, task 16) —
+  //    the behavioral profile, spec 04 §3.
+  current = tallyProfile(current, input.class);
 
   return { state: current, events };
 }

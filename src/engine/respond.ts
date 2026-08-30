@@ -61,7 +61,7 @@
 //   - `'nounUnresolved'` (or `reason` absent, e.g. an older/hand-built
 //     outcome) → rung 3 as before, seen/unseen split included.
 
-import type { NpcId, ObjectId, VerbId } from './ids';
+import type { ActionClass, NpcId, ObjectId, VerbId } from './ids';
 import type { GameEvent, GameState, WorldDef } from './world';
 import { npcRoom } from './world';
 import { objectLocation, objectState } from './resolve';
@@ -77,6 +77,26 @@ import { NPC_VERB_IDS, respondToAsk, respondToGreeting, respondToShow, respondTo
 export interface RespondResult {
   state: GameState;
   events: GameEvent[];
+  /**
+   * The behavioral-profile class this turn tallies as (§8 task 16's owed
+   * action-class plumbing, spec 04 §3) — `null` whenever nothing was
+   * actually resolved/performed (rungs 3-5 of the ladder, plus `clarify`/
+   * `unreachable`/`allEmpty`), matching `ActionResult.class`'s own
+   * "`null` = neutral" convention. `tick.ts`'s `TickInput.class` is meant
+   * to receive this field once a later task (18, `Session`) wires
+   * `respond()` and `tick()` into one turn loop.
+   *
+   * MULTI-ACTION TURNS (ALL/AND, §3.5): `outcome.actions` can carry more
+   * than one `StructuredAction` in a single call. Each one resolves its own
+   * class independently (`respondToAction`, below), but this field is a
+   * single value for the whole call — it reports the *last* action's
+   * class. Tallying every sub-action's class individually needs a per-
+   * action tick, which only exists once task 18's `Session` decides how
+   * many turns an ALL/AND command actually consumes; flagged here rather
+   * than guessed at, the same way this file already flags the NPC rung-1
+   * gap above.
+   */
+  class: ActionClass | null;
 }
 
 /** Dispatches one already-interpreted `InterpretOutcome` to prose (§3.6's full ladder, plus the interpreter's other outcome kinds). */
@@ -84,15 +104,15 @@ export function respond(world: WorldDef, state: GameState, vocab: CompiledVocabu
   if (outcome.kind === 'actions') return respondToActions(world, state, vocab, outcome.actions);
   if (outcome.kind === 'miss') return respondToMiss(world, state, vocab, outcome);
   if (outcome.kind === 'clarify') {
-    return { state, events: [{ type: 'clarify', question: outcome.question, options: outcome.options }] };
+    return { state, events: [{ type: 'clarify', question: outcome.question, options: outcome.options }], class: null };
   }
   if (outcome.kind === 'unreachable') {
-    return { state, events: [{ type: 'line', kind: 'system', text: outcome.message }] };
+    return { state, events: [{ type: 'line', kind: 'system', text: outcome.message }], class: null };
   }
   // 'allEmpty' (§3.5): an authored family, not a coverage gap — no diag.
   const key = allEmptyFamilyKey(outcome.verb);
   const rendered = render(world, state, key, family(world, key));
-  return { state: rendered.state, events: [{ type: 'line', kind: 'prose', text: rendered.text }] };
+  return { state: rendered.state, events: [{ type: 'line', kind: 'prose', text: rendered.text }], class: null };
 }
 
 // ---------------------------------------------------------------------------
@@ -102,12 +122,14 @@ export function respond(world: WorldDef, state: GameState, vocab: CompiledVocabu
 function respondToActions(world: WorldDef, state: GameState, vocab: CompiledVocabulary, actions: StructuredAction[]): RespondResult {
   let current = state;
   const events: GameEvent[] = [];
+  let cls: ActionClass | null = null; // see RespondResult.class's MULTI-ACTION TURNS note: last action wins
   for (const action of actions) {
     const result = respondToAction(world, current, vocab, action);
     current = result.state;
     events.push(...result.events);
+    cls = result.class;
   }
-  return { state: current, events };
+  return { state: current, events, class: cls };
 }
 
 /**
@@ -170,7 +192,7 @@ function respondToAction(world: WorldDef, state: GameState, vocab: CompiledVocab
     ...(dobj !== undefined ? { dobj: dobj as ObjectId } : {}),
     ...(iobj !== undefined ? { iobj: iobj as ObjectId } : {}),
   });
-  return { state: result.state, events: result.events };
+  return { state: result.state, events: result.events, class: result.class };
 }
 
 /** Rung 2 for an NPC target (see file header): no handler mechanism exists for NPCs, so this always renders the verb's own `default` family. */
@@ -186,6 +208,7 @@ function respondToNpcTarget(world: WorldDef, state: GameState, vocab: CompiledVo
       { type: 'line', kind: 'prose', text: rendered.text },
       { type: 'diag', code: 'defaultResponse', detail: `verb "${verb}" on npc "${npc}" fell to its default family` },
     ],
+    class: verbDef.class,
   };
 }
 
@@ -203,6 +226,7 @@ function respondToShowDefault(world: WorldDef, state: GameState, vocab: Compiled
       { type: 'line', kind: 'prose', text: rendered.text },
       { type: 'diag', code: 'defaultResponse', detail: `verb "${verb}" (show) of "${dobj}" to npc "${npc}" fell to its default family` },
     ],
+    class: verbDef.class,
   };
 }
 
@@ -234,7 +258,7 @@ function respondToMiss(world: WorldDef, state: GameState, vocab: CompiledVocabul
  */
 function respondToBareVerb(world: WorldDef, state: GameState, verb: VerbId): RespondResult {
   const result = performAction(world, state, { verb });
-  return { state: result.state, events: result.events };
+  return { state: result.state, events: result.events, class: result.class };
 }
 
 /** Rung 3. Spoiler boundary: `nounMiss.seen` only for a candidate the player has actually seen (see file header); `nounMiss.unseen` never names anything. */
@@ -250,6 +274,7 @@ function respondToNounMiss(world: WorldDef, state: GameState, vocab: CompiledVoc
       { type: 'line', kind: 'prose', text: rendered.text },
       { type: 'diag', code: 'nounMiss', detail: `verb "${verb}" — noun not in scope (${key})` },
     ],
+    class: null, // nothing resolved — no action to tally
   };
 }
 
@@ -263,6 +288,7 @@ function respondToUnknownVerbKnownNoun(world: WorldDef, state: GameState, vocab:
       { type: 'line', kind: 'prose', text: rendered.text },
       { type: 'diag', code: 'parserMiss', detail: `verb unrecognized; noun "${name}" resolved` },
     ],
+    class: null, // nothing resolved — no action to tally
   };
 }
 
@@ -275,6 +301,7 @@ function respondToUnknown(world: WorldDef, state: GameState): RespondResult {
       { type: 'line', kind: 'prose', text: rendered.text },
       { type: 'diag', code: 'parserMiss', detail: 'nothing in the input was recognized' },
     ],
+    class: null, // nothing resolved — no action to tally
   };
 }
 

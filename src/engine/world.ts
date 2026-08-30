@@ -33,7 +33,7 @@
 
 import type { Cond } from './cond';
 import { evaluate } from './cond';
-import type { ActionClass, DayPhase, FlagId, FlagValue, MemoryId, ClueId, NpcId, ObjectId, PlaceId, QuestionId, RoomId, ScriptId, TopicId, VerbId } from './ids';
+import type { ActionClass, DayPhase, FlagId, FlagValue, MemoryId, ClueId, NpcId, ObjectId, PlaceId, PuzzleId, QuestionId, RoomId, ScriptId, TopicId, VerbId } from './ids';
 // Type-only: `Effect` is only referenced in `HandlerDef`'s type signature
 // below, never called at runtime from this module, so this stays a
 // compile-time-only edge even though `effects.ts` itself imports `WorldDef`
@@ -339,6 +339,62 @@ export interface EventDef {
   effects: Effect[];
 }
 
+/**
+ * §2.7's `PuzzleDef`, verbatim plus one task-16 addition (`route`, on
+ * `solutions` entries — see `PuzzleSolution` below). `solvedWhen` is
+ * derived — never a stored boolean (§1.1) — and checked every tick
+ * (`puzzles.ts`, §8 task 16) for a first-time (edge) transition to true, at
+ * which point `onSolved` fires once. Multi-route convergence needs no
+ * special machinery: each route is ordinary handlers/effects that
+ * eventually satisfy `solvedWhen` (e.g. `{ any: [{ flag: door_unlocked },
+ * { flag: guard_distracted }] }`) — `solutions` merely *documents* those
+ * routes "so hints, the profile system, and the design review can see
+ * them" (§2.7).
+ */
+export interface PuzzleDef {
+  id: PuzzleId;
+  name: string;
+  /** The player-facing anchor for HINT (§6.5/spec 04 §15). */
+  question?: QuestionId;
+  /** Derived — never a stored boolean (§1.1). */
+  solvedWhen: Cond;
+  solutions: PuzzleSolution[];
+  /** Progressive ladder, vague → explicit (spec 04 §15). Authored prose (hard rule 5) — fixture-only strings belong in tests. */
+  hints: string[];
+  /** Fired once, the first tick `solvedWhen` holds (`puzzles.ts`, §4.2 step 6). */
+  onSolved?: Effect[];
+  /**
+   * Named recovery path (§4.3.4/constitution §10) — satisfies
+   * `validate.ts`'s clock-free-solution rule when no `solutions` route is
+   * itself clock-free. Names the recovery a missed timed window falls back
+   * to (a second occurrence, an alternate clue source, an NPC report)
+   * rather than silently dooming the player.
+   */
+  missedRecovery?: string;
+}
+
+/**
+ * §2.7's `solutions` entry (`{ id, class, note }`) verbatim, plus `route` —
+ * the shape chosen (task 16) to make §4.3.4's clock-free-solution rule
+ * mechanical. The spec entry carries no condition at all, so nothing about
+ * it was checkable for a `clock`/`clockPhase`/`weekday` term; `route` is an
+ * optional `Cond` describing what this specific route actually depends on
+ * — typically the same flag/state condition that route's own handlers set
+ * and `solvedWhen` reads back (e.g. `{ flag: door_unlocked }` for the
+ * "pick the lock" route of a puzzle whose `solvedWhen` is `{ any: [{ flag:
+ * door_unlocked }, { flag: guard_distracted }] }`). Optional and
+ * design-time only — nothing in the engine evaluates it at runtime; a
+ * route with no `route` cond at all reads as trivially clock-free to
+ * `validate.ts` (there is nothing in it to flag), the safe default for a
+ * route whose real condition genuinely never mentions the clock.
+ */
+export interface PuzzleSolution {
+  id: string;
+  class: ActionClass;
+  note: string;
+  route?: Cond;
+}
+
 /** Narrow, still-growing slice of §2.1's `WorldDef`. */
 export interface WorldDef {
   meta: WorldMeta;
@@ -375,6 +431,8 @@ export interface WorldDef {
    * effect.
    */
   questions?: Record<QuestionId, { text: string; openWhen?: Cond; answerWhen?: Cond }>;
+  /** §2.7's `PuzzleDef`s (§8 task 16). Content is not required to declare any. */
+  puzzles?: Record<PuzzleId, PuzzleDef>;
   /** The `script` effect's escape hatch (ADR 0008): pure functions registered by id. */
   scripts?: Record<ScriptId, ScriptFn>;
   /**

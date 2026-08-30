@@ -45,7 +45,7 @@
 // correctly. This module is therefore never reached for an absent NPC and
 // has no presence check of its own to write.
 
-import type { NpcId, ObjectId, VerbId } from './ids';
+import type { ActionClass, NpcId, ObjectId, VerbId } from './ids';
 import { V } from './ids';
 import { evaluate } from './cond';
 import { apply } from './effects';
@@ -73,6 +73,18 @@ export const NPC_VERB_IDS = {
 export interface NpcResult {
   state: GameState;
   events: GameEvent[];
+  /**
+   * The behavioral-profile class this interaction tallies as (§8 task 16's
+   * owed action-class plumbing, spec 04 §3). Topic responses (ASK/TELL,
+   * matched or falling to `unknownTopic`) are `'social'` — §2.6's declared
+   * default for `TopicDef.class`, applied uniformly here since attempting a
+   * topic is itself a social move regardless of whether it landed. SHOW and
+   * TALK TO/HELLO have no per-entry override field (`ShowResponseDef`/
+   * `greeting` carry none), so they fall to the verb's own declared
+   * `class` in `world.verbs` — the same "verb default, overridable per
+   * handler" convention `actions.ts`'s `ActionResult.class` already uses.
+   */
+  class: ActionClass | null;
 }
 
 function requireNpc(world: WorldDef, npc: NpcId): NpcDefSlice {
@@ -128,7 +140,7 @@ function respondToTopic(world: WorldDef, state: GameState, vocab: CompiledVocabu
     topic: rawTopic,
     path,
   });
-  return { state: newState, events };
+  return { state: newState, events, class: topic.class ?? 'social' };
 }
 
 /** `unknownTopic` — authored per NPC (§2.6: "the personality lives here"). Fires with a `topicMiss` diag (§8 task 14) — the playtester's signal for a conversation the player reasonably tried and the author never anticipated. */
@@ -144,6 +156,7 @@ function respondToUnknownTopic(world: WorldDef, state: GameState, vocab: Compile
       { type: 'line', kind: 'prose', text: rendered.text },
       { type: 'diag', code: 'topicMiss', detail: `npc "${npc}" — topic "${rawTopic}" not matched or not yet known` },
     ],
+    class: 'social', // still an ASK/TELL attempt — §2.6's topic default applies whether or not it landed
   };
 }
 
@@ -187,7 +200,7 @@ export function respondToShow(world: WorldDef, state: GameState, vocab: Compiled
     iobj: npcName,
     path,
   });
-  return { state: newState, events };
+  return { state: newState, events, class: world.verbs?.[NPC_VERB_IDS.show]?.class ?? null };
 }
 
 // ---------------------------------------------------------------------------
@@ -207,7 +220,11 @@ export function respondToGreeting(world: WorldDef, state: GameState, vocab: Comp
 
   const name = candidateName(vocab, npc);
   const rendered = render(world, state, `npc.${npc}.greeting`, def.greeting, { name, dobj: name });
-  return { state: rendered.state, events: [{ type: 'line', kind: 'prose', text: rendered.text }] };
+  return {
+    state: rendered.state,
+    events: [{ type: 'line', kind: 'prose', text: rendered.text }],
+    class: world.verbs?.[NPC_VERB_IDS.talk]?.class ?? null,
+  };
 }
 
 /** Verb ids `hasNpcSemantics` recognizes — `respond.ts` uses this the same way it uses `actions.ts`'s `hasBuiltinSemantics`. */

@@ -3,16 +3,14 @@
 // slice (task 6's), run from a content test so a bad authoring choice fails
 // `npm test`, not a play session hours in (§2.1's own framing).
 //
-// SCOPE NOTE: `WorldDef` does not yet declare `puzzles`, `events`,
-// `topics`, `deaths`, or `endings` — those land in tasks 13-17. Rules that
-// need those fields (every `PuzzleDef` has a clock-free solution or
-// `missedRecovery`; no authored `Effect` strands a plot-critical object)
-// have no data surface to check yet and are not implemented here. `exits`
-// (task 11, §3.5's `GO TO`) is now declared and checked below
-// (`checkRoomExits`). See this task's report for the full list — when a
-// later task adds one of those fields to `WorldDef`, it must extend this
+// SCOPE NOTE: `WorldDef` does not yet declare `deaths` or `endings` —
+// those land in a later task. `exits` (task 11), `events`/`topics` (tasks
+// 13-14), and `puzzles` (task 16, including §4.3.4's clock-free-solution
+// rule) are now declared and checked below (`checkRoomExits`/
+// `checkWitnessedEvents`+`checkNpcConversation`/`checkPuzzles`). When a
+// later task adds `deaths`/`endings` to `WorldDef`, it must extend this
 // file with the matching rule at the same time, the same way this file's
-// own rules were added alongside task 6's schema slice.
+// own rules were added alongside each earlier task's schema slice.
 //
 // Every rule below returns findings rather than throwing, and `validate`
 // collects ALL of them in one pass (§8 task 7's own instruction: "return
@@ -21,7 +19,7 @@
 
 import type { Cond } from './cond';
 import type { Effect } from './effects';
-import type { ClueId, DayPhase, FlagId, MemoryId, NpcId, ObjectId, PlaceId, QuestionId, RoomId, VerbId } from './ids';
+import type { ClueId, DayPhase, FlagId, MemoryId, NpcId, ObjectId, PlaceId, PuzzleId, QuestionId, RoomId, VerbId } from './ids';
 import { compileVocabulary } from './parser/vocabulary';
 import { NOISE_WORDS } from './parser/tokenize';
 import type { Prose, ProseRef, ProseRule } from './prose';
@@ -54,6 +52,7 @@ export function validate(world: WorldDef): Finding[] {
   checkWitnessedEvents(world, findings);
   checkKnowledgeConds(world, findings);
   checkClueQuestionRefs(world, findings);
+  checkPuzzles(world, findings);
 
   return findings;
 }
@@ -764,5 +763,54 @@ function checkClueQuestionRefs(world: WorldDef, findings: Finding[]): void {
     (def!.questions ?? []).forEach((qid, i) => {
       checkQuestionRef(world, qid, `clue.${id}.questions[${i}]`, findings);
     });
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Puzzles (§2.7, §8 task 16): referential integrity for `solvedWhen`/
+// `question`/`onSolved`/`solutions[*].route`, plus §4.3.4's clock-free-
+// solution rule — "the single most important rule in the validator"
+// (task 16's own brief). Constitution §10 ("never secretly doom the
+// player") made mechanical: every `PuzzleDef` must have at least one
+// `solutions` entry whose `route` (task 16's chosen shape — see
+// `PuzzleSolution` in `world.ts`) carries no `clock`/`clockPhase`/
+// `weekday` term, or an explicit `missedRecovery` naming the recovery
+// path. A `solutions` entry with no `route` at all reads as trivially
+// clock-free (nothing in it to flag) — see `world.ts`'s doc comment on
+// `PuzzleSolution.route` for why that's the deliberate, safe default.
+// ---------------------------------------------------------------------------
+
+/** Whether `route` (or any nested leaf of it) mentions the clock — §4.3.4's disqualifying terms. */
+function routeMentionsClock(route: Cond): boolean {
+  let found = false;
+  walkCond(route, (leaf) => {
+    if ('clock' in leaf || 'clockPhase' in leaf || 'weekday' in leaf) found = true;
+  });
+  return found;
+}
+
+function checkPuzzles(world: WorldDef, findings: Finding[]): void {
+  for (const [rawId, def] of Object.entries(world.puzzles ?? {})) {
+    const id = rawId as PuzzleId;
+    const path = `puzzle.${id}`;
+
+    checkCondRefs(world, def!.solvedWhen, `${path}.solvedWhen`, findings);
+    if (def!.question !== undefined) checkQuestionRef(world, def!.question, `${path}.question`, findings);
+    if (def!.onSolved !== undefined) checkPlotCriticalStrand(world, def!.onSolved, `${path}.onSolved`, findings);
+
+    def!.solutions.forEach((solution, i) => {
+      if (solution.route !== undefined) checkCondRefs(world, solution.route, `${path}.solutions[${i}].route`, findings);
+    });
+
+    if (def!.missedRecovery !== undefined) continue; // recovery path named — the rule is satisfied regardless of routes
+    const hasClockFreeRoute = def!.solutions.some((s) => s.route === undefined || !routeMentionsClock(s.route));
+    if (!hasClockFreeRoute) {
+      findings.push(
+        error(
+          'puzzle-no-clock-free-solution',
+          `${path} has no "solutions" entry whose route is free of clock/clockPhase/weekday terms, and declares no missedRecovery — a missed timed window would silently doom the player (§4.3.4/constitution §10)`,
+        ),
+      );
+    }
   }
 }
