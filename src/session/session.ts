@@ -16,7 +16,8 @@ import { initialState } from '../engine/world';
 import type { GameEvent, GameState, WorldDef } from '../engine/world';
 import type { SaveStore } from './store';
 import type { HistoryEntry, SaveFile } from './savefile';
-import { SAVE_VERSION, appendHistory, deserializeSave, serializeSave } from './savefile';
+import { SAVE_VERSION, appendHistory, serializeSave } from './savefile';
+import { migrateSaveFile } from './migrate';
 
 /** §5.5: "an in-memory ring of the last 15 pre-action states." */
 export const UNDO_RING_SIZE = 15;
@@ -78,7 +79,7 @@ export function save(session: SessionState, opts: PersistOptions & { slot: strin
 export function load(store: SaveStore, slot: string): SessionState | undefined {
   const raw = store.get(slot);
   if (raw === undefined) return undefined;
-  return fromSaveFile(deserializeSave(raw));
+  return fromSaveFile(migrateSaveFile(raw));
 }
 
 /** `SAVES` (§5.3): the player's own named saves — `auto`/`undo`/`checkpoint` are bookkeeping, never listed. */
@@ -93,7 +94,7 @@ export function exportSave(session: SessionState, opts: { gameVersion: string; n
 
 /** `IMPORT` (§5.3): the inverse of `exportSave` — reseeds the ring, same as `load`. */
 export function importSave(json: string): SessionState {
-  return fromSaveFile(deserializeSave(json));
+  return fromSaveFile(migrateSaveFile(json));
 }
 
 /** `RESTART` (§5.3, §5.5): a fresh playthrough. Cheap by construction — no store access, nothing to undo back from. */
@@ -122,7 +123,7 @@ export function undo(session: SessionState, store: SaveStore): SessionState {
   }
   const raw = store.get('undo');
   if (raw === undefined) return session; // nothing to undo — no-op
-  return { ...session, state: deserializeSave(raw).state };
+  return { ...session, state: migrateSaveFile(raw).state };
 }
 
 export type DeathOption = 'undo' | 'restartEncounter' | 'restart';

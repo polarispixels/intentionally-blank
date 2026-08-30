@@ -12,6 +12,42 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.2.28] - 2026-08-30
+
+### Added
+
+- **Architecture task 19: migrations and durability.**
+  `src/session/migrate.ts` and `tests/fixtures/saves/`. 27 new tests; 685
+  green. Every load path — `LOAD`, `IMPORT`, and even an `auto` or `undo`
+  slot left behind by an older build — now runs through the chain.
+- The chain is empty today, because content growth needs no migration. The
+  work was making *adding version 2 during Act III* a small, obviously
+  correct change instead of a scramble against saves already sitting in
+  players' browsers: bump the shape, push one entry, add its fixture, run
+  the tests.
+- **A forgotten fixture fails loudly.** The test enumerates the fixture
+  directory rather than listing files, and asserts a save exists for every
+  version through the current one — so a version bump with no fixture fails
+  an assertion instead of quietly not being tested. ADR 0009 calls a
+  migration without its fixture a blocking review finding; this is what
+  makes that mechanical.
+- The renames table, since content ids are effectively append-only. It
+  validates that a rename's target actually exists and rejects no-ops, and
+  the runtime half substitutes ids across every part of state that holds
+  one, including the parser's pronoun antecedents.
+- **The replay invariant**: on unchanged content, replaying history from
+  the initial state reproduces the save exactly. Tested three ways — the
+  bit-for-bit happy path, the documented void case on a truncated save, and
+  the case that proves it is a *diagnostic rather than a recovery path*, in
+  which a legitimate content change diverges on purpose.
+
+### Notes
+
+This module's failure mode is not a crash. It is a player's eight-hour
+playthrough quietly becoming unloadable, which is the worst bug this
+project could ship — which is why the machinery exists before there is
+anything to migrate.
+
 ## [0.2.27] - 2026-08-30
 
 The engine is a playable loop for the first time.
