@@ -250,6 +250,12 @@ main session's own creative judgment, without waiting for input.
   builder's work is committed deliberately as part of that release. Check
   `git status` before staging; the cost of the habit is one command and
   the cost of skipping it is a changelog that lies.
+- **Release scripts run under `set -e`, and bookkeeping is chained to the
+  commit, not merely adjacent to it.** In v0.2.25 the version bump and
+  changelog edit sat on a line above `npm test && git commit`; the edit
+  failed an assertion, the commit ran anyway, and a tag was cut on a
+  release whose files still carried the previous version. A newline is not
+  a dependency. Either chain every step with `&&` or start with `set -e`.
 
 ## Browser verification on WSL
 

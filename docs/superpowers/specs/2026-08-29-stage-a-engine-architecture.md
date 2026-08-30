@@ -1340,6 +1340,17 @@ green + `npm test` green.
     history ceiling + `historyTruncated`, prompt round-trip
     (`prompt` event → `respondToPrompt` with `values` → script), death menu
     flow. Also adds `src/session/` to the purity scan (task 1 residual).
+
+    **Also settles how many turns an `ALL`/`AND` command consumes**, and
+    with it the profile tally. `respond` returns one `ActionClass` per
+    call, but `TAKE ALL` expands to several actions each carrying their
+    own class; task 16 returns the last as a stopgap and flagged it. One
+    typed command is probably one player decision and therefore one turn
+    and one tally — but that is a Session call about turn consumption, so
+    decide it deliberately rather than inheriting the stopgap. The profile
+    must stay honest either way: it is read back to the player in Act IV as
+    evidence the system has been scoring them, and an inflated count would
+    be a lie the game tells about itself.
 19. **Migrations + durability.** `src/session/migrate.ts`;
     `tests/migrate.test.ts`: fixture-save chain, renames table, replay
     invariant (history replay reproduces state bit-for-bit on same

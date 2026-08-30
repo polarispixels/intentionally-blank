@@ -12,6 +12,53 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.2.25] - 2026-08-30
+
+Both outstanding debts from earlier tasks are paid.
+
+> **Release note:** the `v0.2.25` tag was first cut on a commit that
+> carried the task-16 code but not its version bump or this entry — a
+> release script put the bookkeeping on a separate line from the
+> `test && commit` chain, so a failed assertion did not stop the commit.
+> The tag was moved to the completed release. The staging discipline in
+> `docs/DEVELOPMENT.md` now also requires `set -e`.
+
+### Added
+
+- **Architecture task 16: puzzles, the behavioral profile, and hints.**
+  `src/engine/puzzles.ts` and the hints slice of `src/engine/views.ts`,
+  filling the last two tick stubs. 40 new tests; 609 green.
+- `solvedWhen` stays derived — never a stored boolean. The once-only
+  `onSolved` edge reuses the same `firedEvents` array world events already
+  use, so it survives a save round-trip without a parallel flag.
+  Multi-route convergence needs no machinery: three routes to one puzzle
+  each fire `onSolved` exactly once, tested.
+- **The clock-free-solution rule is finally real** (§4.3.4, constitution
+  §10). Every puzzle must keep at least one solution route with no time
+  term in it, or name an explicit `missedRecovery`. Unwritten since task 7
+  because the data did not exist. Across 28 puzzles this is the difference
+  between "never secretly doom the player" being a promise and being a
+  property. `PuzzleSolution` gains an optional `route: Cond` so a route has
+  something checkable — the spec's `{id, class, note}` carried no condition.
+- **The behavioral profile now counts.** The class tag was discarded in
+  `respond.ts`'s wrappers, and `npc.ts` never carried one. Attempting a
+  topic counts as social even when the topic misses — trying to talk to
+  someone *is* the play style. Meta verbs never tally; checking the map is
+  not a way of playing.
+
+  This is what Act IV reads back to the player. It only lands as *the
+  system has been scoring you since turn one* if the count is honest from
+  turn one.
+- Hints: `HINT` lists open questions with an available ladder, `HINT <n>`
+  reveals the next level and records it in state. Only ever on explicit
+  request — never volunteered, never triggered by the game deciding the
+  player looks stuck (constitution §21).
+
+### Notes
+
+Task 18 owes a decision on how many turns an `ALL`/`AND` command consumes,
+and therefore how it tallies.
+
 ## [0.2.24] - 2026-08-30
 
 ### Added
