@@ -13,6 +13,7 @@
 import type {
   ActionClass,
   ClueId,
+  DayPhase,
   FlagId,
   FlagValue,
   MemoryId,
@@ -23,8 +24,21 @@ import type {
   RoomId,
 } from './ids';
 
+/**
+ * The day/week scheduling surface (canon A9). `phases` gives the start
+ * minute of each of the four `DayPhase`s; `weekLength` is the number of
+ * days in a week (`weekday = (day - 1) % weekLength`, 0-based). Consumed by
+ * `clock.ts`'s `phase()`/`weekday()` — see that module for the resolution
+ * rules (wraparound, duplicate-boundary rejection).
+ */
+export interface WorldMeta {
+  phases: Record<DayPhase, number>;
+  weekLength: number;
+}
+
 /** Narrow slice of §2.1's `WorldDef` — just what `cond.ts` reads today. */
 export interface WorldDef {
+  meta: WorldMeta;
   flags: Record<FlagId, { default: FlagValue; doc: string }>;
 }
 

@@ -25,6 +25,12 @@ export const FLAG_BOOL = F('fixture_flag_bool');
 export const FLAG_NUM = F('fixture_flag_num');
 
 export const FIXTURE_WORLD: WorldDef = {
+  meta: {
+    // morning 06:00, afternoon 12:00, evening 18:00, night 22:00 — night
+    // wraps past midnight and covers 22:00..05:59.
+    phases: { morning: 360, afternoon: 720, evening: 1080, night: 1320 },
+    weekLength: 7,
+  },
   flags: {
     [FLAG_BOOL]: { default: false, doc: 'fixture boolean flag, defaults off' },
     [FLAG_NUM]: { default: 2, doc: 'fixture numeric flag, defaults to 2' },

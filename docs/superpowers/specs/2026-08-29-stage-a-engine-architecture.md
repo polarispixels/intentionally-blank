@@ -60,6 +60,7 @@ src/engine/
   world.ts         scope, visibility, light, movement, resolution helpers
   actions.ts       built-in verb semantics (take/drop/open/…)
   respond.ts       the §14 response ladder
+  clock.ts         phase()/weekday() — leaf; imported by cond and tick
   tick.ts          clock, schedules, world events, triggers, puzzles
   npc.ts           topics, ASK/TELL/SHOW
   knowledge.ts     memories, clues, questions
@@ -888,10 +889,16 @@ coverage mechanism (ADR 0004's consequence).
   scripted effects can add more (`advanceClock`). Meta verbs (SAVE, MAP,
   HINT, VERSION…) cost nothing.
 - **The authored surface of time is the 4-phase day** (canon A9), derived
-  from the minute clock — phases do not replace it. `tick.ts` exports
-  `phase(meta, clock): DayPhase` (boundaries from `meta.phases`) and
-  `weekday(meta, clock): number` (`(day - 1) % weekLength`); the
-  `clockPhase` and `weekday` Cond arms evaluate through them. Schedules,
+  from the minute clock — phases do not replace it. **`clock.ts`** — a leaf
+  module importing only `ids.ts` and the `Clock`/`WorldMeta` types —
+  exports `phase(meta, clock): DayPhase` (boundaries from `meta.phases`)
+  and `weekday(meta, clock): number` (`(day - 1) % weekLength`); the
+  `clockPhase` and `weekday` Cond arms evaluate through them. These were
+  originally filed under `tick.ts`, which is a cycle: `tick` imports
+  `evaluate` from `cond`, so `cond` cannot import back from `tick`. They
+  depend on nothing in `tick` and belong in a leaf both can import.
+  Night's window wraps past midnight — its start minute is larger than its
+  end — which is the boundary case to test first. Schedules,
   weekly windows (poker night, trash day, deliveries), and nightly
   maintenance are written in phases and weekdays; the raw minute `clock`
   arm stays for the rare precise beat. Hard story events are

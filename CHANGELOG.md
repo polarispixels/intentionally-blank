@@ -12,11 +12,54 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.2.10] - 2026-08-29
+
+First code of engine v2. Nothing imports it yet — the deployed game is
+still the MVP engine, unchanged (architecture §7 step 2).
+
+### Added
+
+- **Architecture task 3: ids and conditions.** `src/engine/ids.ts`
+  (branded id types so a `RoomId` can never be passed where an `ObjectId`
+  belongs, plus `samePlace` for the mixed-form `PlaceId`),
+  `src/engine/cond.ts` (the full `Cond` union with `evaluate`, and the
+  `flag`/`questionStatus` resolvers that are the only sanctioned way to
+  read the sparse overlays), `src/engine/clock.ts`, and the shared
+  story-free fixture world. 47 new tests.
+- `src/engine/clock.ts` — `phase()` and `weekday()`. Phase windows are
+  half-open and sorted by start minute, so the phase with the latest start
+  is by construction the one that wraps past midnight: no special-casing of
+  "night" by name, proved by a scrambled-key-order test. Throws on a
+  duplicate start minute, an empty phase table, or a non-positive week
+  length rather than silently picking a winner by object key order.
+
+### Changed
+
+- `phase()` and `weekday()` moved out of `tick.ts` in the architecture
+  spec. `tick` imports `evaluate` from `cond`, so `cond` importing back for
+  the `clockPhase` arm would have closed a cycle; they depend on nothing in
+  `tick` and now live in a leaf module both import. Caught by the builder,
+  which correctly escalated rather than guessing at a module boundary.
+- `docs/DEVELOPMENT.md` — release commits during the build stage explicit
+  paths. `git add -A` while a builder holds uncommitted work sweeps a
+  half-finished task into someone else's release, which is what happened in
+  v0.2.9. That entry now carries a correction.
+
 ## [0.2.9] - 2026-08-29
 
 **Stage A is complete.** The whole game now exists on paper: five acts, 41
-rooms, 28 puzzles, and the engine they run on. Docs-only — no engine code
-has changed yet. Stage B starts implementation.
+rooms, 28 puzzles, and the engine they run on. Stage B starts
+implementation.
+
+> **Correction (added in 0.2.10):** this entry originally said "docs-only —
+> no engine code has changed yet." That was wrong. The release commit ran
+> `git add -A` while a builder had task 3 in progress, so
+> `src/engine/ids.ts`, `src/engine/world.ts`, and `tests/fixtures/world.ts`
+> shipped inside it. Nothing was broken and no released behavior changed —
+> nothing imports those files yet — but the entry misdescribed the release.
+> The tag stands; the record is corrected here rather than by rewriting
+> published history. The staging rule that prevents a repeat is now in
+> `docs/DEVELOPMENT.md`.
 
 ### Added
 

@@ -16,6 +16,7 @@ export type TopicId = string & { __topic: true };
 
 export type FlagValue = boolean | number | string;
 export type ActionClass = 'analytical' | 'social' | 'direct';
+export type DayPhase = 'morning' | 'afternoon' | 'evening' | 'night';
 
 /** Where a thing can be (spec §1.2). */
 export type PlaceId =

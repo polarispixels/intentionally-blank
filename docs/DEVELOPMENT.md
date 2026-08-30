@@ -241,6 +241,15 @@ main session's own creative judgment, without waiting for input.
   replay content, polish → 1.0.0.
 - **Process weight** follows the calibration table above: full ceremony for
   stage A and engine work; light paths for rooms, puzzles, and prose.
+- **Stage releases stage explicit paths.** During the build the main
+  session releases while builder subagents have uncommitted work in the
+  same tree. `git add -A` in that window sweeps a half-finished task into
+  someone else's release — it happened in v0.2.9, which claims to be
+  docs-only and in fact carries three engine files from task 3. Release
+  commits name their paths (`git add docs/ CHANGELOG.md …`), or the
+  builder's work is committed deliberately as part of that release. Check
+  `git status` before staging; the cost of the habit is one command and
+  the cost of skipping it is a changelog that lies.
 
 ## Browser verification on WSL
 
