@@ -12,6 +12,18 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.2.5] - 2026-08-29
+
+### Changed
+
+- **Siblings are named** (Ryan): I Jules, II Luke, III Eli, IV Jack, V
+  Sissy. `docs/spec/03-characters-and-relationships.md` gains a birth-order
+  table, the tattoo block now carries names, and §4/§9/§10 are retitled.
+- Jules (sibling I) is now canonically the missing facilities supervisor,
+  by elimination from the other four siblings' canon 2047 occupations.
+- Both decisions registered in `docs/spec/09-canon-decisions.md` (entries
+  1 and 2) under the full-game build protocol.
+
 ## [0.2.4] - 2026-08-29
 
 ### Added

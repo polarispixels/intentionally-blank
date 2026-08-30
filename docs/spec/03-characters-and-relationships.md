@@ -1,6 +1,6 @@
 # 03 - Characters and Relationships
 
-**Spec version:** `0.1.0`
+**Spec version:** `0.2.5`
 
 # 1. The Protagonist
 
@@ -70,22 +70,33 @@ Do not decide too early.
 
 ## CANON
 
-The family consists of five siblings:
+The family consists of five siblings: four brothers and one younger sister.
+In birth order:
 
-- four brothers
-- one younger sister
+| Numeral | Name | Role by 2047 |
+|---|---|---|
+| I | **Jules** | facilities supervisor at the Badlands data center — the missing sibling |
+| II | **Luke** | 51st President of the United States |
+| III | **Eli** | energy advisor; crochet and origami master |
+| IV | **Jack** | monster-truck driver |
+| V | **Sissy** | astronaut, living on Mars |
 
 Each sibling has a Roman numeral tattoo based on birth order:
 
 ```text
-I
-II
-III
-IV
-V
+I    Jules
+II   Luke
+III  Eli
+IV   Jack
+V    Sissy
 ```
 
 This is a family inside joke and a major analog identity device.
+
+Note the name-shaped joke sitting under the tattoos: four of the five names
+are ordinary and one is a placeholder that stuck. "Sissy" is what four older
+brothers called the baby, and it outlasted whatever was on the certificate.
+The game should not explain this either.
 
 ## Narrative Function of the Tattoos
 
@@ -116,13 +127,14 @@ This supports the theme:
 
 ---
 
-# 4. The Missing Facilities Supervisor
+# 4. Jules - Sibling I - The Missing Facilities Supervisor
 
 ## CANON
 
-One sibling worked as facilities supervisor at the Badlands data center.
+Jules, the oldest sibling, worked as facilities supervisor at the Badlands
+data center. Jules is the sibling who disappeared.
 
-Before disappearing, this person:
+Before disappearing, Jules:
 
 - began behaving differently
 - became secretive
@@ -137,7 +149,7 @@ The character should not be a simple innocent victim.
 
 ## WORKING DIRECTION
 
-The missing sibling may simultaneously have:
+Jules may simultaneously have:
 
 - loved the family
 - lied repeatedly
@@ -308,11 +320,11 @@ The contrast between major energy responsibility and sleepy demeanor is useful c
 
 ---
 
-# 9. Sibling IV
+# 9. Jack - Sibling IV
 
 ## CANON
 
-The fourth-oldest sibling is a monster-truck driver.
+Jack, the fourth-oldest sibling, is a monster-truck driver.
 
 Potential uses:
 
@@ -327,11 +339,11 @@ A monster-truck solution should sometimes be a legitimate solution.
 
 ---
 
-# 10. Sibling V
+# 10. Sissy - Sibling V
 
 ## CANON
 
-The youngest sibling is a girl.
+Sissy is the youngest sibling and the only sister.
 
 By 2047:
 
@@ -385,8 +397,8 @@ Examples:
 | Luke's vocabulary | humor, clues, wordplay |
 | Eli's energy role | data-center and reactor analysis |
 | Eli's origami | physical puzzle solving |
-| IV's monster trucks | traversal and direct-action paths |
-| V on Mars | off-world mystery bridge |
+| Jack's monster trucks | traversal and direct-action paths |
+| Sissy on Mars | off-world mystery bridge |
 | Dad's poker skill | alternate route through adversary |
 | Dad's Catan skill | resource-trading puzzle |
 | Family escape-room skill | team puzzle sequence |
