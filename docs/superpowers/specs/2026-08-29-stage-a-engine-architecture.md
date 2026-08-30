@@ -1206,6 +1206,16 @@ green + `npm test` green.
 8. **Built-in actions.** `src/engine/actions.ts`; `tests/actions.test.ts`:
    take/drop/open/close/lock/unlock/put in/put on/wear/read/turn on-off
    semantics, handler-overrides-builtin, `consumesTurn`.
+
+   **Also owes two `validate` rules** (task 7 could not write them — the
+   data did not exist yet, and a code comment will not survive a dozen
+   tasks). This task adds `WorldDef.verbs` and `HandlerDef`, so it adds in
+   the same change: (a) **every non-meta verb has a non-null `default`
+   prose family** (§2.9) — this is what makes response-ladder rung 2
+   possible at all, and without it the game says "I don't understand" for
+   any verb–object pair nobody hand-authored; (b) **no authored effect
+   strands a `plotCritical` object** in `'nowhere'` or `{ npc: … }` (§2.5)
+   — task 5's runtime `move()` guard covers scripts, this covers data.
 9. **Parser: tokenizer + grammar + vocabulary compiler.**
    `src/engine/parser/`; `tests/parser-grammar.test.ts`: multi-word verbs,
    patterns, prepositions/instruments, noise words, collision report.
@@ -1237,6 +1247,16 @@ green + `npm test` green.
     `src/engine/views.ts` (hints part); `tests/puzzles.test.ts`:
     solvedWhen edge-trigger, multi-route convergence, class tallies,
     hint-ladder consumption.
+
+    **Also owes the clock-free-solution `validate` rule** (§4.3.4), which
+    task 7 could not write because `WorldDef.puzzles` did not exist. This
+    task introduces it, so it adds the rule in the same change: every
+    `PuzzleDef` must have at least one `solutions` entry whose route
+    carries no `clock` / `clockPhase` / `weekday` term, **or** an explicit
+    `missedRecovery` string naming the recovery path. This is constitution
+    §10 — never secretly doom the player — made mechanical. It is the
+    single most important rule in the validator and it is currently
+    unwritten; do not close this task without it.
 17. **Views.** rest of `src/engine/views.ts`; `tests/views.test.ts`: map
     hides unvisited names, `????` stubs, questions/notebook/memories
     reflect state only.

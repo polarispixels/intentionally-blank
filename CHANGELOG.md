@@ -12,6 +12,44 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.2.14] - 2026-08-30
+
+### Added
+
+- **Architecture task 7: world validation.** `src/engine/validate.ts` — 16
+  rule codes covering referential integrity (exits, locations, flags,
+  memories, clues, questions, prop targets), prose health (unknown or
+  cyclic `ProseRef`, empty rotation arrays, a rule list whose last rule is
+  conditional and so can produce no text), schedule cycles, and question
+  phrasing. 25 new tests; 290 green.
+
+  The point of this module is that authoring mistakes fail `npm test`
+  rather than a play session three hours in. Across 41 rooms that is the
+  difference between a ten-second red test and a player hitting a dead end.
+- Findings are returned as a list with stable codes rather than throwing on
+  the first, because an author fixing content wants the whole list.
+- The `dark`-cond-references-a-light-source check is a **warning**, not an
+  error — §2.4 calls it a smell, and inventing an error there would have
+  been dodging a judgment call.
+
+### Changed
+
+- **Three validator rules pinned to the tasks that introduce their data.**
+  Task 7 could not write them because `WorldDef` has no `verbs`, `puzzles`,
+  or `handlers` yet. They are now explicit acceptance criteria on tasks 8
+  and 16 in the architecture spec, not a code comment hoping to survive a
+  dozen tasks: per-verb default prose families and the plot-critical
+  stranding rule land with task 8; the clock-free-solution rule — the one
+  that mechanically enforces "never secretly doom the player" — lands with
+  task 16 and that task cannot close without it.
+
+### Notes
+
+The schedule-cycle rule bans `npcAt` anywhere in a schedule condition
+rather than detecting true cross-NPC cycles. That is a strict superset of
+what is unsafe, deliberately: real cycle detection is graph analysis, and
+no legitimate schedule needs to ask where another NPC is standing.
+
 ## [0.2.13] - 2026-08-29
 
 ### Added
