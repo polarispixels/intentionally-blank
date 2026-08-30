@@ -122,8 +122,26 @@ const yourDoorOutside: ObjectDefSlice = {
   // the Landing, so this is unambiguous in play) — the obvious phrasing
   // for "go back to my room" now lands on this door, same as "door".
   nouns: ['door', 'keyhole', 'room'],
+  // Walking-dead bug fix (priority insert, Ryan's playtest): this object
+  // used to have no `container` at all, so `builtinOpen` refused every
+  // `OPEN DOOR` from the Landing with `open.notContainer` ("no lid, no
+  // door, no seam to argue with") — CLOSE (below) could set the exit's
+  // `open` overlay false, and nothing could ever set it back true, a
+  // permanent lockout out of `your_room` (constitution §10). `door.ts`'s
+  // own `DOOR` object is the model: a real `container`, so it's genuinely
+  // openable in its own right.
+  container: { open: false },
   handlers: [
     { verbs: [EXAMINE], effects: [{ say: doorOutsideExamine }] },
+    {
+      // The mirror of `door.ts`'s own OPEN handler: mechanically trivial
+      // from this side (§16 Rule 2 — "it comes open to a hand"), so this
+      // reuses the shared `open.success` family (the same "use
+      // open.success" precedent `door.ts`'s own header names) rather than
+      // staging new prose for a push that needs none.
+      verbs: [OPEN],
+      effects: [{ say: { ref: 'open.success' } }, { setState: [YOUR_DOOR_OUTSIDE, 'open', true] }, { setState: [DOOR, 'open', true] }],
+    },
     {
       verbs: [LOCK, CLOSE],
       effects: [

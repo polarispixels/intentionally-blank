@@ -334,6 +334,16 @@ function tryAnswer(vocab: CompiledVocabulary, candidates: (ObjectId | NpcId)[], 
   return { kind: 'ambiguous', candidates: matches };
 }
 
+/**
+ * `reask`'s question text is deliberately NOT the same sentence as the
+ * first ask (review fix, after Ryan's "which do you mean, the rack or the
+ * key?" loop): a plain word answer already failed to distinguish these
+ * candidates once, so repeating the identical phrasing offers no new way
+ * to answer. The re-ask instead numbers the options and asks for a number
+ * — `tryOrdinalAnswer` already accepts "1"/"first"/etc. — which is always
+ * answerable even when every candidate shares every word a player might
+ * type (the key-rack/room-key case: both are bare-noun "key").
+ */
 function buildClarify(
   vocab: CompiledVocabulary,
   verb: VerbId,
@@ -344,9 +354,12 @@ function buildClarify(
   deferredIobj?: UnresolvedNounPhrase,
 ): InterpretOutcome & { kind: 'clarify' } {
   const names = candidates.map((id) => candidateName(vocab, id));
+  const question = reask
+    ? `Which do you mean — ${names.map((n, i) => `${i + 1}) the ${n}`).join(', ')}? Say the number.`
+    : `Which do you mean, ${joinWithOr(names.map((n) => `the ${n}`))}?`;
   return {
     kind: 'clarify',
-    question: `Which do you mean, ${joinWithOr(names.map((n) => `the ${n}`))}?`,
+    question,
     options: names,
     pending: {
       verb,
@@ -357,6 +370,30 @@ function buildClarify(
       ...(deferredIobj !== undefined ? { deferredIobj } : {}),
     },
   };
+}
+
+/**
+ * True when `pending` was already asking about exactly this ambiguity —
+ * same verb, same slot, same candidate set (order-independent) — so a
+ * repeat is a continuation of the same unresolved question, not a new one.
+ * Deliberately blind to *how* the repeat arrived: whether the player typed
+ * a bare answer again or retyped the whole command (`pick up the key`
+ * after `take key`), both land here the same way — the fresh-reformulation
+ * path was the actual gap in Ryan's report (a literal repeated answer
+ * already escalated `reask`; a retyped command reset it to a fresh
+ * first-ask every time, so the loop had no exit as long as the player kept
+ * rephrasing instead of answering bare).
+ */
+function sameAmbiguity(
+  pending: ParserContext['pending'],
+  verb: VerbId,
+  slot: 'dobj' | 'iobj',
+  candidates: (ObjectId | NpcId)[],
+): boolean {
+  if (pending === undefined || pending.verb !== verb || pending.slot !== slot) return false;
+  if (pending.candidates.length !== candidates.length) return false;
+  const priorSet = new Set(pending.candidates);
+  return candidates.every((id) => priorSet.has(id));
 }
 
 // ---------------------------------------------------------------------------
@@ -414,12 +451,7 @@ export class DeterministicParser implements IntentInterpreter {
         return this.finalizePending(view, pending, answer.id);
       }
       if (answer.kind === 'ambiguous') {
-        if (pending.reask === true) {
-          // Never nests: a second ambiguous answer in a row gives up
-          // gracefully — drop the question and parse this input fresh.
-          return this.parseFresh(input, view, tokens);
-        }
-        return buildClarify(view.vocabulary, pending.verb, pending.slot, answer.candidates, pending.partial, true);
+        return this.disambiguate(view, pending.verb, pending.slot, answer.candidates, pending.partial, pending.deferredIobj);
       }
       // Not an answer at all: the pending question is silently dropped and
       // this input is parsed as a fresh command (§3.3).
@@ -427,6 +459,51 @@ export class DeterministicParser implements IntentInterpreter {
     }
 
     return this.parseFresh(input, view, tokens);
+  }
+
+  /**
+   * Turns a freshly-ranked ambiguous candidate pool into this turn's
+   * outcome, checking it against whatever question `view.parser.pending`
+   * left outstanding from the previous turn (§3.3, generalized in review
+   * after Ryan's "which do you mean, the rack or the key?" loop — the key
+   * rack and the room key both carried the bare noun "key," so no word
+   * the player typed could ever tell them apart, and asking again and
+   * again never got anywhere). `sameAmbiguity` recognizes a repeat
+   * regardless of whether this turn's input was a literal answer to
+   * `pending` or a completely retyped command that happened to resolve to
+   * the identical ambiguity — both are the same unresolved question:
+   *  - not the same ambiguity (or nothing was pending) → first ask,
+   *    ordinary wording.
+   *  - the same ambiguity, asked once before (`pending.reask` not yet
+   *    set) → re-ask, but numbered (`buildClarify`'s `reask` wording) so
+   *    an ordinal answer is always a way out even when no word
+   *    distinguishes the candidates.
+   *  - the same ambiguity a third time → there is no further exit through
+   *    asking. This is a content bug (two objects sharing a bare noun
+   *    with no distinguishing adjective — `validate`'s new noun-collision
+   *    warning flags exactly this), and the player must not be the one
+   *    trapped by it: give up and resolve to the first candidate, via the
+   *    same `finalizePending` continuation an ordinary answer would use
+   *    (so a deferred iobj still gets resolved for real, never guessed).
+   */
+  private disambiguate(
+    view: ScopeView,
+    verb: VerbId,
+    slot: 'dobj' | 'iobj',
+    candidates: (ObjectId | NpcId)[],
+    partial: Partial<StructuredAction>,
+    deferredIobj?: UnresolvedNounPhrase,
+  ): InterpretOutcome {
+    const priorPending = view.parser.pending;
+    const repeat = sameAmbiguity(priorPending, verb, slot, candidates);
+    if (repeat && priorPending!.reask === true) {
+      return this.finalizePending(
+        view,
+        { verb, slot, candidates, partial, ...(deferredIobj !== undefined ? { deferredIobj } : {}) },
+        candidates[0]!,
+      );
+    }
+    return buildClarify(view.vocabulary, verb, slot, candidates, partial, repeat, deferredIobj);
   }
 
   /**
@@ -555,7 +632,7 @@ export class DeterministicParser implements IntentInterpreter {
       if (result.kind === 'none') return miss(action.verb);
       const topic = action.topic !== undefined ? { topic: action.topic } : {};
       if (result.kind === 'ambiguous') {
-        return buildClarify(view.vocabulary, action.verb, 'dobj', result.candidates, { verb: action.verb, ...topic, raw: action.raw }, false);
+        return this.disambiguate(view, action.verb, 'dobj', result.candidates, { verb: action.verb, ...topic, raw: action.raw });
       }
       return { kind: 'actions', actions: [{ verb: action.verb, dobj: result.id, ...topic, raw: action.raw }] };
     }
@@ -572,7 +649,7 @@ export class DeterministicParser implements IntentInterpreter {
 
     if (action.iobj === undefined) {
       if (dobjResult.kind === 'ambiguous') {
-        return buildClarify(view.vocabulary, action.verb, 'dobj', dobjResult.candidates, { verb: action.verb, raw: action.raw }, false);
+        return this.disambiguate(view, action.verb, 'dobj', dobjResult.candidates, { verb: action.verb, raw: action.raw });
       }
       return { kind: 'actions', actions: [{ verb: action.verb, dobj: dobjResult.id, raw: action.raw }] };
     }
@@ -587,15 +664,7 @@ export class DeterministicParser implements IntentInterpreter {
     // iobj rather than guessing.
     const prep = action.prep !== undefined ? { prep: action.prep } : {};
     if (dobjResult.kind === 'ambiguous') {
-      return buildClarify(
-        view.vocabulary,
-        action.verb,
-        'dobj',
-        dobjResult.candidates,
-        { verb: action.verb, ...prep, raw: action.raw },
-        false,
-        action.iobj,
-      );
+      return this.disambiguate(view, action.verb, 'dobj', dobjResult.candidates, { verb: action.verb, ...prep, raw: action.raw }, action.iobj);
     }
 
     return this.resolveIobj(view, action.verb, action.iobj, { verb: action.verb, dobj: dobjResult.id, ...prep, raw: action.raw });
@@ -608,7 +677,7 @@ export class DeterministicParser implements IntentInterpreter {
       return { kind: 'miss', raw: settled.raw ?? '', verb, knownNouns: knownNounsIn(view.vocabulary, iobjPhrase.words), reason: 'nounUnresolved' };
     }
     if (iobjResult.kind === 'ambiguous') {
-      return buildClarify(view.vocabulary, verb, 'iobj', iobjResult.candidates, settled, false);
+      return this.disambiguate(view, verb, 'iobj', iobjResult.candidates, settled);
     }
     return { kind: 'actions', actions: [{ ...settled, iobj: iobjResult.id } as StructuredAction] };
   }

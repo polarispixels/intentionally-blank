@@ -12,6 +12,35 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.5.0] - 2026-09-02
+
+### Added
+
+- **Main Street** — the first exterior. Night, brick, three horses at a
+  rail, a billboard lit by a glow on the horizon that isn't dawn, and a man
+  four buildings down on a stepladder with a lamp cover in his hand. Seven
+  objects. The year stays unavailable by absence: no vehicle at the kerb,
+  none moving, none anywhere.
+- Canon 27: the horses don't shy from the investigator — one leans its
+  weight into a hand you hadn't offered. Uninterpretable until much later.
+
+### Fixed
+
+- **You could lock yourself out of your own room permanently.** The
+  landing-side door could be closed but was never declared openable, so
+  `OPEN DOOR` refused it while the exit reported the way shut. A
+  walking-dead state (constitution §10), and mine: I added closing without
+  adding opening.
+- **Disambiguation could be unwinnable.** The key rack and the room key both
+  claimed the bare noun `key`, so "the rack or the key?" had no valid
+  answer and re-asked forever.
+- The street door couldn't be opened by name, making Main Street reachable
+  only by guessing `OPEN ENTRANCE`.
+- Marlow's key now lands on the counter, where his line says he puts it,
+  instead of teleporting into the player's pocket.
+- `validate` gains noun-collision and unopenable-door-on-an-exit rules, so
+  the remaining 27 rooms can't ship either class again.
+
 ## [0.4.1] - 2026-09-01
 
 Ryan got stuck talking to Marlow. Nothing was broken — twelve good topics

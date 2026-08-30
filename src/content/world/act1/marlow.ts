@@ -58,6 +58,7 @@ import {
   FLAG_REGISTER_IMPRESSION_FOUND,
   FLAG_SPARE_KEY_GIVEN,
   FRONT_DESK,
+  FRONT_DESK_COUNTER,
   PAGE_78,
   ROOM_KEY,
 } from './ids';
@@ -192,7 +193,15 @@ const topics: TopicDef[] = [
     words: ['key', 'keys', 'spare', 'rack', 'board', 'hook', 'lock', 'my key'],
     response:
       '"Spare\'s on the board." He has it off its hook before you have finished asking and puts it on the counter between you. "It comes back when you go. Nobody\'s ever been much good at that rule."',
-    effects: [{ set: [FLAG_SPARE_KEY_GIVEN, true] }, { move: [ROOM_KEY, 'inventory'] }],
+    // Bug fix (Ryan's playtest): the prose says he "puts it on the counter
+    // between you," not into the player's hands — the effect used to move
+    // it straight to `'inventory'`, so `LOOK` never mentioned it and the
+    // player went hunting for a key they already held. Moving it onto
+    // `FRONT_DESK_COUNTER` instead makes the world match the words: it's a
+    // real, listed object (`world.ts`'s `objectsListedInRoom` room-listing
+    // mechanism, no prose change needed — see hard rule 5) the player then
+    // has to `TAKE`.
+    effects: [{ set: [FLAG_SPARE_KEY_GIVEN, true] }, { move: [ROOM_KEY, { on: FRONT_DESK_COUNTER }] }],
   },
   {
     id: TOPIC_HEAD,

@@ -195,7 +195,12 @@ const takeKeyText = "The board is behind the desk and behind the desk is Marlow'
 const keyRack: ObjectDefSlice = {
   location: FRONT_DESK,
   name: 'key rack',
-  nouns: ['rack', 'key rack', 'board', 'key board', 'hooks', 'hook', 'keys', 'key', 'pigeonholes', 'numbers'],
+  // "key" is deliberately NOT one of this object's nouns (bug fix, Ryan's
+  // playtest): the actual room key (`roomKey`, below) also answers to bare
+  // "key" once it's in scope, and two objects sharing an undistinguishable
+  // bare noun made `TAKE KEY` an unwinnable disambiguation loop. "keys"
+  // (plural — the rack full of them) stays; it's a different word.
+  nouns: ['rack', 'key rack', 'board', 'key board', 'hooks', 'hook', 'keys', 'pigeonholes', 'numbers'],
   handlers: [
     { verbs: [EXAMINE], effects: [{ say: keyRackExamine }, { grantClue: CLUE_HOUSE_EMPTY }] },
     { verbs: [TAKE], effects: [{ say: takeKeyText }] },
@@ -260,7 +265,19 @@ const streetDoor: ObjectDefSlice = {
   // report) — front_desk_bell already claims "bell" for the counter's own
   // bell, and having both objects answer to the same noun would make "ring
   // bell" ambiguous in this room. Everything else transcribed as authored.
-  nouns: ['street door', 'front door', 'entrance', 'glass', 'panel', 'blind', 'mat', 'scraper', 'outside', 'street'],
+  //
+  // Bug fix (Ryan's playtest): the multi-word entries 'street door'/'front
+  // door' were unreachable by typing them — `grammar.ts`'s `toPhrase`
+  // always takes the LAST word of a noun phrase as the head noun and
+  // everything before it as adjectives, so "open street door" resolves as
+  // noun "door" + adjective "street," never as the two-word string "street
+  // door." Nothing else in this room claims bare "door" (verified against
+  // every other Front Desk object's own `nouns`), so it's added here as
+  // its own noun, with "street"/"front"/"glass" as real `adjectives` (not
+  // just noun-phrase substrings) so "street door"/"front door"/"glass
+  // door" all resolve the same way "OPEN DOOR" now does.
+  nouns: ['door', 'entrance', 'glass', 'panel', 'blind', 'mat', 'scraper', 'outside', 'street'],
+  adjectives: ['street', 'front', 'glass'],
   handlers: [
     { verbs: [EXAMINE], effects: [{ say: streetDoorExamine }] },
     { verbs: [SEARCH], effects: [{ say: lookThroughDoor }] },

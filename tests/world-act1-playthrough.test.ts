@@ -448,14 +448,14 @@ describe('Front Desk & Lobby — CLI playthrough (meeting Marlow)', () => {
     'ask marlow about visitor',
     'ask marlow about register',
     'ask marlow about key',
-    // "open entrance", not "open street door": `street_door`'s own noun
-    // list (front-desk-prose §4.6, pre-existing, out of this task's own
-    // module) has no bare "door" — the grammar's noun-phrase head is always
-    // the LAST word of the phrase (`grammar.ts`'s `toPhrase`), so "street
-    // door"/"front door" typed literally never resolve. Flagged in this
-    // task's report; "entrance" is one of the object's own single-word
-    // nouns and sidesteps it.
-    'open entrance',
+    // Bug fix (Ryan's playtest, noun-collision-loop task): `street_door`
+    // used to have no bare "door" noun — `grammar.ts`'s `toPhrase` always
+    // takes the LAST word of a typed phrase as the head noun, so "street
+    // door"/"open door" could never resolve and only single-word nouns
+    // like "entrance" worked. `street_door` now carries "door" plus real
+    // `adjectives` ('street'/'front'/'glass'), so the phrase a player
+    // actually types works directly.
+    'open street door',
     'out',
   ]);
   const { stdout, stderr, status } = play(['--world', worldPath, '--save-dir', saveDir, '--script', script, '--fast', '--diag']);

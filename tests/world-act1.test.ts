@@ -45,10 +45,9 @@ describe('validate — Act I room 1', () => {
   // practice, which is exactly what this warning class exists to flag and
   // let stand — asserted exactly, so a genuinely new, unreviewed warning
   // still fails this test.
-  it('produces exactly the seven expected warnings, no others', () => {
+  it('produces exactly the six expected verb-noun-collision warnings, no others', () => {
     const warnings = validate(WORLD).filter((f) => f.severity === 'warning');
     const collisions = warnings.filter((f) => f.code === 'verb-noun-collision');
-    expect(warnings.length).toBe(7);
     expect(collisions.length).toBe(6);
     expect(collisions.map((f) => f.message).sort()).toEqual(
       [
@@ -60,5 +59,41 @@ describe('validate — Act I room 1', () => {
         'verb "n"\'s word "north" is also an object/NPC noun or adjective — usually fine (sentence position disambiguates), but worth a second look',
       ].sort(),
     );
+  });
+
+  // Noun-collision-loop task: `checkObjectNounCollisions` (`validate.ts`,
+  // added after Ryan's "which do you mean, the rack or the key?" loop)
+  // adds four more warnings, reviewed here rather than fixed — each is two
+  // genuinely different things in the same scene sharing one bare word,
+  // with other single-word nouns available to tell them apart (unlike the
+  // key-rack/room-key bug this rule exists to catch, where no word did):
+  //   - "sign": `billboard` vs. `boarding_house` (Main Street) — the
+  //     billboard's sign and the boarding house's own painted glass sign.
+  //   - "light": `horizon_glow` vs. `maintenance_man` (Main Street) — the
+  //     glow on the horizon and the streetlamp he's fixing.
+  //   - "building": `boarding_house` vs. `brick_row` (Main Street) — the
+  //     boarding house and the row of shops.
+  //   - "paper": `page_78` vs. `papers` (Your Room) — the single loose
+  //     page and the heap of loose papers on the floor; "page"/"papers"
+  //     (plural) each resolve unambiguously.
+  // Every one accepted, not a bug — asserted exactly, so a genuinely new,
+  // unreviewed collision still fails this test.
+  it('produces exactly the four expected object-noun-collision warnings, no others', () => {
+    const warnings = validate(WORLD).filter((f) => f.severity === 'warning');
+    const collisions = warnings.filter((f) => f.code === 'object-noun-collision');
+    expect(collisions.length).toBe(4);
+    expect(collisions.map((f) => f.message).sort()).toEqual(
+      [
+        '"act1_billboard" and "act1_boarding_house" can be in scope together and both answer to bare noun "sign" — a plain "sign" alone can never tell them apart (only a full adjective+noun phrase can); verify this is deliberate disambiguation, not an accidental shared word',
+        '"act1_horizon_glow" and "act1_maintenance_man" can be in scope together and both answer to bare noun "light" — a plain "light" alone can never tell them apart (only a full adjective+noun phrase can); verify this is deliberate disambiguation, not an accidental shared word',
+        '"act1_boarding_house" and "act1_brick_row" can be in scope together and both answer to bare noun "building" — a plain "building" alone can never tell them apart (only a full adjective+noun phrase can); verify this is deliberate disambiguation, not an accidental shared word',
+        '"act1_page_78" and "act1_papers" can be in scope together and both answer to bare noun "paper" — a plain "paper" alone can never tell them apart (only a full adjective+noun phrase can); verify this is deliberate disambiguation, not an accidental shared word',
+      ].sort(),
+    );
+  });
+
+  it('produces exactly eleven warnings total, no others', () => {
+    const warnings = validate(WORLD).filter((f) => f.severity === 'warning');
+    expect(warnings.length).toBe(11);
   });
 });

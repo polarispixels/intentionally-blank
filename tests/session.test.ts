@@ -84,6 +84,17 @@ const NOW = '2026-08-30T00:00:00.000Z';
 const WORLD: WorldDef = { ...FIXTURE_WORLD, responses: { ...FIXTURE_WORLD.responses, ...RESPONSES } };
 const vocab = compileVocabulary(WORLD);
 
+/**
+ * `FIXTURE_WORLD`'s own known, deliberate `object-noun-collision` warnings
+ * (`validate.ts`'s `checkObjectNounCollisions`, added after Ryan's "which
+ * do you mean, the rack or the key?" loop) — see `tests/validate.test.ts`'s
+ * own `KNOWN_FIXTURE_WARNINGS` for the full explanation: `KEY`/`DOOR_KEY`/
+ * `SPARE_KEY` share bare noun "key" and `BOX`/`METAL_BOX` share "box" on
+ * purpose. The worlds below only ever ADD objects with their own distinct
+ * nouns, never touching this set.
+ */
+const KNOWN_FIXTURE_WARNINGS = validate(FIXTURE_WORLD).filter((f) => f.severity === 'warning');
+
 function opts(store: MemoryStore, gameVersion = 'test-0.0.0'): PersistOptions {
   return { store, now: NOW, gameVersion };
 }
@@ -600,7 +611,7 @@ const phaseGateVocab = compileVocabulary(PHASE_GATE_WORLD);
 
 describe('PHASE_GATE_WORLD is itself a valid world', () => {
   it('satisfies validate.ts\'s death/ending-family rule', () => {
-    expect(validate(PHASE_GATE_WORLD)).toEqual([]);
+    expect(validate(PHASE_GATE_WORLD)).toEqual(KNOWN_FIXTURE_WARNINGS);
   });
 });
 
@@ -770,7 +781,7 @@ describe('durability contract: a save taken today plays correctly once content g
   };
 
   it('is itself a valid world', () => {
-    expect(validate(EXTENDED_WORLD)).toEqual([]);
+    expect(validate(EXTENDED_WORLD)).toEqual(KNOWN_FIXTURE_WARNINGS);
   });
 
   it('an old save reads new flags at their authored default and new objects at their authored location, and plays on with zero migration', () => {

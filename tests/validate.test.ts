@@ -20,15 +20,33 @@ import type { WorldDef } from '../src/engine/world';
 import type { Prose } from '../src/engine/prose';
 import { BUILTIN_VERB_IDS } from '../src/engine/actions';
 import { validate } from '../src/engine/validate';
-import { CLUE_1, FIXTURE_WORLD, GUIDE, KEY, LAMP, LETTER, MEMORY_1, NOTEBOOK, QUESTION_1, QUESTION_2, ROOM_A, ROOM_B, ROOM_C } from './fixtures/world';
+import { BOX, CLUE_1, DOOR, DOOR_KEY, FIXTURE_WORLD, GUIDE, KEY, LAMP, LETTER, MEMORY_1, METAL_BOX, NOTEBOOK, QUESTION_1, QUESTION_2, ROOM_A, ROOM_B, ROOM_C, SHELF, SPARE_KEY } from './fixtures/world';
 
 function findingsOf(world: WorldDef, code: string) {
   return validate(world).filter((f) => f.code === code);
 }
 
+/**
+ * `FIXTURE_WORLD`'s own known, deliberate `object-noun-collision` warnings
+ * (new rule, `validate.ts`'s `checkObjectNounCollisions`, added after
+ * Ryan's "which do you mean, the rack or the key?" loop): `KEY`/`DOOR_KEY`/
+ * `SPARE_KEY` share bare noun "key" and `BOX`/`METAL_BOX` share "box" ON
+ * PURPOSE — `fixtures/world.ts`'s own header comment names this as the
+ * exact ambiguity `tests/parser-resolve.test.ts` needs to exercise real
+ * disambiguation. Every "does not flag X" test below that reuses
+ * `FIXTURE_WORLD` unmodified (or extends it with objects that declare no
+ * `nouns`, so the set can't change) subtracts this constant instead of
+ * asserting a bare `[]` — the fixture is deliberately not silent on this
+ * one rule, and that's the accepted false positive the rule's own header
+ * says to expect, not a regression in whatever each test actually checks.
+ */
+const KNOWN_FIXTURE_WARNINGS = validate(FIXTURE_WORLD).filter((f) => f.severity === 'warning');
+
 describe('validate — the fixture world is clean', () => {
-  it('produces zero errors and zero warnings against the shared fixture', () => {
-    expect(validate(FIXTURE_WORLD)).toEqual([]);
+  it('produces zero errors, and only the deliberate noun-collision warnings its own fixtures document', () => {
+    expect(validate(FIXTURE_WORLD)).toEqual(KNOWN_FIXTURE_WARNINGS);
+    expect(KNOWN_FIXTURE_WARNINGS.every((f) => f.code === 'object-noun-collision')).toBe(true);
+    expect(KNOWN_FIXTURE_WARNINGS.length).toBe(4); // KEY×DOOR_KEY, KEY×SPARE_KEY, DOOR_KEY×SPARE_KEY, BOX×METAL_BOX
   });
 });
 
@@ -65,7 +83,7 @@ describe('validate — referential integrity', () => {
         [O('nowhere_object')]: { location: 'nowhere' },
       },
     };
-    expect(validate(world)).toEqual([]);
+    expect(validate(world)).toEqual(KNOWN_FIXTURE_WARNINGS);
   });
 
   it('flags a room.dark Cond referencing an undeclared flag', () => {
@@ -118,7 +136,7 @@ describe('validate — referential integrity', () => {
       ...FIXTURE_WORLD,
       rooms: { ...FIXTURE_WORLD.rooms, [ROOM_A]: { dark: { any: [{ memory: MEMORY_1 }, { clue: CLUE_1 }, { question: [QUESTION_1, 'open'] }] } } },
     };
-    expect(validate(world)).toEqual([]);
+    expect(validate(world)).toEqual(KNOWN_FIXTURE_WARNINGS);
   });
 });
 
@@ -141,7 +159,7 @@ describe('validate — ProseRef families', () => {
 
   it('does not flag a valid one-hop ref chain', () => {
     const world: WorldDef = { ...FIXTURE_WORLD, responses: { unknown: 'Huh?', nounMiss: { ref: 'unknown' } } };
-    expect(validate(world)).toEqual([]);
+    expect(validate(world)).toEqual(KNOWN_FIXTURE_WARNINGS);
   });
 });
 
@@ -172,7 +190,7 @@ describe('validate — authoring completeness (prose)', () => {
       ...FIXTURE_WORLD,
       responses: { foo: [{ when: { flag: F('fixture_flag_bool') }, text: 'sometimes' }, { text: 'always' }] },
     };
-    expect(validate(world)).toEqual([]);
+    expect(validate(world)).toEqual(KNOWN_FIXTURE_WARNINGS);
   });
 });
 
@@ -526,7 +544,7 @@ describe('validate — knowledge referential integrity (§2.7, §8 task 15)', ()
   it('accepts real refs: fixture clue.questions -> QUESTION_1 (also covered by the whole-fixture-is-clean test, asserted directly here too)', () => {
     expect(FIXTURE_WORLD.clues![CLUE_1]!.questions).toContain(QUESTION_1);
     expect(FIXTURE_WORLD.questions![QUESTION_2]!.openWhen).toBeDefined();
-    expect(validate(FIXTURE_WORLD)).toEqual([]);
+    expect(validate(FIXTURE_WORLD)).toEqual(KNOWN_FIXTURE_WARNINGS);
   });
 });
 
@@ -613,5 +631,148 @@ describe('validate — room description mentions a portable object it is authore
 
   it('the shared fixture world itself is clean of this warning', () => {
     expect(findingsOf(FIXTURE_WORLD, 'room-description-mentions-portable')).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Exit doors: can a player-closed door always be reopened? (priority
+// insert, Ryan's playtest — `your_door_outside` could be closed by a
+// custom handler but had no `container` and no OPEN handler, so
+// `builtinOpen` refused every reopen attempt and the exit stayed
+// permanently blocked). `DOOR` (fixture: `ROOM_C`'s own `w` exit) already
+// has a `container`, so the shared fixture is clean of this rule by
+// default — these tests swap `DOOR`'s own definition to exercise the rule
+// directly, same pattern the noun-collision tests below use.
+// ---------------------------------------------------------------------------
+
+describe('validate — exit doors can always be reopened once closed (walking-dead check)', () => {
+  it('flags a door a custom handler can CLOSE that has no "container" and no OPEN handler — the exact your_door_outside shape', () => {
+    const world: WorldDef = {
+      ...FIXTURE_WORLD,
+      objects: {
+        ...FIXTURE_WORLD.objects,
+        [DOOR]: {
+          location: ROOM_B,
+          name: 'stuck door',
+          nouns: ['stuck door'],
+          handlers: [{ verbs: [BUILTIN_VERB_IDS.close], effects: [{ say: 'It shuts.' }] }],
+        },
+      },
+    };
+    const findings = findingsOf(world, 'door-exit-cannot-reopen');
+    expect(findings.length).toBe(1);
+    expect(findings[0]!.severity).toBe('error');
+    expect(findings[0]!.message).toContain(DOOR);
+  });
+
+  it('does not flag a door with a "container" — the built-in OPEN always works regardless of any custom CLOSE handler', () => {
+    // The shared fixture's own `DOOR` (ROOM_C's `w` exit) already has
+    // `container: { open: false }` and no custom handlers at all.
+    expect(findingsOf(FIXTURE_WORLD, 'door-exit-cannot-reopen')).toEqual([]);
+  });
+
+  it('does not flag a door with no "container" but a custom OPEN handler alongside its CLOSE handler', () => {
+    const world: WorldDef = {
+      ...FIXTURE_WORLD,
+      objects: {
+        ...FIXTURE_WORLD.objects,
+        [DOOR]: {
+          location: ROOM_B,
+          name: 'clever door',
+          nouns: ['clever door'],
+          handlers: [
+            { verbs: [BUILTIN_VERB_IDS.close], effects: [{ say: 'It shuts.' }] },
+            { verbs: [BUILTIN_VERB_IDS.open], effects: [{ say: 'It opens.' }] },
+          ],
+        },
+      },
+    };
+    expect(findingsOf(world, 'door-exit-cannot-reopen')).toEqual([]);
+  });
+
+  it('does not flag a door that can never be closed at all — the always-shut build-boundary-gate shape (permanently sealed by design, not a player-inflicted lockout)', () => {
+    const world: WorldDef = {
+      ...FIXTURE_WORLD,
+      objects: { ...FIXTURE_WORLD.objects, [DOOR]: { location: ROOM_B } }, // no container, no handlers: can be neither opened nor closed
+    };
+    expect(findingsOf(world, 'door-exit-cannot-reopen')).toEqual([]);
+  });
+
+  it('does not flag a door object nothing exits through — checkRoomExits already reports the world for referencing it wrong, not this rule', () => {
+    // A stuck door authored but never named by any exit is out of this
+    // rule's scope by design (see `checkDoorExitsCanReopen`'s own header):
+    // nothing traverses through it, so nobody can be locked out by it.
+    const world: WorldDef = {
+      ...FIXTURE_WORLD,
+      objects: {
+        ...FIXTURE_WORLD.objects,
+        [O('fixture_decorative_door')]: {
+          location: ROOM_A,
+          name: 'decorative door',
+          nouns: ['decorative door'],
+          handlers: [{ verbs: [BUILTIN_VERB_IDS.close], effects: [{ say: 'It shuts, for show.' }] }],
+        },
+      },
+    };
+    expect(findingsOf(world, 'door-exit-cannot-reopen')).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Object/object noun collisions (Ryan's playtest, "which do you mean, the
+// rack or the key?" loop) — `checkObjectNounCollisions`'s own header names
+// the fixture's KEY/DOOR_KEY/SPARE_KEY and BOX/METAL_BOX as its own
+// deliberate baseline (`KNOWN_FIXTURE_WARNINGS`, top of this file). These
+// tests exercise the scope rules directly, on top of that baseline.
+// ---------------------------------------------------------------------------
+
+describe('validate — object/object noun collisions (§3.2/§3.3, after Ryan\'s "rack or the key" loop)', () => {
+  it('the fixture already demonstrates same-room collisions: KEY×DOOR_KEY, KEY×SPARE_KEY, DOOR_KEY×SPARE_KEY (all ROOM_A), and BOX×METAL_BOX (both ROOM_A)', () => {
+    const findings = findingsOf(FIXTURE_WORLD, 'object-noun-collision');
+    expect(findings.length).toBe(4);
+    expect(findings.every((f) => f.severity === 'warning')).toBe(true);
+    expect(findings.some((f) => f.message.includes(KEY) && f.message.includes(DOOR_KEY))).toBe(true);
+    expect(findings.some((f) => f.message.includes(KEY) && f.message.includes(SPARE_KEY))).toBe(true);
+    expect(findings.some((f) => f.message.includes(DOOR_KEY) && f.message.includes(SPARE_KEY))).toBe(true);
+    expect(findings.some((f) => f.message.includes(BOX) && f.message.includes(METAL_BOX))).toBe(true);
+  });
+
+  it('does not flag two objects in DIFFERENT rooms that happen to share a noun, neither one portable', () => {
+    // SHELF (ROOM_A, scenery, nouns ['shelf']) vs. a new non-portable
+    // "shelf" scenery object authored at ROOM_B: never in scope together,
+    // and neither travels — no warning.
+    const world: WorldDef = {
+      ...FIXTURE_WORLD,
+      objects: {
+        ...FIXTURE_WORLD.objects,
+        [O('fixture_other_shelf')]: { location: ROOM_B, name: 'other shelf', nouns: ['shelf'] },
+      },
+    };
+    const findings = findingsOf(world, 'object-noun-collision');
+    expect(findings.some((f) => f.message.includes('fixture_other_shelf'))).toBe(false);
+  });
+
+  it('flags a portable object against a DIFFERENT room\'s own directly-placed object — "commonly carried," this task\'s own worked example', () => {
+    // HAT (ROOM_A, portable) given a noun that collides with SHELF (ROOM_A)
+    // is already same-room and uninteresting; instead prove the
+    // cross-room "commonly carried" half by giving a NEW portable object
+    // at ROOM_A the exact noun DOOR (ROOM_B) uses.
+    const world: WorldDef = {
+      ...FIXTURE_WORLD,
+      objects: {
+        ...FIXTURE_WORLD.objects,
+        [O('fixture_carried_door_stop')]: { location: ROOM_A, name: 'door stop', nouns: ['door'], portable: true },
+      },
+    };
+    const findings = findingsOf(world, 'object-noun-collision');
+    expect(findings.some((f) => f.message.includes('fixture_carried_door_stop') && f.message.includes(DOOR) && f.message.includes('"door"'))).toBe(true);
+  });
+
+  it('does not flag two objects sharing only a DIFFERENT word each also has, when the shared word itself differs', () => {
+    // LAMP (ROOM_A, nouns ['lamp', 'light']) vs. NOTEBOOK (ROOM_A, nouns
+    // ['notebook']) share nothing — sanity check that unrelated same-room
+    // objects produce no finding for each other.
+    const findings = findingsOf(FIXTURE_WORLD, 'object-noun-collision');
+    expect(findings.some((f) => f.message.includes(LAMP) && f.message.includes(NOTEBOOK))).toBe(false);
   });
 });

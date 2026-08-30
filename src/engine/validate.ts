@@ -17,13 +17,14 @@
 // ALL findings, not just the first" — an author fixing content wants the
 // whole list, not one error at a time).
 
+import { BUILTIN_VERB_IDS } from './actions';
 import type { Cond } from './cond';
 import type { Effect } from './effects';
 import type { ClueId, DayPhase, FlagId, MemoryId, NpcId, ObjectId, PlaceId, PuzzleId, QuestionId, RoomId, VerbId } from './ids';
 import { compileVocabulary, NOISE_WORDS } from './parser';
 import type { Prose, ProseRef, ProseRule } from './prose';
 import { DEAD_REFUSED_FAMILY, ENDED_REFUSED_FAMILY } from './turn';
-import type { TopicDef, VerbDef, WorldDef } from './world';
+import type { ObjectDefSlice, TopicDef, VerbDef, WorldDef } from './world';
 
 export interface Finding {
   /** Stable short id, e.g. `'unknown-room-ref'` — never renamed once shipped (content tests key off it). */
@@ -56,6 +57,8 @@ export function validate(world: WorldDef): Finding[] {
   checkClueQuestionRefs(world, findings);
   checkPuzzles(world, findings);
   checkDeathEndingResponseFamilies(world, findings);
+  checkDoorExitsCanReopen(world, findings);
+  checkObjectNounCollisions(world, findings);
 
   return findings;
 }
@@ -754,10 +757,16 @@ function checkRoomExits(world: WorldDef, findings: Finding[]): void {
 //     two in the overwhelming majority of real inputs, so this is a smell
 //     worth an author's second look, not a guaranteed misparse.
 //
-// Two objects sharing a noun with no distinguishing adjective is
-// deliberately NOT reported here at all — the task brief is explicit that
-// this is ordinary content (task 10's disambiguation handles it at
-// resolve-time), not a collision to warn about.
+// UPDATED (Ryan's playtest, "which do you mean, the rack or the key?"
+// loop): two objects sharing a noun with no distinguishing adjective used
+// to be deliberately NOT reported here — task 10's own disambiguation was
+// assumed to always handle it at resolve-time. It doesn't, reliably:
+// `resolveNounPhrase` only narrows an ambiguous bare-noun pool when the
+// player's phrase supplies an adjective, and a bare query never does, so
+// two objects sharing an exact bare noun (the key rack and the room key
+// both indexed under plain "key") makes that word permanently ambiguous —
+// no phrasing resolves it. `checkObjectNounCollisions`, right below, is
+// the noun/noun sibling of this section's own verb/noun check.
 // ---------------------------------------------------------------------------
 
 /**
@@ -825,6 +834,118 @@ function checkVocabularyCollisions(world: WorldDef, findings: Finding[]): void {
           `verb "${form.id}"'s word "${word}" is also an object/NPC noun or adjective — usually fine (sentence position disambiguates), but worth a second look`,
         ),
       );
+    }
+  }
+}
+
+/**
+ * Object/object noun collision — the noun/noun sibling of
+ * `checkVocabularyCollisions`'s own verb/noun half (its header, above,
+ * explains why that one never covered this). Two DIFFERENT objects that
+ * can be in scope together, both answering to the identical bare noun
+ * string, make a bare query for that word permanently ambiguous:
+ * `resolveNounPhrase` (`parser/resolver.ts`) only narrows an ambiguous
+ * bare-noun pool when the player's phrase supplies an adjective — a plain
+ * "TAKE KEY" gets no such help no matter what adjectives either object
+ * separately has. This is exactly the shape of bug Ryan's playtest hit:
+ * the key rack and the room key both carried the bare noun "key," and no
+ * phrasing existed that told them apart (`interpreter.ts`'s `disambiguate`
+ * now stops that loop from trapping the player forever, but the content
+ * bug that causes it belongs in `validate`, not just survived at runtime).
+ *
+ * A WARNING, not an error (this task's brief) — same reasoning as
+ * `verb-noun-collision`/`room-description-mentions-portable`: two objects
+ * genuinely sharing a word and expecting the player to disambiguate (two
+ * shut doors, both plainly "door") is sometimes exactly the right content
+ * choice. Nothing static can tell "this is a content bug" from "this is
+ * intended," so every hit here is a prompt for a human read, not an
+ * automatic failure — and it must stay rare enough to keep reading as one,
+ * or it becomes noise nobody opens `validate`'s output to look at again.
+ *
+ * SCOPE, stated precisely (this task's own instruction: "say precisely
+ * what it catches and misses"):
+ *   CATCHES — two objects each authored `location` as the exact same
+ *   `RoomId` (direct placement, the static default — never a runtime
+ *   overlay; `validate` has no state to read) sharing one exact noun
+ *   string; and, separately, any `portable` object's nouns checked against
+ *   every OTHER room's own directly-placed objects, since a takeable
+ *   object travels — once carried, it sits in scope alongside whatever
+ *   room the player is standing in, wherever that ends up being (the
+ *   "commonly carried" half of this task's brief). A portable object is
+ *   checked this way regardless of its OWN authored `location`, including
+ *   `'nowhere'` (not yet revealed) — `room_key` itself, this task's own
+ *   worked example, is authored exactly that way.
+ *   MISSES — nesting: an object placed `{ in }`/`{ on }` another object
+ *   (one level below a room) never resolves to that room here, the same
+ *   gap `checkRoomDescriptionMentionsPortable` already accepts, for the
+ *   same reason stated there. A non-portable, scenery object authored
+ *   `location: 'nowhere'` is invisible to this check entirely (nothing
+ *   ever carries it into view, so there is no static room to compare it
+ *   against). Two portable objects are never compared against EACH OTHER
+ *   (only against a room's direct placements) — two carried objects
+ *   sharing a bare noun while both sit in inventory ships uncaught. NPCs
+ *   are not compared at all — an `NpcDefSlice`'s location is a conditional
+ *   `schedule`, not one static place, and collapsing that into "which
+ *   rooms" is a real static-analysis job this rule does not attempt. And
+ *   it only catches an EXACT shared noun string; two different words that
+ *   merely sound alike or overlap partially ship uncaught too.
+ */
+function checkObjectNounCollisions(world: WorldDef, findings: Finding[]): void {
+  const objects = Object.entries(world.objects ?? {}) as [ObjectId, ObjectDefSlice][];
+  const roomIds = new Set(Object.keys(world.rooms ?? {}));
+  const directRoomOf = (def: ObjectDefSlice): RoomId | undefined =>
+    typeof def.location === 'string' && roomIds.has(def.location) ? (def.location as RoomId) : undefined;
+
+  const byRoom = new Map<RoomId, [ObjectId, ObjectDefSlice][]>();
+  for (const [id, def] of objects) {
+    const room = directRoomOf(def);
+    if (room === undefined) continue;
+    const list = byRoom.get(room) ?? [];
+    list.push([id, def]);
+    byRoom.set(room, list);
+  }
+
+  const reported = new Set<string>();
+  const flag = (aId: ObjectId, bId: ObjectId, word: string): void => {
+    const [x, y] = [aId, bId].sort();
+    const key = `${x}:${y}:${word}`;
+    if (reported.has(key)) return;
+    reported.add(key);
+    findings.push(
+      warning(
+        'object-noun-collision',
+        `"${x}" and "${y}" can be in scope together and both answer to bare noun "${word}" — a plain "${word}" alone can never tell them apart (only a full adjective+noun phrase can); verify this is deliberate disambiguation, not an accidental shared word`,
+      ),
+    );
+  };
+
+  const shareNoun = (a: ObjectDefSlice, b: ObjectDefSlice): string | undefined => (a.nouns ?? []).find((n) => (b.nouns ?? []).includes(n));
+
+  // Same room, direct placement.
+  for (const list of byRoom.values()) {
+    for (let i = 0; i < list.length; i++) {
+      for (let j = i + 1; j < list.length; j++) {
+        const [aId, aDef] = list[i]!;
+        const [bId, bDef] = list[j]!;
+        const word = shareNoun(aDef, bDef);
+        if (word !== undefined) flag(aId, bId, word);
+      }
+    }
+  }
+
+  // Commonly carried: a portable object's nouns against every OTHER room's
+  // own directly-placed objects (it could be carried there) — its own home
+  // room, if it has one, is already covered by the loop above.
+  for (const [portableId, portableDef] of objects) {
+    if (portableDef.portable !== true) continue;
+    const home = directRoomOf(portableDef);
+    for (const [room, list] of byRoom) {
+      if (room === home) continue;
+      for (const [otherId, otherDef] of list) {
+        if (otherId === portableId) continue;
+        const word = shareNoun(portableDef, otherDef);
+        if (word !== undefined) flag(portableId, otherId, word);
+      }
     }
   }
 }
@@ -978,6 +1099,74 @@ function checkPuzzles(world: WorldDef, findings: Finding[]): void {
           `${path} has no "solutions" entry whose route is free of clock/clockPhase/weekday terms, and declares no missedRecovery — a missed timed window would silently doom the player (§4.3.4/constitution §10)`,
         ),
       );
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Exit doors: can a player-closed door always be reopened? (priority
+// insert, Ryan's playtest — `your_door_outside` on the Landing could be
+// closed via a custom CLOSE handler but had no `container` and no OPEN
+// handler of its own, so `builtinOpen` refused every `OPEN DOOR` with
+// `open.notContainer` and the exit stayed permanently blocked: a real
+// walking-dead state (constitution §10), the same family
+// `puzzle-no-clock-free-solution` (above) exists to catch, just for doors
+// instead of puzzle routes.
+//
+// The check: `canClose(door)` (a `container`, so the built-in works, OR a
+// handler on the CLOSE verb) `&& !canOpen(door)` (no `container` AND no
+// handler on OPEN). A door nobody can ever close in the first place (e.g.
+// the always-shut build-boundary gates, `LANDING_BOUNDARY_GATE`/
+// `MAIN_STREET_BOUNDARY_GATE` — no `container`, no handlers at all, by
+// design) is `canClose === false` and never flagged: permanently shut is
+// the intended state there, not a player-inflicted lockout.
+//
+// KNOWN GAPS, stated rather than silently accepted (same convention as
+// this file's other static rules):
+//   - `container` alone is treated as "openable," even though a `key`ed,
+//     locked container with no reachable key is its own, deeper
+//     walking-dead shape (a puzzle-solvability question, not a "does an
+//     OPEN handler exist" one) — not attempted here.
+//   - A handler is "an OPEN/CLOSE handler exists," not "it actually
+//     succeeds" — a handler gated by an unreachable `when` condition would
+//     still count as `canOpen`/`canClose` here. Modelling reachability
+//     needs simulating state, which this file (static-only, §2.1) never
+//     does.
+//   - Only exits with a `door` reference are checked; a door object never
+//     named by any exit (a decorative interior door, say) is out of scope
+//     by design — nothing traverses through it, so there is nothing to be
+//     locked out of.
+// ---------------------------------------------------------------------------
+
+function canOpenDoor(def: ObjectDefSlice): boolean {
+  if (def.container !== undefined) return true;
+  return (def.handlers ?? []).some((h) => h.verbs.includes(BUILTIN_VERB_IDS.open));
+}
+
+function canCloseDoor(def: ObjectDefSlice): boolean {
+  if (def.container !== undefined) return true;
+  return (def.handlers ?? []).some((h) => h.verbs.includes(BUILTIN_VERB_IDS.close));
+}
+
+function checkDoorExitsCanReopen(world: WorldDef, findings: Finding[]): void {
+  const checked = new Set<ObjectId>();
+  for (const [roomId, roomDef] of Object.entries(world.rooms ?? {})) {
+    for (const exit of roomDef!.exits ?? []) {
+      if (exit.door === undefined) continue;
+      if (checked.has(exit.door)) continue; // one finding per door object, not per exit that names it
+      checked.add(exit.door);
+
+      const doorDef = world.objects?.[exit.door];
+      if (doorDef === undefined) continue; // unknown ref — checkRoomExits already reports this
+
+      if (canCloseDoor(doorDef) && !canOpenDoor(doorDef)) {
+        findings.push(
+          error(
+            'door-exit-cannot-reopen',
+            `object "${exit.door}" (an exit door, first named at room.${roomId}) can be closed but has no "container" and no OPEN handler — nothing can ever reopen it once shut, a permanent lockout through that exit (constitution §10)`,
+          ),
+        );
+      }
     }
   }
 }

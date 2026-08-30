@@ -210,11 +210,35 @@ describe('disambiguation — answer / fresh-command / re-ask-once (§3.3)', () =
     if (reasked.kind !== 'clarify') throw new Error('expected clarify');
     expect(reasked.pending?.reask).toBe(true);
     expect(reasked.pending?.candidates).toEqual([KEY, DOOR_KEY, SPARE_KEY]);
+    // The re-ask's own wording differs from the first ask (numbered, not a
+    // repeat) — a plain word answer already failed to distinguish these
+    // once, so it asks for a number instead.
+    expect(reasked.question).toBe('Which do you mean — 1) the brass key, 2) the door key, 3) the key? Say the number.');
 
-    // A second ambiguous answer in a row never nests into a third question.
+    // A second ambiguous answer in a row never nests into a third question:
+    // there is no word that could ever disambiguate these three (a content
+    // bug — `validate`'s noun-collision rule flags it), so the parser gives
+    // up and resolves to the first candidate rather than asking again.
     const gaveUp = parser.interpret('key', view({ parser: { pending: reasked.pending! } }));
-    expect(gaveUp.kind).toBe('miss');
-    expect(gaveUp).toEqual({ kind: 'miss', raw: 'key', knownNouns: ['key'] });
+    expect(gaveUp).toEqual({ kind: 'actions', actions: [{ verb: BUILTIN_VERB_IDS.take, dobj: KEY, raw: 'take key' }] });
+  });
+
+  it('the never-nests give-up also applies when the repeat arrives as a retyped command, not a bare answer (Ryan\'s playtest: "pick up spare key" / "the key" / "pick up the key" looped forever because a full reformulation reset the re-ask counter to a fresh first ask every time)', () => {
+    const clarify = parser.interpret('take key', view());
+    if (clarify.kind !== 'clarify') throw new Error('expected clarify');
+
+    // A bare bad word ("with") isn't recognized as an answer at all, so it
+    // is dropped and reparsed fresh — but "take key" is retyped in full,
+    // landing on the exact same ambiguity, which must still count as the
+    // re-ask, not a brand-new first ask.
+    const retried = parser.interpret('take key', view({ parser: { pending: clarify.pending! } }));
+    expect(retried.kind).toBe('clarify');
+    if (retried.kind !== 'clarify') throw new Error('expected clarify');
+    expect(retried.pending?.reask).toBe(true);
+
+    // Retyped a third time: no further exit through asking — give up.
+    const gaveUp = parser.interpret('take key', view({ parser: { pending: retried.pending! } }));
+    expect(gaveUp).toEqual({ kind: 'actions', actions: [{ verb: BUILTIN_VERB_IDS.take, dobj: KEY, raw: 'take key' }] });
   });
 
   it('re-ask-once: a unique answer to the re-ask still resolves normally', () => {

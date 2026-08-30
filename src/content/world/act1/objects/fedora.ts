@@ -15,8 +15,8 @@
 import type { Effect } from '../../../../engine/effects';
 import type { HandlerDef, ObjectDefSlice } from '../../../../engine/world';
 import type { ProseRule } from '../../../../engine/prose';
-import { FEDORA, FEDORA_BAND, FLOOR_LAMP, MEM_HAT, PAGE_78, YOUR_ROOM } from '../ids';
-import { BREAK, CUT, EXAMINE, READ, REMOVE, SEARCH, SMELL, TAKE, TASTE, WEAR } from '../verbs';
+import { FEDORA, FEDORA_BAND, FLOOR_LAMP, HORSES, MEM_HAT, PAGE_78, YOUR_ROOM } from '../ids';
+import { BREAK, CUT, EXAMINE, GIVE, READ, REMOVE, SEARCH, SMELL, TAKE, TASTE, WEAR } from '../verbs';
 import { ROOM_DARK } from './common';
 
 const examine: ProseRule[] = [
@@ -136,6 +136,18 @@ const fedora: ObjectDefSlice = {
         },
       ],
     },
+    // GIVE FEDORA TO HORSE (spec 06 §4's own worked example — the response
+    // below is transcribed verbatim from there). Engine gap, not a content
+    // choice: `actions.ts`'s `findHandler` dispatches GIVE on the DOBJ's
+    // own handlers (`world.objects[dobj].handlers`), matching `withInstrument`
+    // against the resolved iobj — it never consults the iobj's (HORSES')
+    // own handlers at all, so this has to live here, on the given item,
+    // not on the recipient.
+    {
+      verbs: [GIVE],
+      withInstrument: [HORSES],
+      effects: [{ say: 'The horse declines your attempt to improve its professional image.' }],
+    },
   ],
 };
 
@@ -151,5 +163,8 @@ export const FEDORA_OBJECTS: Record<string, ObjectDefSlice> = {
   [FEDORA_BAND]: fedoraBand,
 };
 
-// give/show/put-on-desk deliberately left unauthored — the doc marks them
-// "global families are fine" (no room-specific override needed).
+// show/put-on-desk deliberately left unauthored — the doc marks them
+// "global families are fine" (no room-specific override needed). GIVE now
+// has one specific override (GIVE FEDORA TO HORSE, above, wired per this
+// task's report) — every other GIVE still falls through to the global
+// family, unaffected.
