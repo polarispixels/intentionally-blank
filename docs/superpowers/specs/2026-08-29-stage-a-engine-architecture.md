@@ -1258,14 +1258,32 @@ green + `npm test` green.
     `tests/respond.test.ts`: one test per rung of §3.6, seen-vs-unseen
     noun-miss, diag events emitted with correct codes.
 
-    **Carries a prose dependency.** Task 11 reserved `${verb}.allEmpty`
-    response families for the "TAKE ALL when there is nothing to take"
-    case, referenced by `allEmptyFamilyKey()` in `parser/multi.ts` but not
-    yet authored. These, and the ladder's own global families (`unknown`,
-    `nounMiss`, `unknownVerbKnownNoun`), are **authored prose** —
-    `narrative-writer` writes them against `docs/spec/06`, the main session
-    reviews for voice, and placeholder text does not reach `main` (hard
-    rule 5). A builder must not invent them.
+    **The prose exists and is approved**:
+    `docs/superpowers/specs/2026-08-30-response-families.md` — 89 family
+    keys, 222 variants, voice-reviewed. Wire that document in; do not
+    write, paraphrase, or extend prose (hard rule 5). Note it splits
+    `nounMiss` into `nounMiss.seen` / `nounMiss.unseen` per §3.6's two
+    cases, and supplies success families for the built-in verbs, which the
+    task list had omitted and `succeed()` requires.
+
+    **Rotation for global families keys on the family, not on the object.**
+    `actions.ts` currently derives `action.<verb>.<dobj>`, which means a
+    player who tries TAKE on forty different immovable things sees variant
+    1 forty times and never reaches the rest of what was written. Change
+    the default path base for verb defaults and refusal families to the
+    **family key** (`take.notPortable`), so successive refusals across
+    different objects walk the variants and the game shows its range.
+
+    This is not a reversal of the per-node rule — it is that rule applied
+    at the right granularity. The MVP defect was *cross-family* sharing
+    plus a counter that froze; per-family counters are independent of each
+    other and advance normally. Per-object keying stays correct for prose
+    that genuinely belongs to one object — a room's description, an
+    object's own `description` — where the node *is* the object.
+
+    Variant order in the approved document is deliberate: variant 1 of each
+    family is the plainest and most reusable, later ones escalate. Preserve
+    the order; do not shuffle.
 13. **Tick: clock, events, schedules.** `src/engine/tick.ts`;
     `tests/tick.test.ts`: minutes advance, meta verbs free, `phase()` /
     `weekday()` boundary cases (first/last minute of each phase, week

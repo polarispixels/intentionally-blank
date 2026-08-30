@@ -12,6 +12,51 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.2.20] - 2026-08-30
+
+**The first authored prose in the project.**
+
+### Added
+
+- `docs/superpowers/specs/2026-08-30-response-families.md` — 89 response
+  family keys, 222 variants, written by `narrative-writer` against the tone
+  guide and voice-reviewed by the main session. The response ladder's
+  global families, every built-in refusal branch in `actions.ts`, the
+  built-in successes, the empty-expansion families, and a default family
+  for every verb.
+
+  These are the lines a player sees most often across all five acts, since
+  they fire whenever someone tries something nobody hand-wrote a response
+  for. Refusals state *why* (constitution §9), so they are facts a player
+  can use rather than walls: `unlock.alreadyUnlocked` redirects attention
+  from the lock to whatever is actually holding the thing shut.
+
+  The `nounMiss.unseen` variants are written to a spoiler boundary — none
+  confirms that the named thing exists, and none denies it either, with the
+  refusal-to-say made part of the narrator's temperament rather than left
+  as a suspicious omission.
+
+### Changed
+
+- **Rotation for global families will key on the family, not the object.**
+  `actions.ts` derives `action.<verb>.<dobj>`, so a player trying TAKE on
+  forty immovable things would see variant 1 forty times and never reach
+  what was written. Task 12 changes the base to the family key. This is the
+  per-node rule applied at the right granularity, not a reversal of it —
+  the MVP defect was cross-family sharing plus a frozen counter, and
+  per-family counters are independent and advance normally. Per-object
+  keying stays right for prose that genuinely belongs to one object.
+
+### Notes
+
+The writer flagged three things worth recording: built-in verb `default`
+families fire only on a bare verb with no object, so they are written as
+object-free prompts; no default or refusal may imply a state change, since
+rendering one changes nothing; and there is no template variable for a
+containing object, which is why `take.containerClosed` says "something you
+have not opened" rather than naming the box. The 43 non-built-in verb ids
+are proposed, not canon — no content verb table exists yet.
+
 ## [0.2.19] - 2026-08-30
 
 ### Fixed
