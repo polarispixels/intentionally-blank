@@ -12,6 +12,21 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.2.7] - 2026-08-29
+
+### Fixed
+
+- **Headless CLI swallowed input during beat delays and crashed on a bad
+  `--script`.** Commands now queue behind whatever is still flushing instead
+  of interleaving with the beats, and argument errors (`--script` with no
+  value, a path that does not exist) print one line on stderr and exit 1
+  rather than throwing a stack trace at the player. New `tests/cli.test.ts`
+  spawns the CLI and covers both.
+- **A command typed during the paced beat sequence was discarded.** The Vue
+  shell flushed the pending beats and returned, but `CommandInput` had
+  already cleared the field, so the command was lost. The beats now flush
+  and the command still runs; a bare Enter flushes without acting.
+
 ## [0.2.6] - 2026-08-29
 
 ### Added

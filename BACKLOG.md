@@ -52,17 +52,19 @@ Version targets follow the ladder in `docs/spec/README.md` and may shift.
 - Response-variant rotation is indexed by `turn`, which freezes in the
   prompt/over phases, so refusal variants never rotate. M1's world model
   should index rotation by a per-response counter.
-- The CLI's readline loop can interleave input during beat delays; a bad
-  `--script` path prints a raw stack trace.
+- ~~The CLI's readline loop can interleave input during beat delays; a bad
+  `--script` path prints a raw stack trace.~~ **Fixed in v0.2.7**: commands
+  queue behind the flush, and argument errors print one line on stderr with
+  exit 1. Covered by `tests/cli.test.ts`.
 - `describeAction` echo vocabulary lives in the engine; if the echo ever
   becomes authored (e.g. "You say: …"), move it to content.
 - Save/undo: the `promptFailed` path is not recorded in the transcript and
   the modal's error/hint visibility is UI-only; a save taken at
   `loginAttempts: 2` would reopen a bare modal. Derive `revealHint` from
   `loginAttempts` when saves exist.
-- A command typed during the paced beat sequence is discarded after
-  flushing (the input clears before the flush check). Either run it after
-  the flush or keep the text.
+- ~~A command typed during the paced beat sequence is discarded after
+  flushing (the input clears before the flush check).~~ **Fixed in v0.2.7**:
+  the beats flush and the command then runs; a bare Enter only flushes.
 - ~~`tests/purity.test.ts` regex-strips string literals without token
   context.~~ **Fixed in v0.2.6**: replaced with a real scanner in
   `tests/helpers/source-scan.ts` (comments, all three string forms,

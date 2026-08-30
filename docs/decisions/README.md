@@ -12,5 +12,8 @@ write a new ADR that supersedes it; do not edit history.
 | [0005](0005-single-version-and-changelog.md) | One SEMVER version and changelog for spec + game | accepted |
 | [0006](0006-docs-site-generated.md) | Public docs site generated from repo markdown | accepted |
 | [0007](0007-model-tiering.md) | Multi-model agent roster routed by blast radius | accepted |
+| [0008](0008-declarative-content-with-script-escape-hatch.md) | Content is declarative data with a pure-script escape hatch | accepted |
+| [0009](0009-overlay-state-and-versioned-saves.md) | Runtime state is an overlay; saves are versioned with fixtures | accepted |
+| [0010](0010-session-layer-owns-persistence.md) | A pure session layer owns persistence, undo, and checkpoints | accepted |
 
 Format: Context → Decision → Consequences. Keep each under a page.

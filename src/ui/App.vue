@@ -82,7 +82,11 @@ function apply(events: readonly GameEvent[]): void {
 }
 
 function submit(text: string): void {
-  if (pending.value.length) { pump(true); return; }
+  // A command typed during a paced beat sequence used to be swallowed: this
+  // flushed and returned, but CommandInput had already cleared the field. Now
+  // the beats flush and the command still runs. A bare Enter only flushes.
+  if (pending.value.length) pump(true);
+  if (text.trim() === '') return;
   const r = step(state.value, parse(text));
   state.value = r.state;
   apply(r.events);

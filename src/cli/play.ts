@@ -1,6 +1,6 @@
 import { createInterface } from 'node:readline';
-import { readFileSync } from 'node:fs';
-import { stdin, stdout, argv, exit } from 'node:process';
+import { existsSync, readFileSync } from 'node:fs';
+import { stdin, stdout, stderr, argv, exit } from 'node:process';
 import { parse, start, step } from '../engine';
 import type { GameEvent, GameState } from '../engine';
 
@@ -9,6 +9,19 @@ const fast = args.includes('--fast');
 const scriptIdx = args.indexOf('--script');
 const scriptFile = scriptIdx >= 0 ? args[scriptIdx + 1] : undefined;
 const BEAT_MS = fast ? 0 : 700;
+
+/** One line on stderr and a non-zero exit — never a stack trace at a player. */
+function die(message: string): never {
+  stderr.write(`play: ${message}\n`);
+  exit(1);
+}
+
+if (scriptIdx >= 0) {
+  if (scriptFile === undefined || scriptFile.startsWith('--')) {
+    die('--script needs a file path');
+  }
+  if (!existsSync(scriptFile)) die(`script not found: ${scriptFile}`);
+}
 
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 const out = (s = '') => stdout.write(`${s}\n`);
@@ -63,8 +76,13 @@ async function main(): Promise<void> {
 
   const rl = createInterface({ input: stdin, output: stdout, prompt: '\n> ' });
   rl.prompt();
+
+  // Commands queue behind whatever is still flushing. Without this, a line
+  // typed during a paced beat sequence interleaved with the beats — and the
+  // input was discarded, because the field cleared before the flush check.
+  let queue: Promise<void> = Promise.resolve();
   rl.on('line', (line) => {
-    void feed(line).then(() => rl.prompt());
+    queue = queue.then(() => feed(line)).then(() => { rl.prompt(); });
   });
   rl.on('close', () => { out(); exit(0); });
 }
