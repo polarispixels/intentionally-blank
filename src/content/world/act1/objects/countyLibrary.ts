@@ -44,6 +44,19 @@ import {
   V_KNOCK,
   V_SIGN,
 } from '../ids';
+// D2-B — the two new reels (Stage D plan §2 D2 "County Library — the film";
+// prose doc 2026-09-10-stage-d2-prose.md PART SEVEN, §19).
+import {
+  ACT2_CLUE_SERVICE_TUNNEL,
+  ACT2_CLUE_TRANSCRIPT_CHANGED,
+  ACT2_DAD_TOLD_HEARING,
+  ACT2_KNOWS_TUNNEL_MOUTH,
+  ACT2_REEL_2029_2031,
+  ACT2_REEL_2029_2031_MAP,
+  ACT2_REEL_HEARING,
+  V_FIT,
+  V_THREAD,
+} from '../../act2/ids';
 
 // ---------------------------------------------------------------------------
 // §9.1 — The reader
@@ -256,6 +269,138 @@ const darkroomDoor: ObjectDefSlice = {
 // §10's always-closed "every other direction" gate — mirrors `POST_OFFICE_NO_EXIT_GATE`.
 const countyLibraryNoExitGate: ObjectDefSlice = { location: COUNTY_LIBRARY };
 
+// ---------------------------------------------------------------------------
+// D2-B — the two new reels (Stage D plan §2 D2; prose doc 2026-09-10-stage-
+// d2-prose.md PART SEVEN, §19). Placed `location: COUNTY_LIBRARY` (top
+// level, like `fiche_drawers` itself), not nested `{ in: FICHE_DRAWERS }` —
+// the drawer bank has no `container` state to open/close (`openDrawerText`'s
+// own line: "Nothing in here is locked and nothing ever needed to be"), so
+// there is nothing for a nested location to gate; both reels are simply
+// always in scope in this room, exactly like the drawer bank and the card
+// catalogue already are. §29.3's own note: the object id stays
+// `act2_reel_2029_2031` even though the drawer LABEL the shipped bank's own
+// six-year/four/two/one rhythm requires reads `2028-2031`, a builder/prose
+// distinction, not a bug.
+// ---------------------------------------------------------------------------
+
+const constructionReelDrawerText =
+  'The drawer marked 2028-2031 runs out on its engineered stop. The hubs are\nlabelled in the same hand all the way along, and one of them has been handled\nenough to take the print off the paper.';
+
+const constructionReelReadText =
+  'The crank takes it and the lamp puts the county\'s own newspaper up on the\nground glass four feet wide, and you go through a year of it at the speed of a\nman winding.\n\n' +
+  '    NEW WORKS: FIRST SOD TURNED IN A COLD WIND\n\n' +
+  'A photograph of eleven people in coats on a scraped field, taken from too far\nback, so that everybody in it is a coat. A caption naming all eleven. One of\nthe eleven is named as the senator, and the senator is standing slightly apart\nfrom the rest with his hands behind his back like a man waiting for a bus.\n\n' +
+  'Four months on:\n\n' +
+  '    DEDICATION SET FOR SPRING\n\n' +
+  'and a photograph of a bronze plaque on a trestle before it went up, shot\nsquare on, every letter legible:\n\n' +
+  '    THE BADLANDS FACILITY\n' +
+  '    COMMISSIONED 2030\n\n' +
+  'And then, in the following winter, a column about the works closing down, and\na sentence in the middle of it that the man who wrote it did not think was the\ninteresting part of his own paragraph:\n\n' +
+  '    The construction adit, which runs some 1.1 miles from the works to the\n' +
+  '    county road, is to be sealed rather than demolished, at the contractor\'s\n' +
+  '    request and at a saving to the county.';
+
+const constructionReelReadEffects: Effect[] = [{ say: constructionReelReadText }, { grantClue: ACT2_CLUE_SERVICE_TUNNEL }];
+
+// `nouns` deliberately does NOT include bare "reel" (a builder call: see
+// this file's own report). `grammar.ts`'s own `toPhrase` resolves EVERY
+// multi-word dobj phrase as `{ noun: lastWord, adjectives:
+// precedingWords }` with no multi-word-noun matching at all — a compound
+// nouns-array entry like `'construction reel'` is therefore never looked
+// up as a phrase; the only way "CONSTRUCTION REEL" could resolve to THIS
+// object rather than the shipped reader (which already owns bare "reel")
+// is for this object to also claim bare "reel", and doing that regresses
+// `tests/world-act1-wave3-library.test.ts`'s own shipped "WIND REEL"/
+// "READ REEL" case (bare "reel" would then have three candidates — the
+// reader plus both new reels — an unwanted clarify prompt where the
+// shipped test expects the reader's own text unambiguously; confirmed by
+// running it). §29.2's own words ("the shipped singular stays on the
+// reader") win: "construction"/"works"/"dedication" are this object's own
+// bare, unique nouns instead. "EXAMINE CONSTRUCTION REEL" as one 2-word
+// phrase therefore falls through to the reader's own generic text (a
+// real, documented gap — see this task's report) rather than an error or
+// a clarify; "EXAMINE CONSTRUCTION" alone reaches this object cleanly.
+const constructionReel: ObjectDefSlice = {
+  location: COUNTY_LIBRARY,
+  name: 'construction reel',
+  portable: false,
+  nouns: ['construction', 'works', 'dedication'],
+  handlers: [
+    { verbs: [EXAMINE], effects: [{ say: constructionReelDrawerText }] },
+    { verbs: [READ, V_THREAD], effects: constructionReelReadEffects },
+  ],
+};
+
+const constructionReelMapText =
+  'The paper ran the site plan on the day of the dedication, badly, the way a\nnewspaper reproduces a drawing: everything grey, the lettering nearly gone.\n\nThe fence is a rectangle. The works are a shape inside it. And out of the west\nside of the shape, running away from it under the grazing, a double line goes\nout to a small square hatched black, on the county road, at the place where\nthe road makes its one bend before it gives up and goes north.\n\nThe small square has a note against it, four words long, that has survived the\nreproduction better than anything else on the page: *access hatch — keep\nclear.*';
+
+// "map page" dropped from this sub-part's own noun list (a builder call,
+// same reasoning as above): its own last word "page" is already
+// `microfiche_reader_screen`'s own noun (same room), and bare "map" alone
+// already reaches this object unambiguously ("map" is nobody else's noun
+// here) — so nothing is lost by leaving it out. "site plan"/"plan" are
+// unaffected (their own last word, "plan", is unique to this object).
+const constructionReelMap: ObjectDefSlice = {
+  location: { on: ACT2_REEL_2029_2031 },
+  name: 'map page',
+  portable: false,
+  nouns: ['map', 'site plan', 'plan'],
+  handlers: [{ verbs: [READ, EXAMINE], effects: [{ say: constructionReelMapText }, { set: [ACT2_KNOWS_TUNNEL_MOUTH, true] }] }],
+};
+
+const hearingReelReadText =
+  'The county paper printed the whole of the siting subcommittee when a local man\nwas on it, because a local man was on it, in six-point type across two pages\nunder the heading SENATOR\'S REMARKS IN FULL.\n\n' +
+  'He talks for a long time and enjoys it. There is a paragraph in the middle\nabout the water table.\n\n' +
+  '    THE CHAIRMAN: And on the aquifer, Senator?\n\n' +
+  '    SENATOR: On the aquifer I am satisfied. I have read what the department\n' +
+  '    has put in front of me, I have no reason to go behind it, and I would not\n' +
+  '    want the record to show hesitation where I do not feel any.\n\n' +
+  'It is a paragraph in which a careful man says he is satisfied.';
+
+const hearingReelCompareText =
+  'You read it to him off the glass, word for word, twice.\n\n' +
+  'The second time he does not let you get to the end.\n\n' +
+  '"No," he says.\n\n' +
+  'Nothing else for a moment. The fan.\n\n' +
+  '"I said the department\'s figures were the department\'s figures and I\'d not put\n' +
+  'my name to another man\'s arithmetic, and a fellow in the third row put his pen\n' +
+  'down, and I was pleased with myself the whole drive home." A pause. "You have\n' +
+  'just read me a paragraph where I say I\'m satisfied. I have never in my life\n' +
+  'been satisfied about water."\n\n' +
+  'Then, quite steadily: "Read me the date at the top of the page."\n\n' +
+  'You read him the date at the top of the page.\n\n' +
+  '"Right," he says. "So that\'s the county\'s copy, printed the next morning,\n' +
+  'before anybody could have got to it. And it already says that." He is not\n' +
+  'frightened. He sounds, if anything, relieved. "Well. Thirty years and I\'d\n' +
+  'started to think I\'d made it up."';
+
+// "COMPARE REEL WITH DAD" cannot be gated object-side on which npc filled
+// the resolved `iobj` (`HandlerDef.withInstrument` is `ObjectId[]` only,
+// `engine/world.ts`) — this task's own report and `act2/verbs.ts`'s own
+// header on the `V_FIT` `'V dobj'` addition cover why. "COMPARE REEL" bare,
+// gated on `act2_dad_told_hearing` alone, is the plan's own fallback
+// ruling for exactly this case; Dad's physical presence in the room is
+// NOT also checked here (a further tightening a later task can add once
+// `ACT2_DAD`'s own schedule is stable — see this task's report).
+const hearingReelCompareEffects: Effect[] = [{ say: hearingReelCompareText }, { grantClue: ACT2_CLUE_TRANSCRIPT_CHANGED }];
+
+// Same reasoning as the construction reel above (this file's own report):
+// no bare "reel" here either. "hearing" is this object's own bare noun;
+// "transcript"/"remarks" already work unaided (each is its own unique
+// last word) — "READ TRANSCRIPT"/"READ REMARKS"/"EXAMINE HEARING" all
+// resolve correctly; "HEARING REEL" as one phrase falls through to the
+// reader, same documented gap.
+const hearingReel: ObjectDefSlice = {
+  location: COUNTY_LIBRARY,
+  name: 'hearing reel',
+  portable: false,
+  nouns: ['hearing', 'transcript', 'remarks'],
+  handlers: [
+    { verbs: [READ, V_THREAD], effects: [{ say: hearingReelReadText }] },
+    { verbs: [V_FIT], when: { flag: ACT2_DAD_TOLD_HEARING }, effects: hearingReelCompareEffects },
+  ],
+};
+
 export const COUNTY_LIBRARY_OBJECTS: Record<string, ObjectDefSlice> = {
   [MICROFICHE_READER]: microficheReader,
   [MICROFICHE_READER_SCREEN]: microficheReaderScreen,
@@ -266,4 +411,7 @@ export const COUNTY_LIBRARY_OBJECTS: Record<string, ObjectDefSlice> = {
   [SIGN_IN_BOOK]: signInBook,
   [DARKROOM_DOOR]: darkroomDoor,
   [COUNTY_LIBRARY_NO_EXIT_GATE]: countyLibraryNoExitGate,
+  [ACT2_REEL_2029_2031]: constructionReel,
+  [ACT2_REEL_2029_2031_MAP]: constructionReelMap,
+  [ACT2_REEL_HEARING]: hearingReel,
 } satisfies Record<string, ObjectDefSlice>;

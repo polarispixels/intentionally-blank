@@ -1,3 +1,4 @@
+import type { ScriptId } from '../../engine/ids';
 // The whole assembled game — `WORLD = assemble(ACT1_SLICE, ACT2_SLICE,
 // ACT3_SLICE)` (ADR 0011 item 3; Stage D plan §0.3/§3 E3).
 //
@@ -21,7 +22,7 @@
 
 import type { WorldDef } from '../../engine/world';
 import { ACT1_SLICE } from './act1/slice';
-import { ACT2_SLICE } from './act2/index';
+import { ACT2_SLICE, ACT2_CENSOR_PROMPT_SCRIPTS } from './act2/index';
 import { ACT3_SLICE } from './act3/index';
 
 /**
@@ -109,3 +110,11 @@ export function assemble(...slices: WorldSlice[]): WorldDef {
 }
 
 export const WORLD: WorldDef = assemble(ACT1_SLICE, ACT2_SLICE, ACT3_SLICE);
+
+/**
+ * The shipped game's prompt → script table (v0.12.0). A prompt id emitted by
+ * content (the letter's `act2_compose_letter`) maps to the script that closes
+ * it; the CLI and the shell merge this over the session layer's own RESTART
+ * prompts. Each act's slice exports its own entries; they are merged here.
+ */
+export const PROMPT_SCRIPTS: Record<string, ScriptId> = { ...ACT2_CENSOR_PROMPT_SCRIPTS };

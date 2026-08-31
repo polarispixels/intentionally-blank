@@ -21,8 +21,8 @@
 import type { ExitDefSlice, HandlerDef, RoomDefSlice } from '../../../engine/world';
 import type { ProseRule } from '../../../engine/prose';
 import { HELLO, LISTEN, SMELL, WAIT, YELL } from './verbs';
-import { CLAIM_TICKET, FLAG_VISITED_TOWN_EDGE, MAIN_STREET, MONSTER_TRUCK, NOLANS_YARD, TOWN_EDGE, TOWN_EDGE_BOUNDARY_GATE, TOWN_EDGE_NO_EXIT_GATE, V_LOOK_UP } from './ids';
-import { ACT2_STARTED, ACT2_WALL_DRUG_EMPORIUM, V_ACT2_DRIVE_TO_PLANT } from '../act2/ids';
+import { CLAIM_TICKET, FLAG_VISITED_TOWN_EDGE, MAIN_STREET, MONSTER_TRUCK, NOLANS_YARD, TOWN_EDGE, TOWN_EDGE_BOUNDARY_GATE, TOWN_EDGE_NO_EXIT_GATE, TOWN_EDGE_TUNNEL_BOUNDARY_GATE, V_LOOK_UP } from './ids';
+import { ACT2_KNOWS_TUNNEL_MOUTH, ACT2_MEM_M15, ACT2_STARTED, ACT2_WALL_DRUG_EMPORIUM, V_ACT2_DRIVE_TO_PLANT } from '../act2/ids';
 import { ACT2_DRIVE_TO_PLANT_EFFECTS } from '../act2/scripts';
 
 // ---------------------------------------------------------------------------
@@ -40,8 +40,12 @@ const FIRST_SIGHT = [
 const RETURN_VISIT =
   'The end of the pavement, the paddock rail, the sign facing away, the billboard. East, past the shed, a fence and a dark house. North, the lights. The street behind you goes back to where the buildings are.';
 
+// D2-C amendment (D2 prose doc §18.4) — retro-visibility, one clause, keyed on M15, appended to the return-visit rule.
+const RETURN_VISIT_WITH_M15 = `${RETURN_VISIT}\n\nThere is a stepladder folded flat against the back of the last building, out\nof the weather, in a place somebody chose.`;
+
 const description: ProseRule[] = [
   { when: { not: { flag: FLAG_VISITED_TOWN_EDGE } }, text: FIRST_SIGHT },
+  { when: { memory: ACT2_MEM_M15 }, text: RETURN_VISIT_WITH_M15 },
   { text: RETURN_VISIT },
 ];
 
@@ -128,6 +132,15 @@ export const northBlockedText: ProseRule[] = [
   { text: TOWN_EDGE_BOUNDARY_NORTH_TEXT },
 ];
 
+// D2-C amendment (§23) — the tunnel's town-side country exit. Same
+// "ENGINE GAP" approximation this file's own header already documents for
+// `TOWN_EDGE_BOUNDARY_NORTH_TEXT` (`blockedText` only ever renders `kind:
+// 'prose'`, never the doc's own instructed `kind: 'system'`): the country
+// line and the system line are concatenated into one string rather than
+// split across two `GameEvent` kinds.
+const NW_TUNNEL_BLOCKED_TEXT =
+  'You go out over the grazing with the last of the town behind you and the line\nof cedar posts on your left, and the posts carry no wire and never have, and\nthey run north as straight as anything in this county.\n\nEND OF BUILD\n\nAct II continues past this point. The fence, the gatehouse, and what a\nborrowed badge opens are not in this version.';
+
 const travelTextOut = 'You walk back in among the buildings and the wind stops being a fact about you.';
 
 /** §13.3 (wave 5) — Town Edge → Nolan's Yard, east of the street. */
@@ -137,7 +150,9 @@ const travelTextToYard = 'Past the shed, along a fence with nothing on the other
 // removed (wave 5, §13.3) — it is now a real exit, below.
 const noOtherExitText = 'There is no road that way, and no reason to be the first man out there tonight.';
 
-const otherDirections: ExitDefSlice[] = (['w', 'ne', 'nw', 'se', 'sw', 'up', 'down'] as const).map((dir) => ({
+// D2-C amendment — "nw" removed from this list (now its own real,
+// flag-gated exit, above).
+const otherDirections: ExitDefSlice[] = (['w', 'ne', 'se', 'sw', 'up', 'down'] as const).map((dir) => ({
   dir,
   to: TOWN_EDGE,
   door: TOWN_EDGE_NO_EXIT_GATE,
@@ -183,6 +198,15 @@ export const townEdgeRoom: RoomDefSlice = {
     { dir: 'n', to: ACT2_WALL_DRUG_EMPORIUM, door: TOWN_EDGE_BOUNDARY_GATE, blockedText: northBlockedText },
     // §13.3 (wave 5) — the real east exit, Nolan's Yard.
     { dir: 'e', to: NOLANS_YARD, travelText: travelTextToYard },
+    // D2-C amendment (§23) — the tunnel's town-side country exit. Only
+    // "exists" once the player has learned the tunnel is there; `to` is a
+    // self-loop (same idiom as `TOWN_EDGE_BOUNDARY_GATE`'s own `n` exit
+    // before D1 pointed it at a real room) since no tunnel room exists in
+    // this build. Removed from `otherDirections` below so the two don't
+    // collide (a room's `exits` array may not declare the same `dir` twice
+    // — `nw`'s own generic "no exit that way" text no longer applies once
+    // `act2_knows_tunnel_mouth` is set).
+    { dir: 'nw', to: TOWN_EDGE, when: { flag: ACT2_KNOWS_TUNNEL_MOUTH }, door: TOWN_EDGE_TUNNEL_BOUNDARY_GATE, blockedText: NW_TUNNEL_BLOCKED_TEXT },
     ...otherDirections,
   ],
   handlers: roomHandlers,

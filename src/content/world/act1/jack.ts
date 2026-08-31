@@ -94,7 +94,7 @@ import {
   V_KISS,
   WORK_ORDER,
 } from './ids';
-import { ACT2_JACK_AWAY, ACT2_LUKE_REFERENCED, ACT2_STARTED, ACT2_TRAVEL_SCRIPT } from '../act2/ids';
+import { ACT2_DAD_BOOTED, ACT2_JACK_AWAY, ACT2_LUKE_REFERENCED, ACT2_RIG, ACT2_STARTED, ACT2_TRAVEL_SCRIPT } from '../act2/ids';
 
 // ---------------------------------------------------------------------------
 // §6.3 — unknownTopic
@@ -182,6 +182,15 @@ const TOPIC_DAD = T('act1_jack_topic_dad');
 const TOPIC_S6 = T('act1_jack_topic_s6');
 const TOPIC_TRASH = T('act1_jack_topic_trash');
 const TOPIC_WALL_DRUG = T('act1_jack_topic_wall_drug');
+// D2 amendment (task A) — five additions (D2 prose doc §9; plan §2 D2 row
+// "Jack's Motel — the rig"). Local ids, same convention as this file's own
+// act1_jack_topic_* declarations above (not centrally registered — that
+// requirement is `act2/ids.ts`'s own, for ids its directory-scan test
+// checks; this file's topic ids have never been declared there).
+const TOPIC_ELI = T('act1_jack_topic_eli');
+const TOPIC_RIG = T('act1_jack_topic_rig');
+const TOPIC_HORSE = T('act1_jack_topic_horse');
+const TOPIC_PLANT = T('act1_jack_topic_plant');
 
 const jobResponse: ProseRule[] = [
   {
@@ -281,7 +290,62 @@ const topicWallDrug: TopicDef = {
   effects: jackWallDrugEffects,
 };
 
+// ---------------------------------------------------------------------------
+// D2 amendment (task A) — five additions (D2 prose doc §9). Prose
+// transcribed verbatim (hard rule 5).
+// ---------------------------------------------------------------------------
+
+/** §9.1 — words per the doc itself: `eli`, `three`, `energy`, `address`, `write`, `letter`, `post`. Declared ahead of `topic_family` (already claims bare "eli") and `topic_letters` (claims "letter") — first-declared-wins, `npc.ts`'s `findTopic` — so this wave's own writing-to-Eli conversation wins those words from here on; `topic_letters` keeps its remaining words ("letters"/"wrote"/"reply"/"replies"/"answered"/"mail"/"froze"/"signature") unaffected. Flagged in this task's report as a deliberate shadowing, not an oversight. */
+const topicEli: TopicDef = {
+  id: TOPIC_ELI,
+  words: ['eli', 'three', 'energy', 'address', 'write', 'letter', 'post'],
+  response:
+    '"Eli." He puts his mug down. "You want to write to him. Right."\n\nHe turns a napkin over and writes an address on it with a pen off the counter,\nand he writes it without stopping to think, which tells you how many times he\nhas written it.\n\n"He answers paper. He\'s answered every letter I\'ve ever sent him on paper,\ninside a week, in a hand you could hang on a wall." A pause. "It\'s the other\nsort he answers wrong. The quick sort. Those come back to me chatty."\n\nHe slides the napkin across. "Don\'t put my name on it."',
+};
+
+/** §9.2 — v2, gated on `act2_dad_booted`; declared ahead of the shipped `TOPIC_DAD` below so it wins while the flag holds and falls through to the shipped response otherwise. */
+const topicDadV2: TopicDef = {
+  id: TOPIC_DAD,
+  words: ['dad', 'father', 'old man', 'house rules', 'catan', 'game', 'parents'],
+  when: { flag: ACT2_DAD_BOOTED },
+  response:
+    'You tell him.\n\nJack does not say anything for long enough that Pearl comes down the counter,\nlooks at the two of you, and goes away again without filling anything.\n\n"Right," he says.\n\nHe turns his mug round on the table without picking it up.\n\n"Give me a night."',
+};
+
+/** §9.3 — after the rig exists (§9.4's own event). */
+const topicRig: TopicDef = {
+  id: TOPIC_RIG,
+  words: ['rig'],
+  when: { objectState: [ACT2_RIG, 'hidden', false] },
+  response:
+    '"It\'s a box, a battery, and a speaker off a thing I don\'t need a speaker off\nany more." He is pleased with it and is not going to say so. "Runs a day.\nDon\'t drop it in water and don\'t ask me what the tape is holding on, because\nthe answer is the tape."',
+};
+
+const topicHorse: TopicDef = {
+  id: TOPIC_HORSE,
+  words: ['horse', 'horses'],
+  response:
+    '"They\'re not anybody\'s that I know of, and they\'ve been not anybody\'s for\nabout as long as I\'ve been looking at them." He shrugs with one shoulder.\n"Somebody\'s feeding them. It isn\'t me."',
+};
+
+const topicPlant: TopicDef = {
+  id: TOPIC_PLANT,
+  words: ['plant', 'facility', 'fence', 'jobs'],
+  response:
+    '"Two hundred jobs and a fence." He says it like a line he has said before.\n"Nolan\'s the one you\'d ask. Nolan\'s all right — Nolan\'s better than all right,\nhe came to our mother\'s funeral and he stayed for the washing up."\n\n"He\'ll tell you anything you ask him. That\'s the trouble with asking him."',
+};
+
 const topics: TopicDef[] = [
+  // D2 amendment (task A) — declared first for the same reason wave 5's own
+  // three additions are (below): `topicEli`'s words shadow `topic_family`'s
+  // bare "eli" and `topic_letters`'s bare "letter" (see `topicEli`'s own
+  // comment); `topicDadV2` must precede the shipped `TOPIC_DAD` entry it
+  // supersedes while the flag holds.
+  topicEli,
+  topicDadV2,
+  topicRig,
+  topicHorse,
+  topicPlant,
   // Wave 5's own three additions, declared FIRST (same idiom as this
   // file's own header note on TOPIC_NAME/TOPIC_JULES): `topic_job`'s bare
   // word "work" is a single-token match against the raw topic "work

@@ -12,9 +12,20 @@ import {
   POST_OFFICE,
   POST_OFFICE_NO_EXIT_GATE,
   V_LOOK_UP,
+  V_POST_LETTER,
   V_WHAT_YEAR,
   V_WHOAMI,
 } from './ids';
+// D2-B — the censor (Stage D plan §2 D2; prose doc 2026-09-10-stage-d2-
+// prose.md §10.2/§12). `V_WRITE` opens the compose prompt; the room's own
+// handler is what a player actually reaches (that verb's own bare
+// `default`, §10.3's text, answers everywhere else). `V_POST_LETTER` is
+// shipped (act1) as a bare, text-only default (`postLetterText`,
+// `objects/postOffice.ts`'s own `mailDrop`); this room-level handler
+// overrides it, gated on carrying the composed letter, exactly the same
+// "prepend, when-gated, else fall through" idiom `act2/index.ts`'s own
+// SLEEP-override loop already uses.
+import { ACT2_COMPOSE_OPEN_SCRIPT, ACT2_LETTER_OUT, ACT2_POST_LETTER_SCRIPT, V_WRITE } from '../act2/ids';
 
 // ---------------------------------------------------------------------------
 // §3.1 — description
@@ -64,6 +75,11 @@ const whatYearText =
   'The hours card, amended twice by hand. A burn ban with no date on it. A livestock sale whose date was filled in with a pen and has since been rained on. A rack of forms that ask you for everything except the year.\n\nA building made entirely of documents, and not one of them is about now.';
 
 const roomHandlers: HandlerDef[] = [
+  // D2-B — "WRITE LETTER" opens `act2_compose_letter`; "POST LETTER" (once
+  // the letter exists) hands off to the censor script. Placed first so
+  // neither falls through to this room's own generic responses below.
+  { verbs: [V_WRITE], effects: [{ script: { id: ACT2_COMPOSE_OPEN_SCRIPT } }] },
+  { verbs: [V_POST_LETTER], when: { has: ACT2_LETTER_OUT }, effects: [{ script: { id: ACT2_POST_LETTER_SCRIPT } }] },
   { verbs: [SMELL], effects: [{ say: smell }] },
   { verbs: [LISTEN], effects: [{ say: listen }] },
   { verbs: [V_LOOK_UP], effects: [{ say: lookUp }] },

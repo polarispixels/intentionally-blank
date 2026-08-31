@@ -229,16 +229,29 @@ describe('The Custodian — posts', () => {
 // ---------------------------------------------------------------------------
 
 describe('The boundary', () => {
-  it('PUT USB IN TERMINAL at Your Room renders the in-world line then the system line, once', () => {
+  // D2, task A's own supersession (Stage D plan §2 D2; prose doc 2026-09-10-
+  // stage-d2-prose.md §29.1): "D1's own boundary route (PUT USB IN TERMINAL
+  // at Your Room rendering system.buildBoundary) is RETIRED here" — that
+  // command is now §3.1's refusal (no adapter chain held) or §5.1's boot
+  // (with one), never the boundary. The one-system.buildBoundary-gate
+  // invariant holds; the gate itself moved to D2's own two doors. Full
+  // coverage of the new behavior lives in `tests/world-act2-dad.test.ts`
+  // ("The boot" / "Dad — derived position" describe blocks) — this is now a
+  // one-line regression guard that the OLD route stays gone.
+  it('PUT USB IN TERMINAL at Your Room no longer renders the boundary (superseded by D2 — see world-act2-dad.test.ts)', () => {
     const store = new MemoryStore();
     const session = withState({ location: YOUR_ROOM, objects: { [FLOOR_LAMP]: { on: true }, [ACT2_USB]: { location: 'inventory' } } });
     const { events } = say(session, 'put usb in terminal', store);
     const system = events.filter((e): e is Extract<GameEvent, { type: 'line' }> => e.type === 'line' && e.kind === 'system');
-    expect(system).toHaveLength(1);
-    expect(system[0]!.text).toContain('END OF BUILD');
-    expect(text(events)).toContain('It fits.');
+    expect(system).toHaveLength(0);
+    expect(text(events)).not.toContain('END OF BUILD');
+    // §3.1's own refusal (no adapter chain held) — the surviving half of this command's old spot.
+    expect(text(events)).toContain('Wrong by about forty years');
   });
 
+  // D2-C amendment (Stage D plan §2 D2 §23; §29.1): D1's own
+  // `jackPlantLineText` ("The plant," Jack says...) is superseded by §23's
+  // truck line — updated here rather than left checking retired text.
   it('DRIVE TO PLANT at the motel, with the truck present, renders the boundary', () => {
     const store = new MemoryStore();
     const session = withState({ location: JACKS_MOTEL });
@@ -246,7 +259,7 @@ describe('The boundary', () => {
     const system = events.filter((e): e is Extract<GameEvent, { type: 'line' }> => e.type === 'line' && e.kind === 'system');
     expect(system).toHaveLength(1);
     expect(system[0]!.text).toContain('END OF BUILD');
-    expect(text(events)).toContain('"The plant," Jack says');
+    expect(text(events)).toContain('Jack takes the cattle guard at a walking pace');
   });
 });
 

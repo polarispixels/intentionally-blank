@@ -7,7 +7,9 @@
 import type { ExitDefSlice, HandlerDef, RoomDefSlice } from '../../../engine/world';
 import type { ProseRule } from '../../../engine/prose';
 import { HELLO, LISTEN, SLEEP, SMELL, WAIT, YELL } from './verbs';
-import { FLAG_VISITED_GENERAL_STORE, GENERAL_STORE, GENERAL_STORE_NO_EXIT_GATE, MAIN_STREET, V_LOOK_UP } from './ids';
+import { CASH_ENVELOPE, FLAG_VISITED_GENERAL_STORE, GENERAL_STORE, GENERAL_STORE_NO_EXIT_GATE, MAIN_STREET, V_LOOK_UP } from './ids';
+import { HONOR_BOX_PAY_TEXT, SHOP_OPEN } from './objects/generalStore';
+import { V_PAY } from '../act2/ids';
 
 // ---------------------------------------------------------------------------
 // §8.1 — description
@@ -22,7 +24,15 @@ const FIRST_SIGHT = [
 const RETURN_VISIT =
   'The recess, out of the wind. The crock, the cup, the twine on its spike. Two windows with the shop behind them and one bulb on over the counter. Main Street is at your back.';
 
+// D2 amendment (task A) — the shop by day (prose doc §4.1). Rule 0,
+// prepended: `act2_started` and daylight are both required, so before Act
+// II starts (and every night after) description falls through unchanged to
+// the two rules below.
+const SHOP_OPEN_TEXT =
+  'The shop door stands open on a hook, and the card on the sucker has been\nturned round to the side that says OPEN in the same hand.\n\nInside is one long room that smells of sacking and paraffin and coffee, which\nyou have had through the gap under this door in the dark and which turns out\nto be exactly right. Shelves to the ceiling both sides. The ladder on its rail\nhas been left where somebody last needed it and not put back. The bulb over\nthe counter is on, because it is always on.\n\nThere is nobody in it. Not nobody behind the counter — nobody, in the way a\nroom is empty when the person who runs it has gone to do something and has\nnot thought about it since.\n\nOn the counter, where the till would be if there were a till: a cigar box with\na slot cut in the lid.';
+
 const description: ProseRule[] = [
+  { when: SHOP_OPEN, text: SHOP_OPEN_TEXT },
   { when: { not: { flag: FLAG_VISITED_GENERAL_STORE } }, text: FIRST_SIGHT },
   { text: RETURN_VISIT },
 ];
@@ -58,6 +68,10 @@ const roomHandlers: HandlerDef[] = [
   { verbs: [WAIT], effects: [{ say: waitText }] },
   { verbs: [SLEEP], effects: [{ say: sleepText }] },
   { verbs: [YELL, HELLO], effects: [{ say: shoutText }] },
+  // D2 amendment (task A) — §4.2's `PAY`, bare (no dobj to hang it on; the
+  // honor box's own file, `objects/generalStore.ts`, owns the text). No
+  // state, no figure (canon 37).
+  { verbs: [V_PAY], when: { all: [SHOP_OPEN, { has: CASH_ENVELOPE }] }, effects: [{ say: HONOR_BOX_PAY_TEXT }] },
 ];
 
 const onEnter: RoomDefSlice['onEnter'] = [{ effects: [{ set: [FLAG_VISITED_GENERAL_STORE, true] }] }];

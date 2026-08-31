@@ -9,7 +9,7 @@ import type { HandlerDef, OnEnterRule, RoomDefSlice } from '../../../engine/worl
 import type { ProseRule } from '../../../engine/prose';
 import { LISTEN, WAIT, checkDateText, findNameText } from './verbs';
 import { CLUE_REGISTER_GAP, FLAG_MET_MARLOW, FLAG_REGISTER_GAP_SEEN, FRONT_DESK, LANDING, MAIN_STREET, MARLOW, STREET_DOOR, V_CHECK_DATE, V_FIND_MY_NAME, V_LOOK_OUTSIDE, V_WHOAMI } from './ids';
-import { ACT2_SEEN_DESK_EMPTY, ACT2_STARTED } from '../act2/ids';
+import { ACT2_MEM_M15, ACT2_SEEN_DESK_EMPTY, ACT2_STARTED } from '../act2/ids';
 
 const FIRST_SIGHT = [
   'The stairs come down into a lobby built for more people than are using it. Ten or eleven chairs stand around a low table with the magazines squared to the corner, and none of them are lit; all the light in this room comes off one green-shaded lamp at the front desk and gives out about four feet from where it starts.',
@@ -37,10 +37,14 @@ const DESK_EMPTY_AFTER =
 
 const MARLOW_ABSENT: Cond = { not: { npcAt: [MARLOW, FRONT_DESK] } };
 
+// D2-C amendment (D2 prose doc §18.4) — retro-visibility, one clause, keyed on M15, appended to the lobby description (the final, unconditional rule).
+const RETURN_VISIT_WITH_M15 = `${RETURN_VISIT}\n\nThe stair carpet has been brushed up the middle since you came down it, in one\ndirection, by somebody who did the whole flight.`;
+
 const description: ProseRule[] = [
   { when: { all: [{ flag: ACT2_STARTED }, MARLOW_ABSENT, { not: { flag: ACT2_SEEN_DESK_EMPTY } }] }, text: DESK_EMPTY_FIRST },
   { when: { all: [{ flag: ACT2_STARTED }, MARLOW_ABSENT] }, text: DESK_EMPTY_AFTER },
   { when: { not: MET_MARLOW }, text: FIRST_SIGHT },
+  { when: { memory: ACT2_MEM_M15 }, text: RETURN_VISIT_WITH_M15 },
   { text: RETURN_VISIT },
 ];
 

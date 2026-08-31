@@ -6,7 +6,9 @@
 // mainStreet.ts`'s `BRICK_ROW_SIGN`/`BRICK_ROW_WINDOW`).
 
 import type { Effect } from '../../../../engine/effects';
+import type { Cond } from '../../../../engine/cond';
 import type { ObjectDefSlice } from '../../../../engine/world';
+import type { ProseRule } from '../../../../engine/prose';
 import { BREAK, EXAMINE, LOOK_UNDER, OPEN, postLetterText, PRY, PULL, READ, SEARCH, SHAKE, SIT, TAKE, TOUCH, TURN, UNLOCK } from '../verbs';
 import {
   CLAIM_TICKET,
@@ -33,6 +35,10 @@ import {
   V_RIGHT,
   V_RING,
 } from '../ids';
+// D2-B — box 141 grows a state machine of its own (Stage D plan §2 D2; prose
+// doc 2026-09-10-stage-d2-prose.md §12.2–§12.4): waiting/arrived, on top of
+// Act I's own always-there text, plus a reply/ruler pickup on OPEN.
+import { ACT2_CACHE_FOUND, ACT2_ORIGAMI_RULER, ACT2_REPLY_AUDIT, ACT2_REPLY_BLANK, ACT2_REPLY_REWRITTEN, ACT2_SAW_REPAVING_NOTICE, ACT2_STARTED } from '../../act2/ids';
 
 // ---------------------------------------------------------------------------
 // §4.1 — The boxes
@@ -42,7 +48,36 @@ const boxesExamine =
   'Four ranks high, the bottom rank down where you would have to kneel to it. Each door has a number stamped into it, a dial with the alphabet round it in place of figures, and a window of glass gone the colour of weak tea.\n\nAbove most of the numbers a slot holds a card with a name written on it. Above some of them the slot is empty, which is what happens when somebody stops paying.';
 
 const boxesWindowText = 'You go along the wall reading the empty slots. There are nine of them, and eight are dark behind the glass.\n\nThe ninth is 141. Behind its window there is the pale edge of something standing on end, the way mail stands when a box has enough in it to hold it up.';
-const boxesWindowEffects: Effect[] = [{ say: boxesWindowText }, { grantClue: CLUE_BOX_141 }];
+
+// D2-B — §12.2/§12.4. Once Act II is under way, box 141's own description
+// widens past Act I's single unconditional line: a reply (or the origami
+// ruler alongside it) sitting in the box reads as "just arrived"; nothing
+// there yet (box already emptied once, per Act I) reads as "still waiting."
+// Prepended above the shipped `boxesWindowText`, same "gate on act2_started,
+// else fall through" idiom `act2/index.ts`'s own SLEEP-override loop uses.
+const box141HasSomethingWaiting: Cond = {
+  any: [
+    { objectAt: [ACT2_REPLY_REWRITTEN, { in: PO_BOXES }] },
+    { objectAt: [ACT2_REPLY_BLANK, { in: PO_BOXES }] },
+    { objectAt: [ACT2_REPLY_AUDIT, { in: PO_BOXES }] },
+    { objectAt: [ACT2_ORIGAMI_RULER, { in: PO_BOXES }] },
+  ],
+};
+
+const box141ArrivalText = 'Behind the yellowed glass of 141 there is the pale edge of something standing\non end.';
+
+const box141WaitingText = 'Nine dark windows and one that has had something in it. Nothing has changed\nabout 141 since the last time you looked, and looking is free.';
+
+const boxesWindowEffects: Effect[] = [
+  {
+    say: [
+      { when: box141HasSomethingWaiting, text: box141ArrivalText },
+      { when: { flag: ACT2_STARTED }, text: box141WaitingText },
+      { text: boxesWindowText },
+    ],
+  },
+  { grantClue: CLUE_BOX_141 },
+];
 
 /** Wave 5's own rule 2 — unedited, byte for byte (§9.3's own instruction: "the shipped string turns out to have been the instructions"). */
 const boxesOpen = 'The dial turns freely both ways and means nothing without the three letters that go with it. You try the door. It is a small brass door and it is doing its job.';
@@ -57,9 +92,18 @@ const boxesOpen = 'The dial turns freely both ways and means nothing without the
 const boxesOpenWithKeyText =
   'You take the tag between finger and thumb, hold it where the lamp can get at it, and turn the dial to the three letters somebody scratched into brass because he did not trust himself to remember them.\n\nThere is no click. The dial does not do anything you can feel. The door simply stops being a door that is shut, and comes a quarter of an inch out of its frame under its own weight.\n\nInside, standing on end the way mail stands: two photographs and a card.';
 
+// D2-B — §12.3 (`OPEN BOX 141` with a reply in it). Same box, same key;
+// prepended above wave 5's own two-line family so a reply's arrival takes
+// precedence over both the with-key and without-key shipped text.
+const box141OpenWithReplyText =
+  'The dial goes round to the three letters and the door comes a quarter of an\ninch out of its frame under its own weight.\n\nInside: one sheet, folded small enough that the post office has stamped the\noutside of it rather than an envelope, because there is no envelope.';
+
+const box141ReplyPickupWithKey: Cond = { all: [box141HasSomethingWaiting, { has: KEYRING }] };
+
 const boxesOpenEffects: Effect[] = [
   {
     say: [
+      { when: box141ReplyPickupWithKey, text: box141OpenWithReplyText },
       { when: { has: KEYRING }, text: boxesOpenWithKeyText },
       { text: boxesOpen },
     ],
@@ -70,6 +114,15 @@ const boxesOpenEffects: Effect[] = [
       then: [{ set: [FLAG_OPENED_BOX_141, true] }, { move: [INTACT_POLAROIDS, 'inventory'] }, { move: [CLAIM_TICKET, 'inventory'] }],
     },
   },
+  // D2-B — moves whichever reply (and the ruler, if present) is currently
+  // sitting in the box into inventory. Each `if` is independently gated by
+  // `objectAt`, which is naturally self-clearing: once moved, the object is
+  // no longer `{ in: PO_BOXES }`, so re-opening the (now empty) box renders
+  // the shipped with-key text again with no extra bookkeeping flag needed.
+  { if: { when: { all: [{ objectAt: [ACT2_REPLY_REWRITTEN, { in: PO_BOXES }] }, { has: KEYRING }] }, then: [{ move: [ACT2_REPLY_REWRITTEN, 'inventory'] }] } },
+  { if: { when: { all: [{ objectAt: [ACT2_REPLY_BLANK, { in: PO_BOXES }] }, { has: KEYRING }] }, then: [{ move: [ACT2_REPLY_BLANK, 'inventory'] }] } },
+  { if: { when: { all: [{ objectAt: [ACT2_REPLY_AUDIT, { in: PO_BOXES }] }, { has: KEYRING }] }, then: [{ move: [ACT2_REPLY_AUDIT, 'inventory'] }] } },
+  { if: { when: { all: [{ objectAt: [ACT2_ORIGAMI_RULER, { in: PO_BOXES }] }, { has: KEYRING }] }, then: [{ move: [ACT2_ORIGAMI_RULER, 'inventory'] }] } },
 ];
 
 const boxesForce = "Brass over an oak carcass, set into a wall, with a federal offence attached to it. You could get one open. You would then be a man with no name who has opened a stranger's mail.";
@@ -121,6 +174,20 @@ const boardExamineEffects: Effect[] = [{ say: boardExamine }, { grantClue: CLUE_
 const notesText =
   'A burn ban. A livestock sale with the date filled in by hand. A card offering fence work, with a row of tear-off tabs along the bottom and every tab still on it. A county form about culvert permits that has been up long enough to curl.\n\nAnd a photograph of a dog, printed at home, above the word FOUND and a telephone number. Not lost. Found.';
 
+// D2-C amendment (D2 prose doc §21.2, L20 — "the buzz") — the county
+// notice, gated on the cache being found. Appended to the shipped
+// `notesText` as a rule above it (the plan's own "not in the blank
+// rectangle" instruction, §26 q4/§21.2's own note — the pinned-through
+// notice is a NEW pin, separate from `noticeBoardCorner`'s own blank
+// rectangle, so this is one rule, not a sub-part).
+const notesWithNoticeText =
+  `${notesText}\n\nAnd one that has gone up since you were last in here, on county stock, pinned\nthrough all four corners by somebody who does that:\n\n    NOTICE OF ROAD WORK\n    COUNTY HIGHWAY - MAIN STREET, FULL LENGTH\n    MILLING AND RESURFACING\n    SCHEDULE TO FOLLOW\n\nIt is pinned over the corner of the culvert-permit form, which has been up long\nenough to curl.\n\nAbove and to the left of it, the rectangle where the cork has never gone brown\nis still the colour cork starts out. Four pins hold nothing. Whatever a town\nputs on a board, it has not put anything there.`;
+
+const notesRule: ProseRule[] = [
+  { when: { flag: ACT2_CACHE_FOUND }, text: notesWithNoticeText },
+  { text: notesText },
+];
+
 const cornerText = 'It comes away from the pin without any trouble at all. Paper, one pinhole, and a fifth of an inch of printed rule along two edges.\n\nYou put it back under the pin.';
 
 const noticeBoard: ObjectDefSlice = {
@@ -131,7 +198,7 @@ const noticeBoard: ObjectDefSlice = {
   nouns: ['board', 'cork board', 'corkboard', 'notice', 'notices', 'poster', 'posters', 'wanted', 'wanted poster', 'bulletin', 'pins', 'pin', 'pinhole', 'gap', 'rectangle', 'space', 'blank', 'heading'],
   handlers: [
     { verbs: [EXAMINE], effects: boardExamineEffects },
-    { verbs: [READ, SEARCH], effects: [{ say: notesText }] },
+    { verbs: [READ, SEARCH], effects: [{ say: notesRule }, { if: { when: { flag: ACT2_CACHE_FOUND }, then: [{ set: [ACT2_SAW_REPAVING_NOTICE, true] }] } }] },
   ],
 };
 
@@ -181,6 +248,11 @@ const dropExamine =
 const formsText =
   'A wooden rack of them, four deep. Change of address. Hold mail. Redirect to a temporary address. Application for a post-office box, with a line for two forms of identification and a line under that for a witness.\n\nAnd one at the back, thinner than the others and grubby at the corner from being reached for: report of mail received opened or damaged in handling.\n\nThey come out of the rack easily enough. Every one of them has a line at the top for a name.';
 
+// D2-B — §10.1. A second `ProseRule`, above the shipped `formsText`, gated
+// `{ flag: ACT2_STARTED }` (plan §2 D2's own table entry for this file).
+const act2FormsText =
+  'A wooden rack of them, four deep. Change of address. Hold mail. Redirect to a\ntemporary address. Application for a post-office box, with a line for two\nforms of identification and a line under that for a witness.\n\nAnd, folded in behind all of it where the rack meets the wall, a short stack of\nthe plainest thing the government makes: a sheet of paper with a printed rule\ndown one side, an aerogramme fold marked in dots, and no line at the top for\nanything.\n\nThey are for people with something to say and no letterhead to say it on.\nThere is a pen on a chain nine inches away.';
+
 const mailDrop: ObjectDefSlice = {
   location: POST_OFFICE,
   name: 'mail drop',
@@ -198,7 +270,12 @@ const mailDropForms: ObjectDefSlice = {
   name: 'forms',
   portable: false,
   nouns: ['form', 'forms', 'rack'],
-  handlers: [{ verbs: [EXAMINE, READ, TAKE], effects: [{ say: formsText }] }],
+  handlers: [
+    {
+      verbs: [EXAMINE, READ, TAKE],
+      effects: [{ say: [{ when: { flag: ACT2_STARTED }, text: act2FormsText }, { text: formsText }] }],
+    },
+  ],
 };
 
 // ---------------------------------------------------------------------------

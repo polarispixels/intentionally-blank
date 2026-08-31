@@ -2,9 +2,17 @@
 // D1's own "one system.buildBoundary gate"). Reuses `act1/scripts.ts`'s own
 // system-line idiom (a `{ script }` effect rather than a plain `{ say }`, so
 // the emitted `GameEvent` can carry `kind: 'system'` — `{ say: Prose }`
-// always renders `kind: 'prose'`, `effects.ts`'s `applyOne`). Text
-// transcribed verbatim (hard rule 5); this is final prose, not a
-// placeholder, per the doc's own §21 header.
+// always renders `kind: 'prose'`, `effects.ts`'s `applyOne`).
+//
+// D2-C amendment (Stage D plan §2 D2 §23, §29.1; D2 prose doc §23) —
+// "D1's `DRIVE TO PLANT` boundary text is superseded by §23's; the single
+// END OF BUILD emission moves to §23's two doors" (this task's own
+// briefing). Both the in-world truck line AND the system line below are
+// replaced with §23's own text (final prose, not a placeholder); the
+// script itself (`act2Boundary`) is unchanged — both doors call the same
+// one `system.buildBoundary` emission, per the plan's own "one emission,
+// two doors" shape. The second door (Town Edge's own `nw` country exit) is
+// wired in `act1/townEdge.ts`, this task's own amendment.
 
 import type { Effect } from '../../../engine/effects';
 import type { ScriptId } from '../../../engine/ids';
@@ -13,8 +21,9 @@ import { ACT2_BOUNDARY_SCRIPT } from './ids';
 
 export { ACT2_BOUNDARY_SCRIPT };
 
+// §23 — "the system line, both cases."
 const ACT2_BOUNDARY_TEXT =
-  'END OF BUILD\n\nAct II continues past this point. The town in daylight, the road in to the\nlights, and what is on that stick are not in this version.';
+  'END OF BUILD\n\nAct II continues past this point. The fence, the gatehouse, and what a\nborrowed badge opens are not in this version.';
 
 const act2Boundary: ScriptFn = (_world, state) => ({
   state,
@@ -26,17 +35,18 @@ export const ACT2_D1_SCRIPTS: Record<ScriptId, ScriptFn> = {
 };
 
 // ---------------------------------------------------------------------------
-// §21's second route — "DRIVE TO PLANT"/"GO TO PLANT" from the motel or
+// §23's first door — "DRIVE TO PLANT"/"RIDE TO PLANT" from the motel or
 // Town Edge, with the truck present. Shared between `act1/jacksMotel.ts`
 // and `act1/townEdge.ts` (both room-level handlers on the bare
 // `V_ACT2_DRIVE_TO_PLANT` verb) so the two rooms render one string, not two
-// copies. Text transcribed verbatim (hard rule 5).
+// copies. Text transcribed verbatim (hard rule 5) — D2-C's own replacement
+// of D1's shipped `jackPlantLineText` (§29.1's own wiring-summary entry).
 // ---------------------------------------------------------------------------
 
-const jackPlantLineText =
-  '"The plant," Jack says, to be sure that is what he heard.\n\nThen he gets in, and does not say anything else, which is how he agrees with\nyou about what kind of idea this is.';
+const truckAtTheCattleGuardText =
+  'Jack takes the cattle guard at a walking pace, the way you take a thing you\nintend to still be there on the way back.\n\nPast it the county road stops pretending. There is a fence on your right and\nit goes on being on your right, and the road holds the line of it without\noffering you anything, and up ahead the fence turns and the road turns with\nit, and neither of them has been made easy to leave.';
 
 /** Also this verb's own `default` (`act2/verbs.ts`) — the room-level handlers below are what a player actually reaches; see that file's own comment on the idiom (`V_CHECK_DATE`/`V_FIND_MY_NAME`). */
-export const ACT2_DRIVE_TO_PLANT_TEXT = jackPlantLineText;
+export const ACT2_DRIVE_TO_PLANT_TEXT = truckAtTheCattleGuardText;
 
-export const ACT2_DRIVE_TO_PLANT_EFFECTS: Effect[] = [{ say: jackPlantLineText }, { script: { id: ACT2_BOUNDARY_SCRIPT } }];
+export const ACT2_DRIVE_TO_PLANT_EFFECTS: Effect[] = [{ say: truckAtTheCattleGuardText }, { script: { id: ACT2_BOUNDARY_SCRIPT } }];

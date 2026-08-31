@@ -46,6 +46,8 @@ import {
   TOWN_EDGE,
   V_LOOK_UP,
 } from './ids';
+import { ACT2_NOLAN } from '../act2/ids';
+import { NOLAN_YARD_WITH_HIM_TEXT } from '../act2/nolan';
 
 // ---------------------------------------------------------------------------
 // §3.1 — description
@@ -60,6 +62,8 @@ const FIRST_SIGHT =
 const RETURN_VISIT = 'The fence, the gate, the dark house, the bin at the kerb. The alley goes back along the side. The road into town is west of you.';
 
 const description: ProseRule[] = [
+  // D2-C amendment (D2 prose doc §17.1) — above the shipped rules, keyed on Nolan actually being present.
+  { when: { npcAt: [ACT2_NOLAN, NOLANS_YARD] }, text: NOLAN_YARD_WITH_HIM_TEXT },
   { when: { flag: FLAG_JACK_COVERING }, text: JACK_COVERING_TEXT },
   { when: { not: { flag: FLAG_VISITED_NOLANS_YARD } }, text: FIRST_SIGHT },
   { text: RETURN_VISIT },

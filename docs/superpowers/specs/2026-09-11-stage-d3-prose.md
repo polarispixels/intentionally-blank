@@ -1,6 +1,6 @@
 # Act III Wave D3 — The Facility Surface
 
-**Status:** draft for main-session voice review · **Author:** `narrative-writer`
+**Status (main session, 2026-08-31):** accepted whole for wiring as v0.13.0 — no cuts; §18 rulings: q1–q3, q5–q8, q10 as recommended (register 66–71); q4 stands; q9 keep all eight; §20 not wired; the truck gets a toolbox and `act3_wrench` (both hatch routes ship); M7's "four years" → nine (register 72). Proposals 65–70 recorded as 66–71. Original: draft for main-session voice review · **Author:** `narrative-writer`
 · **Date:** 2026-09-11
 **Covers:** Act III's surface — five standard rooms
 (**Perimeter Road & Gatehouse**, **Lobby / Visitor Center**, **Data Hall A**,
@@ -2589,7 +2589,7 @@ before I put my name on anything. I get a number. I stand at the far end with
 it and I do not like it.
 
 It is not that it is wrong. Things are wrong all day; that is the job. It is
-that I have walked this floor every working week for four years and I have
+that I have walked this floor every working week for nine years and I have
 never once had a reason to count it, and now I have counted it twice and I am
 going to come back and count it again tomorrow, and I already know what I am
 going to get.

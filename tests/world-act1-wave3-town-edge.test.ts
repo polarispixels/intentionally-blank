@@ -311,14 +311,29 @@ describe('Town Edge — a real playthrough, teleported in (§12-§14)', () => {
   });
 
   // 'east' is no longer in this list — wave 5 (§13.3) makes it a real exit
-  // to Nolan's Yard; see the dedicated test below.
-  it('every other direction (west/ne/nw/se/sw/up/down) is in-world, not the build boundary', () => {
-    for (const input of ['west', 'northeast', 'northwest', 'southeast', 'southwest', 'up', 'down']) {
+  // to Nolan's Yard; see the dedicated test below. 'northwest' is also no
+  // longer in this list — D2-C (Stage D plan §2 D2 §23) makes it a real,
+  // flag-gated exit (the tunnel's town-side country exit); see the
+  // dedicated test further below for its own two states.
+  it('every other direction (west/ne/se/sw/up/down) is in-world, not the build boundary', () => {
+    for (const input of ['west', 'northeast', 'southeast', 'southwest', 'up', 'down']) {
       const { state: after, text } = feed(fresh(), input);
       expect(after.location).toBe(TOWN_EDGE);
       expect(text).toContain('There is no road that way, and no reason to be the first man out there tonight.');
       expect(text).not.toContain('END OF BUILD');
     }
+  });
+
+  // D2-C amendment (§23) — 'northwest' before `act2_knows_tunnel_mouth`:
+  // the exit does not exist at all yet, so it falls to the engine's own
+  // generic no-exit family rather than this room's own in-world
+  // `noOtherExitText` (an exit gated `false` by `when` is indistinguishable
+  // from "no exit was ever declared" — same semantics as every other
+  // flag-gated exit in this codebase, not special to this one).
+  it('northwest, before the tunnel is known about, falls to the generic no-exit family', () => {
+    const { state: after, text } = feed(fresh(), 'northwest');
+    expect(after.location).toBe(TOWN_EDGE);
+    expect(text).not.toContain('END OF BUILD');
   });
 
   // Wave 5 (§13.3) — 'east' is now Nolan's Yard, not the no-exit gate.

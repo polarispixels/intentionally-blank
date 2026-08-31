@@ -33,7 +33,9 @@ import type { Effect } from '../../../../engine/effects';
 import type { ProseRule } from '../../../../engine/prose';
 import { DIRECTION_VERB_IDS } from '../../../../engine/move';
 import { crossStreetText, crouchText, EXAMINE, HELLO, OPEN, READ, SEARCH, SMELL, TAKE, TOUCH } from '../verbs';
-import { ACT2_HORSE } from '../../act2/ids';
+import { ACT2_HORSE, ACT2_STARTED } from '../../act2/ids';
+import { POKER_NIGHT } from '../../act2/calendar';
+import { POKER_NIGHT_WINDOW_TEXT } from '../../act2/poker';
 import {
   BILLBOARD,
   BOARDING_HOUSE,
@@ -410,7 +412,11 @@ const diner: ObjectDefSlice = {
   name: 'diner',
   portable: false,
   nouns: ['diner', 'cafe', 'café', 'diner window', 'sundown'],
-  handlers: [{ verbs: [DIRECTION_VERB_IDS.in, V_APPROACH, V_FIND, V_CROSS], effects: crossToDinerEffects }],
+  handlers: [
+    { verbs: [DIRECTION_VERB_IDS.in, V_APPROACH, V_FIND, V_CROSS], effects: crossToDinerEffects },
+    // D2-C amendment (D2 prose doc §14.2) — Friday night, the window from outside. No rule 2 (§14.2's own note: "outside the window the table is not there" — EXAMINE elsewhere falls to the generic default, unedited).
+    { verbs: [EXAMINE], when: { all: [{ flag: ACT2_STARTED }, POKER_NIGHT] }, effects: [{ say: POKER_NIGHT_WINDOW_TEXT }] },
+  ],
 };
 
 // Wave-3 amendment (§15.3) — routing-only scenery, exactly like
@@ -444,7 +450,7 @@ const enterMotelEffects: Effect[] = [{ goto: JACKS_MOTEL }];
 const motelSignFront: ObjectDefSlice = {
   location: MAIN_STREET,
   name: 'motel',
-  nouns: ['motel', 'arrowhead', 'motel sign', 'sign post', 'vacancy', 'jack'],
+  nouns: ['motel', 'arrowhead', 'motel sign', 'sign post', 'vacancy', 'jack'], // 'jack' is FIND JACK's handle; the noun-miss family no longer names this object for it (v0.12.0)
   handlers: [{ verbs: [DIRECTION_VERB_IDS.in, V_APPROACH, V_FIND], effects: enterMotelEffects }],
 };
 

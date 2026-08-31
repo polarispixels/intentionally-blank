@@ -97,7 +97,7 @@ const returnedLetterOpenText =
 const returnedLetter: ObjectDefSlice = {
   location: 'nowhere',
   name: 'returned letter',
-  nouns: ['letter', 'envelope', 'mail', 'post', 'return', 'stamp'],
+  nouns: ['envelope', 'mail', 'post', 'return', 'stamp', 'returned letter'], // bare 'letter' is the one you write (D2)
   portable: true,
   handlers: [
     { verbs: [EXAMINE], effects: [{ say: returnedLetterExamine }, { grantClue: ACT2_CLUE_RETURNED_LETTER }] },

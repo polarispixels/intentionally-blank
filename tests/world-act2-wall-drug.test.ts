@@ -298,7 +298,7 @@ describe('Memories — M6, M14, M12', () => {
     const store = new MemoryStore();
     const base = withState({ objects: { [ACT2_RETURNED_LETTER]: { location: ACT2_WALL_DRUG_BACK_CORRIDOR, hidden: false } } });
     const { session } = enter(base, ACT2_WALL_DRUG_BACK_CORRIDOR);
-    const { session: after } = say(session, 'take returned letter', store);
+    const { session: after } = say(session, 'take envelope', store);
 
     expect(after.state.memories).toContain(ACT2_MEM_M14);
   });

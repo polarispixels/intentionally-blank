@@ -19,17 +19,41 @@
 
 import type { VerbDef } from '../../../engine/world';
 import { VERB_DEFAULTS } from '../../responses';
-import { RUB, ACT1_VERBS } from '../act1/verbs';
+import { RUB, SIT, ACT1_VERBS } from '../act1/verbs';
+import { V_ASSEMBLE } from '../act1/ids';
 import { OUTDOOR_LINES } from './time';
 import { ACT2_DRIVE_TO_PLANT_TEXT } from './scripts';
+import { ACT2_WRITE_AWAY_TEXT } from './objects/censor';
 import {
+  V_ACT2_BET,
+  V_ACT2_CHECK,
   V_ACT2_DRIVE_TO_PLANT,
+  V_ACT2_RAISE,
+  V_ACT2_SWAP_DECK,
   V_ACT2_WAIT_UNTIL_AFTERNOON,
   V_ACT2_WAIT_UNTIL_EVENING,
   V_ACT2_WAIT_UNTIL_MORNING,
   V_ACT2_WAIT_UNTIL_NIGHT,
   V_FIT,
+  V_PAY,
+  V_THREAD,
+  V_UNFOLD,
+  V_WRITE,
 } from './ids';
+
+// ---------------------------------------------------------------------------
+// D2-A — one in-place amendment to an Act I verb, same idiom as this file's
+// own `RUB` amendment above: `V_ASSEMBLE` (act1/ids.ts, registered in
+// act1/verbs.ts) ships with `['assemble', 'piece together', 'reassemble',
+// 'sort', 'put together']`; the adapter-parts puzzle (§4.4) wants "COMBINE
+// PARTS" too, and "combine" is not claimed by any other verb (grepped
+// clean). Mutating the shared `ACT1_VERBS` object in place, at module load,
+// same guard idiom (idempotent under a double import).
+// ---------------------------------------------------------------------------
+
+if (!ACT1_VERBS[V_ASSEMBLE]!.words.includes('combine')) {
+  ACT1_VERBS[V_ASSEMBLE] = { ...ACT1_VERBS[V_ASSEMBLE]!, words: [...ACT1_VERBS[V_ASSEMBLE]!.words, 'combine'] };
+}
 
 // ---------------------------------------------------------------------------
 // D1 — one in-place amendment to an Act I verb, same idiom `act2/index.ts`'s
@@ -58,6 +82,25 @@ if (!ACT1_VERBS[RUB]!.patterns.includes('V dobj prep iobj')) {
   };
 }
 
+// ---------------------------------------------------------------------------
+// D2-C — "JOIN GAME" on the shipped `SIT` (word "join", grepped clean
+// against every act1/act2 verb's own word list — same idempotent in-place
+// idiom as the two amendments above). `SIT`'s pattern stays `'V dobj'`
+// only (see `poker.ts`'s own header on why a bare `'V'` pattern is not
+// added here); "join" still needs a following noun phrase ("JOIN GAME"),
+// same as "sit"/"sit on"/"sit down" already do. `V_PLAY` (`act1/ids.ts`)
+// needs no amendment at all — "play" is already `'V dobj'`, and "PLAY
+// POKER" resolves once `poker.ts`'s table object claims the noun "poker".
+// ---------------------------------------------------------------------------
+
+if (!ACT1_VERBS[SIT]!.words.includes('join')) {
+  // "join" alone (not "join game" as a fixed 2-word phrase — that would
+  // consume "game" as part of the verb trigger itself, leaving no dobj for
+  // the `'V dobj'` pattern to resolve; found by this task's own test run).
+  ACT1_VERBS[SIT] = { ...ACT1_VERBS[SIT]!, words: [...ACT1_VERBS[SIT]!.words, 'join'] };
+}
+
+
 export const ACT2_VERBS: Record<string, VerbDef> = {
   // D1 — the notebook/page fitting puzzle (§13.6, R4). "fit"/"compare"/
   // "match" are new words (grepped clean against act1/verbs.ts); "hold" is
@@ -72,8 +115,49 @@ export const ACT2_VERBS: Record<string, VerbDef> = {
   [V_FIT]: {
     id: V_FIT,
     words: ['fit', 'compare', 'match'],
-    patterns: ['V dobj prep iobj'],
+    // D2-B addition: `'V dobj'` (bare — no prep/iobj at all), for "COMPARE
+    // REEL" alone. Needed because `HandlerDef.withInstrument` is typed
+    // `ObjectId[]` only (`engine/world.ts`) — an NPC (Dad) can never be the
+    // matched `iobj` there, so "COMPARE REEL WITH DAD" cannot be gated
+    // object-side even though it parses; `objects/countyLibrary.ts`'s own
+    // hearing-reel handler answers the bare form instead, gated on
+    // `act2_dad_told_hearing` (see that file's own header — the plan's own
+    // fallback ruling for exactly this case). D1's page-fitting puzzle
+    // keeps using the prepped shape unaffected.
+    patterns: ['V dobj prep iobj', 'V dobj'],
     preps: ['in', 'with', 'against', 'to'],
+    class: 'analytical',
+    default: VERB_DEFAULTS.touch,
+  },
+  // D2-B — "WRITE LETTER" (§10.2): a bare, fixed-phrase verb, same idiom as
+  // `V_POST_LETTER`/`V_ACT2_DRIVE_TO_PLANT` (no "letter" object exists yet
+  // to hang a dobj handler on before one is composed). This `default` is
+  // §10.3's own text — the Post Office's own room handler
+  // (`act1/postOffice.ts`) is the one real place this opens the prompt.
+  [V_WRITE]: {
+    id: V_WRITE,
+    words: ['write', 'write letter', 'compose'],
+    patterns: ['V'],
+    class: null,
+    default: ACT2_WRITE_AWAY_TEXT,
+  },
+  // D2-B — "UNFOLD LETTER" (§11.3). "FOLD LETTER" is NOT this verb — see
+  // `ids.ts`'s own long comment on `V_UNFOLD` for why "fold" itself is
+  // wired through `CUT` instead.
+  [V_UNFOLD]: {
+    id: V_UNFOLD,
+    words: ['unfold'],
+    patterns: ['V dobj'],
+    class: 'direct',
+    default: VERB_DEFAULTS.touch,
+  },
+  // D2-B — "THREAD REEL"/"WIND ON"/"LOAD" (§19). `READ` (built-in) is the
+  // other word `objects/countyLibrary.ts`'s two new reels answer to; this
+  // is the dedicated word the prose doc's own trigger list also names.
+  [V_THREAD]: {
+    id: V_THREAD,
+    words: ['thread', 'wind on', 'load'],
+    patterns: ['V dobj'],
     class: 'analytical',
     default: VERB_DEFAULTS.touch,
   },
@@ -117,5 +201,38 @@ export const ACT2_VERBS: Record<string, VerbDef> = {
     patterns: ['V'],
     class: 'direct',
     default: ACT2_DRIVE_TO_PLANT_TEXT,
+  },
+  // D2-A — the general store's honor box (§4.2), a bare verb (no dobj to
+  // hang it on — the box takes money, not an object handler). "pay" is
+  // unclaimed elsewhere (grepped clean; `jack.ts`'s own "pay"/"paid" are
+  // topic words, a disjoint vocabulary from verb words).
+  [V_PAY]: {
+    id: V_PAY,
+    words: ['pay', 'pay for', 'leave money'],
+    patterns: ['V'],
+    class: 'direct',
+    // Bare-safe (no `{name}`): the honor box's handler answers by day; at night
+    // or elsewhere this is a bare verb with nothing to aim it at.
+    default: VERB_DEFAULTS.wait,
+  },
+  // D2-C — the Friday table (`poker.ts`). `act2_bet`/`act2_check` have no
+  // hand-specific text anywhere in the doc (`poker.ts`'s own header); the
+  // `default` below is what a player sees outside a session, or for either
+  // of these two even inside one — borrowed, non-templated, bare-safe,
+  // same "reuse an existing family" idiom `V_FIT`'s own `default` uses.
+  [V_ACT2_BET]: { id: V_ACT2_BET, words: ['bet'], patterns: ['V'], class: 'direct', default: VERB_DEFAULTS.wait },
+  [V_ACT2_RAISE]: { id: V_ACT2_RAISE, words: ['raise'], patterns: ['V'], class: 'direct', default: VERB_DEFAULTS.wait },
+  [V_ACT2_CHECK]: { id: V_ACT2_CHECK, words: ['check'], patterns: ['V'], class: 'direct', default: VERB_DEFAULTS.wait },
+  // "SWAP DECK"/"DEAL FROM MY DECK" — `'V dobj'`, dobj `act2_deck`
+  // (`objects/truck.ts`). `default` is reached only if the deck is
+  // resolved but `poker.ts`'s own handler doesn't match (i.e. no session
+  // in progress) — bare-safe by construction since a dobj is always
+  // present here (same as `V_FIT`).
+  [V_ACT2_SWAP_DECK]: {
+    id: V_ACT2_SWAP_DECK,
+    words: ['swap', 'deal from'],
+    patterns: ['V dobj'],
+    class: 'direct',
+    default: VERB_DEFAULTS.touch,
   },
 };

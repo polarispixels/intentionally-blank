@@ -5,9 +5,10 @@
 // header for the established idiom this follows).
 
 import type { Effect } from '../../../../engine/effects';
-import type { ObjectDefSlice } from '../../../../engine/world';
+import type { EventDef, ObjectDefSlice } from '../../../../engine/world';
+import type { Cond } from '../../../../engine/cond';
 import { DIRECTION_VERB_IDS } from '../../../../engine/move';
-import { BREAK, EXAMINE, OPEN, PRY, READ, TAKE, TURN } from '../verbs';
+import { BREAK, EXAMINE, OPEN, PRY, READ, SEARCH, TAKE, TURN } from '../verbs';
 import {
   CLUE_FIVE_FACES,
   CROCK_CUP,
@@ -31,6 +32,8 @@ import {
   V_TURN_OVER,
   WATER_CROCK,
 } from '../ids';
+import { V_ASSEMBLE } from '../ids';
+import { ACT2_ADAPTER_CHAIN, ACT2_ADAPTER_PARTS, ACT2_HONOR_BOX, ACT2_JUNK_DRAWER, ACT2_STARTED } from '../../act2/ids';
 
 // ---------------------------------------------------------------------------
 // §9.1 — The postcard rack
@@ -214,3 +217,137 @@ export const GENERAL_STORE_OBJECTS: Record<string, ObjectDefSlice> = {
   [STORE_RECESS]: storeRecess,
   [GENERAL_STORE_NO_EXIT_GATE]: generalStoreNoExitGate,
 } satisfies Record<string, ObjectDefSlice>;
+
+// ---------------------------------------------------------------------------
+// D2 amendment (task A) — the shop by day (prose doc §4.2–§4.4; plan §2 D2
+// row 3; this wave's own ruling 4).
+//
+// IDIOM CHOSEN FOR "REACHABLE ONLY FROM THE SHOP ROOM" (ruling 4's own
+// question): no new room (main-session ruling — the shop interior is the
+// SAME `GENERAL_STORE` room in a different state) and no `hidden`/`reveal`
+// toggle either — `effects.ts`'s `Effect` union has `{ reveal: ObjectId }`
+// (one-directional, `hidden: false` forever) but no matching "hide" effect,
+// so `hidden` can be permanently UNSET but never re-SET, wrong for
+// something that must go dark again every night. Instead: these three
+// objects are placed `{ in: STORE_DOOR }` (the shipped shop door, already a
+// `container`), and `STORE_DOOR`'s own `open` boolean — which nothing in
+// its shipped EXAMINE/OPEN text ever exposes to the player; those handlers
+// are untouched and still read "locked," a fiction gap flagged in this
+// task's report — is toggled every turn by the two `once: false` events
+// below. `open`/`transparent` is exactly the containment test `scope()`/
+// `inScopeAt` already runs for every object in the game (`engine/world.ts`),
+// so this reuses a mechanism instead of adding one: closed at night, these
+// three are out of scope precisely like anything else inside a shut
+// container, and `EXAMINE DRAWER` at 4 a.m. resolves solely to
+// `storeWindow`'s own shipped "drawer"/"junk drawer" nouns (unchanged, this
+// task's report) because `act2_junk_drawer` isn't a candidate at all.
+//
+// KNOWN GAP, stated rather than silently accepted: by day, `storeWindow`
+// STILL claims "drawer"/"junk drawer" too (it is unconditionally in the
+// room), so a bare `EXAMINE DRAWER` while the shop is open is genuinely
+// ambiguous between the two objects — the parser's own disambiguation
+// (`parser/resolver.ts`'s `'ambiguous'` outcome, a clarify prompt) handles
+// it; the qualified `EXAMINE JUNK DRAWER` (an adjective+noun full match)
+// reaches the interior drawer unambiguously either way. This is the same
+// "recommend a `whichOne` clarify rather than a silent pick" idiom the
+// prose doc's own §29.2 already accepts for the "chain"/"letter" collisions
+// — not attempted to be engineered away here.
+// ---------------------------------------------------------------------------
+
+/** Exported for `act1/generalStore.ts`'s own description rule 0 and `PAY` handler, so the two files share one definition of "open." */
+export const SHOP_OPEN: Cond = { all: [{ flag: ACT2_STARTED }, { any: [{ clockPhase: 'morning' }, { clockPhase: 'afternoon' }] }] };
+
+const honorBoxExamine =
+  'A cigar box, the lid held shut by a screw through the hinge side and a slot\ncut in the top with a knife by somebody who was not showing off. It does not\nrattle. It has weight.\n\nA card is propped against it in the same firm hand as everything else in this\ncounty that is not typed:\n\n    PLEASE LEAVE WHAT IT\'S WORTH.\n    THE PENCIL IS FOR THE BOOK.\n\nThe book is a school exercise book, open, with a pencil on a string beside it.\nPeople have written down what they took. Nobody has written down what they\npaid.';
+
+const honorBoxOpenText =
+  'There is a shop with nobody in it, a box with money in it, and a screw you\ncould get out with the flat of a key. You put the box back exactly where it\nwas standing, which takes a moment, because you had already picked it up.';
+
+/** §4.2's `PAY` — see `act1/generalStore.ts`'s own room-level handler (bare verb; no dobj exists to hang this on). */
+export const HONOR_BOX_PAY_TEXT =
+  'You take out what the parts are worth and post it through the slot, and it\ngoes down onto the rest of it without much of a sound, so there is a good deal\nof the rest of it.\n\nThen you take the pencil on its string and write down what you took, in the\ncolumn where everybody else has written down what they took, and the line\nabove yours is somebody\'s tinned peaches.';
+
+const honorBox: ObjectDefSlice = {
+  location: { in: STORE_DOOR },
+  name: 'honor box',
+  nouns: ['box', 'honor box', 'cigar box', 'till', 'exercise book', 'pencil'],
+  portable: false,
+  handlers: [
+    { verbs: [EXAMINE], effects: [{ say: honorBoxExamine }] },
+    { verbs: [OPEN, PRY], effects: [{ say: honorBoxOpenText }] },
+  ],
+};
+
+const junkDrawerExamine =
+  'Under the counter on the customer side, standing an inch open the way it was\nstanding an inch open through the glass at four in the morning.\n\nIt is the drawer every shop has: the drawer for the thing that is not\nanything. Fuse wire. A bulldog clip with no jaw spring. Two keys on a loop of\ngarden twine. A rubber stamp with the date wheels seized. Batteries of a size\nthat stopped being a size.\n\nAnd, further back, where a drawer keeps what it has been keeping longest,\nthree items that are all the same kind of item.';
+
+const junkDrawer: ObjectDefSlice = {
+  location: { in: STORE_DOOR },
+  name: 'junk drawer',
+  nouns: ['drawer', 'junk drawer'],
+  // "junk" as a real adjective (not folded into the compound noun string
+  // the way `storeWindow`'s own "junk drawer" entry is) — this is what
+  // makes `EXAMINE JUNK DRAWER` a full adjective+noun match against THIS
+  // object specifically (`parser/resolver.ts`'s own ranking rule), rather
+  // than an ambiguous bare-noun pool of two. Bare `EXAMINE DRAWER` by day
+  // stays genuinely ambiguous between the two — see this section's own
+  // header note (§29.2's "recommend a whichOne clarify" idiom).
+  adjectives: ['junk'],
+  portable: false,
+  handlers: [{ verbs: [EXAMINE, OPEN, SEARCH], effects: [{ say: junkDrawerExamine }] }],
+};
+
+const partsExamine =
+  '    a gender changer, in chromed pot metal, with pins on both faces and a\n    thumbscrew missing from one side\n\n    a short ribbon lead with a keyed collar at one end and nothing keyed\n    about the other\n\n    a converter in a die-cast box the size of a bar of soap, with a switch\n    marked DCE / DTE and a label in typewriter capitals reading SERIAL\n\nEvery one of them was made to join a thing to a thing that neither of them was\never going to meet again. Nobody in this county has needed any of them since\nbefore the sign over the door was last painted.\n\nThey fit each other. You can see that they fit each other from here.';
+
+const combineSuccessText =
+  'The gender changer goes onto the converter. The ribbon lead goes onto the\ngender changer. Each join takes a shove and then goes home with the small\nsatisfaction of a thing designed by somebody who expected to be shoved.\n\nWhat you are holding is about nine inches long, weighs more than the machine\nit is going to plug into deserves, and has one end shaped like this decade and\none end shaped like an argument that decade lost.\n\nYou put it in your coat. There is now a chain of adapters in your coat, which\nis either going to work or is going to be a story.';
+
+/** Transcribed for completeness (hard rule 5); unreachable in this build — `act2_adapter_parts` is one collectible bundle, never partially held, so `COMBINE`'s "not held yet" branch below always has all three or none. Flagged in this task's report. */
+const combineMissingPartText = 'Two of the three will go together. Two of the three get you to a shape that is\nstill not the shape you need.';
+
+const combineEffects: Effect[] = [{ say: combineSuccessText }, { move: [ACT2_ADAPTER_PARTS, 'nowhere'] }, { move: [ACT2_ADAPTER_CHAIN, 'inventory'] }];
+
+const parts: ObjectDefSlice = {
+  location: { in: STORE_DOOR },
+  name: 'parts',
+  article: 'the',
+  nouns: ['parts', 'gender changer', 'ribbon lead', 'converter', 'adapter parts'],
+  portable: true,
+  handlers: [
+    { verbs: [EXAMINE], effects: [{ say: partsExamine }] },
+    { verbs: [V_ASSEMBLE], when: { has: ACT2_ADAPTER_PARTS }, effects: combineEffects },
+    { verbs: [V_ASSEMBLE], effects: [{ say: combineMissingPartText }] },
+  ],
+};
+
+const chain: ObjectDefSlice = {
+  location: 'nowhere',
+  name: 'adapter chain',
+  // Deliberately NOT "chain" (§29.2 — the water crock's chained cup already owns it).
+  nouns: ['adapter', 'adapters', 'adapter chain', 'lead', 'converter'],
+  portable: true,
+  description: 'About nine inches of obsolete adapters, shoved home end to end: a gender\nchanger, a ribbon lead, a converter. One end is shaped like this decade. One\nend is shaped like an argument that decade lost.',
+};
+
+export const ACT2_GENERAL_STORE_D2_OBJECTS: Record<string, ObjectDefSlice> = {
+  [ACT2_HONOR_BOX]: honorBox,
+  [ACT2_JUNK_DRAWER]: junkDrawer,
+  [ACT2_ADAPTER_PARTS]: parts,
+  [ACT2_ADAPTER_CHAIN]: chain,
+};
+
+/** The shop opens — `STORE_DOOR`'s `open` toggle (see this section's own header). */
+export const ACT2_SHOP_OPEN_EVENT: EventDef = {
+  id: 'act2_ev_shop_open',
+  when: SHOP_OPEN,
+  once: false,
+  effects: [{ setState: [STORE_DOOR, 'open', true] }],
+};
+
+export const ACT2_SHOP_CLOSED_EVENT: EventDef = {
+  id: 'act2_ev_shop_closed',
+  when: { not: SHOP_OPEN },
+  once: false,
+  effects: [{ setState: [STORE_DOOR, 'open', false] }],
+};

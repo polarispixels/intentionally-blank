@@ -7,7 +7,7 @@ import type { ExitDefSlice, HandlerDef, RoomDefSlice } from '../../../engine/wor
 import type { ProseRule } from '../../../engine/prose';
 import { HELLO, LISTEN, SLEEP, SMELL, YELL } from '../act1/verbs';
 import { TOWN_EDGE, TOWN_EDGE_BOUNDARY_GATE, V_LOOK_UP } from '../act1/ids';
-import { ACT2_DOT, ACT2_VISITED_EMPORIUM, ACT2_WALL_DRUG_BACK_CORRIDOR, ACT2_WALL_DRUG_EMPORIUM, ACT2_WALL_DRUG_EMPORIUM_NO_EXIT_GATE , ACT2_CUSTODIAN } from './ids';
+import { ACT2_DOT, ACT2_MEM_M15, ACT2_VISITED_EMPORIUM, ACT2_WALL_DRUG_BACK_CORRIDOR, ACT2_WALL_DRUG_EMPORIUM, ACT2_WALL_DRUG_EMPORIUM_NO_EXIT_GATE , ACT2_CUSTODIAN } from './ids';
 
 // ---------------------------------------------------------------------------
 // §5.1 — description (4 rules)
@@ -27,11 +27,15 @@ const DOT_PRESENT_TEXT_NO_CUSTODIAN =
 
 const OTHERWISE_TEXT = 'The aisles, the hats, the counter, the claim window. The dinosaur, at the back, on its interval. The doors out to the porch and the road.';
 
+// D2-C amendment (D2 prose doc §18.4) — retro-visibility, one clause, keyed on M15, appended to the Emporium's own generic return rule.
+const OTHERWISE_TEXT_WITH_M15 = `${OTHERWISE_TEXT}\n\nThe porch rail is finished at this end and wet at the other, and it was wet at\nthis end yesterday.`;
+
 const description: ProseRule[] = [
   { when: { not: { flag: ACT2_VISITED_EMPORIUM } }, text: FIRST_SIGHT },
   { when: { clockPhase: 'night' }, text: NIGHT_TEXT },
   { when: { all: [{ npcAt: [ACT2_DOT, ACT2_WALL_DRUG_EMPORIUM] }, { npcAt: [ACT2_CUSTODIAN, ACT2_WALL_DRUG_EMPORIUM] }] }, text: DOT_PRESENT_TEXT },
   { when: { npcAt: [ACT2_DOT, ACT2_WALL_DRUG_EMPORIUM] }, text: DOT_PRESENT_TEXT_NO_CUSTODIAN },
+  { when: { memory: ACT2_MEM_M15 }, text: OTHERWISE_TEXT_WITH_M15 },
   { text: OTHERWISE_TEXT },
 ];
 

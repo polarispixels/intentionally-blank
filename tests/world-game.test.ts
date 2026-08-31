@@ -66,15 +66,25 @@ describe('assemble', () => {
 // Edge through the same permanently closed door object... with §7's own
 // blockedText"), so the highway is now one road blocked from both ends by
 // the same gate object, each side with its own authored `blockedText`.
+//
+// UPDATED AGAIN (Stage D2, task C — the moved boundary, D2 prose doc §23):
+// the count is now exactly three. Town Edge gains a THIRD exit, `nw`
+// (`act1/townEdge.ts`) — the tunnel's town-side country exit, gated
+// `{ flag: act2_knows_tunnel_mouth }` — referencing a new, separate gate
+// object (`TOWN_EDGE_TUNNEL_BOUNDARY_GATE`) that never opens in this
+// build, same as the other two. It is deliberately named with
+// "boundary_gate" (not "tunnel_gate"): it marks the SAME edge-of-built-
+// content as the other two, just reached a different way (learning about
+// the tunnel, rather than walking north or south of the highway).
 describe('system.buildBoundary', () => {
-  it('exactly two exits reference a build-boundary gate (Town Edge north, Emporium south — same gate object)', () => {
+  it('exactly three exits reference a build-boundary gate (Town Edge north, Emporium south, Town Edge nw — two gate objects)', () => {
     let count = 0;
     for (const room of Object.values(WORLD.rooms ?? {})) {
       for (const exit of room.exits ?? []) {
         if (exit.door && /boundary_gate/i.test(exit.door)) count++;
       }
     }
-    expect(count).toBe(2);
+    expect(count).toBe(3);
   });
 });
 

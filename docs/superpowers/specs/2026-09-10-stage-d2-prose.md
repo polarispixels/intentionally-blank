@@ -1,6 +1,6 @@
 # Act II Wave D2 — The Town in Daylight: Dad, the Censor, the Table
 
-**Status (main session, 2026-08-31):** accepted whole for wiring as v0.12.0 — no cuts; §26 rulings: q1 five fragments; q2 constant (register 58); q3 audio (59); q4 the fifteenth topic `sublevel` is wired; q5 silent, told to the playtester; q6 keep; q7 stands; q8 names print (60); q9 stands; q10 ambiguous (63); §28 not wired (both Custodian ATTACK texts stand at their posts). Proposals 60–66 recorded as register 58–64. Original: draft for main-session voice review · **Author:** `narrative-writer`
+**Status (main session, 2026-08-31):** **wired and shipped v0.12.0**; accepted whole — no cuts; §26 rulings: q1 five fragments; q2 constant (register 58); q3 audio (59); q4 the fifteenth topic `sublevel` is wired; q5 silent, told to the playtester; q6 keep; q7 stands; q8 names print (60); q9 stands; q10 ambiguous (63); §28 not wired (both Custodian ATTACK texts stand at their posts). Proposals 60–66 recorded as register 58–64. Original: draft for main-session voice review · **Author:** `narrative-writer`
 · **Date:** 2026-09-10
 **Covers:** no new rooms. Zone 1 amendments, every one gated on `act2_started`:
 **Dad** (`act2/dad.ts`, the boot and fourteen topics), the **adapter comedy** and
@@ -1828,7 +1828,7 @@ take out to get five."
 
 ```text
 "Him." He puts the mug down on the step. "Julian — Jules. Jules, sorry. I did
-that to his face for four years and he was decent about it every time."
+that to his face for nine years and he was decent about it every time."
 
 "Best supervisor I ever had and I've had six. He'd walk a job before he wrote
 it up, which nobody does." The mug gets turned round once. "Then it went bad.
@@ -1839,7 +1839,7 @@ anyway, because the paper was what I had in front of me."
 He is quiet for a moment.
 
 "I couldn't tell you what he looked like. Isn't that a thing." He picks the mug
-back up. "Four years across a desk. Julian. Jules."
+back up. "Nine years across a desk. Julian. Jules."
 ```
 
 ### 17.6 `topic_badge`

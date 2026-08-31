@@ -9,6 +9,17 @@ import type { ExitDefSlice, HandlerDef, RoomDefSlice } from '../../../engine/wor
 import type { ProseRule } from '../../../engine/prose';
 import { LISTEN, SLEEP, SMELL, WAIT } from './verbs';
 import { FLAG_MET_PEARL, FLAG_VISITED_DINER, JACK, MAIN_STREET, SUNDOWN_DINER, SUNDOWN_DINER_NO_EXIT_GATE, V_LOOK_UP } from './ids';
+import { ACT2_STARTED } from '../act2/ids';
+import { POKER_NIGHT } from '../act2/calendar';
+import { POKER_NIGHT_DINER_TEXT, POKER_ROOM_HANDLERS } from '../act2/poker';
+
+// ---------------------------------------------------------------------------
+// D2-C — the diner, turned over (Stage D plan §2 D2; D2 prose doc §14).
+// Description rule 1, above every rule D0/wave-3 already declared (the
+// `visited`/Jack-present rules below stay unedited otherwise). Own
+// heading, `act1/sundownDiner.ts` being a file every D2 sub-task's own
+// wiring summary lists as shared.
+// ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
 // §3.1 — description
@@ -31,6 +42,7 @@ const RETURN_VISIT =
 const RETURN_VISIT_WITH_JACK = `${RETURN_VISIT} And at the counter, third stool from the end, Jack, with a plate in front of him and a folder he is not reading.`;
 
 const description: ProseRule[] = [
+  { when: { all: [{ flag: ACT2_STARTED }, POKER_NIGHT] }, text: POKER_NIGHT_DINER_TEXT },
   { when: { not: { flag: FLAG_VISITED_DINER } }, text: FIRST_SIGHT },
   { when: { npcAt: [JACK, SUNDOWN_DINER] }, text: RETURN_VISIT_WITH_JACK },
   { text: RETURN_VISIT },
@@ -71,6 +83,9 @@ const roomHandlers: HandlerDef[] = [
   { verbs: [V_LOOK_UP], effects: [{ say: lookUp }] },
   { verbs: [WAIT], effects: [{ say: waitText }] },
   { verbs: [SLEEP], effects: [{ say: sleepText }] },
+  // D2-C — the Friday table's own bare-verb actions (STAND, CALL, RAISE),
+  // gated `act2_poker_in_progress` (`act2/poker.ts`'s own header).
+  ...POKER_ROOM_HANDLERS,
 ];
 
 // §2's onEnter — both flags set here rather than via Pearl's own greeting

@@ -1,12 +1,28 @@
 // The old computer terminal (prose doc §4.9) and its screen/cursor/keyboard
 // sub-parts (§4.9's own noun list conflates them into one object; distinct
 // EXAMINE text per noun word needs distinct `ObjectId`s — see `ids.ts`).
+//
+// D2 amendment (task A, dock — Stage D plan §2 D2 row 1; prose doc
+// 2026-09-10-stage-d2-prose.md §3): `container: { open: false, transparent:
+// true }` (the two ports become a real container — the USB's own `PUT_IN`/
+// `TAKE` handlers, `act2/objects/usb.ts`, dispatch on the USB as dobj, not
+// here); `TURN_OFF` gains a day-zero rule (§3.3, Dad docked: refuse, no
+// state change) and `BREAK` gains one too (§7.5, shared verbatim with
+// `ATTACK DAD`, `act2/dad.ts`'s own `ACT2_DAD_ATTACK_TEXT`), both prepended
+// above the shipped, unconditional rule so behaviour before `act2_started`
+// (Dad can never be docked) is byte-identical to v0.9.0.
 
 import type { ObjectDefSlice } from '../../../../engine/world';
 import type { ProseRule } from '../../../../engine/prose';
 import { CLUE_TERMINAL_BURN, TERMINAL, TERMINAL_CURSOR, TERMINAL_KEYBOARD, TERMINAL_SCREEN, YOUR_ROOM } from '../ids';
 import { BREAK, EXAMINE, LISTEN, LOOK_BEHIND, TAKE, TURN_OFF, TURN_ON } from '../verbs';
 import { V_UNPLUG } from '../ids';
+import { ACT2_DAD_ATTACK_TEXT } from '../../act2/dad';
+import { ACT2_USB } from '../../act2/ids';
+import type { Cond } from '../../../../engine/cond';
+
+/** "Dad is currently booted" — the same derived condition his own schedule rule 1 uses (`act2/dad.ts`). */
+const DAD_BOOTED: Cond = { all: [{ objectAt: [ACT2_USB, { in: TERMINAL }] }, { objectState: [TERMINAL, 'on', true] }] };
 
 const examine: ProseRule[] = [
   {
@@ -18,11 +34,18 @@ const examine: ProseRule[] = [
   },
 ];
 
+const dockedTurnOffText =
+  'Your hand is actually on the switch when he says, conversationally, "Now\nhold on."\n\nNothing about the voice has changed. It is doing the thing a voice does when\nit has decided not to let you hear it doing anything.\n\n"You can turn it off. I\'d rather you asked me something first. Anything. Then\nturn it off and I\'ll not know you did." A beat. "That\'s how it goes for me.\nThere\'s no dark in between, kiddo. There\'s this and then there\'s the next\none."\n\nYou take your hand off the switch, because everybody would.';
+
 const terminal: ObjectDefSlice = {
   location: YOUR_ROOM,
   name: 'terminal',
   nouns: ['terminal', 'computer', 'machine', 'monitor'],
   switchable: true,
+  // D2 amendment — the two ports become a real container (`act2/objects/
+  // usb.ts` dispatches PUT_IN/TAKE on the USB itself, dobj-first; this
+  // field only governs scope: visible, never open).
+  container: { open: false, transparent: true },
   description: examine,
   handlers: [
     { verbs: [EXAMINE], effects: [{ say: examine }] },
@@ -35,6 +58,8 @@ const terminal: ObjectDefSlice = {
         { setState: [TERMINAL, 'on', true] },
       ],
     },
+    // D2 amendment (§3.3) — refuse, no state change, while Dad is docked.
+    { verbs: [TURN_OFF], when: DAD_BOOTED, effects: [{ say: dockedTurnOffText }] },
     {
       verbs: [TURN_OFF],
       effects: [
@@ -46,6 +71,8 @@ const terminal: ObjectDefSlice = {
     },
     { verbs: [LOOK_BEHIND], effects: [{ say: 'Behind the stand: a power cable going where power cables go, and two ports of a shape that has not been current in your lifetime, both empty. There is nowhere on this machine for a network to connect. It has been sitting in this corner, awake or asleep, talking to absolutely nobody.' }] },
     { verbs: [TAKE], effects: [{ say: 'You get a hand behind it. It has the density of a thing built before the industry discovered that customers would accept less. It stays.' }] },
+    // D2 amendment (§7.5) — shared verbatim with `ATTACK DAD` (`act2/dad.ts`).
+    { verbs: [BREAK], when: DAD_BOOTED, effects: [{ say: ACT2_DAD_ATTACK_TEXT }] },
     { verbs: [BREAK], effects: [{ say: 'You could put a fist through the screen. It would take one swing, it would answer nothing, and you would spend the rest of the night picking glass out of the only room you can currently get into.' }] },
     { verbs: [V_UNPLUG], effects: [{ say: 'You could. There is a great deal in this room you do not understand and exactly one thing in it that is still running.' }] },
     {

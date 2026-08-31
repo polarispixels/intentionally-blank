@@ -29,6 +29,7 @@ import {
   TOWN_EDGE,
   V_LOOK_UP,
 } from './ids';
+import { ACT2_CUSTODIAN, ACT2_MEM_M15, ACT2_STARTED } from '../act2/ids';
 
 // ---------------------------------------------------------------------------
 // §2.2 — description
@@ -56,8 +57,26 @@ const FIRST_SIGHT = [
 const RETURN_VISIT =
   'The street, both ways, empty. The horses at their rail across the road. One lamp lit four buildings down, a man still under it. The store dark, the diner lit at the counter end, the post office dim, one lit blind at the sheriff\'s, and the motel sign burning away past the end of it all. North, past the roofs, the same light on the same horizon. The boarding house door is behind you.';
 
+// D2-C amendment (D2 prose doc §18.4) — retro-visibility, one clause, keyed on M15. Appended to `RETURN_VISIT` only (the ruling's own naming: "Main Street, return visit").
+// From `act2_started` the ladder man is retired (`nowhere`), so the return
+// text loses its "a man still under it" clause — a trim, not new prose
+// (found in the D2 playtest).
+const RETURN_VISIT_ACT2 = RETURN_VISIT.replace(', a man still under it', '');
+const M15_CLAUSE = `And the rail outside the post office, where a man in grey coveralls is\nfinishing a bracket that nobody in this town has looked at in twenty years.`;
+
+// D2-C amendment (Stage D plan §2 D2; D2 prose doc §20) — Main Street by day, above the night-based first-sight/return-visit split.
+const DAYTIME_TEXT =
+  'Main Street in the daylight is Main Street with the dark taken off it.\n\nBrick both sides, the poles and the wire, the lamp standards out because it is\nday and out anyway. The horses are at the rail and two of them are asleep\nstanding up, which they were also doing in the dark.\n\nA truck goes through, northbound, without slowing, and the sound of it is\navailable for some time after it has gone. A woman comes out of the post\noffice with a parcel under her arm, crosses at the middle of the road because\nthere is nothing to look for, and goes in at a door further down without\nlooking up.\n\nNorth, past the last roof, there is nothing to see at all. Whatever it is that\nsits on the horizon at night does not exist in the morning, and the country\njust goes on being country until it stops.';
+
+const DAYTIME_TEXT_WITH_M15 = `${DAYTIME_TEXT}\n\n${M15_CLAUSE}`;
+
 const description: ProseRule[] = [
+  // The M15 clause describes him at the rail (mornings), so it rides on the daytime text while he is there.
+  { when: { all: [{ memory: ACT2_MEM_M15 }, { npcAt: [ACT2_CUSTODIAN, MAIN_STREET] }, { flag: ACT2_STARTED }, { any: [{ clockPhase: 'morning' }, { clockPhase: 'afternoon' }] }] }, text: DAYTIME_TEXT_WITH_M15 },
+  { when: { all: [{ flag: ACT2_STARTED }, { any: [{ clockPhase: 'morning' }, { clockPhase: 'afternoon' }] }] }, text: DAYTIME_TEXT },
   { when: { not: { flag: FLAG_VISITED_MAIN_STREET } }, text: FIRST_SIGHT },
+  // The M15 clause describes him at the rail, so it renders only while he is there (mornings).
+  { when: { flag: ACT2_STARTED }, text: RETURN_VISIT_ACT2 },
   { text: RETURN_VISIT },
 ];
 

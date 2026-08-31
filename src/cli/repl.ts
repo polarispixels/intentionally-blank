@@ -62,7 +62,7 @@ import { compileVocabulary } from '../engine/parser';
 import type { CompiledVocabulary } from '../engine/parser';
 import { availableHints, mapView, memoriesView, notebookView, questionsView, revealHint } from '../engine/views';
 import type { GameEvent, WorldDef } from '../engine/world';
-import { WORLD as SHIPPED_WORLD } from '../content/world/game';
+import { WORLD as SHIPPED_WORLD, PROMPT_SCRIPTS as SHIPPED_PROMPT_SCRIPTS } from '../content/world/game';
 import {
   deathOptions,
   exportSave,
@@ -365,7 +365,7 @@ async function main(): Promise<void> {
   if (worldPath === undefined) {
     // No --world flag: the real shipped game (task 22's default-world wiring).
     WORLD = SHIPPED_WORLD;
-    PROMPT_SCRIPTS = RESTART_PROMPT_SCRIPTS;
+    PROMPT_SCRIPTS = { ...RESTART_PROMPT_SCRIPTS, ...SHIPPED_PROMPT_SCRIPTS };
   } else {
     const mod = await loadWorldModule(worldPath);
     WORLD = mod.WORLD;

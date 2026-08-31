@@ -12,6 +12,61 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.12.0] - 2026-08-31
+
+**Stage D2 — the town in daylight.** No new rooms; the largest wave by
+systems (`docs/superpowers/specs/2026-09-10-stage-d2-prose.md`).
+
+### Added
+
+- **Dad on the USB.** The store opens by day (an honor box, a junk drawer,
+  three adapters that fit each other); the boot — eight beats, a volume
+  label, a speaker an inch across that has made one noise its whole life
+  and now makes several; fifteen topics, two bad blocks, three confidently
+  wrong dates, the hearing that made him keep a copy of everything, the
+  service adit and where its hatch is. Jack's rig by morning: Dad in a
+  loaf-sized speaker, following.
+- **The censor.** Plain sheets behind the forms; `WRITE LETTER` as a prompt
+  (`TO —` / `AND SAY —`); a reply the next day that is warm, fluent, signed
+  in full and answers nothing (R5); a reply in four days that is numbers
+  (R6 — "about the size of a second one of these") with the shorthand
+  annotated in the margin; a folded letter comes back with a ruler of
+  creases. The rule is never stated by anyone.
+- **The Friday table.** The diner turned over, one lamp pulled low, Nolan
+  dealing; three hands, the same three every week; the gate talk between
+  the second and third (Tuesday convoys; maintenance has the building from
+  the last office light); Dad in your ear, right, right, and confidently
+  wrong; the badge loan: *"Go see for yourself. There is no Sublevel 6.
+  Bring it back Monday."*
+- **Nolan at home**, evenings on his step with the dog across his feet —
+  sorry, tidy, and unable to say what Jules looked like across nine years
+  of desk; the sentence, verbatim, kindly, every time (M8).
+- **The Custodian on Main Street** mornings, wire-brushing a bracket; M15
+  and four one-clause retro-visibility inserts. Main Street by day. The
+  buzz (the county is repaving; nobody says why). The library's two reels
+  (the plaque photographed; *sealed, not demolished*; the hearing
+  transcript that changed overnight — L19). Five memories.
+
+### Changed
+
+- **A bare non-built-in verb the room answers is an action** (`FOLD` at
+  the table).
+- A noun miss names only objects whose name carries the word; an absent
+  person is never "the motel".
+- The CLI and the shell merge the shipped game's prompt scripts, so
+  letters can be written from a script.
+- Main Street's Act II return text loses the retired ladder man; the M15
+  clause rides on the daytime text while the Custodian is at the rail.
+- Bare "letter" is the one you write; the returned letter and the replies
+  answer to their own names.
+
+### Decisions
+
+Register **58–65** (recorded ahead in v0.11.0) and **66–72** (D3's rulings,
+ahead; and Nolan managed Jules for nine years, not four).
+
+1223 tests (from 1132).
+
 ## [0.11.0] - 2026-08-31
 
 **Act II begins.** Stage D1 — the ride north, and Wall Drug.

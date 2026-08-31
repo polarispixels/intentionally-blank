@@ -1,66 +1,101 @@
-// Act II, Wave D1 — the boundary's USB-dock route (D1 prose doc §21, route
-// (a): `PUT USB IN TERMINAL` at Your Room). Text transcribed verbatim (hard
-// rule 5).
+// Act II, Stage D2, task A — the dock (D2 prose doc §3, §9.4). Prose
+// transcribed verbatim (hard rule 5).
 //
-// AMENDS TASK B'S OWN `act2_usb` OBJECT IN PLACE (same idiom `act2/verbs.ts`
-// already uses for `RUB`/`ACT1_VERBS`, and `act2/index.ts`'s own header
-// documents for room `handlers` arrays): the cache's own USB
-// (`objects/cache.ts`) already has one `PUT_IN`/`withInstrument` handler —
-// Wall Drug's own dead terminal (`ACT2_WD_TERMINAL`), "nothing happens,
-// because nothing in this corridor has anywhere to send electricity." This
-// task needs a SECOND `PUT_IN`/`withInstrument` handler on the SAME
-// object — Your Room's real terminal (`act1_terminal`) — and `actions.ts`'s
-// `findHandler` only ever consults one `world.objects[dobj].handlers`
-// array (matched top to bottom, first `verbs`/`when`/`withInstrument`
-// match wins), so both handlers must live in that one array; a second,
-// competing declaration of `act2_usb` would either lose the merge
-// (`assemble()`'s duplicate-id error) or silently shadow one task's own
-// handler depending on object-spread order (confirmed by running exactly
-// that failure mode against the assembled `WORLD` before landing this
-// file's current shape — see this task's report). `cache.ts` exports `usb`
-// for exactly this reason (a one-line, non-content addition to that file —
-// see its own comment there).
+// AMENDS TASK B'S OWN `act2_usb` OBJECT IN PLACE — see this file's own
+// header from D1 (unchanged reasoning, restated briefly): `actions.ts`'s
+// `findHandler` only ever consults ONE `world.objects[dobj].handlers`
+// array, so every `PUT_IN`/`TAKE` handler this task needs on the USB has
+// to live in that same array as the corridor's own dead-terminal handler
+// (`objects/cache.ts`'s own `usb` export).
 //
-// WHY THE HANDLER GOES ON THE USB, NOT THE TERMINAL (a deliberate deviation
-// from this task's own brief, which said "a handler on the terminal ...
-// with withInstrument: [ACT2_USB]" — reported here rather than silently
-// followed): `actions.ts`'s `findHandler` looks up `world.objects[input.
-// dobj].handlers`, and for `PUT USB IN TERMINAL` (`'V dobj prep iobj'`,
-// prep "in") the parser resolves `dobj = USB`, `iobj = TERMINAL` — so a
-// custom handler is only ever reached via the USB's own `handlers` array,
-// with `withInstrument: [TERMINAL]` matching the `iobj`. This exactly
-// mirrors the one other `PUT_IN`-with-`withInstrument` handler already
-// shipped in this codebase (`objects/nolansYard.ts`'s `pieBox`, `{ verbs:
-// [PUT_IN], withInstrument: [YARD_GATE], ... }` — declared on the pie box,
-// not the fence), the Stage D plan's own D2 draft text for this exact dock
-// ("USB handler `{ verbs: [PUT_IN], withInstrument: [TERMINAL], ... }`" —
-// also framed as the USB's own handler), and task B's own identical
-// pattern for the corridor terminal (`objects/cache.ts`'s own `usb`
-// object, above). `act1/objects/terminal.ts` is therefore untouched by
-// this task — no change there is required.
+// SUPERSESSION (§29.1 of the D2 prose doc) — D1's own boundary route
+// (`PUT USB IN TERMINAL` at Your Room rendering `system.buildBoundary`) is
+// RETIRED here: the single handler this file used to push (dockAtBoundary
+// Effects: "it fits" + `{ script: ACT2_BOUNDARY_SCRIPT }`) is replaced by
+// two handlers on the exact same `verbs`/`withInstrument` pair — §3.1's
+// refusal without the chain, §5.1's boot with it. The one-`system.
+// buildBoundary`-gate invariant still holds; the gate itself has moved to
+// D2's own two doors (a different, concurrent task's own file — not this
+// one). `ACT2_BOUNDARY_SCRIPT` is no longer imported/referenced anywhere in
+// this file.
 //
-// NO STATE CHANGE (ruling 5's own instruction): the USB is not moved into
-// the terminal and no flag is set — just the in-world line, then the
-// boundary's system line. Docking (D2) is a separate, later handler.
-//
-// Idempotent guard (module-load mutation, same as `act2/verbs.ts`'s own
-// `RUB` amendment) so importing this file twice under different specifiers
-// never double-appends the handler.
+// PUT USB IN RIG / TAKE USB (from either the terminal while booted, or the
+// rig) — this wave's own ruling 5: "a handler on the USB gated
+// `{ objectAt: [ACT2_USB, { in: ACT2_RIG }] }`" (the rig's own file,
+// `objects/rig.ts`, owns only the rig's EXAMINE/DROP).
 
-import type { Effect } from '../../../../engine/effects';
-import { PUT_IN } from '../../act1/verbs';
+import { PUT_IN, TAKE } from '../../act1/verbs';
 import { TERMINAL } from '../../act1/ids';
-import { ACT2_BOUNDARY_SCRIPT } from '../ids';
+import { ACT2_ADAPTER_CHAIN, ACT2_DAD, ACT2_DAD_BOOT_SCRIPT, ACT2_RIG, ACT2_USB } from '../ids';
 import { usb } from './cache';
 
-const itFitsText =
-  'It fits. Of course it fits — the machine is old enough to have been built\nexpecting it, and the man who wrote on the tape knew that when he wrote on the\ntape.';
+// ---------------------------------------------------------------------------
+// §3.1 — `PUT USB IN TERMINAL` without the chain.
+// ---------------------------------------------------------------------------
 
-const dockAtBoundaryEffects: Effect[] = [{ say: itFitsText }, { script: { id: ACT2_BOUNDARY_SCRIPT } }];
+const noChainText =
+  'The ports are behind the machine, which means doing this by feel, with your\ncheek against warm beige and your arm somewhere you cannot see.\n\nThe stick is the wrong shape. Not a little wrong. Wrong by about forty years:\nit wants a slot with the pins in the socket, and this machine offers you two\nmouths full of pins that want a plug with holes.\n\nYou stop before you make it a matter of force. Somewhere in this county there\nis a drawer with the in-between in it.';
 
-const alreadyWired = usb.handlers!.some(
-  (h) => h.verbs.includes(PUT_IN) && Array.isArray(h.withInstrument) && h.withInstrument.includes(TERMINAL),
-);
+// ---------------------------------------------------------------------------
+// §3.4 — `TAKE USB` while Dad is booted (docked + terminal on).
+// ---------------------------------------------------------------------------
+
+const takeWhileBootedText =
+  '"Right," he says, before your fingers are all the way round it. "That\'s fine.\nGo on."\n\nHe does not say anything else, and you stand there for a second holding a\nthing that has stopped talking, which is not the same as a thing that has\nfinished.';
+
+// ---------------------------------------------------------------------------
+// §9.4 — `PUT USB IN RIG` / `TAKE USB` from the rig.
+// ---------------------------------------------------------------------------
+
+const putInRigText =
+  'The stick goes in. The box thinks about it for a moment longer than the\nterminal does, being younger and less certain of itself.\n\n"Where are we?" says Dad, out of a loaf-sized speaker, into a car park.';
+
+const takeFromRigText = '"Right, that\'s me," he says, and then it is just a battery and some tape.';
+
+// ---------------------------------------------------------------------------
+// The handlers — declared once, pushed onto the shared array below. Order
+// matters (`findHandler` is first-match-wins): the chain-gated boot rule
+// must precede the unconditional no-chain refusal that shares its
+// `verbs`/`withInstrument` pair.
+// ---------------------------------------------------------------------------
+
+const newHandlers: NonNullable<typeof usb.handlers> = [
+  // §5.1 — the boot, with the chain in hand. `setState: [TERMINAL, 'on',
+  // true]` — Dad's own schedule rule 1 (`dad.ts`) requires the terminal
+  // "on" as a separate, derived condition from the USB's own location, and
+  // §5.1's own beats narrate the screen waking on its own the moment the
+  // stick goes in ("the screen clears itself without being asked") — the
+  // docking event itself is what powers it, not a prerequisite `TURN ON
+  // TERMINAL` the doc never mentions.
+  {
+    verbs: [PUT_IN],
+    withInstrument: [TERMINAL],
+    when: { has: ACT2_ADAPTER_CHAIN },
+    effects: [{ move: [ACT2_USB, { in: TERMINAL }] }, { setState: [TERMINAL, 'on', true] }, { script: { id: ACT2_DAD_BOOT_SCRIPT } }],
+  },
+  // §3.1 — the refusal, without it.
+  { verbs: [PUT_IN], withInstrument: [TERMINAL], effects: [{ say: noChainText }] },
+  // §9.4 — PUT USB IN RIG.
+  {
+    verbs: [PUT_IN],
+    withInstrument: [ACT2_RIG],
+    effects: [{ move: [ACT2_USB, { in: ACT2_RIG }] }, { say: putInRigText }, { setFollowing: [ACT2_DAD, true] }],
+  },
+  // §3.4 — TAKE while booted (docked + terminal on).
+  {
+    verbs: [TAKE],
+    when: { all: [{ objectAt: [ACT2_USB, { in: TERMINAL }] }, { objectState: [TERMINAL, 'on', true] }] },
+    effects: [{ say: takeWhileBootedText }, { move: [ACT2_USB, 'inventory'] }],
+  },
+  // §9.4 — TAKE USB from the rig.
+  {
+    verbs: [TAKE],
+    when: { objectAt: [ACT2_USB, { in: ACT2_RIG }] },
+    effects: [{ say: takeFromRigText }, { move: [ACT2_USB, 'inventory'] }, { setFollowing: [ACT2_DAD, false] }],
+  },
+];
+
+const alreadyWired = usb.handlers!.some((h) => h.verbs.includes(PUT_IN) && Array.isArray(h.withInstrument) && h.withInstrument.includes(ACT2_RIG));
 if (!alreadyWired) {
-  usb.handlers!.push({ verbs: [PUT_IN], withInstrument: [TERMINAL], effects: dockAtBoundaryEffects });
+  usb.handlers!.push(...newHandlers);
 }

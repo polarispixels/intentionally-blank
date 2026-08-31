@@ -188,7 +188,7 @@ const nolanHouse: ObjectDefSlice = {
   // "BREAK HOUSE"/"BREAK DOOR" reach the same text via BREAK's own dobj
   // pattern instead (same class of accepted gap this codebase already
   // documents elsewhere, e.g. `mainStreet.ts`'s "ASK MAN" note).
-  nouns: ['house', 'home', 'place', 'building', 'window', 'windows', 'curtain', 'curtains', 'porch', 'step', 'steps', 'door', 'front door', 'drive', 'driveway', 'car', 'siding', 'eave', 'nolan', 'bell'],
+  nouns: ['house', 'home', 'place', 'building', 'window', 'windows', 'curtain', 'curtains', 'porch', 'step', 'steps', 'door', 'front door', 'drive', 'driveway', 'car', 'siding', 'eave', 'bell'],
   handlers: [
     { verbs: [EXAMINE], effects: [{ say: houseExamineText }] },
     { verbs: [V_KNOCK, V_RING, HELLO], effects: [{ say: knockText }] },

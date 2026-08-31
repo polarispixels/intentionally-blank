@@ -670,6 +670,20 @@ export const OPEN_COUNTRY = O('act1_open_country');
 export const TOWN_EDGE_BOUNDARY_GATE = O('act1_town_edge_boundary_gate');
 /** §14's "every other direction — in-world, not the build boundary" gate — mirrors `POST_OFFICE_NO_EXIT_GATE`/`SHERIFF_OFFICE_NO_EXIT_GATE`. */
 export const TOWN_EDGE_NO_EXIT_GATE = O('act1_town_edge_no_exit_gate');
+/**
+ * D2-C amendment (Stage D plan §2 D2 §23; ruling 6) — the tunnel's town-
+ * side country exit, `nw`, gated `{ flag: act2_knows_tunnel_mouth }`: the
+ * direction only exists once the player has learned the tunnel is there
+ * (before that, "nw" falls to the ordinary no-exit-that-way family, same
+ * as any unlearned direction). Once it exists, this gate — always closed,
+ * no `container` declared, same shape as `TOWN_EDGE_BOUNDARY_GATE` — never
+ * opens in this build; `blockedText` is §23's country line + the system
+ * line. Named with "boundary_gate" (not "tunnel_gate") on purpose: it is
+ * a THIRD `system.buildBoundary`-class gate, not a plain "no exit that
+ * way" — `tests/world-game.test.ts`'s own boundary-count test is updated
+ * from two to three in the same change, with this note pointed at.
+ */
+export const TOWN_EDGE_TUNNEL_BOUNDARY_GATE = O('act1_town_edge_tunnel_boundary_gate');
 
 // --- Flags (§11's table). ---
 

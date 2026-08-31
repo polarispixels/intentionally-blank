@@ -139,12 +139,23 @@ describe('validate — Act I room 1', () => {
   // Reviewed and accepted the same way every other bare-verb collision in
   // this list already is: sentence position disambiguates "DRIVE TO PLANT"
   // from "EXAMINE PLANT" in practice.
-  it('produces exactly the 36 expected verb-noun-collision warnings, no others', () => {
+  //
+  // Stage D2 adds two more, both genuine and both the same shape as
+  // `act1_post_letter`'s own pre-existing "letter" hit above: two new bare,
+  // self-contained verbs whose own multi-word phrase happens to contain a
+  // token some object already declares as a noun. Task A's own
+  // `act2_pay`'s bare word "money" collides with the general store's honor
+  // box (§4.2's own vocabulary); this task's own `act2_write`'s "write
+  // letter" collides with "letter" the same way "post letter" already
+  // does (censor.ts's own new "letter"-shaped objects).
+  it('produces exactly the 38 expected verb-noun-collision warnings, no others', () => {
     const warnings = validate(WORLD).filter((f) => f.severity === 'warning');
     const collisions = warnings.filter((f) => f.code === 'verb-noun-collision');
-    expect(collisions.length).toBe(36);
+    expect(collisions.length).toBe(38);
     expect(collisions.map((f) => f.message).sort()).toEqual(
       [
+        "verb \"act2_pay\" can be typed bare and its word \"money\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act2_write\" can be typed bare and its word \"letter\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act2_drive_to_plant\" can be typed bare and its word \"drive\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act2_drive_to_plant\" can be typed bare and its word \"north\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act2_drive_to_plant\" can be typed bare and its word \"plant\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
@@ -258,9 +269,11 @@ describe('validate — Act I room 1', () => {
   // room-description tests and the verb-noun test above for what each new
   // one is and who added it. Stage D0 adds 5 more verb-noun collisions
   // (above): 34 + 5 = 39. Stage D1, task A (the ride north) adds 3 more
-  // (`act2_drive_to_plant`'s own three words, above): 39 + 3 = 42.
-  it('produces exactly forty-two warnings total, no others', () => {
+  // (`act2_drive_to_plant`'s own three words, above): 39 + 3 = 42. Stage
+  // D2 adds 2 more (`act2_pay`/"money", task A; `act2_write`/"letter",
+  // this task — see the verb-noun test above): 42 + 2 = 44.
+  it('produces exactly forty-four warnings total, no others', () => {
     const warnings = validate(WORLD).filter((f) => f.severity === 'warning');
-    expect(warnings.length).toBe(42);
+    expect(warnings.length).toBe(44);
   });
 });

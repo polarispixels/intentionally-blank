@@ -20,7 +20,9 @@ import { T } from '../../../engine/ids';
 import type { NpcDefSlice, ShowResponseDef, TopicDef } from '../../../engine/world';
 import type { ProseRule } from '../../../engine/prose';
 import { FLAG_MET_PEARL, FLAG_PEARL_NOTICED_YOU, FLAG_TOLD_PEARL_ABOUT_ROOM, MUG, PAGE_78, PEARL, PIE_BOX, SUNDOWN_DINER, V_ATTACK, V_FOLLOW, V_HUG, V_KISS } from './ids';
-import { ACT2_HORSE_BORROWED } from '../act2/ids';
+import { ACT2_CACHE_FOUND, ACT2_CLUE_REPAVING, ACT2_HORSE_BORROWED, ACT2_STARTED } from '../act2/ids';
+import { POKER_NIGHT } from '../act2/calendar';
+import { POKER_NIGHT_PEARL_GREETING } from '../act2/poker';
 
 // ---------------------------------------------------------------------------
 // §6.3 — unknownTopic
@@ -44,6 +46,10 @@ const description =
 // ---------------------------------------------------------------------------
 
 const greeting: ProseRule[] = [
+  // D2-C amendment (Stage D plan §2 D2; D2 prose doc §14.1) — Friday night,
+  // above the shipped rotation (and above the first-meeting rule too: a
+  // player's first Friday still gets the poker-night line).
+  { when: { all: [{ flag: ACT2_STARTED }, POKER_NIGHT] }, text: POKER_NIGHT_PEARL_GREETING },
   {
     // Reachable as of v0.8.0: the engine now marks an NPC met after the first exchange (`npc.ts`'s `markMet`), so this is exactly the first HELLO.
     when: { not: { met: PEARL } },
@@ -77,6 +83,8 @@ const TOPIC_JACK = T('act1_pearl_topic_jack');
 const TOPIC_PIE_TO_GO = T('act1_pearl_topic_pie_to_go');
 // D1 amendment (Stage D1 prose doc §17).
 const TOPIC_HORSES = T('act1_pearl_topic_horses');
+// D2-C amendment (§21.1) — the ninth entry, appended after `topic_horses`.
+const TOPIC_VISIT = T('act1_pearl_topic_visit');
 
 const topics: TopicDef[] = [
   {
@@ -148,6 +156,15 @@ const topics: TopicDef[] = [
     words: ['horse', 'horses', 'rail', 'hitching rail', 'whose horses', 'owner'],
     response: '"Whose?" She thinks about it while doing three other things. "They\'re at the\nrail. They\'ve been at the rail since I\'ve been looking at that rail." A pan\ncomes off the heat. "Somebody feeds them, because they\'re fed."',
     effects: [{ set: [ACT2_HORSE_BORROWED, true] }],
+  },
+  // D2-C amendment (D2 prose doc §21.1, L20 — "the buzz") — gated on the cache being found; grants `act2_clue_repaving`.
+  {
+    id: TOPIC_VISIT,
+    words: ['visit', 'president', 'buzz', 'road', 'repaving', 'resurfacing', 'crews', 'work', 'gravel', 'stone'],
+    when: { flag: ACT2_CACHE_FOUND },
+    response:
+      '"Now, there\'s a thing." She is pleased to have a thing. "County\'s asked about\nthe road. Not asked *us* — asked the state, and the state\'s asked about\ncrushed stone, and Elmer\'s boy at the yard\'s been told to hold what he\'s got\nback."\n\nThe cloth goes along a stretch that does not need it. "Milling and resurfacing,\nfull length of Main. Nobody\'s said why, and I\'ll tell you what — nobody\'s\nsaying they don\'t know why, either, which is different."\n\nShe looks up. "It\'s been that road my whole life and it has never once been\nworth doing."',
+    effects: [{ grantClue: ACT2_CLUE_REPAVING }],
   },
 ];
 

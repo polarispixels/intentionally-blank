@@ -423,6 +423,10 @@ function respondToMiss(world: WorldDef, state: GameState, vocab: CompiledVocabul
   if (outcome.verb !== undefined) {
     if (outcome.reason === 'noPattern') {
       if (hasBuiltinSemantics(outcome.verb)) return respondToBareVerb(world, state, outcome.verb);
+      // A bare non-built-in verb that the current room answers at room level
+      // (v0.12.0 — FOLD at the poker table) is an action, not a half-formed
+      // one: run it through `performAction` so the room handler fires.
+      if (roomAnswersBare(world, state, outcome.verb)) return respondToBareVerb(world, state, outcome.verb);
       return respondToBareNonBuiltinVerb(world, state, outcome.verb);
     }
     return respondToNounMiss(world, state, vocab, outcome.verb, outcome.knownNouns);
@@ -445,6 +449,12 @@ function respondToMiss(world: WorldDef, state: GameState, vocab: CompiledVocabul
 function respondToBareVerb(world: WorldDef, state: GameState, verb: VerbId): RespondResult {
   const result = performAction(world, state, { verb });
   return { state: result.state, events: result.events, class: result.class };
+}
+
+/** True when the player's current room declares a room-level handler for `verb` whose `when` (if any) holds — the signal that a bare invocation is meant. */
+function roomAnswersBare(world: WorldDef, state: GameState, verb: VerbId): boolean {
+  const handlers = world.rooms?.[state.location]?.handlers ?? [];
+  return handlers.some((h) => h.verbs.includes(verb) && (h.when === undefined || evaluate(world, state, h.when)));
 }
 
 /**
@@ -477,10 +487,18 @@ function respondToBareNonBuiltinVerb(world: WorldDef, state: GameState, verb: Ve
 
 /** Rung 3. Spoiler boundary: `nounMiss.seen` only for a candidate the player has actually seen (see file header); `nounMiss.unseen` never names anything. */
 function respondToNounMiss(world: WorldDef, state: GameState, vocab: CompiledVocabulary, verb: VerbId, knownNouns: string[]): RespondResult {
-  const candidates = candidatesForWords(vocab, knownNouns);
+  // Only objects whose own display name carries one of the words are named
+  // (v0.12.0): a routing alias ("jack" on the street's motel-sign scenery)
+  // used to answer "The motel is not here"; an absent person falls to the
+  // unnamed family rather than "The Jack is not here… seen it somewhere".
+  const candidates = candidatesForWords(vocab, knownNouns).filter((id) => {
+    if (isNpcId(vocab, id)) return false;
+    const name = (world.objects?.[id as ObjectId]?.name ?? '').toLowerCase();
+    return knownNouns.some((w) => name.includes(w));
+  });
   const seen = candidates.find((id) => hasSeen(world, state, vocab, id));
   const key = seen !== undefined ? 'nounMiss.seen' : 'nounMiss.unseen';
-  const ctx = seen !== undefined ? { name: displayNameFor(world, vocab, seen), dobj: displayNameFor(world, vocab, seen) } : {};
+  const ctx = seen !== undefined ? { name: displayNameFor(world, vocab, seen), dobj: displayNameFor(world, vocab, seen), ...(isNpcId(vocab, seen) ? { proper: 'name dobj' } : {}) } : {};
   const rendered = render(world, state, key, family(world, key), ctx);
   return {
     state: rendered.state,

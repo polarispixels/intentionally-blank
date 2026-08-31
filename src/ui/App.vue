@@ -10,6 +10,7 @@ import { DeterministicParser } from '../engine/interpreter';
 import { compileVocabulary } from '../engine/parser';
 import type { DeathOption } from '../session/session';
 import { RESTART_PROMPT_SCRIPTS } from '../session/session';
+import { PROMPT_SCRIPTS as SHIPPED_PROMPT_SCRIPTS } from '../content/world/game';
 // The shipped game: the whole assembled world (Act I + Act II + Act III
 // slices), not just Act I (ADR 0011 item 3; Stage D E3).
 import { WORLD } from '../content/world/game';
@@ -47,7 +48,7 @@ const opts: ControllerOpts = {
   // RESTART_PROMPT_SCRIPTS (`../session/session`): the RESTART/RESET
   // confirmation's own prompt id -> respond-script table. Act1 authors no
   // other generic-prompt content yet.
-  promptScripts: RESTART_PROMPT_SCRIPTS,
+  promptScripts: { ...RESTART_PROMPT_SCRIPTS, ...SHIPPED_PROMPT_SCRIPTS },
 };
 
 const deathLabels: Record<DeathOption, string> = {
