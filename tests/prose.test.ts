@@ -258,3 +258,26 @@ describe('render(): say-by-reference (ProseRef)', () => {
     expect(result.state.counters).toEqual({ 'npc.mara.greet[0]': 1 });
   });
 });
+
+// ---------------------------------------------------------------------------
+// proper names drop the article in front of their placeholder (v0.8.0)
+// ---------------------------------------------------------------------------
+
+describe('templating — `proper` keys', () => {
+  const T = 'You hold up the {name}. The {iobj} looks at it, or near it.';
+
+  it('a capitalized proper name loses the article ("The Jack" → "Jack")', () => {
+    const r = render(WORLD, baseState(), 'test.proper', T, { name: 'mug', iobj: 'Jack', proper: 'iobj' });
+    expect(r.text).toBe('You hold up the mug. Jack looks at it, or near it.');
+  });
+
+  it('a lowercase display name keeps its article', () => {
+    const r = render(WORLD, baseState(), 'test.proper', T, { name: 'mug', iobj: 'guide', proper: 'iobj' });
+    expect(r.text).toBe('You hold up the mug. The guide looks at it, or near it.');
+  });
+
+  it('keys not listed as proper are untouched even when capitalized', () => {
+    const r = render(WORLD, baseState(), 'test.proper', 'The {name} sits there.', { name: 'Catan box' });
+    expect(r.text).toBe('The Catan box sits there.');
+  });
+});

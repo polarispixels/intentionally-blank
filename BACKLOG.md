@@ -19,7 +19,7 @@ Maintenance rules:
 |---|---|---|---|
 | A | Story + engine architecture: five-act causal spine, puzzle network, room list, NPC agendas, memory system, save/undo design; canon decisions registered in `docs/spec/09` | docs site | ✅ **complete v0.2.9** — story architecture (41 rooms, 28 puzzles, 5 acts) + engine v2 architecture + ADRs 0008–0010; 15 canon decisions promoted (register entries 3–17) |
 | B | Engine v2 (world model, parser v2, save/undo/autosave, map + open-questions UI) + the opening room (M1) | 0.3.0 | ✅ **shipped v0.3.0** — 23 tasks, 729 tests; the live URL is now the real game |
-| C | Act I: town, client, missing sibling, notebook trail (M2–M4) | 0.4–0.7 | 🚧 in progress — 10 of 12 Act I rooms and three NPCs live as of v0.7.0 (wave 3: diner + Pearl, library, Town Edge); wave 4 (motel, Jack) and the close-out remain |
+| C | Act I: town, client, missing sibling, notebook trail (M2–M4) | 0.4–0.8 | 🚧 in progress — 11 of 12 Act I rooms and four NPCs live as of v0.8.0 (wave 4: the Arrowhead Motel + Jack; M1 and M3 open the memory system); the close-out (Nolan's Yard, the drawer, the notebook objective) remains |
 | D | Acts II–III: data center, underground, Dad on the USB, contradictions | 0.7–0.8 | queued |
 | E | Acts IV–V: reality travel, identity, the recursive ending | 0.9 | queued |
 | F | Hints, playtester sweeps, replay content, polish | 1.0.0 | queued |
@@ -34,8 +34,7 @@ board above is the plan. This table is what is *left*.
 
 | # | Remaining | Type |
 |---|---|---|
-| C-4 | Act I wave 4: Motel Forecourt, Jack's Room + **Jack** (the client — built alone). Carries two items held from wave 3: the **M1 memory fragment** (wave-3 doc §17, written and final, held until Jack is placeable) and **Pearl's Jack topic** (§16.4 item 5 — she is his morning neighbour; add when R1 ships, not before) | Content |
-| C-5 | Act I close-out: the notebook objective, first analog-vs-digital contradiction | Content |
+| C-5 | Act I close-out: **Nolan's Yard** (room 13, P6 — the trash sequence; Nolan's name now reachable via Jack), the jammed drawer's pry tool and the cash envelope + matchbook (P2, the other half of R1), the notebook objective, first analog-vs-digital contradiction; the route for P8's three letters (register entry 36) | Content |
 | D | Acts II–III: Wall Drug cache, Dad on the USB, the facility, Sublevel 6 | Content |
 | E | Acts IV–V: identity thread, the archive environments, the root console | Content |
 | F | Hints across all acts, `playtester` agent, replay content, 1.0 polish | Content + process |
@@ -145,6 +144,16 @@ scenery. Not urgent; it is invisible rather than broken.
   about the generic fallback.
 
 ## Prose gaps to batch into the next `narrative-writer` pass
+
+- **NPC-facing sense defaults (v0.8.0).** `SMELL JACK` renders the object
+  family (*"smells faintly of the room it has been sitting in"*) — "it", for
+  a person. SMELL/TOUCH/LISTEN TO on an NPC need a person-facing default
+  family (or per-NPC handlers). Same for bare `KNOCK` (no target) at the
+  motel. Small.
+
+- **`TELL JACK ABOUT MEMORY` ships as the small version** (wave 4 §12.3
+  q5): the designed beat where the client learns his investigator is an
+  amnesiac is unwritten and unowned.
 
 - **The carried mug (v0.7.0).** `DRINK COFFEE` / `DRINK FROM MUG` / `LOOK IN
   MUG` fall to the global default while the player is holding a full cup,

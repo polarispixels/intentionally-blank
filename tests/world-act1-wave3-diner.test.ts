@@ -296,9 +296,12 @@ describe('Sundown Diner — a real playthrough', () => {
 // ---------------------------------------------------------------------------
 
 describe('Pearl', () => {
-  it('greeting rotates: rule 1 is structurally unreachable (met_pearl is set by onEnter before any greeting can fire — same engine gap as Marlow/Whitlock), so HELLO PEARL always shows rule 2\'s rotation, starting with variant 1', () => {
+  it('greeting rule 1 is the first HELLO (the engine marks her met after it, v0.8.0); the rotation starts on the second', () => {
     const store = new MemoryStore();
-    const { session } = enterDiner();
+    let { session } = enterDiner();
+    const first = say(session, 'hello pearl', store);
+    expect(text(first.events)).toContain('Well, sit down');
+    session = first.session;
     const { events } = say(session, 'hello pearl', store);
     expect(text(events)).toContain('Shift comes off at four and the buses take most of them home');
   });
@@ -306,6 +309,7 @@ describe('Pearl', () => {
   it('greeting rotation continues through variants 2 and 3', () => {
     const store = new MemoryStore();
     let { session } = enterDiner();
+    session = say(session, 'hello pearl', store).session; // rule 1, the first meeting
     const first = say(session, 'hello pearl', store); // consume variant 1
     session = first.session;
     let r = say(session, 'hello pearl', store);

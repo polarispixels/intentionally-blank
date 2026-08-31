@@ -21,6 +21,7 @@ import {
   FLAG_VISITED_MAIN_STREET,
   FRONT_DESK,
   GENERAL_STORE,
+  JACKS_MOTEL,
   MAIN_STREET,
   POST_OFFICE,
   SHERIFF_OFFICE,
@@ -36,8 +37,11 @@ import {
 // §15.1 (wave-3 amendment) — replaces wave 2's own inserted sentence, now
 // that all six named neighbours (store, diner, post office, sheriff,
 // library) are committed; §5's "no business is named" ruling is retired.
+// §10.1 (wave-4 amendment) appends one more sentence, now that the motel is
+// the last named neighbour — modest on purpose, and it does not name the
+// motel (§3.1 of that doc gives the player the name on arrival instead).
 const GOLD_LETTERING_SENTENCE =
-  'The windows down this end carry gold lettering: a store across the road and, beside it, a diner with its lights on at one end only. On this side a post office and, past it, the sheriff, and past that the library up its six steps in the dark.';
+  'The windows down this end carry gold lettering: a store across the road and, beside it, a diner with its lights on at one end only. On this side a post office and, past it, the sheriff, and past that the library up its six steps in the dark. Past the last of the brick on this side, set back off the road, a sign on a post with a light still in it.';
 
 const FIRST_SIGHT = [
   'Main Street runs north and south and is not doing anything. Brick both sides, two storeys mostly, the dark in the upstairs windows deeper than the dark of the sky. Poles and wire down the west side. Every lamp standard is out but one, four buildings down, and there is a man up a stepladder under it with the glass cover in his hand.',
@@ -47,9 +51,10 @@ const FIRST_SIGHT = [
 ].join('\n\n');
 
 // §15.2 (wave-3 amendment) — replaces wave 2's own return-visit text,
-// adding the diner's lit counter end.
+// adding the diner's lit counter end. §10.2 (wave-4 amendment) adds one
+// more clause, the motel sign burning at the end of it all.
 const RETURN_VISIT =
-  'The street, both ways, empty. The horses at their rail across the road. One lamp lit four buildings down, a man still under it. The store dark, the diner lit at the counter end, the post office dim, one lit blind at the sheriff\'s. North, past the roofs, the same light on the same horizon. The boarding house door is behind you.';
+  'The street, both ways, empty. The horses at their rail across the road. One lamp lit four buildings down, a man still under it. The store dark, the diner lit at the counter end, the post office dim, one lit blind at the sheriff\'s, and the motel sign burning away past the end of it all. North, past the roofs, the same light on the same horizon. The boarding house door is behind you.';
 
 const description: ProseRule[] = [
   { when: { not: { flag: FLAG_VISITED_MAIN_STREET } }, text: FIRST_SIGHT },
@@ -126,6 +131,10 @@ export const mainStreetRoom: RoomDefSlice = {
     { dir: 'nw', to: SUNDOWN_DINER },
     { dir: 'se', to: COUNTY_LIBRARY },
     { dir: 'n', to: TOWN_EDGE },
+    // §10.3 (wave-4 amendment) — the last named neighbour. No inbound
+    // `travelText` is authored (same "left unset, not invented" note as
+    // every other exit in this array).
+    { dir: 'ne', to: JACKS_MOTEL },
   ],
   handlers: roomHandlers,
 };

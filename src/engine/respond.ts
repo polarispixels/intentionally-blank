@@ -216,7 +216,7 @@ function respondToActions(world: WorldDef, state: GameState, vocab: CompiledVoca
  * every other npc-targeting shape here, so it needs its own guard rather
  * than reusing the `dobj`-is-npc check below. A miss (`respondToShow`
  * returns `undefined` — nothing in `showResponses` matched) falls to
- * `respondToShowDefault`, a SHOW-specific rung-2 default rather than
+ * `respondToNpcIobjDefault`, a SHOW-specific rung-2 default rather than
  * `respondToNpcTarget`: `performAction`'s ordinary rung-2 path would
  * template `{name}`/`{iobj}` from an object-only naming table, and it is
  * the *object*'s name that belongs in `{name}` here, the npc's in `{iobj}`
@@ -273,10 +273,16 @@ function respondToAction(world: WorldDef, state: GameState, vocab: CompiledVocab
     if (greeting !== undefined) return greeting;
     // No greeting authored: fall through to the ordinary rung-2 default below.
   }
-  if (action.verb === NPC_VERB_IDS.show && dobj !== undefined && !isNpcId(vocab, dobj) && iobj !== undefined && isNpcId(vocab, iobj)) {
-    const shown = respondToShow(world, state, vocab, dobj as ObjectId, iobj);
-    if (shown !== undefined) return shown;
-    return respondToShowDefault(world, state, vocab, action.verb, dobj as ObjectId, iobj);
+  if (dobj !== undefined && !isNpcId(vocab, dobj) && iobj !== undefined && isNpcId(vocab, iobj)) {
+    // An object handed toward a person: SHOW's authored `showResponses`
+    // first; otherwise the verb's own default, named for the person
+    // (v0.8.0 — GIVE/THROW/etc. used to fall into `performAction`'s
+    // object-only naming table and print the npc's raw id).
+    if (action.verb === NPC_VERB_IDS.show) {
+      const shown = respondToShow(world, state, vocab, dobj as ObjectId, iobj);
+      if (shown !== undefined) return shown;
+    }
+    return respondToNpcIobjDefault(world, state, vocab, action.verb, dobj as ObjectId, iobj);
   }
 
   if (dobj !== undefined && isNpcId(vocab, dobj)) {
@@ -315,7 +321,7 @@ function respondToNpcTarget(world: WorldDef, state: GameState, vocab: CompiledVo
   if (verb === EXAMINE_VERB_ID && npcDef?.description !== undefined) {
     const name = npcDisplayName(world, vocab, npc);
     const path = `npc.${npc}.description`;
-    const rendered = render(world, state, path, npcDef.description, { name, dobj: name });
+    const rendered = render(world, state, path, npcDef.description, { name, dobj: name, proper: 'name dobj' });
     return {
       state: rendered.state,
       events: [{ type: 'line', kind: 'prose', text: rendered.text }],
@@ -327,7 +333,7 @@ function respondToNpcTarget(world: WorldDef, state: GameState, vocab: CompiledVo
   if (verbDef === undefined) throw new Error(`respond: verb "${verb}" is not declared in world.verbs`);
   if (verbDef.default === null) throw new Error(`respond: verb "${verb}" has no default family`);
   const name = npcDisplayName(world, vocab, npc);
-  const rendered = render(world, state, verbDefaultPath(verb), verbDef.default, { name, dobj: name });
+  const rendered = render(world, state, verbDefaultPath(verb), verbDef.default, { name, dobj: name, proper: 'name dobj' });
   return {
     state: rendered.state,
     events: [
@@ -356,19 +362,19 @@ function applyNpcHandler(world: WorldDef, state: GameState, vocab: CompiledVocab
   };
 }
 
-/** SHOW's own rung-2 default (see `respondToAction`'s SHOW note): `{name}`/`{dobj}` is the shown object, `{iobj}` the npc. */
-function respondToShowDefault(world: WorldDef, state: GameState, vocab: CompiledVocabulary, verb: VerbId, dobj: ObjectId, npc: NpcId): RespondResult {
+/** Rung-2 default for a verb whose indirect object is a person (SHOW, GIVE, …): `{name}`/`{dobj}` is the object, `{iobj}` the npc's display name. */
+function respondToNpcIobjDefault(world: WorldDef, state: GameState, vocab: CompiledVocabulary, verb: VerbId, dobj: ObjectId, npc: NpcId): RespondResult {
   const verbDef = world.verbs?.[verb];
   if (verbDef === undefined) throw new Error(`respond: verb "${verb}" is not declared in world.verbs`);
   if (verbDef.default === null) throw new Error(`respond: verb "${verb}" has no default family`);
   const dobjName = world.objects?.[dobj]?.name ?? dobj;
   const npcName = npcDisplayName(world, vocab, npc);
-  const rendered = render(world, state, verbDefaultPath(verb), verbDef.default, { name: dobjName, dobj: dobjName, iobj: npcName });
+  const rendered = render(world, state, verbDefaultPath(verb), verbDef.default, { name: dobjName, dobj: dobjName, iobj: npcName, proper: 'iobj' });
   return {
     state: rendered.state,
     events: [
       { type: 'line', kind: 'prose', text: rendered.text },
-      { type: 'diag', code: 'defaultResponse', detail: `verb "${verb}" (show) of "${dobj}" to npc "${npc}" fell to its default family` },
+      { type: 'diag', code: 'defaultResponse', detail: `verb "${verb}" of "${dobj}" to npc "${npc}" fell to its default family` },
     ],
     class: verbDef.class,
   };

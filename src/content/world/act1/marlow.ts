@@ -61,6 +61,7 @@ import {
   FRONT_DESK_COUNTER,
   PAGE_78,
   ROOM_KEY,
+  MARLOW,
 } from './ids';
 
 // ---------------------------------------------------------------------------
@@ -102,7 +103,8 @@ const description =
 
 const greeting: ProseRule[] = [
   {
-    when: { not: { flag: FLAG_MET_MARLOW } },
+    // Reachable as of v0.8.0: the engine now marks an NPC met after the first exchange (`npc.ts`'s `markMet`), so this is exactly the first HELLO.
+    when: { not: { met: MARLOW } },
     text: '"Evening." He has been awake for hours and does not pretend otherwise. His eyes go to the side of your head, once, and come back. He does not ask.\n\n"There\'s a towel behind the desk, if you want one."',
   },
   {

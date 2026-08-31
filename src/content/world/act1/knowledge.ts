@@ -18,19 +18,25 @@ import {
   CLUE_DEAD_CROSS_REFERENCE,
   CLUE_DRAWER_HELD,
   CLUE_FIVE_FACES,
+  CLUE_HIRED,
   CLUE_HORIZON_GLOW,
   CLUE_HOUSE_EMPTY,
+  CLUE_JULES,
+  CLUE_LETTERS_ANSWERED,
   CLUE_LIGHTS_RESOLVED,
   CLUE_MAP_ADDITION,
   CLUE_MUG_SPELLING,
   CLUE_NO_COUNTY_RECORD,
   CLUE_NO_NAME_RECALLED,
   CLUE_NOTHING_NAMED,
+  CLUE_ODD_KEY,
   CLUE_PAGE_INDENTATION,
+  CLUE_POLAROID_FLARE,
   CLUE_RECORD_RANGE,
   CLUE_REGISTER_GAP,
   CLUE_REGISTER_IMPRESSION,
   CLUE_SAME_DISTANCE,
+  CLUE_TATTOO_GAP,
   CLUE_TERMINAL_BURN,
   CLUE_TERMINAL_NO_CROSSREFS,
   CLUE_VISITOR_UNREMARKABLE,
@@ -41,20 +47,25 @@ import {
   FLAG_ENTERED_PADDOCK,
   FLAG_HANDLED_MUG,
   FLAG_HAS_STRING,
+  FLAG_HEARD_NOLAN_NAME,
   FLAG_HORSE_TOUCHED,
+  FLAG_JACK_SAW_PAGE,
   FLAG_LAMP_FIRST_OFF_DONE,
   FLAG_LAMP_FIRST_ON_DONE,
   FLAG_LAMP_RIGHTED,
   FLAG_MARLOW_KNOWS_YOU_KNOW,
   FLAG_MARLOW_PRESSED,
   FLAG_MARLOW_TOLD_ABOUT_ROOM,
+  FLAG_MET_JACK,
   FLAG_MET_MARLOW,
   FLAG_MET_PEARL,
   FLAG_MET_WHITLOCK,
+  FLAG_NOTICED_ODD_KEY,
   FLAG_PEARL_NOTICED_YOU,
   FLAG_POCKETS_CHECKED,
   FLAG_RANG_BELL,
   FLAG_READ_BILLBOARD_SCRATCH,
+  FLAG_READ_JACK_LETTERS,
   FLAG_READ_LEFT_FRAME,
   FLAG_READ_POSTCARDS,
   FLAG_REGISTER_GAP_SEEN,
@@ -64,11 +75,13 @@ import {
   FLAG_SAT_IN_POST_OFFICE,
   FLAG_SAW_BLANK_RECTANGLE,
   FLAG_SAW_GRADED_STRIP,
+  FLAG_SAW_JACK_TATTOO,
   FLAG_SEEN_MAINTENANCE_MAN,
   FLAG_SIGNED_THE_BOOK,
   FLAG_SPARE_KEY_GIVEN,
   FLAG_STOOD_UP,
   FLAG_TERMINAL_TRIED,
+  FLAG_TOLD_JACK_ABOUT_ROOM,
   FLAG_TOLD_PEARL_ABOUT_ROOM,
   FLAG_TOLD_WHITLOCK_ABOUT_ROOM,
   FLAG_TOWEL_TAKEN,
@@ -76,6 +89,7 @@ import {
   FLAG_VISITED_GENERAL_STORE,
   FLAG_VISITED_LIBRARY,
   FLAG_VISITED_MAIN_STREET,
+  FLAG_VISITED_MOTEL,
   FLAG_VISITED_POST_OFFICE,
   FLAG_VISITED_SHERIFF_OFFICE,
   FLAG_VISITED_TOWN_EDGE,
@@ -85,10 +99,15 @@ import {
   FLAG_WOUND_EXAMINED,
   LANDING,
   MEM_HAT,
+  MEM_M1_HIRING,
+  MEM_M3_ANALYTICAL,
+  MEM_M3_DIRECT,
+  MEM_M3_SOCIAL,
   PUZZLE_LEAVE_YOUR_ROOM,
   PUZZLE_REGISTER,
   QUESTION_OUT_OF_THIS_ROOM,
   QUESTION_THE_RECORD,
+  SUNDOWN_DINER,
 } from './ids';
 
 /**
@@ -182,6 +201,24 @@ export const ACT1_FLAGS: WorldDef['flags'] = {
   [FLAG_READ_BILLBOARD_SCRATCH]: { default: false, doc: 'set by EXAMINE/READ BILLBOARD — read by nothing yet — L10 pays off in Act II' },
   [FLAG_ENTERED_PADDOCK]: { default: false, doc: 'set by OPEN GATE / ENTER PADDOCK / CLIMB FENCE — read by nothing yet — P9 should read it' },
   [FLAG_SAW_GRADED_STRIP]: { default: false, doc: 'set by EXAMINE COUNTRY — read by nothing yet — P16b should read it' },
+
+  // -------------------------------------------------------------------
+  // The Arrowhead Motel (wave-4 prose §2's table — this task's own four;
+  // Jack's own five flags belong to the concurrent Jack task, below)
+  // -------------------------------------------------------------------
+  [FLAG_VISITED_MOTEL]: { default: false, doc: 'set by jacks_motel\'s own onEnter (first entry) — gates room description rule 2' },
+  [FLAG_MET_JACK]: { default: false, doc: 'set by jacks_motel\'s own onEnter (same engine gap as met_pearl/met_whitlock — greeting cannot run an Effect) — read by jack.ts\'s own greeting rotation' },
+  [FLAG_NOTICED_ODD_KEY]: { default: false, doc: 'set by EXAMINE KEYRING — read by nothing yet — P8 should read it' },
+  [FLAG_READ_JACK_LETTERS]: { default: false, doc: 'set by READ LETTERS — read by nothing yet — R15 should read it' },
+
+  // -------------------------------------------------------------------
+  // Jack (wave-4 prose §2's table — this task's own four; the room's
+  // own flags belong to the concurrent Arrowhead Motel task)
+  // -------------------------------------------------------------------
+  [FLAG_SAW_JACK_TATTOO]: { default: false, doc: 'set by both of topic_tattoo\'s rules (jack.ts) — triggers M3 (mem_m3_*); read by topic_tattoo rule 1' },
+  [FLAG_TOLD_JACK_ABOUT_ROOM]: { default: false, doc: 'set by tell_room (jack.ts) — read by greeting rule 2' },
+  [FLAG_JACK_SAW_PAGE]: { default: false, doc: 'set by SHOW PAGE TO JACK — read by nothing yet, M14 should read it' },
+  [FLAG_HEARD_NOLAN_NAME]: { default: false, doc: 'set by topic_nolan (jack.ts) — read by nothing yet, P6\'s prerequisite' },
 };
 
 export const ACT1_CLUES: NonNullable<WorldDef['clues']> = {
@@ -333,6 +370,45 @@ export const ACT1_CLUES: NonNullable<WorldDef['clues']> = {
     detail:
       'From the edge of town the light on the north horizon is a great many separate white lights, low and far, in rows the same distance apart, with one red one higher up going on and off very slowly, and steam going up behind all of it. No building is visible.',
   },
+
+  // -------------------------------------------------------------------
+  // The Arrowhead Motel (wave-4 prose §2's table — this task's own four;
+  // Jack's own two clues belong to the concurrent Jack task, below)
+  // -------------------------------------------------------------------
+  [CLUE_HIRED]: {
+    title: 'Who hired you',
+    detail:
+      'A man called Jack, at the Arrowhead Motel, hired you three weeks ago to find his brother. Cash, weekly. You report to him at Pearl\'s counter at nine, twice a week. You did not come last night.',
+  },
+  [CLUE_POLAROID_FLARE]: {
+    title: 'The light-struck Polaroid',
+    detail:
+      'A porch step in summer. An old man, a young man behind him, a girl on the step below, two more at the right-hand edge. The left-hand third of the print is a white flare, and an arm comes out of it and lies across the young man\'s shoulders, with a watch on the wrist. Jack says that is Jules.',
+  },
+  [CLUE_ODD_KEY]: {
+    title: "An odd key on Jules's ring",
+    detail:
+      "Jules's spare keys hang on a nail in Jack's room: a truck key, two house keys, a padlock key tagged SHED — and one that is not shaped like any of them. Short, flat, brass, a number stamped into the bow, and a squared bit that has never been near a house door.",
+  },
+  [CLUE_LETTERS_ANSWERED]: {
+    title: 'The letters that came back',
+    detail:
+      'Jack has written to his brother Luke about Jules, repeatedly. The replies are short, warm, fluent, ask after everybody, and never once answer the question. Each one is signed **L**. Jack says Luke has never signed off L in his life.',
+  },
+
+  // -------------------------------------------------------------------
+  // Jack (wave-4 prose §2's table — this task's own two)
+  // -------------------------------------------------------------------
+  [CLUE_JULES]: {
+    title: 'The missing brother',
+    detail:
+      "Jack's oldest brother Jules was facilities supervisor at the plant north of town. Five weeks ago he stopped being anywhere. He had been behaving strangely for six months before it. Nobody else in the county remembers him — not the sheriff, not the county records, not his own manager, not Pearl.",
+  },
+  [CLUE_TATTOO_GAP]: {
+    title: "The numeral on Jack's arm",
+    detail:
+      "Inside Jack's left forearm, above the wrist: **IV**. All five of them were done the same afternoon, in birth order. Luke is II, Eli III, Jack IV, Sissy V. Jules is I.",
+  },
 };
 
 export const ACT1_MEMORIES: NonNullable<WorldDef['memories']> = {
@@ -349,6 +425,54 @@ export const ACT1_MEMORIES: NonNullable<WorldDef['memories']> = {
       'Rain — and the sound of rain on a hat is not the sound of rain on your head. It is closer, and drier, and oddly private, like being told something. There is somebody two steps ahead of you on a wet sidewalk, talking, and you are not listening, because you are thinking about how the brim keeps the water off the back of your neck, and about how you have never in your life owned anything that did that.',
       'Then it is gone, in the way a smell is gone, and you are standing in a cold room in a borrowed-feeling hat.\n\nThe hat fits. You have no idea whether that is good news.',
     ],
+  },
+
+  // -------------------------------------------------------------------
+  // M1 — the hiring (wave-4 prose §7: held from wave 3 §17, unchanged,
+  // "not reproduced here so that there is exactly one copy of it in the
+  // repository" — transcribed here instead, since wave 3 never wired it.
+  // Trigger: main-session decision, first entry to the diner.)
+  // -------------------------------------------------------------------
+  [MEM_M1_HIRING]: {
+    title: 'The Hiring',
+    lines: [
+      'This counter, and a man across the corner of it with his hands round a cup he was not drinking, saying a thing twice because the first time you had not answered.',
+      'Cash on the formica, counted out in front of you, which is a way of paying that means something and you knew at the time what it meant.',
+      'Then it is a counter again, and your own hands on it.',
+    ],
+    trigger: { when: { visited: SUNDOWN_DINER } },
+  },
+
+  // -------------------------------------------------------------------
+  // M3 — the tattoo day (wave-4 prose §8). Three behavioral variants
+  // sharing one title, selected by `profileLeader` at grant time — exactly
+  // one of the three ever fires, since `evaluateMemoryTriggers` (`knowledge.ts`)
+  // grants a memory the first tick its own `trigger.when` holds and each of
+  // these three `when`s is mutually exclusive with the other two (the
+  // social variant's `not: { any: [...] }` is what makes a tie fire social,
+  // per §8.1's own note: "default when no class leads: social").
+  // -------------------------------------------------------------------
+  [MEM_M3_ANALYTICAL]: {
+    title: 'The Numbering',
+    lines: [
+      'A back room off a street in Rapid City with a curtain instead of a door, and a price list on the wall that charged by the inch. The order had been settled in the car and the order was not up for discussion. I went first because I was first, which is the whole of the principle. The man doing it said four minutes and took nine, because a straight line is harder than a curve, and every one of us had a straight line in us somewhere.',
+    ],
+    // Exactly one M3 variant may ever fire: each excludes the others (the playtest caught direct firing first and social firing later once the profile leader changed).
+    trigger: { when: { all: [{ flag: FLAG_SAW_JACK_TATTOO }, { profileLeader: 'analytical' }, { not: { any: [{ memory: MEM_M3_SOCIAL }, { memory: MEM_M3_DIRECT }] } }] } },
+  },
+  [MEM_M3_SOCIAL]: {
+    title: 'The Numbering',
+    lines: [
+      'Everybody had a different reason for wanting to go last, and the youngest had the loudest one. Dad said youngest goes last, on the grounds that it was already the arrangement, and that settled it the way things got settled.\n\nI went first because I was first. I made a face on purpose. The laughing came out of the waiting room and through the curtain and I could hear exactly which of them was doing which of it.',
+    ],
+    trigger: { when: { all: [{ flag: FLAG_SAW_JACK_TATTOO }, { not: { any: [{ profileLeader: 'analytical' }, { profileLeader: 'direct' }] } }, { not: { any: [{ memory: MEM_M3_ANALYTICAL }, { memory: MEM_M3_DIRECT }] } }] } },
+  },
+  [MEM_M3_DIRECT]: {
+    title: 'The Numbering',
+    lines: [
+      'It is a vibration more than a pain and it goes into the bone of the arm, and the trick is not to watch. I watched.\n\nI went first because I was first, and I kept the arm flat on the towel the whole way through so that nobody coming in after me would have anything to be frightened of. Afterwards the skin came up shiny and hot, and Dad paid, and we ate in the car on the way home.',
+    ],
+    trigger: { when: { all: [{ flag: FLAG_SAW_JACK_TATTOO }, { profileLeader: 'direct' }, { not: { any: [{ memory: MEM_M3_ANALYTICAL }, { memory: MEM_M3_SOCIAL }] } }] } },
   },
 };
 

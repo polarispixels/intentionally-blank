@@ -15,9 +15,11 @@ import { sheriffOfficeRoom } from './sheriffOffice';
 import { countyLibraryRoom } from './countyLibrary';
 import { sundownDinerRoom } from './sundownDiner';
 import { townEdgeRoom } from './townEdge';
+import { jacksMotelRoom } from './jacksMotel';
 import { marlow } from './marlow';
 import { whitlock } from './whitlock';
 import { pearl } from './pearl';
+import { jack } from './jack';
 import { ACT1_OBJECTS } from './objects/index';
 import { FRONT_DESK_OBJECTS } from './objects/frontDesk';
 import { MAIN_STREET_OBJECTS } from './objects/mainStreet';
@@ -27,10 +29,11 @@ import { SHERIFF_OFFICE_OBJECTS } from './objects/sheriffOffice';
 import { COUNTY_LIBRARY_OBJECTS } from './objects/countyLibrary';
 import { SUNDOWN_DINER_OBJECTS } from './objects/sundownDiner';
 import { TOWN_EDGE_OBJECTS } from './objects/townEdge';
+import { JACKS_MOTEL_OBJECTS } from './objects/jacksMotel';
 import { ACT1_RESPONSES } from './responses';
 import { yourRoom } from './room';
 import { ACT1_VERBS } from './verbs';
-import { COUNTY_LIBRARY, FRONT_DESK, GENERAL_STORE, LANDING, MAIN_STREET, MARLOW, PEARL, POST_OFFICE, SHERIFF_OFFICE, SUNDOWN_DINER, TOWN_EDGE, WHITLOCK, YOUR_ROOM } from './ids';
+import { COUNTY_LIBRARY, FRONT_DESK, GENERAL_STORE, JACK, JACKS_MOTEL, LANDING, MAIN_STREET, MARLOW, PEARL, POST_OFFICE, SHERIFF_OFFICE, SUNDOWN_DINER, TOWN_EDGE, WHITLOCK, YOUR_ROOM } from './ids';
 
 export const WORLD: WorldDef = {
   meta: {
@@ -53,6 +56,7 @@ export const WORLD: WorldDef = {
     [COUNTY_LIBRARY]: countyLibraryRoom,
     [SUNDOWN_DINER]: sundownDinerRoom,
     [TOWN_EDGE]: townEdgeRoom,
+    [JACKS_MOTEL]: jacksMotelRoom,
   },
   objects: {
     ...ACT1_OBJECTS,
@@ -64,8 +68,9 @@ export const WORLD: WorldDef = {
     ...COUNTY_LIBRARY_OBJECTS,
     ...SUNDOWN_DINER_OBJECTS,
     ...TOWN_EDGE_OBJECTS,
+    ...JACKS_MOTEL_OBJECTS,
   },
-  npcs: { [MARLOW]: marlow, [WHITLOCK]: whitlock, [PEARL]: pearl },
+  npcs: { [MARLOW]: marlow, [WHITLOCK]: whitlock, [PEARL]: pearl, [JACK]: jack },
   verbs: ACT1_VERBS,
   clues: ACT1_CLUES,
   memories: ACT1_MEMORIES,

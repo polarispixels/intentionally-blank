@@ -228,7 +228,8 @@ describe('respond — NPC target: description (EXAMINE), handlers (rung 1), and 
     // the authored "name" now wins.
     const outcome: InterpretOutcome = { kind: 'actions', actions: [{ verb: EXAMINE, dobj: NAMED_NPC, raw: 'snurf clerk' }] };
     const result = respond(WORLD_WITH_NAMED_NPC, baseState(), vocabWithNamedNpc, outcome);
-    expect(lineText(result.events)).toBe(VERB_DEFAULTS['examine'][0]!.replace(/\{name\}/g, 'Corwin'));
+    // v0.8.0: a capitalized proper name also drops the article in front of its placeholder (`ProseContext.proper`).
+    expect(lineText(result.events)).toBe(VERB_DEFAULTS['examine'][0]!.replace(/\b(?:[Tt]he|[Aa]n?) \{name\}/g, 'Corwin').replace(/\{name\}/g, 'Corwin'));
     expect(lineText(result.events)).not.toContain('old clerk');
   });
 

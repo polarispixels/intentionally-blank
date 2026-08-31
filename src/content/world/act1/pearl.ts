@@ -19,7 +19,7 @@
 import { T } from '../../../engine/ids';
 import type { NpcDefSlice, ShowResponseDef, TopicDef } from '../../../engine/world';
 import type { ProseRule } from '../../../engine/prose';
-import { FLAG_MET_PEARL, FLAG_PEARL_NOTICED_YOU, FLAG_TOLD_PEARL_ABOUT_ROOM, MUG, PAGE_78, SUNDOWN_DINER, V_ATTACK, V_FOLLOW, V_KISS } from './ids';
+import { FLAG_MET_PEARL, FLAG_PEARL_NOTICED_YOU, FLAG_TOLD_PEARL_ABOUT_ROOM, MUG, PAGE_78, PEARL, SUNDOWN_DINER, V_ATTACK, V_FOLLOW, V_HUG, V_KISS } from './ids';
 
 // ---------------------------------------------------------------------------
 // §6.3 — unknownTopic
@@ -44,7 +44,8 @@ const description =
 
 const greeting: ProseRule[] = [
   {
-    when: { not: { flag: FLAG_MET_PEARL } },
+    // Reachable as of v0.8.0: the engine now marks an NPC met after the first exchange (`npc.ts`'s `markMet`), so this is exactly the first HELLO.
+    when: { not: { met: PEARL } },
     text: '"Well, sit down," she says, as though you had been arguing about it. "You want the coffee, you want the eggs, and you don\'t want to talk about your head, so we won\'t."\n\nShe is pouring before the stool has stopped turning.',
   },
   {
@@ -67,6 +68,10 @@ const TOPIC_TOWN = T('act1_pearl_topic_town');
 const TOPIC_HEAD = T('act1_pearl_topic_head');
 const TOPIC_MARLOW = T('act1_pearl_topic_marlow');
 const TOPIC_WHITLOCK = T('act1_pearl_topic_whitlock');
+// Jack (wave 4) — §9 of `docs/superpowers/specs/2026-09-05-act1-wave4-
+// prose.md`, the eighth and last topic, appended after `topic_whitlock`;
+// nothing else in this file changes.
+const TOPIC_JACK = T('act1_pearl_topic_jack');
 
 const topics: TopicDef[] = [
   {
@@ -110,6 +115,12 @@ const topics: TopicDef[] = [
     words: ['sheriff', 'whitlock', 'dana', 'law', 'police', 'cops', 'records', 'database', 'computer'],
     response:
       '"Dana. She was one of mine in that end booth doing her homework and now she carries a gun and won\'t sit down." A cloth goes over her shoulder. "If she tells you a thing it\'s true. But she\'ll not tell you a thing she can\'t get off that computer, and there\'s a deal in this town that never got on it."',
+  },
+  {
+    id: TOPIC_JACK,
+    words: ['jack', 'truck', 'monster truck', 'the man with the truck', 'motel', 'arrowhead', 'stranger', 'visitor'],
+    response:
+      '"Jack? He\'s in at six most mornings, and he has the eggs, and he asks people things." She says it exactly the way she says the weather. "Been doing it since the start of last month. He\'s not sleeping and it\'s got into his talk, and there\'s two or three won\'t sit by him now."\n\nA plate goes down somewhere. "He\'s a good boy carrying a thing. I put food in front of him and he eats it. That\'s not nothing."',
   },
 ];
 
@@ -167,7 +178,8 @@ export const pearl: NpcDefSlice = {
   greeting,
   handlers: [
     { verbs: [V_ATTACK], effects: [{ say: attackText }] },
-    { verbs: [V_KISS], effects: [{ say: kissHugText }] },
+    // `hug` moved from V_KISS to its own V_HUG in wave 4 (Jack answers the two differently); Pearl's one text still covers both.
+    { verbs: [V_KISS, V_HUG], effects: [{ say: kissHugText }] },
     { verbs: [V_FOLLOW], effects: [{ say: followText }] },
   ],
 };

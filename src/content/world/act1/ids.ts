@@ -747,3 +747,113 @@ export const V_LOOK_OUT = V('act1_look_out');
 export const V_LOOK_FOR_FACE = V('act1_look_for_face');
 /** §6.8's "KISS PEARL"/"HUG PEARL" — one shared response, one verb id (same idiom as HELLO's own multi-word rotation). */
 export const V_KISS = V('act1_kiss');
+
+// ---------------------------------------------------------------------------
+// The Arrowhead Motel (wave 4)
+// (`docs/superpowers/specs/2026-09-05-act1-wave4-prose.md` PART ONE, §2-§5,
+// and §10's Main Street amendment). Zone 1 rooms 11-12, merged. Jack himself
+// (`JACK`, his own flags/clues/memories) is a separate concurrent task's own
+// module — not declared here (main-session brief for this task).
+// ---------------------------------------------------------------------------
+
+export const JACKS_MOTEL = R('act1_jacks_motel');
+
+// --- Objects — the six the task names, plus two sub-parts the same "which
+// noun word resolved" gap this file's own header explains requires: the
+// truck's own "cab"/glass cluster needs EXAMINE/SEARCH text distinct from
+// plain "examine truck" (§4.1's second response block), and the Polaroid's
+// own "back" needs EXAMINE text distinct from plain "examine polaroid"
+// (§4.3's second response block, shared with the parent's own TAKE/
+// V_TURN_OVER handlers — see `objects/jacksMotel.ts`) — plus one
+// always-closed "every other direction" gate (§5), same idiom as
+// `TOWN_EDGE_NO_EXIT_GATE`/`SHERIFF_OFFICE_NO_EXIT_GATE`. ---
+
+export const MONSTER_TRUCK = O('act1_monster_truck');
+/** Sub-part — see this block's own header comment. Also carries the truck's own "door" + adjective "truck" (§14's wiring item 2 — see `objects/jacksMotel.ts`'s own comment on the bare "door"/"truck door" collision with `motel_unit`), NOT this sub-part; that lives on the parent `MONSTER_TRUCK` itself. */
+export const MONSTER_TRUCK_CAB = O('act1_monster_truck_cab');
+export const MOTEL_UNIT = O('act1_motel_unit');
+export const POLAROID = O('act1_polaroid');
+/** Sub-part — see this block's own header comment. */
+export const POLAROID_BACK = O('act1_polaroid_back');
+export const KEYRING = O('act1_keyring');
+export const JACK_LETTERS = O('act1_jack_letters');
+export const CATAN_BOX = O('act1_catan_box');
+
+/** §5's "every other direction — in-world, not the build boundary" gate. */
+export const JACKS_MOTEL_NO_EXIT_GATE = O('act1_jacks_motel_no_exit_gate');
+
+// --- Main Street amendment (§10.3) — one new street-facing scenery object,
+// so "GO TO MOTEL"/"ENTER MOTEL"/"FIND JACK"/"GO TO ARROWHEAD" resolve
+// before `JACKS_MOTEL` has ever been visited (`GO TO`'s BFS only walks
+// already-visited rooms) — same idiom as `COUNTY_LIBRARY_FRONT`/`DINER`. ---
+
+export const MOTEL_SIGN_FRONT = O('act1_motel_sign_front');
+
+// --- Flags (§2's table — this task's four; Jack's own five are a separate module's). ---
+
+export const FLAG_VISITED_MOTEL = F('act1_visited_motel');
+export const FLAG_MET_JACK = F('act1_met_jack');
+export const FLAG_NOTICED_ODD_KEY = F('act1_noticed_odd_key');
+export const FLAG_READ_JACK_LETTERS = F('act1_read_jack_letters');
+
+// --- Clues (§2's table — this task's four; Jack's own two, `clue_jules` and `clue_tattoo_gap`, are a separate module's). ---
+
+export const CLUE_HIRED = C('act1_clue_hired');
+export const CLUE_POLAROID_FLARE = C('act1_clue_polaroid_flare');
+export const CLUE_ODD_KEY = C('act1_clue_odd_key');
+export const CLUE_LETTERS_ANSWERED = C('act1_clue_letters_answered');
+
+// --- New verbs. `drive`/`start` (§4.1's "DRIVE TRUCK"/"START TRUCK") and
+// `play` (§4.6's "PLAY CATAN"/"PLAY GAME") are brand-new — neither word
+// exists anywhere else in this table (checked). "get in truck" reuses the
+// existing dobj-taking direction verb IN instead of a new id ("get in"
+// added to its own `words` in `verbs.ts` — matches the established
+// "extend an existing verb's synonym list" idiom, e.g. Main Street's own
+// "untie"/"mount" added to TAKE); "take truck"/"open [truck] door" reuse
+// the existing TAKE/OPEN builtins, and "ask for keys"/"borrow keys" reuse
+// the existing V_ORDER ("ask for") and TAKE ("borrow" added to its own
+// `words`) — see `objects/jacksMotel.ts`'s own report notes. ---
+
+export const V_DRIVE = V('act1_drive');
+export const V_PLAY = V('act1_play');
+
+// ---------------------------------------------------------------------------
+// Jack (wave 4) — `docs/superpowers/specs/2026-09-05-act1-wave4-prose.md`
+// PART TWO (§6), PART THREE (§7-§8), PART FOUR (§9). Zone 1 rooms 11-12
+// merged into "The Arrowhead Motel" (`jacks_motel`, declared just above by
+// the concurrent Arrowhead Motel task — landed before this task finished,
+// so `JACK`'s own `schedule` (jack.ts) posts to that `JACKS_MOTEL` directly;
+// no second declaration needed here).
+// ---------------------------------------------------------------------------
+
+/** Jack (§6) — the game's fourth NPC. */
+export const JACK = N('act1_jack');
+
+// --- Flags (§2's table — this task's own four; the room's own flags
+// belong to the concurrent Arrowhead Motel task). ---
+export const FLAG_SAW_JACK_TATTOO = F('act1_saw_jack_tattoo');
+export const FLAG_TOLD_JACK_ABOUT_ROOM = F('act1_told_jack_about_room');
+export const FLAG_JACK_SAW_PAGE = F('act1_jack_saw_page');
+export const FLAG_HEARD_NOLAN_NAME = F('act1_heard_nolan_name');
+
+// --- Clues (§2's table — this task's own two). ---
+export const CLUE_JULES = C('act1_clue_jules');
+export const CLUE_TATTOO_GAP = C('act1_clue_tattoo_gap');
+
+// --- Memories (§7-§8). M1 is held from wave 3 and unblocks here; M3 is
+// three behavioral variants sharing one title (main-session decision, this
+// task's own brief). ---
+export const MEM_M1_HIRING = M('act1_mem_m1_hiring');
+export const MEM_M3_ANALYTICAL = M('act1_mem_m3_analytical');
+export const MEM_M3_SOCIAL = M('act1_mem_m3_social');
+export const MEM_M3_DIRECT = M('act1_mem_m3_direct');
+
+// --- New verb. `HUG` collides with `V_KISS`'s own word "hug" (added for
+// Pearl in wave 3, where KISS/HUG shared one response) — Jack's §6.8 needs
+// distinct text for `KISS JACK` and `HUG JACK`, which is impossible under
+// one verb id (`validate.ts`'s verb-word-collision check is a hard error
+// against two verbs both claiming "hug"). This task moves "hug" off
+// `V_KISS` onto this new verb instead of leaving it a dead synonym on both
+// — see `verbs.ts`'s own comment on the consequence for Pearl, and this
+// task's report.
+export const V_HUG = V('act1_hug');

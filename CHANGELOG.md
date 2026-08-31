@@ -12,6 +12,71 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.8.0] - 2026-08-30
+
+### Added
+
+- **The Arrowhead Motel, and Jack — the client.** Act I wave 4, written by
+  `narrative-writer` and wired from
+  `docs/superpowers/specs/2026-09-05-act1-wave4-prose.md`. Eleven of Act I's
+  twelve rooms are live; the last named neighbour on Main Street has a sign
+  now, northeast past the end of the brick. Jack is the fourth character and
+  the first who knows you: R1 (*you were hired*) lands in the room
+  description itself, as a complaint from a man who sat in a doorway until
+  midnight waiting for a report. Fourteen topics, two of them with a second
+  rule that only exists for a player holding a memory; the Polaroid with a
+  third of it burned out; Jules's spare keys on a nail; the letters from
+  Luke that answer everything except the question; a travel Catan box with
+  the house rules in the lid. Six clues — the whole of the Act I case.
+
+- **The memory system opens.** M1 *The Hiring* (held since wave 3) fires on
+  the diner threshold; M3 *The Numbering* fires when Jack turns his arm over,
+  in one of three tellings chosen by the player's behavioural profile
+  (social when tied). Both are the first person of somebody the player
+  cannot have been.
+
+- **Pearl has a Jack topic** — reported as weather; she does not say the
+  name she cannot say.
+
+### Changed
+
+- **NPCs are now marked met by conversation.** `cond.ts` has had
+  `{ met: npc }` since the engine landed and nothing ever set it; every
+  NPC's first-greeting rule was keyed on a flag the room set on entry, and
+  so was unreachable — four prose documents say so in their own margins.
+  The engine now marks a person met after the first exchange, and the
+  four first greetings (Marlow's *"Evening."*, Whitlock's, Pearl's, Jack's)
+  are exactly the first HELLO.
+
+- **Proper names drop the article in front of their placeholder.** The SHOW
+  default read *"The Jack looks at it"*; NPC-facing render sites now mark
+  the name as proper (`ProseContext.proper`) and a capitalized name loses
+  its "The". Lowercase display names ("the guide") keep it; objects are
+  untouched ("the Catan box").
+
+- **Any verb with a person as its indirect object renders against the
+  person.** `GIVE KEY TO JACK` printed *"The act1_jack does not take…"* —
+  it had fallen into the object-only naming path. SHOW's authored responses
+  still come first; everything else gets the verb's default, named.
+
+### Decisions (main session, full-game build protocol)
+
+- Canon register entries **30–37**: Jack is awake at four and the plot pays
+  for it; he never had the investigator's name; he does not recognize the
+  hat; his IV sits where the player's blank patch is; the motel is THE
+  ARROWHEAD; the Act I timeline (5/5/3 weeks) moves together; **P8's box
+  opens on three letters, not a key** — the shipped post office stands and
+  the odd key on Jules's ring is unassigned; and the game never prints a
+  wage, rent or fare.
+- Jack's schedule is one post, all phases: the engine clock starts at 07:00
+  while the fiction is 4 a.m., so the document's phase-based posts would
+  put him in the diner at the opening. Revisit when the clock is aligned.
+- The validator stands at 29 warnings (four new, all bare-noun collisions
+  with words the wave's own noun lists require — `name`, `letter`). Pinned
+  in `tests/world-act1.test.ts`.
+
+996 tests (from 941).
+
 ## [0.7.0] - 2026-08-30
 
 ### Added

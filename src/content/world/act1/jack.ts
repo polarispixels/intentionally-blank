@@ -1,0 +1,353 @@
+// Jack — the game's fourth NPC
+// (`docs/superpowers/specs/2026-09-05-act1-wave4-prose.md` PART TWO §6,
+// PART THREE §7-§8 by reference, PART FOUR §9 for pearl.ts's own topic).
+// Prose transcribed exactly (hard rule 5).
+//
+// SCHEDULE — main-session decision, not the document's own §2 phase table:
+// `[{ room: JACKS_MOTEL }]`, one post, all phases, exactly like `pearl.ts`.
+// The document's own phase-based schedule (night/evening at the motel,
+// morning at the diner) is NOT wired: the engine clock starts at 07:00
+// (`world.ts`'s `meta.phases`) while the fiction's opening is 4 a.m., so a
+// `clockPhase: 'morning'` rule would put Jack in the diner at the game's
+// very first tick, before the player has ever met him. One unconditional
+// post sidesteps that clock/fiction mismatch entirely, at the cost of the
+// document's own "morning at the diner" texture — not reachable in this
+// build regardless.
+//
+// GREETING RULE 1 — reachable, not "structurally unreachable" as §6.4's own
+// annotation claims. The document was authored against the same engine gap
+// `marlow.ts`/`whitlock.ts` originally documented (a room's own `onEnter`
+// used to be the only way to set a "met" flag, firing before any greeting
+// could). As of v0.8.0 the engine marks an NPC met via `npc.ts`'s own
+// `markMet`, run only after a real ASK/TELL/SHOW/HELLO exchange — so
+// `{ not: { met: JACK } }` is exactly the first HELLO JACK, the same fix
+// already applied to `pearl.ts`/`whitlock.ts`. Transcribed exactly
+// regardless (hard rule 5); rule ORDER is the document's own (§6.4's note:
+// rule 2 sits above rule 3 because a man who has just learned his room was
+// searched does not go back to being hospitable).
+//
+// NOUNS — `jack`, `man`, `brother`, `client`, `driver` only; `him`/`he` are
+// dropped (main-session decision — pronouns are the parser's own fallback
+// machinery, `parser/pronouns.ts`, not NPC nouns).
+//
+// TOPIC COUNT — the document's own §6.5 header says "thirteen" and its own
+// §14 wiring table says "13 topics / 15 responses," but the body actually
+// authors FOURTEEN distinct topics (jules, nobody, job, notebook, family,
+// tattoo, letters, polaroid, keys, nolan, pearl, name, head, dad), two of
+// which (job, tattoo) carry two rules each — 14 topics / 16 responses.
+// Flagged as a doc-authoring miscount, not a cut: every topic block in the
+// body is transcribed and wired; none dropped to hit the stated thirteen.
+//
+// WORD-COLLISION CALLS (topics are matched first-declared-wins,
+// `npc.ts`'s `findTopic`) — three beyond the two the main session already
+// resolved (`topic_job` before `topic_jules` with "job" dropped from
+// `topic_jules`; "writing" kept on `topic_notebook` only, dropped from
+// `topic_letters`):
+//   1. "work" is on both `topic_job`'s and (per the document) `topic_nolan`'s
+//      word lists. `topic_job` is declared first (main-session's own
+//      ordering requirement), which would make `topic_nolan`'s "work" a
+//      dead synonym — dropped from `topic_nolan` rather than left unreachable.
+//   2. "counter" is on both `topic_job`'s and `topic_pearl`'s word lists,
+//      same shape as #1 — dropped from `topic_pearl`.
+//   3. `topic_name`'s own "who am i"/"am i" phrases lose to `topic_jules`'s
+//      bare word "who" (a single-token match beats needing the full
+//      three-token phrase) whenever `topic_jules` is declared first —
+//      exactly the class of collision the main session's own "topic_name
+//      before anything else that claims me" instruction is guarding
+//      against, just via "who" rather than "me". `topic_name` is declared
+//      before `topic_jules` to keep "ASK JACK WHO AM I" reaching the
+//      identity topic rather than the missing-brother one.
+//
+// V_HUG — see `ids.ts`'s own comment on why "hug" moved off `V_KISS` (a
+// hard verb-word collision, `validate.ts`) and what that costs `pearl.ts`.
+
+import { T } from '../../../engine/ids';
+import type { Effect } from '../../../engine/effects';
+import type { NpcDefSlice, ShowResponseDef, TopicDef } from '../../../engine/world';
+import type { ProseRule } from '../../../engine/prose';
+import {
+  CLUE_JULES,
+  CLUE_TATTOO_GAP,
+  FEDORA,
+  FLAG_HEARD_NOLAN_NAME,
+  FLAG_JACK_SAW_PAGE,
+  FLAG_SAW_JACK_TATTOO,
+  FLAG_TOLD_JACK_ABOUT_ROOM,
+  JACK,
+  JACKS_MOTEL,
+  MEM_M1_HIRING,
+  MEM_M3_ANALYTICAL,
+  MEM_M3_DIRECT,
+  MEM_M3_SOCIAL,
+  MUG,
+  PAGE_78,
+  ROOM_KEY,
+  V_ATTACK,
+  V_FOLLOW,
+  V_HUG,
+  V_KISS,
+} from './ids';
+
+// ---------------------------------------------------------------------------
+// §6.3 — unknownTopic
+// ---------------------------------------------------------------------------
+
+const unknownTopic: string[] = [
+  '"I don\'t know that." He says it fast, to get it out of the way of what he does want to talk about.',
+  'He starts on it, and six words in it has turned back into his brother, and he does not appear to notice that it has.',
+  '"That\'s not one of mine." He is not being short with you. He has been over what he has so often that he knows exactly where it stops.',
+];
+
+// ---------------------------------------------------------------------------
+// §6.2 — description
+// ---------------------------------------------------------------------------
+
+const description =
+  'Forty-odd and built like the job: a wide man in a T-shirt in a cold room, with forearms that have spent years under vehicles. Three days unshaved, and no decision made about it.\n\nOn the inside of his left forearm, above the wrist, there is a small tattoo in ink gone soft and blue. It is two or three strokes long. He is not hiding it and he is not showing it, and from where you are standing it could be anything.';
+
+// ---------------------------------------------------------------------------
+// §6.4 — greeting
+// ---------------------------------------------------------------------------
+
+const greeting: ProseRule[] = [
+  {
+    // Reachable as of v0.8.0 — see this file's header.
+    when: { not: { met: JACK } },
+    text:
+      'He gets the chair out from under the table with his foot and stands there until you are in it.\n\n"Nine last night," he says. "Then ten. Then I walked down to Marlow\'s at midnight and stood in the street like a fool." He is looking at the side of your head the whole time. "How long have you had that?"\n\nYou do not know. He takes that the way he is going to take everything else tonight, which is straight on.',
+  },
+  {
+    when: { flag: FLAG_TOLD_JACK_ABOUT_ROOM },
+    text: [
+      'He does not sit down now. He talks at the window end of the room, with the curtain moved about two inches.',
+      '"Truck\'s got gas in it," he says, apropos of nothing at all, which is what he says now instead of asking whether you are all right.',
+    ],
+  },
+  {
+    when: { memory: MEM_M1_HIRING },
+    text:
+      '"You want the coffee out of that machine, or you want to walk down to Pearl\'s when it\'s light," he says. "I know which I\'d do."\n\nIt is not the first time he has offered you that counter.',
+  },
+  {
+    text: [
+      'He is at the table with the folder open and three sheets out of it, which appear to be the three he always has out.',
+      '"Five weeks I\'ve been in this room," he says, to nobody in particular. "A man could build something in five weeks."',
+      'He has been awake so long that he has come out the far side of it and gone hospitable. "There\'s crackers. There\'s a whole thing of crackers."',
+    ],
+  },
+];
+
+// ---------------------------------------------------------------------------
+// §6.5 — topics (fourteen; see this file's header on the document's own
+// miscount). Declaration order matters (first-declared-wins) — see this
+// file's header for the three word-collision calls this ordering resolves.
+// ---------------------------------------------------------------------------
+
+const TOPIC_JOB = T('act1_jack_topic_job');
+const TOPIC_NAME = T('act1_jack_topic_name');
+const TOPIC_JULES = T('act1_jack_topic_jules');
+const TOPIC_NOBODY = T('act1_jack_topic_nobody');
+const TOPIC_NOTEBOOK = T('act1_jack_topic_notebook');
+const TOPIC_FAMILY = T('act1_jack_topic_family');
+const TOPIC_TATTOO = T('act1_jack_topic_tattoo');
+const TOPIC_LETTERS = T('act1_jack_topic_letters');
+const TOPIC_POLAROID = T('act1_jack_topic_polaroid');
+const TOPIC_KEYS = T('act1_jack_topic_keys');
+const TOPIC_NOLAN = T('act1_jack_topic_nolan');
+const TOPIC_PEARL = T('act1_jack_topic_pearl');
+const TOPIC_HEAD = T('act1_jack_topic_head');
+const TOPIC_DAD = T('act1_jack_topic_dad');
+
+const jobResponse: ProseRule[] = [
+  {
+    when: { memory: MEM_M1_HIRING },
+    text:
+      '"Cash, because that\'s what I had, and because you didn\'t want anything with a name on it, which suited me." He turns his mug round on the table without picking it up. "Nine o\'clock, twice a week, at Pearl\'s counter. You tell me what you\'ve got and I don\'t ask how you came by it."\n\nHe looks up. "I asked you a thing that first morning. Asked it twice, because you didn\'t answer the first time." He waits, and then says it rather than let you not have it. "I asked whether you thought I was lying."\n\nBack to the mug. "You didn\'t answer it the second time either. I\'ve thought about that most days since."',
+  },
+  {
+    text:
+      '"Cash. Weekly, and whatever it costs you. Nine o\'clock, twice a week, at Pearl\'s counter." He turns his mug round on the table without picking it up. "You tell me what you\'ve got and I don\'t ask how you came by it."\n\nThen: "What have you got?" — with no weight on it at all, and when nothing comes he lets it go, the way he has been letting it go for three weeks.',
+  },
+];
+
+const tattooResponse: ProseRule[] = [
+  {
+    when: { any: [{ memory: MEM_M3_ANALYTICAL }, { memory: MEM_M3_SOCIAL }, { memory: MEM_M3_DIRECT }] },
+    text:
+      'He turns his arm over on the table without being asked twice.\n\n    IV\n\n"Four. Luke\'s two, Eli\'s three, Sissy\'s five." He says them in order and does not stop at the end of the order, because there is no reason to. "Jules is one."\n\nYou put the paperwork to him: four of them on any piece of paper in this county, and four of them starting at two.\n\nJack looks at his own arm for a while.\n\n"Ask Luke why he\'s two," he says. "Go on. Ask him."',
+  },
+  {
+    text:
+      'He turns his arm over on the table so you can see it properly.\n\n    IV\n\n"We all got them the same afternoon. Dad drove us up to Rapid and paid for it and complained about the money the whole way home." He puts the arm back down. "Birth order. That\'s the whole of the joke. I\'m four."',
+  },
+];
+
+const tattooEffects = [{ set: [FLAG_SAW_JACK_TATTOO, true] as [typeof FLAG_SAW_JACK_TATTOO, true] }, { grantClue: CLUE_TATTOO_GAP }];
+
+const topics: TopicDef[] = [
+  {
+    id: TOPIC_JOB,
+    words: ['job', 'work', 'hired', 'hire', 'terms', 'money', 'pay', 'paid', 'cash', 'fee', 'deal', 'arrangement', 'report', 'reports', 'counter'],
+    response: jobResponse,
+  },
+  {
+    id: TOPIC_NAME,
+    words: ['name', 'my name', 'who am i', 'me', 'myself', 'called', 'identity', 'am i'],
+    response:
+      '"You never gave me one." He says it like a man reading back an invoice. "First morning. I asked, you didn\'t answer, and I took it that it was part of what I was paying for."\n\n"I\'ve called you nothing at all for three weeks. You\'d be amazed how far you get."',
+  },
+  {
+    id: TOPIC_JULES,
+    words: ['jules', 'brother', 'sibling', 'missing', 'disappear', 'disappeared', 'gone', 'case', 'who'],
+    response:
+      '"Jules." He spells it. He has got into the habit of spelling it. "My oldest brother. Facilities supervisor out at the plant, and five weeks ago he stopped being anywhere at all."\n\nHe does not use the word missing. He is careful about that word in a way that suggests somebody has used it at him.\n\n"He\'d got strange before it. Six months of strange — not answering, then answering too fast. I put it down to the job." A hand goes flat on the table and comes off again. "It wasn\'t the job."',
+    effects: [{ grantClue: CLUE_JULES }],
+  },
+  {
+    id: TOPIC_NOBODY,
+    words: ['remember', 'remembers', 'nobody', 'anybody', 'believe', 'crazy', 'delusional', 'proof', 'lying', 'alone', 'mad'],
+    response:
+      '"Nobody remembers him." He says it like a man who has already been laughed at for it. "Not the sheriff. Not the county. Not the man he worked for. Not Pearl, and Pearl has fed this family for forty years."\n\nHe waits to see what your face does. He has got good at watching that.\n\n"I\'m not asking you to believe me. I asked you to go and look. There\'s a difference and I\'ve got very clear on it."',
+  },
+  {
+    id: TOPIC_NOTEBOOK,
+    words: ['notebook', 'book', 'journal', 'diary', 'notes', 'writing', 'handwriting', 'shorthand', 'papers'],
+    response:
+      '"He kept a book." Jack\'s hands stop moving. "Not a diary — a work book. Figures, readings, things he was checking on. He carried it inside his coat and he wrote in it at the dinner table like it was rude of him."\n\n"I saw it once. He told me it was work."\n\nThen: "It isn\'t at his place. I\'ve been through his place twice and I\'d have known it, because it has a rubber band round it and he\'s had that book since he was twenty-nine."',
+  },
+  {
+    id: TOPIC_FAMILY,
+    words: ['family', 'brothers', 'sister', 'siblings', 'luke', 'eli', 'sissy', 'president', 'astronaut', 'mars', 'famous'],
+    response:
+      '"There\'s four of us that anybody\'s heard of." He says it with no edge on it, which is worse. "Luke\'s the President. Eli does energy, whatever that means, and sleeps eleven hours a day. Sissy\'s on Mars, which I still can\'t say out loud without it sounding like a lie."\n\n"And me. I drive a truck over other trucks." He is not fishing; it is the family\'s own joke and he has told it a thousand times. "Somebody had to stay where he was. I wrote to Luke about Jules. More than once."',
+  },
+  {
+    id: TOPIC_TATTOO,
+    words: ['tattoo', 'tattoos', 'ink', 'arm', 'forearm', 'wrist', 'numeral', 'numerals', 'number', 'numbers', 'iv', 'four', 'roman', 'mark'],
+    response: tattooResponse,
+    effects: tattooEffects,
+  },
+  {
+    id: TOPIC_LETTERS,
+    words: ['letters', 'letter', 'wrote', 'reply', 'replies', 'answered', 'mail', 'froze', 'signature'],
+    response:
+      '"I wrote to him about Jules. Proper letters, and then the other kind, when the proper ones didn\'t do anything."\n\n"He writes back. That\'s the part. He writes back every time, nice as you like, asks after everybody, and never once answers the question I asked him."\n\nHe shuts the folder with one hand. "Twenty years I\'ve been the one that stayed. I\'d have taken him not writing back."',
+  },
+  {
+    id: TOPIC_POLAROID,
+    words: ['polaroid', 'photo', 'photograph', 'picture', 'snapshot', 'flare', 'porch', 'damage'],
+    response:
+      '"That\'s the porch at the old place. Dad\'s sixtieth." He does not have to look at it to say what is in it. "Somebody left the camera on the seat of a truck in July and half the pack came out like that."\n\n"He\'s on the left. That\'s his arm."\n\nThen he is talking about the porch, and the old place, and what happened to the old place.',
+  },
+  {
+    id: TOPIC_KEYS,
+    words: ['keys', 'key', 'keyring', 'ring', 'spares', 'shed', 'place', 'his place', 'apartment', 'house'],
+    response:
+      '"His spares. He left them with me when he took the place out on the county road." He does not take them off the nail. "That\'s how I got in. Twice. There\'s nothing in it — there\'s less in it than there ought to be, and I couldn\'t tell you what\'s gone, because I couldn\'t tell you what was ever there."',
+  },
+  {
+    id: TOPIC_NOLAN,
+    words: ['nolan', 'manager', 'boss', 'supervisor', 'plant boss', 'foreman'],
+    response:
+      '"Nolan. Jules\'s manager out there, near enough nine years." Jack\'s face does something small and unfriendly and stops doing it. "I went out to his house. He gave me coffee on the porch and said he was sorry, and he was sorry, and he did not know who I was talking about."\n\n"He said the name back to me wrong. Twice, and corrected himself both times. I still don\'t know what to do with that."',
+    effects: [{ set: [FLAG_HEARD_NOLAN_NAME, true] }],
+  },
+  {
+    id: TOPIC_PEARL,
+    words: ['pearl', 'diner', 'sundown', 'breakfast', 'mornings', 'coffee', 'eat', 'food'],
+    response:
+      '"Six every morning, at that counter. It\'s the only hour of the day I know what I\'m doing." He nearly smiles about it. "She feeds me and she lets me talk and she doesn\'t remember him either, and she has known this family since before I could see over that counter."\n\n"That\'s the one that gets me. Not the sheriff. Her."',
+  },
+  {
+    id: TOPIC_HEAD,
+    words: ['head', 'wound', 'hurt', 'blood', 'injury', 'doctor', 'clinic', 'hospital', 'attack', 'hit', 'last night', 'tonight'],
+    response:
+      '"Somebody hit you." He says it as a finding. "Front or behind?"\n\nBehind.\n\n"Then they weren\'t trying to talk to you first." He sits back down harder than he meant to. "Clinic\'s at nine. I\'ll drive you and I\'ll sit in the waiting room, and if they want a name for the form they can have mine."',
+  },
+  {
+    id: TOPIC_DAD,
+    words: ['dad', 'father', 'old man', 'house rules', 'catan', 'game', 'parents'],
+    response:
+      '"That\'s his writing in the lid." Jack does not pick the box up. "Commissioner, then a senator, then a nuisance. Six years gone." He almost laughs. "He\'d have had this sorted by Thursday and been wrong about all of it."',
+  },
+];
+
+// ---------------------------------------------------------------------------
+// §6.6 — tellTopics (two overrides)
+// ---------------------------------------------------------------------------
+
+const TELL_ROOM = T('act1_jack_tell_room');
+const TELL_MEMORY = T('act1_jack_tell_memory');
+
+const tellTopics: TopicDef[] = [
+  {
+    id: TELL_ROOM,
+    words: ['room', 'attack', 'attacked', 'robbed', 'search', 'searched', 'break in', 'breakin', 'burglary', 'ransacked', 'crime', 'night'],
+    response:
+      'You tell him the room was gone through while you were in it, and that nothing is gone.\n\nJack stops moving entirely, which is the first time tonight.\n\n"Nothing." He wants it again. "You woke on the floor of a room somebody had been through, and there\'s nothing missing out of it."\n\nHe gets up, moves the curtain two inches with one finger, and looks at his own truck in his own lot for a while.\n\n"Then they got what they came for, or they didn\'t and they\'ll be back." He lets the curtain go. "Either way there\'s somebody else looking for the same thing I am, and I\'ve spent five weeks telling this town there\'s nothing to look for."',
+    effects: [{ set: [FLAG_TOLD_JACK_ABOUT_ROOM, true] }],
+  },
+  {
+    id: TELL_MEMORY,
+    words: ['memory', 'amnesia', 'forgot', 'forget', 'remember', 'name', 'cant remember', 'nothing'],
+    response:
+      'You tell him you cannot remember your own name.\n\nJack takes a while over it. You can hear the ice machine.\n\n"Doesn\'t change what I\'m paying for," he says. "I never had it anyway." Then, and it is plainly the arithmetic he does not like the shape of: "Does it change what you found?"',
+  },
+];
+
+// ---------------------------------------------------------------------------
+// §6.7 — showResponses (four)
+// ---------------------------------------------------------------------------
+
+const showResponses: ShowResponseDef[] = [
+  {
+    objects: [FEDORA],
+    response: '"Keep it on," he says. "It\'s cold in here and your head\'s open."',
+  },
+  {
+    objects: [MUG],
+    response: 'He leans over and reads it without picking it up. "Take that back to her or she\'ll have it off you at breakfast."',
+  },
+  {
+    objects: [PAGE_78],
+    response:
+      'He goes still. Then he takes it — the only thing he has taken out of your hand all night — and rubs the corner between finger and thumb.\n\n"Where did you get this?"\n\nYou tell him. He gives it back, and sits down, and for a minute or two he is not much use to anybody.',
+    effects: [{ set: [FLAG_JACK_SAW_PAGE, true] }],
+  },
+  {
+    objects: [ROOM_KEY],
+    response: '"Marlow\'s tag." He turns it over once and gives it back. "Five\'s still paid, next door. I\'m not going to keep saying it."',
+  },
+];
+
+// ---------------------------------------------------------------------------
+// §6.8 — handlers (four)
+// ---------------------------------------------------------------------------
+
+const attackText = 'You would have to explain it to him afterwards, and he would listen.';
+const kissText = 'He takes it the way he has taken everything else tonight, which is as further evidence that somebody hit you in the head.';
+const hugText = 'He allows it. He is not good at it and he does not stop it, and afterwards neither of you refers to it again.';
+const followText = '"I\'m not going anywhere." He sits back down in the chair by the door, facing the lot. "That\'s been the whole of my week."';
+
+export const jack: NpcDefSlice = {
+  // Main-session decision — see this file's header. §6's own header calls
+  // for a phase-based schedule the engine's own clock start (07:00) can't
+  // support without putting Jack in the wrong place at the game's opening.
+  schedule: [{ room: JACKS_MOTEL }],
+  nouns: ['jack', 'man', 'brother', 'client', 'driver'],
+  adjectives: ['big', 'wide'],
+  name: 'Jack',
+  pronoun: 'he',
+  description,
+  topics,
+  tellTopics,
+  showResponses,
+  unknownTopic,
+  greeting,
+  handlers: [
+    { verbs: [V_ATTACK], effects: [{ say: attackText }] },
+    { verbs: [V_KISS], effects: [{ say: kissText }] },
+    { verbs: [V_HUG], effects: [{ say: hugText }] },
+    { verbs: [V_FOLLOW], effects: [{ say: followText }] },
+  ],
+};

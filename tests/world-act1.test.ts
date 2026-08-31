@@ -76,18 +76,27 @@ describe('validate — Act I room 1', () => {
   // `act1_whoami`, each against a bare noun "my") never materialize — no
   // object or NPC in the landed content declares a bare "my" noun
   // (`act1_self`’s own reflexive list is "me"/"myself"/"self"/"body", not
-  // "my") — so the final count is 20, not 23. This task’s own Main Street
-  // changes (deleting `MAIN_STREET_BOUNDARY_GATE`; adding
-  // `county_library_front`’s nouns and "sundown" to `diner`’s; adding
-  // "go toward"/"go towards" to `V_APPROACH`, whose pattern is `V dobj`
-  // only and so never contributes here) add zero new collisions of this
-  // kind.
-  it('produces exactly the 20 expected verb-noun-collision warnings, no others', () => {
+  // "my") — so the count was 20, not 23.
+  //
+  // Wave 4 (Arrowhead Motel) adds four more, all genuine, all from
+  // doc-mandated noun lists this task transcribed verbatim
+  // (`objects/jacksMotel.ts`): "name" — `monster_truck`'s own noun (the
+  // lettering on its door, §4.1) is the first object anywhere to declare
+  // it, and it happens to also be a token inside three pre-existing
+  // multi-word verb phrases (`act1_whoami`'s "look myself up" is
+  // unaffected; the collision is against "find name"/"find my name",
+  // "write name"/"write my name", and — via `V_WHOAMI`'s own earlier
+  // "name" word — the front desk's original name-topic vocabulary); and
+  // "letter" — `jack_letters`'s own noun (§4.5) is the first object to
+  // declare it, colliding with the pre-existing `V_POST_LETTER`'s own
+  // "post letter"/"mail letter" words (wave 2, Post Office).
+  it('produces exactly the 24 expected verb-noun-collision warnings, no others', () => {
     const warnings = validate(WORLD).filter((f) => f.severity === 'warning');
     const collisions = warnings.filter((f) => f.code === 'verb-noun-collision');
-    expect(collisions.length).toBe(20);
+    expect(collisions.length).toBe(24);
     expect(collisions.map((f) => f.message).sort()).toEqual(
       [
+        "verb \"act1_find_my_name\" can be typed bare and its word \"name\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act1_look_for_face\" can be typed bare and its word \"face\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act1_look_out\" can be typed bare and its word \"street\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act1_look_out\" can be typed bare and its word \"window\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
@@ -97,11 +106,14 @@ describe('validate — Act I room 1', () => {
         "verb \"act1_look_up_subject\" can be typed bare and its word \"subject\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act1_measure\" can be typed bare and its word \"map\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act1_measure\" can be typed bare and its word \"scale\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act1_post_letter\" can be typed bare and its word \"letter\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act1_post_letter\" can be typed bare and its word \"mail\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act1_post_letter\" can be typed bare and its word \"post\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act1_sign\" can be typed bare and its word \"name\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act1_sign\" can be typed bare and its word \"sign\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act1_type_terminal\" can be typed bare and its word \"key\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act1_whoami\" can be typed bare and its word \"myself\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act1_whoami\" can be typed bare and its word \"name\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"e\" can be typed bare and its word \"east\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"in\" can be typed bare and its word \"back\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"n\" can be typed bare and its word \"north\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
@@ -180,12 +192,11 @@ describe('validate — Act I room 1', () => {
     );
   });
 
-  // RECONCILED (wave-3 Main Street amendments task): 1 (grey/FEDORA) + 20
-  // (verb-noun) + 4 (object-noun) = 25, down from the pre-landing
-  // estimate of 28 — see the verb-noun test above for why (three "my"
-  // collisions that never materialized).
-  it('produces exactly twenty-five warnings total, no others', () => {
+  // RECONCILED (wave-4 Arrowhead Motel task): 1 (grey/FEDORA) + 24
+  // (verb-noun) + 4 (object-noun) = 29 — see the verb-noun test above for
+  // wave 4's own four additions ("name" x3, "letter" x1).
+  it('produces exactly twenty-nine warnings total, no others', () => {
     const warnings = validate(WORLD).filter((f) => f.severity === 'warning');
-    expect(warnings.length).toBe(25);
+    expect(warnings.length).toBe(29);
   });
 });

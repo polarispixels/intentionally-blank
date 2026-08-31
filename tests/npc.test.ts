@@ -363,6 +363,45 @@ describe('respondToGreeting', () => {
 });
 
 // ---------------------------------------------------------------------------
+// met — conversation marks the NPC (v0.8.0)
+// ---------------------------------------------------------------------------
+
+describe('conversation marks an NPC as met, after the exchange renders', () => {
+  const MET_WORLD: WorldDef = {
+    ...WORLD,
+    npcs: {
+      ...WORLD.npcs,
+      [GUIDE]: {
+        ...WORLD.npcs![GUIDE]!,
+        greeting: [
+          { when: { not: { met: GUIDE } }, text: 'First time: the guide looks you over.' },
+          { text: 'Again: the guide nods.' },
+        ],
+      },
+    },
+  };
+
+  it('a greeting rule keyed on `not met` is exactly the first HELLO; the second falls through', () => {
+    const first = respondToGreeting(MET_WORLD, baseState(), vocab, GUIDE)!;
+    expect(lineText(first.events)).toBe('First time: the guide looks you over.');
+    expect(first.state.npcs[GUIDE]?.met).toBe(true);
+    const second = respondToGreeting(MET_WORLD, first.state, vocab, GUIDE)!;
+    expect(lineText(second.events)).toBe('Again: the guide nods.');
+  });
+
+  it('ASK, TELL, SHOW and an unknown topic all count as meeting', () => {
+    expect(respondToAsk(WORLD, baseState(), vocab, GUIDE, 'brother').state.npcs[GUIDE]?.met).toBe(true);
+    expect(respondToAsk(WORLD, baseState(), vocab, GUIDE, 'gremlins').state.npcs[GUIDE]?.met).toBe(true);
+    expect(respondToTell(WORLD, baseState(), vocab, MARA, 'brother').state.npcs[MARA]?.met).toBe(true);
+    expect(respondToShow(WORLD, baseState(), vocab, KEY, GUIDE)!.state.npcs[GUIDE]?.met).toBe(true);
+  });
+
+  it('an NPC nobody has spoken to is not met', () => {
+    expect(baseState().npcs[GUIDE]?.met).toBeUndefined();
+  });
+});
+
+// ---------------------------------------------------------------------------
 // respond.ts routing — end-to-end through the ladder
 // ---------------------------------------------------------------------------
 

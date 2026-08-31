@@ -47,11 +47,13 @@ import {
   V_CROSS,
   V_CROUCH,
   V_DRINK,
+  V_DRIVE,
   V_EAT,
   V_FEED,
   V_FIND_MY_NAME,
   V_HELP,
   V_HOLD_TO_LAMP,
+  V_HUG,
   V_KISS,
   V_KNOCK,
   V_FILL,
@@ -65,6 +67,7 @@ import {
   V_LOOK_UP,
   V_MEASURE,
   V_ORDER,
+  V_PLAY,
   V_POST_LETTER,
   V_POUR,
   V_QUESTION,
@@ -358,7 +361,8 @@ export const ACT1_VERBS: Record<string, VerbDef> = {
   // "steal" added (front-desk-prose §4.2's "STEAL REGISTER") — a general TAKE synonym, not register-specific vocabulary.
   // "untie"/"mount" added (main-street-prose §4.1's "TAKE HORSE"/"UNTIE HORSE"/"MOUNT HORSE" — shares one failure text with "RIDE HORSE" there) — general TAKE synonyms, not horse-specific vocabulary. "ride" is NOT added here: it already belongs to `V_SLIDE_DOWN` (the landing banister's own word) and `validate.ts`'s verb-word-collision check is a hard error — "RIDE HORSE" reaches `horses`' own `V_SLIDE_DOWN` handler instead (`objects/mainStreet.ts`), sharing the same text.
   // "buy" added (wave-2's General Store §9.1 "BUY POSTCARD"/"TAKE POSTCARD") — a general TAKE synonym, not postcard-specific vocabulary.
-  [TAKE]: { id: TAKE, words: ['take', 'get', 'pick up', 'steal', 'untie', 'mount', 'buy'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.take },
+  // "borrow" added (wave-4's Arrowhead Motel §4.4 "BORROW KEYS") — a general TAKE synonym, not keyring-specific vocabulary.
+  [TAKE]: { id: TAKE, words: ['take', 'get', 'pick up', 'steal', 'untie', 'mount', 'buy', 'borrow'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.take },
   [DROP]: { id: DROP, words: ['drop', 'put down'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.drop },
   // "try handle" added (§15.1.5's landing_doors block: "open / unlock /
   // try handle") — a general OPEN synonym, not landing-specific vocabulary,
@@ -626,11 +630,30 @@ export const ACT1_VERBS: Record<string, VerbDef> = {
   [V_LOOK_OUT]: { id: V_LOOK_OUT, words: ['look out window', 'look at street', 'look out'], patterns: ['V'], class: 'analytical', default: windowStreetText },
   [V_LOOK_FOR_FACE]: { id: V_LOOK_FOR_FACE, words: ['look for yourself', 'look for a face you know'], patterns: ['V'], class: 'analytical', default: dinerFacesText },
   // §6.8's "KISS PEARL"/"HUG PEARL" — no `kiss`/`hug` family exists; reuses TOUCH's own family rather than inventing new global prose. `npc.pearl.handlers` (pearl.ts) is what a player actually reaches.
-  [V_KISS]: { id: V_KISS, words: ['kiss', 'hug'], patterns: ['V dobj'], class: 'social', default: VERB_DEFAULTS.touch },
+  // "hug" moved off this verb in wave 4 (`ids.ts`'s own comment on `V_HUG`):
+  // Jack needs KISS and HUG to render distinct text, which one shared verb
+  // id can never do. Consequence for Pearl (out of this task's own
+  // `pearl.ts` scope, flagged in this task's report rather than silently
+  // patched there): `HUG PEARL` now resolves to `V_HUG` below, which she
+  // has no handler for, so it falls to that verb's own generic default
+  // (the same `VERB_DEFAULTS.touch` family) instead of her authored
+  // `kissHugText` — no test exercises `HUG PEARL` today, only `KISS PEARL`.
+  [V_KISS]: { id: V_KISS, words: ['kiss'], patterns: ['V dobj'], class: 'social', default: VERB_DEFAULTS.touch },
+  // Jack (wave 4, §6.8) — "HUG JACK", now its own verb id; see `ids.ts`'s own comment on `V_HUG`.
+  [V_HUG]: { id: V_HUG, words: ['hug', 'embrace', 'hold'], patterns: ['V dobj'], class: 'social', default: VERB_DEFAULTS.touch },
 
   // Town Edge (wave 3) — new verb. Bare, self-contained (no dobj, no flag,
   // no other room declares it) — same idiom as V_WHAT_YEAR/V_CHECK_DATE.
   [V_THINK]: { id: V_THINK, words: ['think', 'remember', 'concentrate'], patterns: ['V'], class: 'analytical', default: townEdgeThinkText },
+
+  // The Arrowhead Motel (wave 4) — two brand-new verbs (`ids.ts`'s own
+  // comment: neither word exists anywhere else in this table). Both are
+  // always caught by `monster_truck`'s/`catan_box`'s own handlers
+  // (`objects/jacksMotel.ts`) in the one room that declares them; `default`
+  // reuses the closest existing authored family rather than inventing new
+  // global prose, same idiom as V_ATTACK/V_FOLLOW above.
+  [V_DRIVE]: { id: V_DRIVE, words: ['drive', 'start'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.push },
+  [V_PLAY]: { id: V_PLAY, words: ['play'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.touch },
   // §8 gap 2: the real reserved `INVENTORY_VERB_ID`, not a room-local id.
   // `default` refs the global `inventory.empty` family — `room.ts`'s own
   // handler overrides it for the empty-hands case (§8.9/§14.4).
@@ -694,9 +717,10 @@ export const ACT1_VERBS: Record<string, VerbDef> = {
   // non-door object (e.g. "enter lamp") now falls through to this
   // already-authored, `{name}`-templated family instead of the movement-
   // only `move.noExit`.
+  // "get in" added (wave-4's Arrowhead Motel §4.1 "GET IN TRUCK") — a general IN synonym, not truck-specific vocabulary.
   [DIRECTION_VERB_IDS.in]: {
     id: DIRECTION_VERB_IDS.in,
-    words: ['in', 'inside', 'enter', 'back', 'go through'],
+    words: ['in', 'inside', 'enter', 'back', 'go through', 'get in'],
     patterns: ['V', 'V dobj'],
     class: 'direct',
     default: VERB_DEFAULTS.enter,

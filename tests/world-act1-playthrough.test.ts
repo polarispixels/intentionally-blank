@@ -472,7 +472,8 @@ describe('Front Desk & Lobby — CLI playthrough (meeting Marlow)', () => {
 
   it('HELLO MARLOW greets him', () => {
     const afterHello = stdout.slice(stdout.indexOf('> hello marlow'));
-    expect(afterHello).toMatch(/"Still up," he says, which is not a question\.|He looks up, and waits, and is prepared to wait\./);
+    // v0.8.0: the first HELLO reaches greeting rule 1 (he has not been spoken to yet), which used to be unreachable.
+    expect(afterHello).toContain('"Evening." He has been awake for hours and does not pretend otherwise.');
   });
 
   it('ASK MARLOW ABOUT NAME — he cannot produce it, and the clue is noted', () => {

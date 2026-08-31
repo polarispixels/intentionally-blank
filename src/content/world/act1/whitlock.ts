@@ -35,6 +35,7 @@ import {
   SHERIFF_OFFICE,
   V_ATTACK,
   V_FOLLOW,
+  WHITLOCK,
 } from './ids';
 
 // ---------------------------------------------------------------------------
@@ -60,7 +61,8 @@ const description =
 
 const greeting: ProseRule[] = [
   {
-    when: { not: { flag: FLAG_MET_WHITLOCK } },
+    // Reachable as of v0.8.0: the engine now marks an NPC met after the first exchange (`npc.ts`'s `markMet`), so this is exactly the first HELLO.
+    when: { not: { met: WHITLOCK } },
     text: '"Morning." She says it at four in the morning with no irony available in it, and then she looks at the side of your head and puts the pen down.\n\n"Sit if you want. Clinic\'s at nine and I can\'t do better than that, so let\'s have whatever else it is."',
   },
   {

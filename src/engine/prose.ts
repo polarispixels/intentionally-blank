@@ -66,6 +66,15 @@ export interface ProseContext {
   dobj?: string;
   iobj?: string;
   topic?: string;
+  /**
+   * Space-separated placeholder keys whose values are proper names (an
+   * NPC's `name`, v0.8.0). Authored families say "The {iobj} looks at it",
+   * which is right for a brass key and wrong for Jack: when a listed key's
+   * value is capitalized, the article in front of its placeholder is
+   * dropped ("Jack looks at it"). A lowercase name ("the guide") keeps it.
+   * Only the NPC-facing render sites set this; objects never do.
+   */
+  proper?: string;
   [key: string]: string | undefined;
 }
 
@@ -83,7 +92,14 @@ export interface ProseResult {
 
 /** Replace `{key}` placeholders from `ctx`; an unresolved key is left as-is. */
 function fillTemplate(template: string, ctx: ProseContext): string {
-  return template.replace(/\{(\w+)\}/g, (whole, key: string) => ctx[key] ?? whole);
+  const proper = new Set((ctx.proper ?? '').split(' ').filter(Boolean));
+  const articled = proper.size === 0
+    ? template
+    : template.replace(/\b(?:[Tt]he|[Aa]n?) \{(\w+)\}/g, (whole, key: string) => {
+        const value = ctx[key];
+        return proper.has(key) && value !== undefined && /^[A-Z]/.test(value) ? `{${key}}` : whole;
+      });
+  return articled.replace(/\{(\w+)\}/g, (whole, key: string) => ctx[key] ?? whole);
 }
 
 /**

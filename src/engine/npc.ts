@@ -94,6 +94,20 @@ function requireNpc(world: WorldDef, npc: NpcId): NpcDefSlice {
 }
 
 /**
+ * Conversation marks an NPC as met — `cond.ts`'s `{ met: npc }` (v0.8.0:
+ * declared since task 10, never set by anything). Applied AFTER the turn's
+ * own text has rendered, so a greeting rule keyed on `not met` is exactly
+ * the first exchange with that person, and a second HELLO falls through to
+ * the return-visit rules. Every conversational verb counts (ASK, TELL, SHOW,
+ * TALK TO/HELLO, and a blank ASK ABOUT) — a person you have questioned is a
+ * person you have met.
+ */
+function markMet(state: GameState, npc: NpcId): GameState {
+  if (state.npcs[npc]?.met === true) return state;
+  return { ...state, npcs: { ...state.npcs, [npc]: { ...state.npcs[npc], met: true } } };
+}
+
+/**
  * The display name for `{name}`/`{dobj}` prose templating on an NPC —
  * `NpcDefSlice.name` (the task-1 fix, see that field's own doc comment on
  * why `candidateName` alone was the root cause of "the night marlow")
@@ -153,8 +167,9 @@ function respondToTopic(world: WorldDef, state: GameState, vocab: CompiledVocabu
     dobj: name,
     topic: rawTopic,
     path,
+    proper: 'name dobj',
   });
-  return { state: newState, events, class: topic.class ?? 'social' };
+  return { state: markMet(newState, npc), events, class: topic.class ?? 'social' };
 }
 
 /** `unknownTopic` — authored per NPC (§2.6: "the personality lives here"). Fires with a `topicMiss` diag (§8 task 14) — the playtester's signal for a conversation the player reasonably tried and the author never anticipated. */
@@ -163,9 +178,9 @@ function respondToUnknownTopic(world: WorldDef, state: GameState, vocab: Compile
     throw new Error(`npc: "${npc}" has topics/tellTopics but no unknownTopic authored`);
   }
   const name = npcDisplayName(world, vocab, npc);
-  const rendered = render(world, state, `npc.${npc}.unknownTopic`, def.unknownTopic, { name, dobj: name, topic: rawTopic });
+  const rendered = render(world, state, `npc.${npc}.unknownTopic`, def.unknownTopic, { name, dobj: name, topic: rawTopic, proper: 'name dobj' });
   return {
-    state: rendered.state,
+    state: markMet(rendered.state, npc),
     events: [
       { type: 'line', kind: 'prose', text: rendered.text },
       { type: 'diag', code: 'topicMiss', detail: `npc "${npc}" — topic "${rawTopic}" not matched or not yet known` },
@@ -215,7 +230,7 @@ export function respondToNoTopic(world: WorldDef, state: GameState, vocab: Compi
     throw new Error(`npc: response family "${CONVERSATION_NO_TOPIC_FAMILY}" is not declared in world.responses`);
   }
   const name = npcDisplayName(world, vocab, npc);
-  const rendered = render(world, state, CONVERSATION_NO_TOPIC_FAMILY, noTopicProse, { name, dobj: name });
+  const rendered = render(world, state, CONVERSATION_NO_TOPIC_FAMILY, noTopicProse, { name, dobj: name, proper: 'name dobj' });
   const events: GameEvent[] = [{ type: 'line', kind: 'prose', text: rendered.text }];
   let nextState = rendered.state;
 
@@ -229,7 +244,7 @@ export function respondToNoTopic(world: WorldDef, state: GameState, vocab: Compi
     }
   }
 
-  return { state: nextState, events, class: world.verbs?.[verb]?.class ?? null };
+  return { state: markMet(nextState, npc), events, class: world.verbs?.[verb]?.class ?? null };
 }
 
 // ---------------------------------------------------------------------------
@@ -261,8 +276,9 @@ export function respondToShow(world: WorldDef, state: GameState, vocab: Compiled
     dobj: objectName,
     iobj: npcName,
     path,
+    proper: 'iobj',
   });
-  return { state: newState, events, class: world.verbs?.[NPC_VERB_IDS.show]?.class ?? null };
+  return { state: markMet(newState, npc), events, class: world.verbs?.[NPC_VERB_IDS.show]?.class ?? null };
 }
 
 // ---------------------------------------------------------------------------
@@ -281,9 +297,9 @@ export function respondToGreeting(world: WorldDef, state: GameState, vocab: Comp
   if (def.greeting === undefined) return undefined;
 
   const name = npcDisplayName(world, vocab, npc);
-  const rendered = render(world, state, `npc.${npc}.greeting`, def.greeting, { name, dobj: name });
+  const rendered = render(world, state, `npc.${npc}.greeting`, def.greeting, { name, dobj: name, proper: 'name dobj' });
   return {
-    state: rendered.state,
+    state: markMet(rendered.state, npc),
     events: [{ type: 'line', kind: 'prose', text: rendered.text }],
     class: world.verbs?.[NPC_VERB_IDS.talk]?.class ?? null,
   };

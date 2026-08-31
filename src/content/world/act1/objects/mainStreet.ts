@@ -51,10 +51,12 @@ import {
   GENERAL_STORE_FRONT,
   HORIZON_GLOW,
   HORSES,
+  JACKS_MOTEL,
   MAIN_STREET,
   MAIN_STREET_PAVING,
   MAIN_STREET_ROAD,
   MAINTENANCE_MAN,
+  MOTEL_SIGN_FRONT,
   POST_OFFICE,
   POST_OFFICE_FRONT,
   SHERIFF_OFFICE,
@@ -394,6 +396,26 @@ const countyLibraryFront: ObjectDefSlice = {
   handlers: [{ verbs: [DIRECTION_VERB_IDS.in, V_APPROACH, V_FIND], effects: enterCountyLibraryEffects }],
 };
 
+// Wave-4 amendment (§10.3) — routing-only scenery, exactly like
+// `county_library_front`/`sheriff_office_front`: no examine prose, so "GO
+// TO MOTEL"/"ENTER MOTEL"/"GO TO ARROWHEAD" resolve before `JACKS_MOTEL`
+// has ever been visited. "jack" is added as a noun here (not in §10.3's own
+// noun list — a builder addition) purely so "FIND JACK" has a dobj to
+// resolve against while standing on Main Street, where the NPC himself is
+// never in scope (he only exists in `jacks_motel`) — no actual collision
+// with his own nouns there, same reasoning as `sign_in_book`'s own note on
+// reusing "register"/"book" across two rooms with no shared scope. Bare
+// "sign" is deliberately NOT claimed (already `billboard`'s/`boarding_
+// house`'s own word — §10.3's own brief).
+const enterMotelEffects: Effect[] = [{ goto: JACKS_MOTEL }];
+
+const motelSignFront: ObjectDefSlice = {
+  location: MAIN_STREET,
+  name: 'motel',
+  nouns: ['motel', 'arrowhead', 'motel sign', 'sign post', 'vacancy', 'jack'],
+  handlers: [{ verbs: [DIRECTION_VERB_IDS.in, V_APPROACH, V_FIND], effects: enterMotelEffects }],
+};
+
 export const MAIN_STREET_OBJECTS: Record<string, ObjectDefSlice> = {
   [HORSES]: horses,
   [BILLBOARD]: billboard,
@@ -410,4 +432,5 @@ export const MAIN_STREET_OBJECTS: Record<string, ObjectDefSlice> = {
   [COUNTY_LIBRARY_FRONT]: countyLibraryFront,
   [SHERIFF_OFFICE_FRONT]: sheriffOfficeFront,
   [DINER]: diner,
+  [MOTEL_SIGN_FRONT]: motelSignFront,
 } satisfies Record<string, ObjectDefSlice>;
