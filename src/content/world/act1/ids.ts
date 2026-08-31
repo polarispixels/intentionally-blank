@@ -387,3 +387,155 @@ export const V_CROUCH = V('act1_crouch');
 export const V_QUESTION = V('act1_question');
 /** §6 "WHAT YEAR IS IT"/"WHAT YEAR"/"WHAT'S THE DATE" — bare, this room only; no room-level handler needed (unlike STAND/V_CROUCH) since it sets no flag. */
 export const V_WHAT_YEAR = V('act1_what_year');
+
+// ---------------------------------------------------------------------------
+// Act I Wave 2 (`docs/superpowers/specs/2026-09-03-act1-wave2-prose.md`) —
+// the Post Office, the General Store, and the Sheriff's Office, plus the
+// game's second NPC, Sheriff Whitlock. Zone 1 rooms 7, 6, 8.
+// ---------------------------------------------------------------------------
+
+export const POST_OFFICE = R('act1_post_office');
+export const GENERAL_STORE = R('act1_general_store');
+export const SHERIFF_OFFICE = R('act1_sheriff_office');
+
+// --- Post Office objects (§4). One sub-part each for `po_boxes` (the
+// window/141/empty-slot noun cluster needs distinct EXAMINE text from bare
+// "examine boxes" — the same "which noun word resolved" gap this file's own
+// header explains for FEDORA_BAND/DOOR_BOLT/etc.) and `mail_drop` (the forms
+// rack needs its own EXAMINE/READ/TAKE text). ---
+
+export const PO_BOXES = O('act1_po_boxes');
+/** Sub-part — "window"/"windows"/"glass"/"141"/"one forty one" need EXAMINE/SEARCH text distinct from plain "box"/"boxes". */
+export const PO_BOXES_WINDOW = O('act1_po_boxes_window');
+export const NOTICE_BOARD = O('act1_notice_board');
+/** Sub-part — "corner"/"paper" need EXAMINE/TOUCH/TAKE/PULL text distinct from plain "board". */
+export const NOTICE_BOARD_CORNER = O('act1_notice_board_corner');
+export const SERVICE_COUNTER = O('act1_service_counter');
+export const MAIL_DROP = O('act1_mail_drop');
+/** Sub-part — "form"/"forms"/"rack" need EXAMINE/READ/TAKE text distinct from plain "slot". */
+export const MAIL_DROP_FORMS = O('act1_mail_drop_forms');
+export const LOBBY_BENCH = O('act1_lobby_bench');
+
+// --- General Store objects (§9), plus the room's own vestibule/shop split
+// (§7) and one new portable item, `string` (§9.4). ---
+
+export const POSTCARD_RACK = O('act1_postcard_rack');
+/** Sub-part — "picture"/"photograph" need EXAMINE text distinct from plain "rack"/"postcard". */
+export const POSTCARD_PICTURE = O('act1_postcard_picture');
+export const STORE_WINDOW = O('act1_store_window');
+export const WATER_CROCK = O('act1_water_crock');
+/** Sub-part — "cup"/"tin cup" need TAKE text distinct from the crock's own "take drink". */
+export const CROCK_CUP = O('act1_crock_cup');
+export const TWINE = O('act1_twine');
+/** Sub-part — "spool" needs TAKE text distinct from "take twine"/"take string". */
+export const TWINE_SPOOL = O('act1_twine_spool');
+export const STORE_DOOR = O('act1_store_door');
+export const STORE_RECESS = O('act1_store_recess');
+/** §9.4's new portable item — granted by taking the twine. */
+export const STRING_ITEM = O('act1_string');
+
+// --- Sheriff's Office objects (§12.3). ---
+
+export const COUNTY_MAP = O('act1_county_map');
+/** Sub-part — "screen"/"monitor" (turn/examine) need text distinct from plain "terminal". */
+export const RECORDS_TERMINAL_SCREEN = O('act1_records_terminal_screen');
+export const RECORDS_TERMINAL = O('act1_records_terminal');
+export const EVIDENCE_CAGE = O('act1_evidence_cage');
+export const WHITLOCK_DESK = O('act1_whitlock_desk');
+/** Sub-part — "form"/"forms"/"paper"/"papers" need EXAMINE/READ text distinct from plain "desk". */
+export const WHITLOCK_DESK_FORM = O('act1_whitlock_desk_form');
+export const SHERIFF_CELL = O('act1_sheriff_cell');
+
+// --- Main Street amendments (§13) — three new street-facing scenery
+// objects, so "ENTER STORE"/"FIND SHERIFF"/etc. resolve on first visit
+// (before `GO TO`'s visited-room graph can route there at all) — same
+// idiom as the existing `BOARDING_HOUSE`. `store`/`stores`/`shop`/`shops`
+// move off `brick_row`'s own noun list onto `GENERAL_STORE_FRONT` (see
+// `objects/mainStreet.ts`'s own wiring note) now that those words name a
+// specific, enterable place rather than generic locked scenery — the same
+// move already made for bare "door" when `boarding_house` first landed.
+// `DINER` is new too (§13.3's "destination-keyed variant" so `GO TO DINER`
+// stops falling to the fully generic boundary text now that its neighbour
+// is real) — scenery only, never a room.
+
+export const GENERAL_STORE_FRONT = O('act1_general_store_front');
+export const POST_OFFICE_FRONT = O('act1_post_office_front');
+export const SHERIFF_OFFICE_FRONT = O('act1_sheriff_office_front');
+export const DINER = O('act1_diner');
+
+// --- "Every other direction — in-world, not the build boundary" gates
+// (§6, §10, §12.5) — one always-closed gate per room, same idiom as
+// `LANDING_BOUNDARY_GATE`/`MAIN_STREET_BOUNDARY_GATE`: no `nouns`, never
+// resolvable, never described, exists only so the direction's `ExitDefSlice.
+// door` has a real id whose `open` state is always false. Unlike the Main
+// Street gate, these never render "END OF BUILD" — their `blockedText` is
+// each room's own in-world refusal line.
+
+export const POST_OFFICE_NO_EXIT_GATE = O('act1_post_office_no_exit_gate');
+export const GENERAL_STORE_NO_EXIT_GATE = O('act1_general_store_no_exit_gate');
+export const SHERIFF_OFFICE_NO_EXIT_GATE = O('act1_sheriff_office_no_exit_gate');
+
+// --- Sheriff Whitlock (§12.6) — the game's second NPC. ---
+
+export const WHITLOCK = N('act1_whitlock');
+
+// --- Flags (§2, §7, §11 — 13 total). ---
+
+export const FLAG_VISITED_POST_OFFICE = F('act1_visited_post_office');
+export const FLAG_RANG_BELL = F('act1_rang_bell');
+export const FLAG_SAW_BLANK_RECTANGLE = F('act1_saw_blank_rectangle');
+export const FLAG_SAT_IN_POST_OFFICE = F('act1_sat_in_post_office');
+
+export const FLAG_VISITED_GENERAL_STORE = F('act1_visited_general_store');
+export const FLAG_READ_POSTCARDS = F('act1_read_postcards');
+export const FLAG_DRANK_WATER = F('act1_drank_water');
+export const FLAG_HAS_STRING = F('act1_has_string');
+
+export const FLAG_VISITED_SHERIFF_OFFICE = F('act1_visited_sheriff_office');
+export const FLAG_MET_WHITLOCK = F('act1_met_whitlock');
+export const FLAG_WHITLOCK_RAN_YOU = F('act1_whitlock_ran_you');
+export const FLAG_TOLD_WHITLOCK_ABOUT_ROOM = F('act1_told_whitlock_about_room');
+export const FLAG_WHITLOCK_ASKED_YEAR = F('act1_whitlock_asked_year');
+
+// --- Clues (§2, §7, §11 — 5 total). ---
+
+export const CLUE_BLANK_RECTANGLE = C('act1_clue_blank_rectangle');
+export const CLUE_BOX_141 = C('act1_clue_box_141');
+export const CLUE_FIVE_FACES = C('act1_clue_five_faces');
+export const CLUE_NO_COUNTY_RECORD = C('act1_clue_no_county_record');
+export const CLUE_MAP_ADDITION = C('act1_clue_map_addition');
+
+// ---------------------------------------------------------------------------
+// Wave 2 — new verbs. Words chosen by this builder where the doc doesn't
+// specify them, following the established convention (see this file's
+// earlier headers) — see this task's report for the vocabulary calls made.
+// ---------------------------------------------------------------------------
+
+/** §4.3 "reach under"/"look under shutter" — LOOK_UNDER's own words ("look under"/"check under") already cover the latter; this covers "reach under"/"reach in". */
+export const V_REACH_UNDER = V('act1_reach_under');
+/** §4.4 "post letter" — bare, self-contained phrase (same idiom as V_CHECK_DATE): no "letter" object exists to hang a dobj-based handler on, so the whole phrase is the verb's own words, matching the established idiom for a fixed phrase with no natural object. */
+export const V_POST_LETTER = V('act1_post_letter');
+/**
+ * §12.3.1 "measure map"/"use scale"/"measure distance" — bare, one map in
+ * the game, no dobj needed. "measure to wall drug" is not registered as a
+ * literal verb phrase — its own word "wall" would collide with `brick_row_
+ * sign`'s adjective "wall" (`wall sign`) for no real gain over the shorter
+ * phrasings already covered. Builder cut, not the spec's; see this task's
+ * report.
+ */
+export const V_MEASURE = V('act1_measure');
+/** Main Street amendment — "FIND SHERIFF" (§13.3's exits table). */
+export const V_FIND = V('act1_find');
+/** §9.3 "fill cup". */
+export const V_FILL = V('act1_fill');
+/**
+ * §12.6.8's "ATTACK WHITLOCK"/"FOLLOW WHITLOCK". Front-desk-prose's own
+ * `marlow.ts` flagged these as out of scope when `NpcDefSlice.handlers`
+ * (npc-targeted rung 1) didn't exist yet ("a real scope expansion beyond
+ * this task's own file list"); that field exists now (`world.ts`), so this
+ * task wires them as ordinary global verbs — words chosen to avoid the
+ * `hit`/`strike` collision BREAK's own words already claim (a hard-error
+ * `verb-word-collision`, not a warning).
+ */
+export const V_ATTACK = V('act1_attack');
+export const V_FOLLOW = V('act1_follow');

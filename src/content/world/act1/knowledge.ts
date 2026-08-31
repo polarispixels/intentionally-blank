@@ -10,11 +10,16 @@
 import type { WorldDef } from '../../../engine/world';
 import { EXIT_TRAVEL_TEXT_LIT } from './room';
 import {
+  CLUE_BLANK_RECTANGLE,
   CLUE_BOLT_THROWN,
+  CLUE_BOX_141,
   CLUE_CALM_SEARCH,
   CLUE_DRAWER_HELD,
+  CLUE_FIVE_FACES,
   CLUE_HORIZON_GLOW,
   CLUE_HOUSE_EMPTY,
+  CLUE_MAP_ADDITION,
+  CLUE_NO_COUNTY_RECORD,
   CLUE_NO_NAME_RECALLED,
   CLUE_NOTHING_NAMED,
   CLUE_PAGE_INDENTATION,
@@ -26,6 +31,8 @@ import {
   CLUE_WINDOW_EXIT,
   FLAG_CROSSED_STREET,
   FLAG_DOOR_BOLT_DRAWN,
+  FLAG_DRANK_WATER,
+  FLAG_HAS_STRING,
   FLAG_HORSE_TOUCHED,
   FLAG_LAMP_FIRST_OFF_DONE,
   FLAG_LAMP_FIRST_ON_DONE,
@@ -34,16 +41,27 @@ import {
   FLAG_MARLOW_PRESSED,
   FLAG_MARLOW_TOLD_ABOUT_ROOM,
   FLAG_MET_MARLOW,
+  FLAG_MET_WHITLOCK,
   FLAG_POCKETS_CHECKED,
+  FLAG_RANG_BELL,
+  FLAG_READ_POSTCARDS,
   FLAG_REGISTER_GAP_SEEN,
   FLAG_REGISTER_IMPRESSION_FOUND,
   FLAG_ROOM_SEARCHED,
+  FLAG_SAT_IN_POST_OFFICE,
+  FLAG_SAW_BLANK_RECTANGLE,
   FLAG_SEEN_MAINTENANCE_MAN,
   FLAG_SPARE_KEY_GIVEN,
   FLAG_STOOD_UP,
   FLAG_TERMINAL_TRIED,
+  FLAG_TOLD_WHITLOCK_ABOUT_ROOM,
   FLAG_TOWEL_TAKEN,
+  FLAG_VISITED_GENERAL_STORE,
   FLAG_VISITED_MAIN_STREET,
+  FLAG_VISITED_POST_OFFICE,
+  FLAG_VISITED_SHERIFF_OFFICE,
+  FLAG_WHITLOCK_ASKED_YEAR,
+  FLAG_WHITLOCK_RAN_YOU,
   FLAG_WINDOW_OPEN,
   FLAG_WOUND_EXAMINED,
   LANDING,
@@ -94,7 +112,32 @@ export const ACT1_FLAGS: WorldDef['flags'] = {
   [FLAG_VISITED_MAIN_STREET]: { default: false, doc: 'set by main_street\'s own onEnter (first entry) — gates room description rule 2' },
   [FLAG_SEEN_MAINTENANCE_MAN]: { default: false, doc: 'set by EXAMINE MAN — read by nothing yet; P4 will read it (main-street-prose §9.1)' },
   [FLAG_HORSE_TOUCHED]: { default: false, doc: 'set by TOUCH/PET/STROKE/PAT HORSE' },
-  [FLAG_CROSSED_STREET]: { default: false, doc: 'set by CROSS STREET / GO TO HORSES / APPROACH HORSES / GO TO RAIL' },
+  [FLAG_CROSSED_STREET]: { default: false, doc: 'set by CROSS STREET / GO TO HORSES / APPROACH HORSES / GO TO RAIL, and now also by ENTER STORE / CROSS TO STORE / GO TO STORE (wave-2 amendment §13.3)' },
+
+  // -------------------------------------------------------------------
+  // Post Office (wave-2 prose §2's table)
+  // -------------------------------------------------------------------
+  [FLAG_VISITED_POST_OFFICE]: { default: false, doc: 'set by post_office\'s own onEnter (first entry) — gates room description rule 2' },
+  [FLAG_RANG_BELL]: { default: false, doc: 'set by RING BELL — gates the bell\'s second variant' },
+  [FLAG_SAW_BLANK_RECTANGLE]: { default: false, doc: 'set by EXAMINE BOARD — read by nothing yet (M4, quarantined, would read it)' },
+  [FLAG_SAT_IN_POST_OFFICE]: { default: false, doc: 'set by SIT — M4\'s trigger if the memory ever ships (quarantined, not wired)' },
+
+  // -------------------------------------------------------------------
+  // General Store (wave-2 prose §7's table)
+  // -------------------------------------------------------------------
+  [FLAG_VISITED_GENERAL_STORE]: { default: false, doc: 'set by general_store\'s own onEnter (first entry) — gates room description rule 2' },
+  [FLAG_READ_POSTCARDS]: { default: false, doc: 'set by EXAMINE POSTCARDS — read by nothing yet' },
+  [FLAG_DRANK_WATER]: { default: false, doc: 'set by DRINK WATER — read by nothing yet' },
+  [FLAG_HAS_STRING]: { default: false, doc: 'set by TAKE TWINE — grants the string item' },
+
+  // -------------------------------------------------------------------
+  // Sheriff's Office (wave-2 prose §11's table)
+  // -------------------------------------------------------------------
+  [FLAG_VISITED_SHERIFF_OFFICE]: { default: false, doc: 'set by sheriff_office\'s own onEnter (first entry) — gates room description rule 2' },
+  [FLAG_MET_WHITLOCK]: { default: false, doc: 'set by sheriff_office\'s own onEnter (same engine gap as met_marlow — greeting cannot run an Effect) — gates her greeting rotation' },
+  [FLAG_WHITLOCK_RAN_YOU]: { default: false, doc: 'set by topic_records — read by the greeting rotation and WHO AM I' },
+  [FLAG_TOLD_WHITLOCK_ABOUT_ROOM]: { default: false, doc: 'set by tell_room — read by nothing yet, P4/P5 should read it' },
+  [FLAG_WHITLOCK_ASKED_YEAR]: { default: false, doc: 'set by topic_year rule 1 — read by topic_year rule 2' },
 };
 
 export const ACT1_CLUES: NonNullable<WorldDef['clues']> = {
@@ -167,6 +210,42 @@ export const ACT1_CLUES: NonNullable<WorldDef['clues']> = {
     title: 'Two signs, the same thirty-two miles',
     detail:
       'The billboard at the edge of town says Wall Drug is 32 miles. So does a sign painted on a brick wall in the middle of town, a quarter mile nearer, and old enough to have been painted over once.',
+  },
+
+  // -------------------------------------------------------------------
+  // Post Office (wave-2 prose §2's table)
+  // -------------------------------------------------------------------
+  [CLUE_BLANK_RECTANGLE]: {
+    title: 'A space on the notice board',
+    detail:
+      'The public board at the post office is sun-darkened everywhere except one sheet-sized rectangle up and to the left, where something hung long enough to shade the cork. Four pins hold nothing. Under one of them there is a corner of printed paper with no words on it.',
+  },
+  [CLUE_BOX_141]: {
+    title: 'Box 141',
+    detail: 'Nine of the boxes have no name card in the slot. Eight of those nine are dark behind the glass. Box 141 has mail standing up in it.',
+  },
+
+  // -------------------------------------------------------------------
+  // General Store (wave-2 prose §7's table)
+  // -------------------------------------------------------------------
+  [CLUE_FIVE_FACES]: {
+    title: 'A postcard caption',
+    detail:
+      'In the store\'s left-hand window there is a spinner rack of postcards, half of them in backwards. One caption reads MOUNT RUSHMORE NATIONAL MEMORIAL - HOME OF THE FIVE FACES. The rack is on the other side of the glass and cannot be turned.',
+  },
+
+  // -------------------------------------------------------------------
+  // Sheriff's Office (wave-2 prose §11's table)
+  // -------------------------------------------------------------------
+  [CLUE_NO_COUNTY_RECORD]: {
+    title: 'The county has no record of you',
+    detail:
+      'Sheriff Whitlock searched the county system by address, since you had no name to give her. The county has three tenancies in the boarding house. No licence, no vehicle, nothing paid and nothing owed, and nobody of any description in the third-floor back. She says people out here live on cash and the county never hears about them, and that it doesn\'t mean anything.',
+  },
+  [CLUE_MAP_ADDITION]: {
+    title: 'The plant is not printed on the map',
+    detail:
+      'The county map in the sheriff\'s office is cloth-backed and old. North of town, past the last section line, somebody has drawn a shape onto it in pencil with a ruler, with a gate and an access road. It has no label.',
   },
 };
 

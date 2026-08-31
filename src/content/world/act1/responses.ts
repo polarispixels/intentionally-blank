@@ -18,15 +18,21 @@ export const ACT1_DARK_REFUSAL_FAMILY = 'act1.your_room.darkRefusal';
  * `V_APPROACH`'s own verb-level `default` — `{ ref }` avoids a
  * `mainStreet.ts` <-> `verbs.ts` import cycle (room files import from
  * `verbs.ts`, never the other way).  Referenced from the room's own
- * `north`/`south`/`west` exits (`blockedText`) and from `billboard`'s/
- * `horizon_glow`'s own `V_APPROACH` handlers (the north variant — §4.2's
- * "go to billboard... routes to the build boundary, north" and §8's "any
- * attempt to walk toward the glow").
+ * `north` exit (`blockedText`) and from `billboard`'s/`horizon_glow`'s own
+ * `V_APPROACH` handlers (the north variant — §4.2's "go to billboard...
+ * routes to the build boundary, north" and §8's "any attempt to walk
+ * toward the glow").
+ *
+ * UPDATED (wave-2 amendment §13.3): the `south` and `west` direction-keyed
+ * variants are DELETED — both directions now travel for real, to the Post
+ * Office and the General Store. `north` is unchanged. `ACT1_MAIN_STREET_
+ * BOUNDARY_DINER` is new — §13.3's own "destination-keyed variant" so
+ * `GO TO DINER` (`diner`, `objects/mainStreet.ts`) stops falling to the
+ * fully generic text now that its neighbour, the store, is real.
  */
 export const ACT1_MAIN_STREET_BOUNDARY_NORTH = 'act1.main_street.buildBoundary.north';
-export const ACT1_MAIN_STREET_BOUNDARY_SOUTH = 'act1.main_street.buildBoundary.south';
-export const ACT1_MAIN_STREET_BOUNDARY_WEST = 'act1.main_street.buildBoundary.west';
 export const ACT1_MAIN_STREET_BOUNDARY_GENERIC = 'act1.main_street.buildBoundary.generic';
+export const ACT1_MAIN_STREET_BOUNDARY_DINER = 'act1.main_street.buildBoundary.diner';
 
 export const ACT1_RESPONSES: Record<string, Prose> = {
   [ACT1_DARK_REFUSAL_FAMILY]: [
@@ -36,10 +42,8 @@ export const ACT1_RESPONSES: Record<string, Prose> = {
   ],
   [ACT1_MAIN_STREET_BOUNDARY_NORTH]:
     'END OF BUILD\n\nNorth is the edge of town, the billboard up close, and whatever is making the light. None of it is in this version.',
-  [ACT1_MAIN_STREET_BOUNDARY_SOUTH]:
-    'END OF BUILD\n\nThe street goes on south past the post office and the sheriff\'s office to the library. This version does not go that far.',
-  [ACT1_MAIN_STREET_BOUNDARY_WEST]:
-    'END OF BUILD\n\nAcross the road are the diner and the general store. Neither is in this version.',
   [ACT1_MAIN_STREET_BOUNDARY_GENERIC]:
     'END OF BUILD\n\nThat is somewhere else in this town. This version is the street, and the house behind you.',
+  [ACT1_MAIN_STREET_BOUNDARY_DINER]:
+    'END OF BUILD\n\nThe diner is the other lit window on this street and it is not in this version. The store next to it is.',
 };

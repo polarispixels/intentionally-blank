@@ -37,6 +37,7 @@ import {
   TERMINAL,
   V_ABOUT,
   V_APPROACH,
+  V_ATTACK,
   V_CALL,
   V_CHECK_DATE,
   V_CLEAN,
@@ -49,12 +50,18 @@ import {
   V_HELP,
   V_HOLD_TO_LAMP,
   V_KNOCK,
+  V_FILL,
+  V_FIND,
+  V_FOLLOW,
   V_LEAN_OVER,
   V_LOOK_DOWN,
   V_LOOK_OUTSIDE,
   V_LOOK_UP,
+  V_MEASURE,
+  V_POST_LETTER,
   V_POUR,
   V_QUESTION,
+  V_REACH_UNDER,
   V_RIGHT,
   V_RING,
   V_ROLL_UP,
@@ -268,6 +275,18 @@ export const crouchText =
   'You crouch. Under the patching, which is dark and poured and cracked across, the street is brick: laid in a herringbone, worn round at the edges, level enough that somebody knew the job.\n\nThe patches have been patched.';
 
 // ---------------------------------------------------------------------------
+// Wave 2 (Post Office / General Store / Sheriff's Office) — shared/bare
+// verb text (same idiom as the two blocks above).
+// ---------------------------------------------------------------------------
+
+/** Post Office §4.4 — "post letter"/"put <object> in slot"/"open flap"/"use slot" all share this one text. Bare "post letter" reaches it as `V_POST_LETTER`'s own `default` (no "letter" object exists to hang a dobj handler on — same idiom as `V_CHECK_DATE`); "open flap"/"use slot" reach the identical string via `mail_drop`'s own OPEN/PULL handlers (`objects/postOffice.ts`). "put <object> in slot" is a genuine engine gap (PUT_IN dispatches on the *given* item's own handlers, not the container's — same shape as Main Street's already-documented GIVE-to-horse gap) — not wired; see this task's report. */
+export const postLetterText =
+  'The flap swings in and stops against nothing you can see. Below it, a drop of about two feet by the sound of it.\n\nYou have nothing to send, nobody to send it to, and no name for the corner of the envelope.';
+
+/** Sheriff's Office §12.3.1 — "measure map"/"use scale"/"measure to wall drug"/"measure distance" — bare, one map in the game. */
+export const measureMapText = 'You lay a thumb along the scale bar and walk it up the highway. Thirty-two miles, near enough.';
+
+// ---------------------------------------------------------------------------
 // The full table.
 // ---------------------------------------------------------------------------
 
@@ -279,7 +298,8 @@ export const ACT1_VERBS: Record<string, VerbDef> = {
   [LOOK_VERB_ID]: { id: LOOK_VERB_ID, words: ['look', 'l', 'look around'], patterns: ['V'], class: null, default: 'You look around.' },
   // "steal" added (front-desk-prose §4.2's "STEAL REGISTER") — a general TAKE synonym, not register-specific vocabulary.
   // "untie"/"mount" added (main-street-prose §4.1's "TAKE HORSE"/"UNTIE HORSE"/"MOUNT HORSE" — shares one failure text with "RIDE HORSE" there) — general TAKE synonyms, not horse-specific vocabulary. "ride" is NOT added here: it already belongs to `V_SLIDE_DOWN` (the landing banister's own word) and `validate.ts`'s verb-word-collision check is a hard error — "RIDE HORSE" reaches `horses`' own `V_SLIDE_DOWN` handler instead (`objects/mainStreet.ts`), sharing the same text.
-  [TAKE]: { id: TAKE, words: ['take', 'get', 'pick up', 'steal', 'untie', 'mount'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.take },
+  // "buy" added (wave-2's General Store §9.1 "BUY POSTCARD"/"TAKE POSTCARD") — a general TAKE synonym, not postcard-specific vocabulary.
+  [TAKE]: { id: TAKE, words: ['take', 'get', 'pick up', 'steal', 'untie', 'mount', 'buy'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.take },
   [DROP]: { id: DROP, words: ['drop', 'put down'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.drop },
   // "try handle" added (§15.1.5's landing_doors block: "open / unlock /
   // try handle") — a general OPEN synonym, not landing-specific vocabulary,
@@ -316,7 +336,8 @@ export const ACT1_VERBS: Record<string, VerbDef> = {
   [TASTE]: { id: TASTE, words: ['taste', 'lick'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.taste },
   [PUSH]: { id: PUSH, words: ['push', 'press against', 'shove'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.push },
   [PULL]: { id: PULL, words: ['pull', 'tug', 'yank', 'drag'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.pull },
-  [TURN]: { id: TURN, words: ['turn', 'rotate', 'twist'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.turn },
+  // "spin" added (wave-2's General Store §9.1 "SPIN RACK") — a general TURN synonym, not rack-specific vocabulary.
+  [TURN]: { id: TURN, words: ['turn', 'rotate', 'twist', 'spin'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.turn },
   [MOVE]: { id: MOVE, words: ['move', 'shift', 'slide', 'reposition'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.move },
   [SHAKE]: { id: SHAKE, words: ['shake', 'rattle', 'jiggle'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.shake },
   // "dust" dropped from the synonym list (validate.ts's verb-noun-collision
@@ -384,9 +405,10 @@ export const ACT1_VERBS: Record<string, VerbDef> = {
   // §4.10's "knock on door" — bare-default text applied unconditioned
   // (no {name} template) rather than invented generic "knock" prose; this
   // room only authors one KNOCK target. See this task's report.
+  // "tap" added (General Store §9.2 "TAP WINDOW") — a general KNOCK synonym, not window-specific vocabulary.
   [V_KNOCK]: {
     id: V_KNOCK,
-    words: ['knock'],
+    words: ['knock', 'tap'],
     patterns: ['V dobj'],
     class: 'direct',
     default: 'You knock on your own door from the inside. Nothing answers, and you stand there a moment longer than you meant to.',
@@ -412,7 +434,8 @@ export const ACT1_VERBS: Record<string, VerbDef> = {
   [V_LEAN_OVER]: { id: V_LEAN_OVER, words: ['lean over', 'look over'], patterns: ['V dobj'], class: 'analytical', default: VERB_DEFAULTS.touch },
   [V_XYZZY]: { id: V_XYZZY, words: ['xyzzy'], patterns: ['V'], class: null, default: xyzzyDefault },
   [V_SUDO]: { id: V_SUDO, words: ['sudo'], patterns: ['V', 'V dobj'], class: null, default: sudoDefault },
-  [V_WHOAMI]: { id: V_WHOAMI, words: ['who am i', 'whoami'], patterns: ['V'], class: null, default: whoamiDefault },
+  // "look for my name"/"search for my name" added (Post Office §5) — reach the same room-scoped WHO AM I override (`postOffice.ts`'s own room handler).
+  [V_WHOAMI]: { id: V_WHOAMI, words: ['who am i', 'whoami', 'look for my name', 'search for my name'], patterns: ['V'], class: null, default: whoamiDefault },
   [V_HOLD_TO_LAMP]: { id: V_HOLD_TO_LAMP, words: ['hold to'], patterns: ['V dobj prep iobj'], preps: ['to'], class: 'analytical', default: VERB_DEFAULTS.touch },
   [V_TURN_OVER]: { id: V_TURN_OVER, words: ['turn over', 'examine other side'], patterns: ['V dobj'], class: 'analytical', default: VERB_DEFAULTS.turn },
   [V_LOOK_UP]: { id: V_LOOK_UP, words: ['look up'], patterns: ['V'], class: null, default: lookUp },
@@ -461,6 +484,22 @@ export const ACT1_VERBS: Record<string, VerbDef> = {
   [V_QUESTION]: { id: V_QUESTION, words: ['question'], patterns: ['V dobj'], class: 'social', default: VERB_DEFAULTS.talk_to },
   // §6's "WHAT YEAR IS IT"/"WHAT YEAR"/"WHAT'S THE DATE" — bare, no room-level handler needed (sets no flag).
   [V_WHAT_YEAR]: { id: V_WHAT_YEAR, words: ['what year is it', 'what year', "what's the date", 'what is the date'], patterns: ['V'], class: 'analytical', default: whatYearText },
+
+  // Wave 2 (Post Office / General Store / Sheriff's Office) — new verbs.
+  // Post Office §4.3's "reach under"/"look under shutter" ("look under"/"check under" already belong to LOOK_UNDER, above).
+  [V_REACH_UNDER]: { id: V_REACH_UNDER, words: ['reach under', 'reach in'], patterns: ['V dobj'], class: 'analytical', default: VERB_DEFAULTS.touch },
+  // Post Office §4.4's bare "post letter"/"mail letter" — see this file's own comment on `postLetterText`.
+  [V_POST_LETTER]: { id: V_POST_LETTER, words: ['post letter', 'mail letter'], patterns: ['V'], class: 'analytical', default: postLetterText },
+  // Sheriff's Office §12.3.1's bare "measure map"/"use scale"/"measure to wall drug"/"measure distance".
+  [V_MEASURE]: { id: V_MEASURE, words: ['measure', 'measure map', 'measure distance', 'use scale'], patterns: ['V'], class: 'analytical', default: measureMapText },
+  // Main Street amendment §13.3's "FIND SHERIFF".
+  [V_FIND]: { id: V_FIND, words: ['find'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.examine },
+  // General Store §9.3's "fill cup".
+  [V_FILL]: { id: V_FILL, words: ['fill'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.push },
+  // Sheriff's Office §12.6.8's "ATTACK WHITLOCK"/"FOLLOW WHITLOCK" — see ids.ts's own comment on why these are new global verbs now. "hit"/"strike" already belong to BREAK (a verb-word collision, hard error), so ATTACK claims only its own word; its `default` reuses the already-authored `attack` family (`content/responses.ts`) rather than inventing new prose.
+  [V_ATTACK]: { id: V_ATTACK, words: ['attack'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.attack },
+  // No `follow` family exists in `content/responses.ts`; this `default` reuses the closest existing authored family (`talk_to`, already the fallback for ASK/TELL misses) rather than inventing new global prose — see this task's report. `npc.whitlock.handlers` (whitlock.ts) is what a player actually reaches for "FOLLOW WHITLOCK" in this build; no other NPC is follow-able yet.
+  [V_FOLLOW]: { id: V_FOLLOW, words: ['follow'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.talk_to },
   // §8 gap 2: the real reserved `INVENTORY_VERB_ID`, not a room-local id.
   // `default` refs the global `inventory.empty` family — `room.ts`'s own
   // handler overrides it for the empty-hands case (§8.9/§14.4).

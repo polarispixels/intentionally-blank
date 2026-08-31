@@ -32,7 +32,7 @@ import type { ObjectDefSlice } from '../../../../engine/world';
 import type { Effect } from '../../../../engine/effects';
 import { DIRECTION_VERB_IDS } from '../../../../engine/move';
 import { crossStreetText, crouchText, EXAMINE, HELLO, OPEN, READ, SEARCH, SMELL, TAKE, TOUCH } from '../verbs';
-import { ACT1_MAIN_STREET_BOUNDARY_NORTH } from '../responses';
+import { ACT1_MAIN_STREET_BOUNDARY_DINER, ACT1_MAIN_STREET_BOUNDARY_NORTH } from '../responses';
 import {
   BILLBOARD,
   BOARDING_HOUSE,
@@ -41,10 +41,13 @@ import {
   BRICK_ROW_WINDOW,
   CLUE_HORIZON_GLOW,
   CLUE_SAME_DISTANCE,
+  DINER,
   FLAG_CROSSED_STREET,
   FLAG_HORSE_TOUCHED,
   FLAG_SEEN_MAINTENANCE_MAN,
   FRONT_DESK,
+  GENERAL_STORE,
+  GENERAL_STORE_FRONT,
   HORIZON_GLOW,
   HORSES,
   MAIN_STREET,
@@ -52,10 +55,15 @@ import {
   MAIN_STREET_PAVING,
   MAIN_STREET_ROAD,
   MAINTENANCE_MAN,
+  POST_OFFICE,
+  POST_OFFICE_FRONT,
+  SHERIFF_OFFICE,
+  SHERIFF_OFFICE_FRONT,
   V_APPROACH,
   V_COUNT,
   V_CROSS,
   V_FEED,
+  V_FIND,
   V_KNOCK,
   V_QUESTION,
   V_SLIDE_DOWN,
@@ -174,7 +182,13 @@ const brickRow: ObjectDefSlice = {
   // (kept: "doors" plural, plus the doc's own sanctioned qualified forms).
   // "window"/"windows"/"glass" and the sign words move to the sub-parts
   // below (this file's own header note).
-  nouns: ['buildings', 'building', 'brick', 'brickwork', 'storefronts', 'shopfront', 'shops', 'shop', 'store', 'stores', 'doors', 'facade', 'wall', 'bench', 'awning', 'shop door', 'nearest door'],
+  //
+  // Wave-2 amendment wiring note: "shop"/"shops"/"store"/"stores" move off
+  // this generic row onto `general_store_front` (below) — those words now
+  // name a specific, enterable place rather than generic locked scenery,
+  // the same move already made for bare "door" when `boarding_house`
+  // first landed.
+  nouns: ['buildings', 'building', 'brick', 'brickwork', 'storefronts', 'shopfront', 'doors', 'facade', 'wall', 'bench', 'awning', 'shop door', 'nearest door'],
   handlers: [
     { verbs: [EXAMINE], effects: [{ say: brickRowExamine }] },
     // "open door"/"try door"/"knock on door"/"enter shop" (§4.4).
@@ -303,6 +317,57 @@ const mainStreetBoundaryGate: ObjectDefSlice = {
   location: MAIN_STREET,
 };
 
+// ---------------------------------------------------------------------------
+// Wave-2 amendment (§13) — three new street-facing scenery objects, so
+// "ENTER STORE"/"CROSS TO STORE"/"GO TO POST OFFICE"/"FIND SHERIFF" (§13.3's
+// exits table) resolve on first visit, before `GO TO`'s visited-room BFS
+// could ever route there. No inbound `travelText` is authored anywhere in
+// the wave-2 doc (only each room's own line back out to Main Street is
+// given), so these `goto` effects carry no `say` of their own — a bare
+// `goto` already re-renders the destination's own arrival description
+// (`effects.ts`: "relocate player (with look)") — see `mainStreet.ts`'s own
+// note on the same gap for the room's plain compass exits. Flagged as a
+// `narrative-writer` opportunity in this task's report, same as there.
+// ---------------------------------------------------------------------------
+
+const enterGeneralStoreEffects: Effect[] = [{ set: [FLAG_CROSSED_STREET, true] }, { goto: GENERAL_STORE }];
+
+const generalStoreFront: ObjectDefSlice = {
+  location: MAIN_STREET,
+  name: 'store',
+  nouns: ['store', 'stores', 'shop', 'shops', 'general store', 'general store window'],
+  handlers: [{ verbs: [DIRECTION_VERB_IDS.in, V_APPROACH, V_CROSS], effects: enterGeneralStoreEffects }],
+};
+
+const enterPostOfficeEffects: Effect[] = [{ goto: POST_OFFICE }];
+
+const postOfficeFront: ObjectDefSlice = {
+  location: MAIN_STREET,
+  name: 'post office',
+  nouns: ['post office', 'office'],
+  adjectives: ['post'],
+  handlers: [{ verbs: [DIRECTION_VERB_IDS.in, V_APPROACH], effects: enterPostOfficeEffects }],
+};
+
+const enterSheriffOfficeEffects: Effect[] = [{ goto: SHERIFF_OFFICE }];
+
+const sheriffOfficeFront: ObjectDefSlice = {
+  location: MAIN_STREET,
+  name: "sheriff's office",
+  nouns: ['sheriff', "sheriff's office", 'sheriff office', 'office'],
+  adjectives: ['sheriff', "sheriff's"],
+  handlers: [{ verbs: [DIRECTION_VERB_IDS.in, V_APPROACH, V_FIND], effects: enterSheriffOfficeEffects }],
+};
+
+// §13.3's "destination-keyed variant" — the diner is scenery only, never a room; "GO TO DINER" gets its own line instead of falling to the fully generic boundary text now that its neighbour (the store) is real.
+const diner: ObjectDefSlice = {
+  location: MAIN_STREET,
+  name: 'diner',
+  portable: false,
+  nouns: ['diner', 'cafe', 'café', 'diner window'],
+  handlers: [{ verbs: [V_APPROACH], effects: [{ say: { ref: ACT1_MAIN_STREET_BOUNDARY_DINER } }] }],
+};
+
 export const MAIN_STREET_OBJECTS: Record<string, ObjectDefSlice> = {
   [HORSES]: horses,
   [BILLBOARD]: billboard,
@@ -315,4 +380,8 @@ export const MAIN_STREET_OBJECTS: Record<string, ObjectDefSlice> = {
   [MAINTENANCE_MAN]: maintenanceMan,
   [BOARDING_HOUSE]: boardingHouse,
   [MAIN_STREET_BOUNDARY_GATE]: mainStreetBoundaryGate,
+  [GENERAL_STORE_FRONT]: generalStoreFront,
+  [POST_OFFICE_FRONT]: postOfficeFront,
+  [SHERIFF_OFFICE_FRONT]: sheriffOfficeFront,
+  [DINER]: diner,
 } satisfies Record<string, ObjectDefSlice>;

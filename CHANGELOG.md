@@ -12,6 +12,46 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.6.0] - 2026-09-03
+
+Three rooms in one wave — written in a single pass, wired in a single pass.
+7 of 12 Act I rooms now live.
+
+### Added
+
+- **Post Office** — the analog channel made architectural. The notice board
+  carries a sun-faded blank rectangle: four pins holding nothing, a fifth
+  hole from something wider, a thumbnail of paper with a printed border and
+  no words. Deliberately unassigned — nothing in this build says what hung
+  there.
+- **General Store** — shut, read through glass from a tiled recess, with the
+  free-water crock outside where anyone off the street can reach it. The
+  postcard rack shows five captions, half the cards backwards because that
+  is how racks are. `MOUNT RUSHMORE NATIONAL MEMORIAL — HOME OF THE FIVE
+  FACES` is the fourth, and the narrator never sees the photograph and never
+  reacts.
+- **Sheriff's Office and Dana Whitlock**, the second NPC and the inverse of
+  the first. Marlow withholds what he knows; **Whitlock withholds nothing
+  and has nothing.** She is harder to open not because there is a door but
+  because there isn't one — everything she has is already on the counter,
+  sourced, complete, and useless. Her `unknownTopic` inverts Marlow's line
+  deliberately: *"I'd be guessing. And I've got a machine here for not
+  guessing."*
+- **The county has no record of you.** She can't search a name, so she
+  searches the address: eleven rooms, three tenancies, *"nobody of any
+  description at all in the third-floor back."* Then she explains it away
+  reasonably and says "Doesn't mean anything." Marlow said four let,
+  counting yours. **Nothing in the game does that subtraction.**
+- Canon 28: Whitlock keeps a night post — Act I's three evidence channels
+  have to be reachable on the opening night or the puzzle network collapses
+  into a chain.
+
+### Notes
+
+`validate` warnings rose from 11 to 33 as three rooms landed at once, all
+reviewed as genuine shared nouns. That is approaching the threshold where a
+warning list stops being read; worth tightening before the next wave.
+
 ## [0.5.0] - 2026-09-02
 
 ### Added
