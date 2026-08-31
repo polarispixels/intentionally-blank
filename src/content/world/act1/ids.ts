@@ -236,8 +236,11 @@ export const MEM_HAT = M('act1_mem_hat');
 
 export const QUESTION_THE_RECORD = Q('act1_q_the_record');
 export const QUESTION_OUT_OF_THIS_ROOM = Q('act1_q_out_of_this_room');
+/** Wayfinding §20 (register 127) — the jammed drawer joins the ledger; both anchors shipped long ago. */
+export const QUESTION_THE_DRAWER = Q('act1_q_the_drawer');
 export const PUZZLE_REGISTER = P('act1_register');
 export const PUZZLE_LEAVE_YOUR_ROOM = P('act1_leave_your_room');
+export const PUZZLE_DRAWER = P('act1_drawer');
 
 // ---------------------------------------------------------------------------
 // Verbs the prose doc needs beyond the response-families' global set (§9's

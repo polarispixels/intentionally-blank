@@ -216,8 +216,14 @@ const helloDefault = 'You say hello to an empty room, which is one of those thin
  * `mvp-prologue.ts`'s own header names for SAY); escalated in task 22a's
  * report, not invented around here.
  */
+// Wayfinding doc §10, patch 3 — one sentence appended to variant 1 only
+// (hard rule 5, transcribed verbatim). Variants 2-4 are the repeat attempts
+// and are unedited; a lead the player has already been given does not want
+// repeating. It points at paper, not at page 78 — the missing half of the
+// hat/hatband thought the opening room's own puzzle already taught, without
+// naming the page, the hat, the graphite or the rubbing.
 export const terminalTypeDefault = [
-  'You type. The keys have the deep, unembarrassed travel of a machine built when people were expected to be sitting at them all day. The cursor takes everything you give it without comment.\n\n    USER NOT RECOGNIZED\n\nThe cursor returns to where it started.\n\nIt does not say *incorrect*. It does not say *no such user*. Not recognized is a different sort of remark, and the machine makes it the same way every time — whether you type a name, a word, or nothing at all.',
+  'You type. The keys have the deep, unembarrassed travel of a machine built when people were expected to be sitting at them all day. The cursor takes everything you give it without comment.\n\n    USER NOT RECOGNIZED\n\nThe cursor returns to where it started.\n\nIt does not say *incorrect*. It does not say *no such user*. Not recognized is a different sort of remark, and the machine makes it the same way every time — whether you type a name, a word, or nothing at all. Somebody knew what to put in it once, and nobody carries a thing like that in his head; he writes it on whatever paper is to hand and then keeps the paper.',
   '    USER NOT RECOGNIZED\n\nYou had, at some level, expected that. It does not help.',
   'You try a different word this time. The machine considers it for exactly as long as it considered the last one, which is no time at all.\n\n    USER NOT RECOGNIZED',
   'You press ENTER on an empty line, to see.\n\n    USER NOT RECOGNIZED\n\nThe same words, at the same speed, for nothing at all.',
@@ -267,9 +273,15 @@ export const telephoneText = 'Black, heavy, bolted through the counter, with a d
 export const coffeeText =
   'You pour a cup off the ring. It is terrible in an entirely familiar way, which is the first familiar thing that has happened to you tonight.';
 
-/** §4.2 "sign register"/"write in register"/"write name"/"write my name". */
+/**
+ * §4.2 "sign register"/"write in register"/"write name"/"write my name".
+ * Wayfinding doc §11, patch 4 — one sentence added (hard rule 5, transcribed
+ * verbatim). Points at Marlow and promises nothing: he does not know the
+ * name (the impression's name column has one pen stroke, begun and
+ * abandoned), only that he was on shift when whoever did know came in.
+ */
 export const signRegisterText =
-  'There is a pen in the inkstand and a book on the counter and a line waiting at the bottom of the page.\n\nYou do not know what to put on it.';
+  'There is a pen in the inkstand and a book on the counter and a line waiting at the bottom of the page.\n\nYou do not know what to put on it. The man on the other side of the counter was awake when whoever did know came in.';
 
 /** §4.2 "read register"/"look through register"/"find my name"/"search register". */
 export const findNameText =

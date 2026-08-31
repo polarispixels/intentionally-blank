@@ -2,7 +2,7 @@
 // pillars land here (§10.1).
 
 import type { ObjectDefSlice } from '../../../../engine/world';
-import { CLUE_CALM_SEARCH, CLUE_NOTHING_NAMED, FLAG_ROOM_SEARCHED, PAPERS, YOUR_ROOM } from '../ids';
+import { CLUE_CALM_SEARCH, CLUE_NOTHING_NAMED, FLAG_ROOM_SEARCHED, MATCHBOOK, PAPERS, YOUR_ROOM } from '../ids';
 import { BURN, EXAMINE, READ, SEARCH, TAKE } from '../verbs';
 
 const searchText = [
@@ -45,7 +45,13 @@ const papers: ObjectDefSlice = {
       verbs: [BURN],
       effects: [
         {
-          say: 'You have nothing to light them with, and if you had, this room would go up in about ninety seconds, and it is currently the only room you own.',
+          // Wayfinding §21 — with the matchbook held, the shipped line would be
+          // a false statement about the player's own inventory. Rule 2 is the
+          // shipped string, untouched, still right for empty hands.
+          say: [
+            { when: { has: MATCHBOOK }, text: 'You have the matches now, which moves this from impossible to merely stupid.\n\nThese papers are the only thing in this room that has told you anything: the glass underneath them, the dry ring where the water stood, the fact that not one sheet in the heap has a name on it. Burning them would be getting rid of the argument in order to be rid of the paper it is written on. And then, about ninety seconds later, of the only room you own.' },
+            { text: 'You have nothing to light them with, and if you had, this room would go up in about ninety seconds, and it is currently the only room you own.' },
+          ],
         },
       ],
     },

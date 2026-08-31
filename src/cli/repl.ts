@@ -253,7 +253,7 @@ async function handleMeta(cmd: MetaCommand): Promise<void> {
       const entries = availableHints(WORLD, session.state);
       if (cmd.n === undefined) {
         if (entries.length === 0) {
-          out('(nothing to hint at right now)');
+          out(String(WORLD.responses?.['hint.empty'] ?? '(nothing to hint at right now)'));
           return;
         }
         entries.forEach((e, i) => out(`${i + 1}. ${e.questionText} (used ${e.used}/${e.total})`));

@@ -253,7 +253,7 @@ function handleMetaCommand(ui: UiState, cmd: MetaCommand, opts: ControllerOpts):
     case 'hint': {
       const entries = availableHints(opts.world, ui.session.state);
       if (cmd.n === undefined) {
-        if (entries.length === 0) return pushSystemLine(ui, '(nothing to hint at right now)');
+        if (entries.length === 0) return pushSystemLine(ui, String(opts.world.responses?.['hint.empty'] ?? '(nothing to hint at right now)'));
         return pushLines(ui, entries.map((e, i): Line => ({ kind: 'system', text: `${i + 1}. ${e.questionText} (used ${e.used}/${e.total})` })));
       }
       const entry = entries[cmd.n - 1];

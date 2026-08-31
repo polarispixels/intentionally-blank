@@ -4,17 +4,24 @@
 // answers when it's poked at.
 //
 // §15.2's build boundary text is defined here (not in `landing.ts`, the
-// room file) and exported, so the stairs' own TOUCH/CLIMB handlers below
-// and the room's `down`/`out` exits (§15.1.6/§15.2) share one string
-// rather than two copies drifting apart.
+// room file) and exported, so the room's `down`/`out` exits (§15.1.6/§15.2)
+// can share it. UPDATED (wayfinding doc §14.1/canon 134): the boundary moved
+// down to the Front Desk's street door (see `landing.ts`'s own header) and
+// `landingStairs`' TOUCH/CLIMB handler below was left pointed at this
+// constant regardless — so `CLIMB STAIRS` told the player the game was over
+// on a staircase `DOWN` walks them down a turn later. Fixed here, not in the
+// room file, per this task's own scope.
+// `BUILD_BOUNDARY_TEXT` stays declared/exported — harmless, unreferenced by
+// this object now — for the same reason the room file's header gives.
 
 import type { ObjectDefSlice } from '../../../../engine/world';
 import type { Prose, ProseRule } from '../../../../engine/prose';
-import { CLIMB, EXAMINE, LISTEN, LOOK_UNDER, LOCK, CLOSE, OPEN, TOUCH, UNLOCK } from '../verbs';
+import { CLIMB, EXAMINE, LISTEN, LOOK_UNDER, LOCK, CLOSE, OPEN, UNLOCK } from '../verbs';
 import { V_KNOCK, V_LEAN_OVER, V_SLIDE_DOWN } from '../ids';
 import {
   DOOR,
   FLAG_DOOR_BOLT_DRAWN,
+  FRONT_DESK,
   LANDING,
   LANDING_BANISTER,
   LANDING_BOUNDARY_GATE,
@@ -41,6 +48,16 @@ const stairsExamine =
 const stairsListen =
   'Nothing on the stairs themselves. Further down, a radio, a chair, and the particular silence of a person who has stopped what they were doing because a door opened upstairs.';
 
+/**
+ * Canon 134 — kept as its own constant rather than importing the room
+ * file's `travelTextToFrontDesk` (`../landing.ts`, unexported): that file
+ * already imports from this one (`LOOK_DOWN_TEXT`), so importing back would
+ * be circular, and this task's scope is this file alone. Transcribed
+ * verbatim from that constant so the two stay in sync by inspection.
+ */
+const stairsClimbDownText =
+  'You go down two flights, around the well, past a landing with no light on it. The smell of coffee gets stronger the whole way.';
+
 const landingStairs: ObjectDefSlice = {
   location: LANDING,
   name: 'stairs',
@@ -48,10 +65,13 @@ const landingStairs: ObjectDefSlice = {
   handlers: [
     { verbs: [EXAMINE], effects: [{ say: stairsExamine }] },
     { verbs: [LISTEN], effects: [{ say: stairsListen }] },
-    // "touch / climb / go down — see §15.2" (doc): TOUCH and CLIMB on the
-    // stairs themselves render the same boundary text as the DOWN/OUT
-    // exits; "go down" (the bare direction verb) is the exits' own job.
-    { verbs: [TOUCH, CLIMB], effects: [{ say: BUILD_BOUNDARY_TEXT }] },
+    // Canon 134 (wayfinding doc §14.1) — `CLIMB STAIRS` now does what
+    // `DOWN` already does: the room's own `down` exit, in prose and effect
+    // (`goto`, no clock advance — the real exit declares none either).
+    // TOUCH is dropped from this handler entirely so it falls through to
+    // the generic `touch.default` family (`responses.ts`) instead of
+    // either the stale boundary text or a movement it should not trigger.
+    { verbs: [CLIMB], effects: [{ say: stairsClimbDownText }, { goto: FRONT_DESK }] },
   ],
 };
 

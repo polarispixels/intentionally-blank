@@ -51,7 +51,11 @@ export function parseMetaCommand(input: string): MetaCommand | undefined {
   if (lower === 'export') return { kind: 'export' };
   if (lower === 'map') return { kind: 'map' };
   if (lower === 'questions') return { kind: 'questions' };
-  if (lower === 'notebook') return { kind: 'notebook' };
+  // `CLUES` is a synonym (wayfinding doc §1's note, canon 126): the new
+  // HELP text names the case ledger by the command that exists
+  // (`NOTEBOOK`), but `CLUES` is the word most players reach for, and both
+  // shells share this one parser.
+  if (lower === 'notebook' || lower === 'clues') return { kind: 'notebook' };
   if (lower === 'memories') return { kind: 'memories' };
   if (lower === 'hint') return { kind: 'hint' };
 

@@ -12,6 +12,32 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.17.1] - 2026-08-31
+
+**The wayfinding wave** — built from the first live player's stuck report
+(`docs/superpowers/specs/2026-09-19-wayfinding-prose.md`).
+
+### Added
+
+- **HELP teaches the game now**: the conversation grammar (TALK TO, ASK
+  ABOUT, TELL ABOUT, SHOW TO), the case ledger (QUESTIONS, CLUES,
+  MEMORIES), and HINT / HINT <n> — a ladder per open puzzle, one rung per
+  request, never volunteered (constitution §21). `CLUES` now opens the
+  ledger. Bare `HINT` with nothing hintable points at QUESTIONS.
+- **Four hint ladders that were empty**: the poker table, getting inside
+  the plant, the second return, the night schedule.
+- **The jammed drawer joins the ledger** (register 127): a question, a
+  three-rung ladder, no new state.
+- **Five one-sentence leading-clue patches** in Act I (the drawer's OPEN,
+  the searched room, the terminal's first refusal, the register, the
+  boxes), each at the method-never-the-object line (register 126).
+
+### Fixed
+
+- The Landing's stairs no longer print `END OF BUILD` for a staircase the
+  player can walk down; `BURN PAPERS` with the matchbook held no longer
+  claims the player has nothing to light them with.
+
 ## [0.17.0] - 2026-08-31
 
 **Stage E1 — the visit.** One new room, and the county rearranged around

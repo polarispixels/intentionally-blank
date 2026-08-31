@@ -90,8 +90,16 @@ const boxesWindowEffects: Effect[] = [
   { grantClue: CLUE_BOX_141 },
 ];
 
-/** Wave 5's own rule 2 — unedited, byte for byte (§9.3's own instruction: "the shipped string turns out to have been the instructions"). */
-const boxesOpen = 'The dial turns freely both ways and means nothing without the three letters that go with it. You try the door. It is a small brass door and it is doing its job.';
+/**
+ * Wave 5's own rule 2. Wayfinding doc §12, patch 5 — one clause added inside
+ * the existing first sentence (hard rule 5, transcribed verbatim): the
+ * general form of `boxesOpenWithKeyText`'s own idea ("scratched into brass
+ * because he did not trust himself to remember them"), moved forward into
+ * the refusal. Names no object, no material, no person — `EXAMINE KEYRING`
+ * at the motel does the rest.
+ */
+const boxesOpen =
+  'The dial turns freely both ways and means nothing without the three letters that go with it, and three letters is not a thing a man keeps in his head; it is a thing he has put somewhere he can look at. You try the door. It is a small brass door and it is doing its job.';
 
 /**
  * Wave 5, §9.3 — rule 1, `{ has: KEYRING }`. The tag's three letters are

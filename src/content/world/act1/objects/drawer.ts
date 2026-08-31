@@ -12,8 +12,14 @@ import type { ObjectDefSlice } from '../../../../engine/world';
 import { CHAIR_LEG, CLUE_DRAWER_HELD, DESK, DRAWER, FLAG_DRAWER_OPEN } from '../ids';
 import { EXAMINE, KICK, OPEN, PRY, PULL, SEARCH, SHAKE, UNLOCK } from '../verbs';
 
+// Wayfinding doc §8, patch 1 — one sentence added, nothing removed (hard
+// rule 5, transcribed verbatim). The gouges were already canon and already
+// described twice elsewhere in this file; this makes them visible from the
+// response the player is most likely to be looking at, without naming the
+// tool. Canon 19 (the drawer stays shut) is untouched — nothing about the
+// gate changes, only that the refusal now reads as *later*.
 export const DRAWER_STUCK_TEXT =
-  'The drawer moves an eighth of an inch and stops against itself. The front is bowed, the runner behind it is bent, and between them they have arrived at an arrangement that does not include you.';
+  'The drawer moves an eighth of an inch and stops against itself. The front is bowed, the runner behind it is bent, and between them they have arrived at an arrangement that does not include you. The lip above the gap is chewed pale in three places, which is the shape a drawer front takes when somebody has put something into the gap and leaned on it.';
 
 export const DRAWER_PRY_TEXT = [
   'Somebody has already tried this. The gouges in the drawer’s lip are fresh — pale where the varnish has been lifted, all three of them at the same angle, made by something flat and hard and used with patience rather than force.',

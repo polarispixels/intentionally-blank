@@ -132,6 +132,8 @@ import {
   QUESTION_THE_RECORD,
   QUESTION_WALL_DRUG,
   SUNDOWN_DINER,
+  QUESTION_THE_DRAWER,
+  PUZZLE_DRAWER,
 } from './ids';
 
 /**
@@ -600,6 +602,13 @@ export const ACT1_QUESTIONS: NonNullable<WorldDef['questions']> = {
     answerWhen: { flag: FLAG_REGISTER_IMPRESSION_FOUND },
     answer: REGISTER_IMPRESSION_DETAIL,
   },
+  // Wayfinding §20 (register 127) — no new state; both anchors shipped.
+  [QUESTION_THE_DRAWER]: {
+    text: 'Whoever searched this room emptied two drawers and gave up on the third. What is in it?',
+    openWhen: { clue: CLUE_DRAWER_HELD },
+    answerWhen: { flag: FLAG_DRAWER_OPEN },
+    answer: 'Eight inches of empty pine, and two things lying in the bottom of it: an envelope, and a book of matches.',
+  },
   [QUESTION_OUT_OF_THIS_ROOM]: {
     text: 'How do you get out of this room?',
     openWhen: { flag: FLAG_STOOD_UP },
@@ -644,6 +653,22 @@ export const ACT1_PUZZLES: NonNullable<WorldDef['puzzles']> = {
       'A page is gone and the sheet under it is blank. Blank is not the same as empty. A pen bearing down on one sheet leaves valleys in the next, and this game has already worked that trick on you once tonight, upstairs, with a page and a lamp lying on its side. Light across paper, or a fingertip on it.',
       'Turn the register until the desk lamp comes across the blank sheet flat, or put a hand on it and read it that way. Then take what you find back to the clerk — he is the person it is about.',
       'EXAMINE REGISTER. Then TILT REGISTER (FEEL PAGE works too, and so does EXAMINE BLANK PAGE). The impression gives you a time in the small hours, your own room number, and a name column with one pen stroke in it that was begun and abandoned. Then ASK MARLOW ABOUT REGISTER, and ASK MARLOW ABOUT VISITOR.',
+    ],
+  },
+  // Wayfinding §20 — three rungs, not five (its own note); rung 3 is the one
+  // solution note too, so nothing here is invented prose.
+  [PUZZLE_DRAWER]: {
+    id: PUZZLE_DRAWER,
+    name: 'The third drawer',
+    question: QUESTION_THE_DRAWER,
+    solvedWhen: { flag: FLAG_DRAWER_OPEN },
+    solutions: [
+      { id: 'pry', class: 'direct', note: 'EXAMINE CHAIR. One of its back legs is out of its socket and lying along the seat, held on by nothing but the stretcher. TAKE LEG, and then PRY DRAWER WITH LEG. (Bare PRY DRAWER works too, once the leg is in your hands.)' },
+    ],
+    hints: [
+      'You are not being kept out of this drawer by a lock, and if you doubt that, try the lock and it will tell you so itself. It is jammed, which is a different problem and a more hopeful one. Look at the lip of it, and at what somebody else has already done to the lip of it.',
+      'Three gouges, all at the same angle, stopping just short of working: the method was right and it ran out of patience. What it wanted was something longer to lean on, and rather less concern about the noise. Nothing in this room was put here to be a tool — but not everything in this room is still in one piece.',
+      'EXAMINE CHAIR. One of its back legs is out of its socket and lying along the seat, held on by nothing but the stretcher. TAKE LEG, and then PRY DRAWER WITH LEG. (Bare PRY DRAWER works too, once the leg is in your hands.)',
     ],
   },
   [PUZZLE_LEAVE_YOUR_ROOM]: {

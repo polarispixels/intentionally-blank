@@ -519,13 +519,18 @@ export const ACT2_P15_PUZZLE: PuzzleDef = {
     { id: 'badge', class: 'social', note: 'Win two of three hands on a Friday, then ask Nolan about the badge or Sublevel 6 while still at the table.', route: POKER_NIGHT },
     { id: 'gate_talk', class: 'social', note: 'Sit in on any complete Friday session, win or lose — the gate talk between hands two and three happens regardless.', route: POKER_NIGHT },
   ],
-  // Not authored anywhere in the D2 prose doc (only a one-line rung-3
-  // sketch exists, plan §4.9: "Fridays; watch before you bet") — flagged
-  // as a narrative-writer need in this task's report rather than invented
-  // here. `views.ts`'s own `openPuzzleHints` skips any puzzle whose
-  // `hints` array is empty, so this stays silently absent from the HINT
-  // menu (not a broken/blank entry) until it is authored.
-  hints: [],
+  // Wayfinding doc §3 — the five-rung ladder, transcribed verbatim (hard
+  // rule 5). Rung 3 is deliberately the load-bearing one: the gate talk is
+  // reachable on any complete Friday session, win or lose, so a player who
+  // stops reading there still has the true route. `SWAP DECK` is a real
+  // verb with a real consequence and is not named at any rung.
+  hints: [
+    'Nolan will not tell you in his own yard what he would not tell the county, and he is not being cagey about it; he is being a man at work, in the evening, in his yard. There is one room in this town where he is not at work, and one night of the week when he is in it.',
+    'Fridays, at the diner, the chairs come down off the tables and three people sit under a low light. There are four chairs. Pearl will tell you, without being asked, whose the fourth one is not, and Jack will stake you the first time so that not having money is not the obstacle you think it is.',
+    'You do not have to win to get the useful half. Between the second hand and the third, Nolan stops dealing and talks about his week — about a convoy, about an apron that has to be clear, and about the hours of the building he runs and has never once been inside during them. That happens whether you are up or down, and the notebook keeps it. Winning buys the other thing: something he will hand across the felt if you ask for it before you stand up.',
+    'The table is readable if you watch it instead of your own cards. Nolan does something with his hand on the first hand every week, and it means what it looks like it means. The sheriff, on the second, does something she does not do, and Jack says so afterwards. Two hands out of three is a good evening. Then ask Nolan about the badge, or about Sublevel 6, while you are still sitting down.',
+    'On a Friday evening, in the Sundown Diner: SIT. Hand one, WATCH NOLAN and then CALL. Hand two, FOLD. Sit through what Nolan says between hands two and three — that is the gate talk, and it is the half of this that does not depend on cards. Hand three, CALL, and if you have brought your father down on the rig, call it over his objection. Then, before you leave the table: ASK NOLAN ABOUT BADGE. Miss a Friday and there is another one; miss all of them and the same two facts are reachable through the gate itself.',
+  ],
   missedRecovery: 'Poker recurs every Friday evening; the badge and the gate talk are each also reachable by P16 routes (b), (c), (d).',
 };
 

@@ -146,7 +146,19 @@ export const ACT3_PUZZLES: WorldSlice['puzzles'] = {
         route: { all: [DELIVERY_MORNING, { has: WORK_ORDER }] },
       },
     ],
-    hints: [],
+    // Wayfinding doc §4 — the five-rung ladder, transcribed verbatim (hard
+    // rule 5). Rungs 4 and 5 are wider than any other ladder's (constitution
+    // §15's flagship, four honest doors): the player who reaches them is not
+    // stuck on cleverness but on which door they are equipped for today. The
+    // service tunnel is fifth in both rungs on purpose — the longest route,
+    // offered last.
+    hints: [
+      'There is more than one way through that gate and none of them involves breaking anything you would have to explain afterwards. The gatehouse, the reader on the post, the fence, and the country west of the road are all part of the same question. Look at all four before you commit to one, because the one you can do today may not be the one you can do best.',
+      'What gets you through is either something you carry or something the plant already believes. Nolan wears the first on his chest on Friday nights and has said, out loud, that he does not mind where it says he has been. The second hangs on a nail at the gatehouse window, one morning a week, and nobody has looked at it after the day it was written. And the cedar posts west of the road are going somewhere: your father said so, the library\'s construction reel drew it, and standing at the fence you can see which way they point.',
+      'Some of these doors only exist at certain hours, and two of them do not care what time it is. Nolan arrives in the first half hour of morning. The convoy and its clipboard are a Tuesday morning. The fence and the hatch on the county road are open to you at any hour of any day, if you have what they want. A route that is not there today is a day away, not gone.',
+      'Four doors, and each of them wants exactly one thing.\n\nThe reader wants Nolan\'s badge, which he lends across a card table to somebody who has beaten him at cards.\n\nThe turnstile wants nobody in particular, and turns for anybody standing close enough behind a man who holds doors for people.\n\nThe manifest wants a vendor number, and there is one printed in a box in the top right corner of the work order you put back together out of strips.\n\nThe fence wants a truck at the perimeter and a driver who has agreed to it, and Jack agrees to it when he is shown what is in the notebook or in the audit.\n\nThe hatch on the county road wants a key or a lever, an hour of walking, and a light for the mile that comes after.',
+      'Any one of these, and you are inside.\n\nUSE BADGE at the gate reader, carrying Nolan\'s badge.\n\nFOLLOW NOLAN on the perimeter road, in the first half hour of morning, while he is there.\n\nSIGN MANIFEST at the gatehouse on a Tuesday morning, carrying the work order.\n\nSHOW NOTEBOOK TO JACK or SHOW AUDIT TO JACK, then RAM FENCE with the truck on the road.\n\nOr: NW from Town Edge to the county road. UNLOCK HATCH with the keyring, or PRY HATCH WITH LEG. Take the headlamp out of the truck\'s toolbox first, because a mile underground is a mile underground. Then DOWN, and keep going.',
+    ],
   },
 };
 
@@ -380,7 +392,19 @@ export const ACT3_D4_PUZZLES: NonNullable<WorldSlice['puzzles']> = {
         route: { visited: ACT3_PIPE_CHASE },
       },
     ],
-    hints: [],
+    // Wayfinding doc §5 — the five-rung ladder, transcribed verbatim (hard
+    // rule 5). Rung 1 exists only to tell the player they are not missing a
+    // deduction — the puzzle's shape (a clue that opened a question, whose
+    // answer is "walk downward") is exactly the shape a player over-thinks.
+    // Nothing below the chase, including the word "town," is named at any
+    // rung.
+    hints: [
+      'You have already done the clever part of this. You put a hand on a pipe and it was warm, and warm is a fact about now — about something at the other end of it, today, running. What is left is not deduction. It is following.',
+      'Two big returns come into this building and only one of them stops where the building stops. Find the place where they turn down through the floor and look at what has been put in beside them, and then look at how well it has been put in. Nobody bolts something through a rolled edge in four places for a thing they use once.',
+      'There are two ways into the same shaft and they are five floors apart. One is a steel plate in the floor at the back of the Cooling Plant, bolted at eight points, with a lifting eye at one corner — Jack\'s wrench off the truck\'s toolbox fits those bolts, and so, less politely, does the chair leg. The other is already open: the formed opening in the end wall on Sublevel 5, where the returns go down and a ladder goes with them.',
+      'Take a light. At the Sublevel 5 opening, examine what is actually in front of you: Return A stops at a valve and a blank flange, because five floors down is where the building stops. Return B does not stop. Neither does the ladder. Then go the way the ladder goes.',
+      'In the Cooling Plant: UNBOLT HATCH WITH WRENCH, or PRY HATCH WITH LEG, then DOWN. On Sublevel 5: EXAMINE OPENING, then DOWN. Either one puts you in the Pipe Chase with a light on and the warm pipe beside you, which is the whole of the answer.',
+    ],
   },
 };
 
@@ -640,7 +664,18 @@ export const ACT3_D5_TASK_F_PUZZLES: NonNullable<WorldSlice['puzzles']> = {
         route: { flag: ACT3_ALARM_PULLED },
       },
     ],
-    hints: [],
+    // Wayfinding doc §6 — the five-rung ladder, transcribed verbatim (hard
+    // rule 5). The alarm is rung 5's second half because it is the
+    // clock-free route (`puzzle-no-clock-free-solution`); the coveralls are
+    // the last clause of the last rung, the least the sentence can say and
+    // still be worth saying. No rung says what is in the chairs.
+    hints: [
+      'A ladder that somebody maintains is a ladder somebody climbs, and a man who climbs it does it at an hour that suits him rather than you. The question is not whether you can get to the bottom of this building. It is whether you can be down there while he is somewhere else.',
+      'He is not a guard. He does a room, he takes about the same time over it every time, and he goes the same way afterwards, and if he finds you he does not do anything worse than make you climb back up. Anything that tells you where he is now, or makes you into somebody who is supposed to be here, is worth more than hurrying.',
+      'Three things in this building will tell you when, and no two of them need each other. There is a clock on Sublevel 5, high on the wall over the gauges, and it is the only instrument in that room that is not measuring the building. There is your father, if you brought him down on the rig, who cannot see a thing and can hear all of it. And there is the red box on the stanchion in the Cooling Plant, which does not tell you when at all: it makes a when.',
+      'Read a clock before you climb. The small hours are the low point — the gauges dip, the offices are dark, and he is furthest from the ladder you want. If Dad is with you, ask him where the man is before every move you make; he will name the room, including the times when the room is the pipe you were about to climb into. When he says the pipe, wait.',
+      'READ CLOCK on Sublevel 5, and if it is not the small hours yet, wait for them. ASK DAD ABOUT ROUNDS, and go DOWN the chase whenever he puts the man anywhere except the pipe. If you would rather not time anything at all: go back up to the Cooling Plant and PULL ALARM. One chiller stops, the note of the building drops a tone, and somebody has to come up and see about it, and the way down is yours for as long as that takes. At the bottom, the first thing on the rail is a set of grey coveralls, and WEAR COVERALLS is how you stop being the only man in a coat on this floor.',
+    ],
   },
 };
 

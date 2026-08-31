@@ -143,15 +143,23 @@ const LIT_LAMP_RIGHTED_DOOR_OPEN = [
   'The terminal in the corner has not been touched by anyone, including you. The door stands open where you left it, and the landing light lies across the boards in a long pale wedge. The window is not curtained, and shows a rectangle of street-coloured nothing.',
 ].join('\n\n');
 
+// Wayfinding doc §9, patch 2 — paragraph 2 only, patched in both variants
+// (paragraphs 1 and 3 untouched). The shipped "everything in this room that
+// was going to come loose has come loose" was false (the drawer and the
+// chair leg have not) and dropped `CHAIR_CLAUSE` entirely; the replacement
+// is that exact constant, already spliced into all four un-searched
+// variants above, so this diff is `${CHAIR_CLAUSE}` in two strings rather
+// than new prose. State-free by construction (true whether or not the leg
+// or the drawer have been taken/opened) — no new `when`, no new rules.
 const LIT_SEARCHED_DOOR_SHUT = [
   'The room has now been searched twice: once by whoever came before you, and once, more recently, by you. Your version was tidier and produced less.',
-  'The papers are in a heap of your own making, which is at least a different heap. The desk is still on its face; it weighs what a desk weighs. The glass is still along the baseboard and the stain is still on the boards, and everything in this room that was going to come loose has come loose.',
+  `The papers are in a heap of your own making, which is at least a different heap. The desk is still on its face; it weighs what a desk weighs. ${CHAIR_CLAUSE} The glass is still along the baseboard and the stain is still on the boards.`,
   'The terminal waits in the corner. The door is shut. The window shows the same rectangle of street-coloured nothing it showed before.',
 ].join('\n\n');
 
 const LIT_SEARCHED_DOOR_OPEN = [
   'The room has now been searched twice: once by whoever came before you, and once, more recently, by you. Your version was tidier and produced less.',
-  'The papers are in a heap of your own making, which is at least a different heap. The desk is still on its face; it weighs what a desk weighs. The glass is still along the baseboard and the stain is still on the boards, and everything in this room that was going to come loose has come loose.',
+  `The papers are in a heap of your own making, which is at least a different heap. The desk is still on its face; it weighs what a desk weighs. ${CHAIR_CLAUSE} The glass is still along the baseboard and the stain is still on the boards.`,
   'The terminal waits in the corner. The door stands open where you left it, and the landing light lies across the boards in a long pale wedge. The window shows the same rectangle of street-coloured nothing it showed before.',
 ].join('\n\n');
 
