@@ -9,7 +9,7 @@
 // ADD their own object/verb/topic/event/script ids below the anchor at the
 // end of this file, with the Edit tool, never Write.
 
-import { C, F, N, O, P, Q, R, S, V } from '../../../engine/ids';
+import { C, F, M, N, O, P, Q, R, S, V } from '../../../engine/ids';
 
 // Flags (§2)
 export const ACT4_STARTED = F('act4_started');
@@ -111,6 +111,106 @@ export const ACT4_REPLY_ELI_NUMERALS = O('act4_reply_eli_numerals');
 export const ACT4_EV_DAD_BREATH = 'act4_ev_dad_breath';
 
 // --- E0 builders append below this line (Edit tool only; one block per task, labelled) ---
+
+// --- E2 task O ---
+// The gate frames, the Escape Chamber, P23, M10, and the boundary
+// (`docs/superpowers/specs/2026-09-19-stage-e2-prose.md` §2-§24, §41,
+// §47.1, §48, §52, §56, §57). Two concurrent builders share this wave:
+// task P (the hab: Galley/Dome/Sissy/M11) has already declared
+// `ACT4_HAB_GALLEY`/`ACT4_HAB_DOME`/`ACT4_ENTER_HAB_SCRIPT`/
+// `ACT4_LEAVE_HAB_SCRIPT`, above; task Q (the library/darkroom/prints/R17)
+// declares `act4_print_last_day`/`act4_clue_sky_is_ceiling` — referenced
+// below by raw `O()`/`C()` construction (not imported) since they may not
+// exist yet; same value once Q lands them. Grep checked before every id
+// below — none pre-existed.
+
+// Room (§6)
+export const ACT4_ESCAPE_CHAMBER = R('act4_escape_chamber');
+
+// The two lit gate frames (§3.2, §3.3) — Hub objects, this task's own.
+export const ACT4_GATE_ESCAPE = O('act4_gate_escape');
+export const ACT4_GATE_HAB = O('act4_gate_hab');
+
+// The Hub's two door-style exits (§56.1/§56.4) need their own `door` stub
+// objects, distinct from the two above: `respond.ts`'s `DOOR_TRAVERSAL_
+// VERB_IDS` checks `traverseDoor` (a door-BY-NAME lookup keyed on the
+// exit's own `door` id) before an object's own handlers ever run for
+// IN/OUT/USE — reusing `act4_gate_escape`/`act4_gate_hab` themselves as
+// the exit's `door` would let that door-by-name check shadow the frame's
+// own `IN` handler (found the hard way: a first draft did exactly that,
+// and "ENTER ESCAPE" rendered the exit's `blockedText` instead of the
+// frame object's own script). Never opens (no `container`), same minimal
+// stub idiom `act3/objects/s6ArchiveHub.ts`'s own `s6BoundaryGate` uses.
+export const ACT4_ESCAPE_EXIT_GATE = O('act4_escape_exit_gate');
+export const ACT4_HAB_EXIT_GATE = O('act4_hab_exit_gate');
+
+// The Chamber's twelve objects (§7-§20), plus the room-reference stub §24
+// needs (a builder's own supporting mechanism, not named by the prose doc
+// — "COMPARE PRINT WITH ROOM" needs a dobj noun 'room'/'kitchen' to resolve
+// to, and no fixture in the room otherwise claims those words; flagged in
+// this task's report).
+export const ACT4_COATS = O('act4_coats');
+export const ACT4_BARE_HOOK = O('act4_bare_hook');
+export const ACT4_SILHOUETTE = O('act4_silhouette');
+export const ACT4_FAMILY_TABLE = O('act4_family_table');
+export const ACT4_TABLE_DRAWER = O('act4_table_drawer');
+export const ACT4_FAMILY_CAMERA = O('act4_family_camera');
+export const ACT4_COFFEE_JAR = O('act4_coffee_jar');
+export const ACT4_SPARE_KEY = O('act4_spare_key');
+export const ACT4_CHAIRS = O('act4_chairs');
+export const ACT4_COUNTDOWN = O('act4_countdown');
+export const ACT4_CHAMBER_DOOR = O('act4_chamber_door');
+export const ACT4_VOICES = O('act4_voices');
+export const ACT4_GAME_BOX = O('act4_game_box');
+export const ACT4_CHAMBER_WINDOW = O('act4_chamber_window');
+export const ACT4_CHAMBER_ROOM_REF = O('act4_chamber_room');
+
+// Flags (§2)
+export const ACT4_CHAMBER_ADMITTED = F('act4_chamber_admitted');
+export const ACT4_CHAMBER_FIRST_DONE = F('act4_chamber_first_done');
+export const ACT4_CHAMBER_COPY_FOUND = F('act4_chamber_copy_found');
+export const ACT4_CHAMBER_PHRASE_SAID = F('act4_chamber_phrase_said');
+/** Numeric — §18.2, §19.4, §21.3 `inc`; the assist's `>= 2` arm (§22). */
+export const ACT4_CHAMBER_FAILURES = F('act4_chamber_failures');
+export const ACT4_CHAMBER_COMPLETE = F('act4_chamber_complete');
+export const ACT4_DEEP_INDEX = F('act4_deep_index');
+/** Mechanical, not named by the prose doc — §15.3/§21.1's "when the timer runs out the panel has one line on it" state, flipped by the timer event and cleared by either prompt outcome. Never player-visible as a number. */
+export const ACT4_CHAMBER_PANEL_LIVE = F('act4_chamber_panel_live');
+/** Numeric, mechanical, never rendered (§52's no-digit discipline: the countdown's own figure is never given, §15.1) — the turn-count `act4_ev_chamber_timer` counts against; resets to 0 each time it fires. */
+export const ACT4_CHAMBER_TIMER_TICKS = F('act4_chamber_timer_ticks');
+
+// Clues (§2)
+export const ACT4_CLUE_FRAME_WANTS_MORE = C('act4_clue_frame_wants_more');
+export const ACT4_CLUE_ADMITTED = C('act4_clue_admitted');
+export const ACT4_CLUE_ROOM_COMPLETED = C('act4_clue_room_completed');
+export const ACT4_CLUE_HARVEST_WRONG = C('act4_clue_harvest_wrong');
+
+// Question (§2)
+export const ACT4_Q_THE_ROOM = Q('act4_q_the_room');
+
+// Puzzle (§2) — P23
+export const ACT4_P23_CHAMBER = P('act4_p23_chamber');
+
+// Memories (§5) — M10, three variants sharing one title.
+export const ACT4_MEM_M10_ANALYTICAL = M('act4_mem_m10_analytical');
+export const ACT4_MEM_M10_SOCIAL = M('act4_mem_m10_social');
+export const ACT4_MEM_M10_DIRECT = M('act4_mem_m10_direct');
+
+// Scripts (§4, §21.2)
+export const ACT4_ENTER_ESCAPE_SCRIPT = S('act4_enter_escape');
+export const ACT4_CHAMBER_DOOR_OPEN_SCRIPT = S('act4_chamber_door_open');
+export const ACT4_CHAMBER_PHRASE_RESPOND_SCRIPT = S('act4_chamber_phrase_respond');
+/** Plain string prompt id (matches `ACT3_HUB_LOGIN_PROMPT_ID`'s own convention) — the doc's own `openPrompt: act4_chamber_phrase` (§21.2). Registered in `game.ts`'s `PROMPT_SCRIPTS` and `tests/world-prompt-ids.test.ts`'s `PROMPT_SCRIPT_TABLES` in this same change. */
+export const ACT4_CHAMBER_PHRASE_PROMPT_ID = 'act4_chamber_phrase';
+
+// Events (§15.3, §23) — plain string ids, matching this file's own
+// `EVENT_ACT4_EV_START` convention.
+export const EVENT_ACT4_EV_CHAMBER_TIMER = 'act4_ev_chamber_timer';
+export const EVENT_ACT4_EV_CHAMBER_COMPLETE = 'act4_ev_chamber_complete';
+
+// Verb (§18.1) — "GO FIRST"/"TAKE THE FIRST TURN," bare fixed phrases with
+// no natural dobj (same idiom as `V_ACT4_PUSH_PAST`).
+export const V_ACT4_GO_FIRST = V('act4_go_first');
 
 // --- E1 task M ---
 // Luke, the escort, R16, and the boundary (`docs/superpowers/specs/2026-09-
@@ -267,3 +367,138 @@ export const EVENT_ACT4_EV_JACK_MORNING_SCENE = 'act4_ev_jack_morning_scene';
  * this task's report rather than silently added.
  */
 export const ACT4_EV_JACK_TUNNEL = 'act4_ev_jack_tunnel';
+
+// --- E2 task Q ---
+// The library annex, the darkroom, the two prints, and R17
+// (`docs/superpowers/specs/2026-09-19-stage-e2-prose.md` §42-§47, §52, §56,
+// §57). The shelf/key live physically in `act1_county_library`
+// (`act1/objects/countyLibrary.ts`, amended in place — this file's own
+// header rule: only the id is namespaced `act4_*` here, same precedent as
+// `act4_crews`/`act4_visit_notice` above). The two prints, the sissy-film
+// develop handler and the develop script itself are this task's own new
+// file, `act4/objects/darkroom.ts` / `act4/scripts.ts`.
+
+// Flags (§2)
+export const ACT4_DARKROOM_OPEN = F('act4_darkroom_open');
+export const ACT4_SISSY_FILM_DEVELOPED = F('act4_sissy_film_developed');
+export const ACT4_JULES_FILM_DEVELOPED = F('act4_jules_film_developed');
+export const ACT4_SKY_MATCHED = F('act4_sky_matched');
+
+// Objects (§42.1, §42.2, §45)
+export const ACT4_ANNEX_SHELF = O('act4_annex_shelf');
+export const ACT4_DARKROOM_KEY = O('act4_darkroom_key');
+export const ACT4_PRINT_SKY = O('act4_print_sky');
+export const ACT4_PRINT_LAST_DAY = O('act4_print_last_day');
+
+// Clue (§2, §46 — R17)
+export const ACT4_CLUE_SKY_IS_CEILING = C('act4_clue_sky_is_ceiling');
+
+// Puzzle (§2, §47.2) — P24
+export const ACT4_P24_MARS_FILM = P('act4_p24_mars_film');
+
+// Script (§44) — one script id, shared by both canisters' own DEVELOP
+// handlers (`args.which`) and the darkroom door's bare ENTER handler (no
+// args — the script reads which canister(s) are held).
+export const ACT4_DEVELOP_SCRIPT = S('act4_develop');
+
+// New verb (§44) — "DEVELOP"/"DEVELOP FILM". A plain, ungated word (like
+// `PRY`/`UNLOCK` in `act1/verbs.ts`) rather than an act4-prefixed compound
+// phrase, since nothing else in the game claims it; declared here rather
+// than in `act1/verbs.ts` because that file is out of this task's named
+// scope (hard rule 1) and `act4/verbs.ts` is this wave's own established
+// home for a brand-new verb word (`V_ACT4_WRITE_ON`'s own precedent).
+export const V_DEVELOP = V('develop');
+
+// `ACT4_SISSY_FILM`, `ACT4_HAB_DOME` and `ACT4_Q_THE_SKY` were forward-
+// declared here as stand-ins (same precedent as `PIE_BOX`, `act1/ids.ts`)
+// while task P's own block had not yet landed. RECONCILED (this task's own
+// report): task P's block below now declares all three properly (room,
+// object with its real `{ in: ACT4_CAMERA }` starting location, and the
+// question's `openWhen`) — the stand-ins are removed in favor of those. This
+// task's own contribution to `act4_q_the_sky` (`answerWhen`/`answer`) is
+// added as a labelled amendment to task P's already-declared
+// `ACT4_P_QUESTIONS[ACT4_Q_THE_SKY]` entry in `./knowledge.ts`, not a
+// second competing declaration.
+
+// --- E2 task P ---
+// The hab: the Galley, the Dome, Sissy, and M11
+// (`docs/superpowers/specs/2026-09-19-stage-e2-prose.md` §25-§40, §52, §56,
+// §57). Two concurrent builders share this wave: task O (the frames/
+// Chamber/P23/boundary — `act4/escapeChamber.ts`, the Hub's gate objects,
+// `act4/scripts.ts`'s phrase prompt) declares `ACT4_ESCAPE_CHAMBER` and the
+// two gate objects; task Q (the library/darkroom/prints/R17) declares the
+// prints and `ACT4_CLUE_SKY_IS_CEILING`. Grep checked before every id below
+// — none pre-existed.
+
+// Rooms (§26, §34)
+export const ACT4_HAB_GALLEY = R('act4_hab_galley');
+export const ACT4_HAB_DOME = R('act4_hab_dome');
+
+// NPC (§32) — `NpcDefSlice` lives in `./sissy.ts` (new file, sidecar-topic
+// style like `luke.ts`).
+export const ACT4_SISSY = N('act4_sissy');
+
+// Flag (§2, §32.4) — M11's own trigger.
+export const ACT4_SISSY_TOPIC_LAUNCH = F('act4_sissy_topic_launch');
+
+/**
+ * Builder-authored (not named by the prose doc) — `act4_leave_hab`'s own
+ * "first crossing back" vs "later crossings back" signal (§25.3/§25.4).
+ * Entering has a natural signal for free (`{ not: { visited:
+ * ACT4_HAB_GALLEY } }` — the room hasn't been arrived at yet); leaving has
+ * no such signal, since the destination (`ACT3_S6_ARCHIVE_HUB`) was always
+ * visited long before Act IV's hab thread exists. Flagged in this task's
+ * report rather than silently added.
+ */
+export const ACT4_HAB_LEFT_ONCE = F('act4_hab_left_once');
+
+// Clues (§2)
+export const ACT4_CLUE_SISSY_COUNTS_THREE = C('act4_clue_sissy_counts_three');
+export const ACT4_CLUE_SISSYS_REASON = C('act4_clue_sissys_reason');
+export const ACT4_CLUE_SAME_ARRANGEMENT = C('act4_clue_same_arrangement');
+
+// Question (§2) — `act4_q_the_sky`. `openWhen` is this task's own
+// (`{ visited: ACT4_HAB_DOME }`); `answerWhen`/`answer` (R17,
+// `act4_clue_sky_is_ceiling`) are task Q's to add to the same def, in their
+// own labelled edit of `./knowledge.ts` — left uncommented there for them
+// rather than guessed at here.
+export const ACT4_Q_THE_SKY = Q('act4_q_the_sky');
+
+// Memory (§33) — M11, *One Sky*.
+export const ACT4_MEM_M11 = M('act4_mem_m11');
+
+// Objects — the Galley (§27-§31)
+export const ACT4_ANOMALY_LOGS = O('act4_anomaly_logs');
+export const ACT4_COMMS_RIG = O('act4_comms_rig');
+export const ACT4_HAB_TERMINAL = O('act4_hab_terminal');
+export const ACT4_AIRLOCK_DOOR = O('act4_airlock_door');
+export const ACT4_GALLEY_TABLE = O('act4_galley_table');
+export const ACT4_HAB_TRAYS = O('act4_hab_trays');
+
+// Objects — the Dome (§35-§40)
+export const ACT4_DOME_GLASS = O('act4_dome_glass');
+export const ACT4_HORIZON = O('act4_horizon');
+export const ACT4_SKY = O('act4_sky');
+export const ACT4_CAMERA = O('act4_camera');
+export const ACT4_DOME_CHAIR = O('act4_dome_chair');
+export const ACT4_SKY_LOG = O('act4_sky_log');
+
+/** The Mars-anomaly canister (§32.2, §38.2) — the `act4_has_sissy_film` derived flag's own note (§2): "use `{ has: act4_sissy_film }`, do not add a flag." Starts `{ in: ACT4_CAMERA }`. */
+export const ACT4_SISSY_FILM = O('act4_sissy_film');
+
+// Scripts (§25) — the second frame's traversal. `act4_enter_hab` is called
+// from task O's `act4_gate_hab` object's own `IN` handler (O's brief: "the
+// gates' IN scripts do the traversal") — coordinate via that object's own
+// `{ script: { id: ACT4_ENTER_HAB_SCRIPT } }` effect, once task O has
+// landed it (see this task's own report if it hadn't yet). `act4_leave_hab`
+// is called from this task's own `act4_airlock_door` object (`./objects/
+// hab.ts`).
+export const ACT4_ENTER_HAB_SCRIPT = S('act4_enter_hab');
+export const ACT4_LEAVE_HAB_SCRIPT = S('act4_leave_hab');
+
+// Verb (§28.2) — "SEND MESSAGE"/"TYPE ON RIG", a bare fixed-phrase verb (no
+// natural "message" object to hang a dobj handler on — same idiom as
+// `V_POST_LETTER`/`V_ACT2_DRIVE_TO_PLANT`, `act1/ids.ts`'s own precedent
+// comment). "USE RIG" reaches the identical text via the built-in
+// `USE_VERB_ID` on the rig object itself, not this verb.
+export const V_ACT4_SEND_MESSAGE = V('act4_send_message');

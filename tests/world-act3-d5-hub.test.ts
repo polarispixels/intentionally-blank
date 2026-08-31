@@ -262,14 +262,17 @@ describe('the gate frames and the boundary — ENTER GATE', () => {
     expect(text(events)).toMatch(/HAB/);
   });
 
-  it('ENTER GATE prints the in-world line then the system line, and the player stays in the Hub', () => {
+  // E2 task O (`docs/superpowers/specs/2026-09-19-stage-e2-prose.md` §3.1,
+  // §56.1) — the class object's `IN` handler stops being a boundary and
+  // becomes §3.1's own "which one" line; the boundary now lives only on
+  // the well's own `down` exit (below).
+  it('ENTER GATE prints §3.1\'s "which one" line, and the player stays in the Hub', () => {
     const store = new MemoryStore();
     const session = loggedInAtHub();
     const { session: after, events } = say(session, 'enter gate', store);
     const rendered = text(events);
-    expect(rendered).toMatch(/the\s+floor on the other side of it is a floor/);
-    expect(rendered).toMatch(/END OF BUILD/);
-    expect(rendered).toMatch(/Act III ends here/);
+    expect(rendered).toMatch(/Which one\./);
+    expect(rendered).not.toMatch(/END OF BUILD/);
     expect(after.state.location).toBe(ACT3_S6_ARCHIVE_HUB);
     expect(after.state.clues).toContain(ACT3_CLUE_GATES);
   });

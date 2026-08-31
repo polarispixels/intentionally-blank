@@ -166,6 +166,181 @@ export const ACT4_J_PUZZLES: NonNullable<WorldSlice['puzzles']> = {
 
 // --- E0 builders append below this line (Edit tool only; one block per task, labelled) ---
 
+// --- E2 task O ---
+// The gate frames, the Escape Chamber, P23, M10, and the boundary
+// (`docs/superpowers/specs/2026-09-19-stage-e2-prose.md` §2, §4, §5, §23,
+// §47.1). Clue detail text is §2's, verbatim; titles composed from each
+// granting section's own sentence (hard rule 5 — same "quote the section's
+// own line" idiom this file's other task blocks use). M10's three variants
+// share M3's own idiom (`act1/knowledge.ts`), except the tie fires
+// `analytical` rather than `social` (§5's own note, §53 q9 — confirmed as
+// written, doc status line).
+import {
+  ACT4_CHAMBER_ADMITTED,
+  ACT4_CHAMBER_COMPLETE,
+  ACT4_CHAMBER_COPY_FOUND,
+  ACT4_CHAMBER_FAILURES,
+  ACT4_CHAMBER_FIRST_DONE,
+  ACT4_CHAMBER_PANEL_LIVE,
+  ACT4_CHAMBER_PHRASE_SAID,
+  ACT4_CHAMBER_TIMER_TICKS,
+  ACT4_CLUE_ADMITTED,
+  ACT4_CLUE_FRAME_WANTS_MORE,
+  ACT4_CLUE_HARVEST_WRONG,
+  ACT4_CLUE_ROOM_COMPLETED,
+  ACT4_DEEP_INDEX,
+  ACT4_ESCAPE_CHAMBER,
+  ACT4_MEM_M10_ANALYTICAL,
+  ACT4_MEM_M10_DIRECT,
+  ACT4_MEM_M10_SOCIAL,
+  ACT4_P23_CHAMBER,
+  ACT4_Q_THE_ROOM,
+} from './ids';
+
+export const ACT4_O_FLAGS: WorldSlice['flags'] = {
+  [ACT4_CHAMBER_ADMITTED]: { default: false, doc: 'set by act4_enter_escape on the admitting branch (§4.1); read by act4_q_the_room\'s openWhen, the Chamber\'s rule 1' },
+  [ACT4_CHAMBER_FIRST_DONE]: { default: false, doc: 'set by §18.1; read by act4_ev_chamber_complete, the voices, the assist' },
+  [ACT4_CHAMBER_COPY_FOUND]: { default: false, doc: 'set by §19.3; read by act4_ev_chamber_complete, the voices, the assist' },
+  [ACT4_CHAMBER_PHRASE_SAID]: { default: false, doc: 'set by act4_chamber_phrase_respond (§21.2); read by act4_ev_chamber_complete, the door' },
+  [ACT4_CHAMBER_FAILURES]: { default: 0, doc: 'numeric — §18.2, §19.4, §21.3 (inc); read by the assist\'s >= 2 arm (§22)' },
+  [ACT4_CHAMBER_COMPLETE]: { default: false, doc: 'set by act4_ev_chamber_complete (§23); read by P23\'s solvedWhen, the Chamber\'s rule 3, the back door, the boundary' },
+  [ACT4_DEEP_INDEX]: { default: false, doc: 'set by act4_ev_chamber_complete (§23); read by E3\'s P27' },
+  [ACT4_CHAMBER_PANEL_LIVE]: { default: false, doc: 'mechanical, not named by the prose doc — flipped by act4_ev_chamber_timer, cleared by either prompt outcome; gates the panel\'s TYPE handler' },
+  [ACT4_CHAMBER_TIMER_TICKS]: { default: 0, doc: 'mechanical, numeric, never rendered — turns spent in the Chamber since the last reset; act4_ev_chamber_timer\'s own counter' },
+};
+
+export const ACT4_O_CLUES: NonNullable<WorldSlice['clues']> = {
+  [ACT4_CLUE_FRAME_WANTS_MORE]: {
+    title: 'There is no reader on this thing',
+    detail:
+      'The first frame is not locked and there is nothing on it to unlock. I walked\ninto it and came out of it eighteen inches further into the same room. It is\nchecking something, and there is no reader, no pad and no slot anywhere near\nit, so whatever it wants is not a thing I can be carrying.',
+  },
+  [ACT4_CLUE_ADMITTED]: {
+    title: 'The floor on the far side of it was linoleum',
+    detail:
+      'It let me in. The second time I put a foot over that sill the floor on the far\nside of it was linoleum. Nothing about me changed between the two attempts\nexcept what I had remembered in between.',
+  },
+  [ACT4_CLUE_ROOM_COMPLETED]: {
+    title: 'It completed',
+    detail:
+      'The kitchen is built out of what four people remember of one afternoon. The\nparts all four of them looked at are exact. The parts nobody looked at are\nblank. There is a place in the middle of it, standing height, that the light\ntreats as occupied and that has nothing in it, and the room will not finish\nuntil somebody does that person\'s small ordinary business: takes his chair,\nlooks where he kept the spare, says the thing he said on the way out.\n\nIt only completes for the one who knew the part.\n\nIt completed.',
+  },
+  [ACT4_CLUE_HARVEST_WRONG]: {
+    title: 'The good cloth is on the table',
+    detail:
+      'On the film the good cloth is on the table. In the room the good cloth is off\nit and folded on the dresser. Four people built that kitchen out of what they\nhad and got that one wrong, and there is no way to be wrong about a thing like\nthat unless it was never looked at by anybody who was in the room.',
+  },
+};
+
+export const ACT4_O_QUESTIONS: NonNullable<WorldSlice['questions']> = {
+  [ACT4_Q_THE_ROOM]: {
+    text: 'Why does the room stop where you stand?',
+    openWhen: { flag: ACT4_CHAMBER_ADMITTED },
+    answerWhen: { flag: ACT4_CHAMBER_COMPLETE },
+    answer:
+      'Because it was built out of four people and there were five, and the shape of\nwhat is missing from it is the shape of a man who took the first chair, kept\nthe spare key in the coffee jar, and said the same thing on his way out of a\ndoor for as long as anybody could remember. It stopped where you stood because\nyou were standing in the hole. It started again when you did his afternoon.',
+  },
+};
+
+export const ACT4_O_PUZZLES: NonNullable<WorldSlice['puzzles']> = {
+  [ACT4_P23_CHAMBER]: {
+    id: ACT4_P23_CHAMBER,
+    name: 'the reconstruction',
+    question: ACT4_Q_THE_ROOM,
+    solvedWhen: { flag: ACT4_CHAMBER_COMPLETE },
+    onSolved: [{ answerQuestion: ACT4_Q_THE_ROOM }],
+    // Clock-free, no missedRecovery (§2's own puzzle-table note: "nothing
+    // in it carries a clock term, and the frame does not close"). Three
+    // `knowledge`-flavored solutions (the doc's own §2 table), each tagged
+    // `analytical` — the engine's nearest `ActionClass` for that taxonomy,
+    // same mapping P21's own three "knowledge" solutions used.
+    solutions: [
+      {
+        id: 'chair',
+        class: 'analytical',
+        note: 'SIT IN THE FIRST CHAIR when the voices call the game. Not the chair nearest the\ndoor and not the chair you would have chosen. The first one — the one at the\nend with its back to the window, which is empty and stays empty.',
+      },
+      {
+        id: 'jar',
+        class: 'analytical',
+        note: 'LOOK IN THE COFFEE JAR on the shelf over the stove. The drawer in the table is\nlocked and there is no key in this room, which is only true of rooms where\nnobody kept a spare. Somebody in this family always kept a spare, and always\nkept it in the same place, and said so often enough that it stuck.',
+      },
+      {
+        id: 'phrase',
+        class: 'analytical',
+        note: 'SAY THE HOUSE RULE at the panel by the back door when the timer runs out. It\nwants a line, not a code. It is the thing the last one out of that kitchen said\nevery time, and you have heard it twice this week from two different people who\nhave never met.',
+      },
+    ],
+    hints: [
+      'There are two openings in that wall with light behind them, and one of them let\nyou in.',
+      'Nothing in this kitchen is locked except a drawer, and nothing in this kitchen is\nasking you a question except a panel by the back door, and neither of those is\nthe first thing that has to happen. Something is being waited for.',
+      'Listen to the speaker properly. They call the game, and then somebody says the\nrule, and then they leave a gap the length of a short answer, and nothing goes in\nit. There is a chair at that table nobody is in.',
+      'Three small ordinary things, in any order, and none of them is clever: take the\nchair the room is holding for you; find the spare key where that family always\nkept the spare of everything; and when the timer runs out, put in the thing the\nlast one out of that kitchen said, which you have heard this week from two people\nwho have never met.',
+      'SIT IN THE FIRST CHAIR — the end one, back to the window. LOOK IN THE JAR on the\nshelf over the stove, and use what is down the side of the glass on the drawer.\nWhen the panel comes up, type YOUNGEST GOES LAST, or HOUSE RULES; it takes\neither, because they are the same sentence in that house. If the room gets away\nfrom you, keep going: it resets, it never locks, and after two bad turns the\nvoices start helping.',
+    ],
+  },
+};
+
+// M10 — *The Kitchen* (§5). Three mutually-exclusive behavioral variants
+// sharing one title, fired on the Chamber threshold. Analytical's own `cond`
+// is the plan's rule, verbatim: `{ any: [{ profileLeader: 'analytical' },
+// { not: { any: [{ profileLeader: 'social' }, { profileLeader: 'direct' }] } }] }`
+// — a tie fires analytical (M10's own default, deliberately NOT M3's
+// social default — §53 q9, confirmed).
+export const ACT4_O_MEMORIES: NonNullable<WorldSlice['memories']> = {
+  [ACT4_MEM_M10_ANALYTICAL]: {
+    title: 'The Kitchen',
+    lines: [
+      'The kitchen timer lived on the sill over the sink and it ran a minute and a half\nslow across its whole travel, which I had established over a summer and which\nnobody had asked me to establish.',
+      'Dad set it for the potatoes and went out to the yard. I put it back a turn.\nWhen it went off, the potatoes were done at the time he thought he had set it\nfor, and he said what he always said, which was that there was nothing wrong\nwith that timer.',
+      'There is nothing wrong with that timer. That was never the claim.',
+    ],
+    trigger: {
+      when: {
+        all: [
+          { visited: ACT4_ESCAPE_CHAMBER },
+          { any: [{ profileLeader: 'analytical' }, { not: { any: [{ profileLeader: 'social' }, { profileLeader: 'direct' }] } }] },
+          { not: { any: [{ memory: ACT4_MEM_M10_SOCIAL }, { memory: ACT4_MEM_M10_DIRECT }] } },
+        ],
+      },
+    },
+  },
+  [ACT4_MEM_M10_SOCIAL]: {
+    title: 'The Kitchen',
+    lines: [
+      'The joke was that the youngest still could not say a particular long word, and\nthe joke was old by then, and she had started getting it wrong on purpose\nbecause a joke you do on purpose is one you own.',
+      'All of us at that table going. Dad not going. Dad going.',
+      'I had the end seat with my back to the window, which is the seat you end up in\nif you are the one who gets up to take the picture.',
+    ],
+    trigger: {
+      when: {
+        all: [
+          { visited: ACT4_ESCAPE_CHAMBER },
+          { profileLeader: 'social' },
+          { not: { any: [{ memory: ACT4_MEM_M10_ANALYTICAL }, { memory: ACT4_MEM_M10_DIRECT }] } },
+        ],
+      },
+    },
+  },
+  [ACT4_MEM_M10_DIRECT]: {
+    title: 'The Kitchen',
+    lines: [
+      'The chair went under me on the back left leg, all at once, the way they do —\nthe dowel coming out of the socket dry and clean with no splinter on it\nanywhere.',
+      'I went down with the plate still level in my hand. I have never managed that\nsince and I did not manage it on purpose then.',
+      'The leg lay under the table for the rest of the afternoon and nobody picked it\nup, and I have thought about that leg more than the day deserves.',
+    ],
+    trigger: {
+      when: {
+        all: [
+          { visited: ACT4_ESCAPE_CHAMBER },
+          { profileLeader: 'direct' },
+          { not: { any: [{ memory: ACT4_MEM_M10_ANALYTICAL }, { memory: ACT4_MEM_M10_SOCIAL }] } },
+        ],
+      },
+    },
+  },
+};
+
 // --- E1 task L ---
 // The Staging Area, the hand-offs, and the visit's machinery
 // (`docs/superpowers/specs/2026-09-18-stage-e1-prose.md` §2, §9.2, §7.1,
@@ -323,5 +498,163 @@ export const ACT4_E1_TASK_N_CLUES: NonNullable<WorldSlice['clues']> = {
     title: 'It has been a numeral since the first morning',
     detail:
       'Jack took my wrist under the inspection lamp in the maintenance bay and turned\nthe arm over and looked at what is under the skin there. He did not say\nanything. He has not said anything about it since.',
+  },
+};
+
+// --- E2 task Q ---
+// The library annex, the darkroom, the two prints, and R17
+// (`docs/superpowers/specs/2026-09-19-stage-e2-prose.md` §2, §42-§47).
+// Flags, this task's own clue (detail text is §2's, verbatim; title
+// composed from the clue's own detail text, hard rule 5 — the same "quote
+// the section's own line" idiom this file's other task blocks use),
+// `act4_q_the_sky` (P's own question — the whole def, since P's block
+// hadn't landed at wiring time; see `ids.ts`'s own header note on
+// `ACT4_Q_THE_SKY` for the reconciliation this needs), and P24
+// (`act4_p24_mars_film`) per §2/§47.2: `solvedWhen`/`onSolved` this task's
+// own instruction, verbatim; three solutions (`conversation`→`social`,
+// `knowledge`→`analytical`, `stealth`→`direct` — the same class mapping
+// `act1/knowledge.ts`'s own "SEARCH SHELVING at night" solution already
+// uses for a stealth route); five hints, §47.2's own ladder, verbatim.
+import {
+  ACT4_CLUE_SKY_IS_CEILING,
+  ACT4_DARKROOM_OPEN,
+  ACT4_JULES_FILM_DEVELOPED,
+  ACT4_P24_MARS_FILM,
+  ACT4_Q_THE_SKY,
+  ACT4_SISSY_FILM_DEVELOPED,
+  ACT4_SKY_MATCHED,
+} from './ids';
+
+export const ACT4_E2_TASK_Q_FLAGS: WorldSlice['flags'] = {
+  [ACT4_DARKROOM_OPEN]: {
+    default: false,
+    doc: "set by act1_darkroom_door's PRY-with-leg (§43.1) or UNLOCK-with-key (§43.2), no act gate (register 131); read by the door's own open-state EXAMINE and both DEVELOP/ENTER handlers",
+  },
+  [ACT4_SISSY_FILM_DEVELOPED]: { default: false, doc: 'set by act4_develop (§44.1); read by act4_p24_mars_film\'s hints' },
+  [ACT4_JULES_FILM_DEVELOPED]: { default: false, doc: 'set by act4_develop (§44.2); read by §24 (O\'s own task), hints, E3\'s re-cache' },
+  [ACT4_SKY_MATCHED]: { default: false, doc: "set by §46 (R17); read by act4_q_the_sky's answerWhen, E3's ending beats" },
+};
+
+export const ACT4_E2_TASK_Q_CLUES: NonNullable<WorldSlice['clues']> = {
+  [ACT4_CLUE_SKY_IS_CEILING]: {
+    title: 'Same arrangement, confirmed',
+    detail:
+      'Her film and the Polaroid, side by side under the safelight. Same arrangement,\nconfirmed — the film is sharp and the discs on the Polaroid are the same discs.\n\nAnd on the film only, because it was open on a tripod for a long time and the\nnegative was pushed: straight lines behind the stars. Faint, but straight, and\nthey meet, and they do not meet at any angle that anything in a sky meets at.\nWhere two of them cross the black is a different black and it has an edge, and\nbehind the edge there is structure — the kind a thing has when it was made\nrather than when it grew.\n\nTwo skies. Eighty million miles. One arrangement, and the seams are in both of\nthem; you can only see them on the one that was photographed properly.',
+  },
+};
+
+// `act4_q_the_sky`'s own text/openWhen are task P's declaration
+// (`ACT4_P_QUESTIONS`, below this file); this task's own `answerWhen`/
+// `answer` (§46's instruction) are added to that SAME object in place, in
+// this task's own addendum at the end of this file (after `ACT4_P_
+// QUESTIONS` exists to mutate — module top-level code runs in file order).
+// No competing `ACT4_Q_THE_SKY` question object is declared here.
+
+export const ACT4_E2_TASK_Q_PUZZLES: NonNullable<WorldSlice['puzzles']> = {
+  [ACT4_P24_MARS_FILM]: {
+    id: ACT4_P24_MARS_FILM,
+    name: 'Mars, on film',
+    question: ACT4_Q_THE_SKY,
+    solvedWhen: { clue: ACT4_CLUE_SKY_IS_CEILING },
+    onSolved: [{ answerQuestion: ACT4_Q_THE_SKY }],
+    solutions: [
+      {
+        id: 'ask_sissy',
+        class: 'social',
+        note: 'ASK SISSY ABOUT THE FILM once she has told you about the launch. She will hand\nit over. She has been waiting a year for somebody to want it.',
+      },
+      {
+        id: 'show_polaroid',
+        class: 'analytical',
+        note: 'SHOW HER THE NIGHT-SKY POLAROID. She will look at it for a long time and then\ngo and get the canister without being asked.',
+      },
+      {
+        id: 'take_film',
+        class: 'direct',
+        note: 'TAKE THE FILM out of the camera on the tripod in the dome while she is down in\nthe galley. It is not locked and it is not hidden and she never asks for it\nback, which is its own answer about her.',
+      },
+    ],
+    hints: [
+      'Everything anybody has told you comes down a wire, and the wire is the one place\nthis world has ever been caught changing its mind. Her sky does not have to.',
+      'She was told to stop shooting film and she did not stop. Ask her about it, or\nshow her the one photograph of a sky you already own, or go up the ladder and\nlook at what is on the tripod.',
+      'A roll of exposed film is worth nothing at all until somebody puts it through\nchemistry, and there is exactly one room in this county with the chemistry in it.\nYou have walked past its door and read the plate on it.',
+      'The library annex, past the drawer bank. It is locked and it has been locked\nsince before you got here. There is more than one way into a door like that: the\nthing you have been prying with all week, or the key that whoever used that room\nlast did not take home with them.',
+      'Open the darkroom — PRY DOOR WITH CHAIR LEG, or SEARCH THE SHELF the sign-in book\nstands on and use the key. DEVELOP FILM; develop both canisters while you are in\nthere, they take the same hour. Then put her print and the night-sky Polaroid\nside by side: COMPARE PRINT WITH POLAROID.',
+    ],
+  },
+};
+
+// --- E2 task P ---
+// The hab: the Galley, the Dome, Sissy, and M11
+// (`docs/superpowers/specs/2026-09-19-stage-e2-prose.md` §2, §32.4, §32.5,
+// §33, §37.3). Clue detail text is §2's, verbatim; titles composed from the
+// granting section (this file's own header convention). M11's `lines` are
+// §33's own text, one entry per paragraph (`act3/knowledge.ts`'s own
+// `ACT3_D5_TASK_G_MEMORIES` precedent).
+import { ACT4_HAB_DOME, ACT4_HAB_LEFT_ONCE, ACT4_MEM_M11, ACT4_SISSY, ACT4_SISSY_TOPIC_LAUNCH } from './ids';
+// `ACT4_Q_THE_SKY` already imported above by task Q's own block (this file's
+// module scope is shared — see that block's own header on the `act4_q_the_
+// sky` reconciliation).
+import { ACT4_CLUE_SAME_ARRANGEMENT, ACT4_CLUE_SISSY_COUNTS_THREE, ACT4_CLUE_SISSYS_REASON } from './ids';
+
+export const ACT4_P_FLAGS: WorldSlice['flags'] = {
+  [ACT4_SISSY_TOPIC_LAUNCH]: { default: false, doc: 'set by topic_launch/topic_brothers (§32.4); M11 (§33)\'s own trigger' },
+  [ACT4_HAB_LEFT_ONCE]: { default: false, doc: 'set by act4_leave_hab (§25.3/§25.4) on the first crossing back; read by that same script for the first/later text split' },
+};
+
+export const ACT4_P_CLUES: NonNullable<WorldSlice['clues']> = {
+  [ACT4_CLUE_SISSY_COUNTS_THREE]: {
+    title: 'She has three brothers',
+    detail:
+      'She has three brothers. She said it the way you say a thing that has never had\na reason to be said carefully — counting off what each of them was doing on the\nday she went up, and stopping when she ran out of them.',
+  },
+  [ACT4_CLUE_SISSYS_REASON]: {
+    title: 'Her account of why the sheet starts at two',
+    detail:
+      'Her account of why the sheet starts at two: the first one did not take. The man\nput it on somebody, it healed out to a smear inside a year, and rather than sit\nthat one down again they moved the whole row up. She cannot tell me which of\nthem it was on. Eli says the parlour refused to do a single upright at all.\nThe President says their father was I and there never was another. All three of them are\ncertain and no two of them agree, and not one of them has mentioned birth\norder, which is the only version I was given by anybody who lives here.',
+  },
+  [ACT4_CLUE_SAME_ARRANGEMENT]: {
+    title: 'The same arrangement, held against the dome',
+    detail:
+      'Held up against the dome: the bright one, and the long shallow triangle of\nsmaller ones under it, and the close pair below and left of that, all in the\nsame positions and the same proportions as they are on a Polaroid of a porch roof in\nSouth Dakota. The Polaroid is out of focus and cannot prove anything on its\nown. The arrangement is the arrangement.',
+  },
+};
+
+// `act4_q_the_sky` — `openWhen` is this task's own. `answerWhen`/`answer`
+// (R17, `act4_clue_sky_is_ceiling`) are task Q's to add to this SAME def,
+// in their own labelled edit below — left uncommented for that task rather
+// than guessed at here (this file's own established "mid-flight" idiom,
+// `act4/luke.ts`'s header note on `ACT4_STAGING_AREA`).
+export const ACT4_P_QUESTIONS: NonNullable<WorldSlice['questions']> = {
+  [ACT4_Q_THE_SKY]: {
+    text: 'Whose sky is that?',
+    openWhen: { visited: ACT4_HAB_DOME },
+  },
+};
+
+// --- E2 task Q (addendum) ---
+// `act4_q_the_sky`'s own `answerWhen`/`answer` (§46's own instruction: "you
+// add answerWhen ... and §2's answer text to that question in a labelled
+// edit once P's block exists"). Task P's block has now landed
+// (`ACT4_P_QUESTIONS`, immediately above) — amended in place rather than
+// declared a second time (the `act2/objects/usb.ts` mutate-in-place idiom;
+// must run textually after `ACT4_P_QUESTIONS`'s own declaration, since both
+// live in this one file and module top-level code runs in file order).
+Object.assign(ACT4_P_QUESTIONS[ACT4_Q_THE_SKY]!, {
+  answerWhen: { clue: ACT4_CLUE_SKY_IS_CEILING },
+  answer:
+    'It is the same one. Her camera and a Polaroid of a porch roof in South Dakota\ntook the same arrangement of stars, and the film is good enough to show what\nthe Polaroid never could: the lines behind them, and where the lines cross.\nNobody up there is looking at anything the people down here are not looking at.',
+});
+
+export const ACT4_P_MEMORIES: NonNullable<WorldSlice['memories']> = {
+  [ACT4_MEM_M11]: {
+    title: 'One Sky',
+    lines: [
+      'A field with the truck backed into it and the tailgate down and four of us up on\nthe bed of it with our necks back, and the cold coming up out of the ground into\nthe metal into us.',
+      'The one who does energy had worked out to the minute when it would clear the\nhorizon and had told everybody twice. The youngest of the boys had driven all day\nand would not say so. I had the blanket, because I was the oldest, which is not a\nprivilege, it is a duty about blankets.',
+      'And the sky over that field was the sky over that field: the whole enormous\nordinary lot of it, going all the way down to the fence line, with nothing of hers\nin it yet.',
+      'We watched a nothing for a long time and then there was a thing in it going up,\nand one of them said her name, and none of us said anything else at all.',
+    ],
+    trigger: { when: { all: [{ met: ACT4_SISSY }, { flag: ACT4_SISSY_TOPIC_LAUNCH }] } },
   },
 };

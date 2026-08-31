@@ -24,10 +24,11 @@
 import type { Effect } from '../../../../engine/effects';
 import type { ObjectDefSlice } from '../../../../engine/world';
 import { USE_VERB_ID } from '../../../../engine/move';
-import { EXAMINE, OPEN, READ, readCardsText, SEARCH, TURN, typeReclamationText, UNLOCK } from '../verbs';
+import { EXAMINE, LOOK_UNDER, OPEN, PRY, READ, readCardsText, SEARCH, TURN, typeReclamationText, UNLOCK } from '../verbs';
 import {
   CARD_CATALOGUE,
   CATALOGUE_TERMINAL,
+  CHAIR_LEG,
   CLUE_DEAD_CROSS_REFERENCE,
   CLUE_RECORD_RANGE,
   CLUE_TERMINAL_NO_CROSSREFS,
@@ -57,6 +58,13 @@ import {
   V_FIT,
   V_THREAD,
 } from '../../act2/ids';
+// Stage E2, task Q — the annex shelf, the darkroom key, and the darkroom
+// door's three new handlers (`docs/superpowers/specs/2026-09-19-stage-e2-
+// prose.md` §42, §43; this file's own header rule: only the ids are
+// namespaced `act4_*` here, the shelf/key/door live physically in this
+// room's own object list, same precedent as `act4_crews`/`act4_visit_
+// notice` in `objects/mainStreet.ts`/`objects/postOffice.ts`).
+import { ACT4_ANNEX_SHELF, ACT4_DARKROOM_KEY, ACT4_DARKROOM_OPEN } from '../../act4/ids';
 
 // ---------------------------------------------------------------------------
 // §9.1 — The reader
@@ -213,6 +221,45 @@ const catalogueTerminal: ObjectDefSlice = {
 };
 
 // ---------------------------------------------------------------------------
+// Stage E2, task Q — the annex shelf and the darkroom key (§42.1, §42.2;
+// register 132 — taped under the shelf the sign-in book stands on, a
+// correction to the plan against shipped prose: there is no counter in
+// this room's own object list, and `SEARCH COUNTER` is kept as a trigger
+// word on the shelf below rather than a real counter object). Declared
+// ahead of the sign-in book (below) so that object's own "LOOK UNDER BOOK"
+// handler can reuse `annexShelfEffects` without a forward reference.
+// ---------------------------------------------------------------------------
+
+const annexShelfText =
+  'The sign-in book lives on a shelf by the door — one board on two brackets, put up\nby somebody who had a board and two brackets.\n\nUnderneath it, out of anybody\'s eyeline and inside the reach of anybody who has\nworked here, there is a strip of gaffer tape stuck across the underside of the\nboard with a key held flat against the wood by it.\n\nThe tape has gone hard and yellow and lets go all at once.';
+
+const annexShelfEffects: Effect[] = [{ say: annexShelfText }, { reveal: ACT4_DARKROOM_KEY }];
+
+const annexShelf: ObjectDefSlice = {
+  location: COUNTY_LIBRARY,
+  name: 'shelf',
+  portable: false,
+  nouns: ['shelf', 'counter', 'ledge', 'bracket', 'underside'],
+  adjectives: ['annex', 'wooden'],
+  handlers: [{ verbs: [EXAMINE, SEARCH], effects: annexShelfEffects }],
+};
+
+const darkroomKeyExamine =
+  'A long key for a mortice lock, older than the door it belongs to by the look of\nit, with a bow you could hang a picture on.\n\nSomebody taped it under a shelf rather than take it home, which is what people do\nabout a key they are not supposed to have and are not prepared to give back.';
+
+const darkroomKey: ObjectDefSlice = {
+  location: COUNTY_LIBRARY,
+  hidden: true,
+  name: 'darkroom key',
+  portable: true,
+  // 'darkroom' too (v0.18.0 playtest): the plate on the door says DARKROOM and
+  // that is the word players use; without it the held keyring won every tie.
+  nouns: ['key', 'darkroom key'],
+  adjectives: ['darkroom', 'long', 'library', 'mortice'],
+  handlers: [{ verbs: [EXAMINE], effects: [{ say: darkroomKeyExamine }] }],
+};
+
+// ---------------------------------------------------------------------------
 // §9.5 — The sign-in book
 // ---------------------------------------------------------------------------
 
@@ -241,6 +288,12 @@ const signInBook: ObjectDefSlice = {
     // V_SIGN so it reaches the same effects rather than the generic
     // `use.default` family.
     { verbs: [V_SIGN, USE_VERB_ID], effects: signBookEffects },
+    // Stage E2, task Q — §42.1's own "LOOK UNDER BOOK" trigger: the key is
+    // taped under the shelf the book stands on, not the book itself, but
+    // "book" is this object's own noun (the shelf below deliberately does
+    // not take it, §56.2's own key-collision row) — so the reveal handler
+    // lives here rather than forcing "book" onto the shelf too.
+    { verbs: [LOOK_UNDER], effects: annexShelfEffects },
   ],
 };
 
@@ -254,6 +307,32 @@ const darkroomExamine =
 const darkroomOpenText =
   "Locked, and old enough that the lock is a good one. Whatever is behind it is somebody's arrangement with the county, and the county has agreed not to think about it.";
 
+// ---------------------------------------------------------------------------
+// Stage E2, task Q — opening the darkroom (§43; canon 96, canon 109;
+// register 131 — no act gate, either route, in any act). Three new
+// handlers, ABOVE the shipped ones below (`findHandler`'s own first-match-
+// wins order, `actions.ts`) — the shipped locked EXAMINE/OPEN-UNLOCK-KNOCK
+// text stays underneath, word for word, and still answers before
+// `act4_darkroom_open` is set.
+// ---------------------------------------------------------------------------
+
+// §43.1 — PRY DOOR WITH CHAIR LEG, the leg's fourth (`act1/objects/
+// drawer.ts`'s own shipped pry idiom, §10.2/§18 — `withInstrument:
+// [CHAIR_LEG]` here rather than a bare-pry-succeeds `{ has }` gate, this
+// task's own instruction).
+export const DARKROOM_PRY_TEXT =
+  'The frame is soft where the frame always goes soft, which is the bottom eight\ninches on the hinge side, and the leg goes in there and stays.\n\nIt is not a fast job. It is three separate leans with a rest in the middle of\nthem, and at the end of the third the screws come out of the keep rather than the\nlock coming out of the door, which is the good outcome and is not the one you\nwere expecting.\n\nThe door swings in about a foot and stops against something soft on the other\nside of it, and the smell that comes out of the gap has been in there a very long\ntime.';
+
+// §43.2 — UNLOCK DOOR WITH KEY, the `K` route.
+export const DARKROOM_UNLOCK_WITH_KEY_TEXT =
+  'The key goes in the whole way and turns with the long slow travel of a mortice\nthat somebody looked after for a great many years and nobody has touched since.\n\nThe door swings in about a foot and stops against something soft, and the smell\nthat comes out of the gap has been in there a very long time.';
+
+// §43.3 — the door, once open — EXAMINE.
+export const DARKROOM_OPEN_EXAMINE_TEXT =
+  'Open a foot on a room that has no light in it, with a heavy curtain hung inside\nthe frame on a rail so that the door and the curtain cannot both be open, which\nis the whole idea.\n\nThe bulb in the red glass shade over the door is not lit. There is a switch for\nit, on the outside, where a switch for it has to be.';
+
+const darkroomOpenEffects: Effect[] = [{ set: [ACT4_DARKROOM_OPEN, true] }, { setState: [DARKROOM_DOOR, 'open', true] }, { setState: [DARKROOM_DOOR, 'locked', false] }];
+
 const darkroomDoor: ObjectDefSlice = {
   location: COUNTY_LIBRARY,
   name: 'darkroom door',
@@ -261,6 +340,19 @@ const darkroomDoor: ObjectDefSlice = {
   nouns: ['darkroom', 'dark room', 'door', 'inner door', 'red light', 'red lamp', 'lamp', 'shade', 'plate', 'brass plate', 'sign', 'lock'],
   container: { open: false, locked: true },
   handlers: [
+    {
+      verbs: [PRY],
+      withInstrument: [CHAIR_LEG],
+      when: { not: { flag: ACT4_DARKROOM_OPEN } },
+      effects: [{ say: DARKROOM_PRY_TEXT }, ...darkroomOpenEffects],
+    },
+    {
+      verbs: [UNLOCK],
+      withInstrument: [ACT4_DARKROOM_KEY],
+      when: { not: { flag: ACT4_DARKROOM_OPEN } },
+      effects: [{ say: DARKROOM_UNLOCK_WITH_KEY_TEXT }, ...darkroomOpenEffects],
+    },
+    { verbs: [EXAMINE], when: { flag: ACT4_DARKROOM_OPEN }, effects: [{ say: DARKROOM_OPEN_EXAMINE_TEXT }] },
     { verbs: [EXAMINE], effects: [{ say: darkroomExamine }] },
     { verbs: [OPEN, UNLOCK, V_KNOCK], effects: [{ say: darkroomOpenText }] },
   ],
@@ -409,6 +501,8 @@ export const COUNTY_LIBRARY_OBJECTS: Record<string, ObjectDefSlice> = {
   [CARD_CATALOGUE]: cardCatalogue,
   [CATALOGUE_TERMINAL]: catalogueTerminal,
   [SIGN_IN_BOOK]: signInBook,
+  [ACT4_ANNEX_SHELF]: annexShelf,
+  [ACT4_DARKROOM_KEY]: darkroomKey,
   [DARKROOM_DOOR]: darkroomDoor,
   [COUNTY_LIBRARY_NO_EXIT_GATE]: countyLibraryNoExitGate,
   [ACT2_REEL_2029_2031]: constructionReel,

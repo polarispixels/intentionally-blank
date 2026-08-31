@@ -12,6 +12,49 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.18.0] - 2026-08-31
+
+**Stage E2 — the archive.** Through the two lit frames
+(`docs/superpowers/specs/2026-09-19-stage-e2-prose.md`).
+
+### Added
+
+- **The Escape Chamber** (hero): a kitchen built out of what four people
+  remember of one afternoon — exact where they looked, blank where they
+  did not; the silhouette the light treats as occupied; the coats, the
+  bare hook with nothing under it, the locked table drawer, the spare key
+  in the coffee jar, the countdown with no figure, the recorded voices.
+  **P23**: the first chair, the copy, and the house rule typed at the
+  panel — and the completion, where for one breath the kitchen is a
+  kitchen, the dark device spent as reserved (register 132). The print
+  against the room finds the good cloth (register 130).
+- **The hab.** The Galley (the anomaly logs, the comms rig never flagged,
+  L3's fourth station showing only a clock), the Observation Dome, and
+  **Sissy** — eight topics, the launch counted off on the back of her
+  hand three brothers at a time one tick before M11 says four; *the first
+  one didn't take* (register 110's third mouth); the twelve-minute reply
+  that came back in four seconds. `COUNT STARS` refuses and points at the
+  camera (register 135).
+- **The darkroom** at the County Library — a scene, not a room, no act
+  gate (register 133): the key taped under the shelf, the chair leg's
+  fourth door, an hour under the red bulb, two prints. **R17**: the same
+  arrangement on both, and on the pushed film only, lines behind the
+  stars that meet at angles — *structure*, undefined.
+- **P24** solved by any of three honest routes to Sissy's film.
+
+### Changed
+
+- The gate frames' boundary arm is the fourth and last; the Polaroids
+  yielded bare `print` to the darkroom and their compare works in both
+  word orders; the darkroom key answers to the plate's own word.
+
+### Decisions
+
+Canon register 128–136 (entry 104 binds floors, not environments — Sissy
+speaks; the canister's provenance; the good cloth; the bare hook; the
+dark device; no act gate; the key's place; a refusal may teach; the
+mother, once).
+
 ## [0.17.1] - 2026-08-31
 
 **The wayfinding wave** — built from the first live player's stuck report

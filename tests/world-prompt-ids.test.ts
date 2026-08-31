@@ -21,6 +21,7 @@ import { PROMPT_SCRIPTS } from '../src/content/world/game';
 import { ACT2_CENSOR_PROMPT_SCRIPTS } from '../src/content/world/act2/index';
 import { ACT3_HUB_PROMPT_SCRIPTS } from '../src/content/world/act3/index';
 import { ACT3_HUB_LOGIN_PROMPT_ID } from '../src/content/world/act3/ids';
+import { ACT4_PROMPT_SCRIPTS } from '../src/content/world/act4/index';
 
 /**
  * Every slice's own prompt→script table, in the same order `game.ts`
@@ -29,7 +30,7 @@ import { ACT3_HUB_LOGIN_PROMPT_ID } from '../src/content/world/act3/ids';
  * own header comment on `PROMPT_SCRIPTS` says so) — until then this list is
  * exactly `game.ts`'s.
  */
-const PROMPT_SCRIPT_TABLES: Record<string, unknown>[] = [ACT2_CENSOR_PROMPT_SCRIPTS, ACT3_HUB_PROMPT_SCRIPTS];
+const PROMPT_SCRIPT_TABLES: Record<string, unknown>[] = [ACT2_CENSOR_PROMPT_SCRIPTS, ACT3_HUB_PROMPT_SCRIPTS, ACT4_PROMPT_SCRIPTS];
 
 /**
  * THE_THREE_LOGINS — plan §3.5's own naming. Only the Hub's login exists

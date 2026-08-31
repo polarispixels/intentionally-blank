@@ -21,7 +21,7 @@
 
 import type { Effect } from '../../../../engine/effects';
 import type { HandlerDef, ObjectDefSlice } from '../../../../engine/world';
-import type { ProseRule } from '../../../../engine/prose';
+import type { Prose, ProseRule } from '../../../../engine/prose';
 import type { Cond } from '../../../../engine/cond';
 import { DIRECTION_VERB_IDS, USE_VERB_ID } from '../../../../engine/move';
 import {
@@ -80,6 +80,9 @@ import { ACT4_CLUE_FILED_UNDER_ONE, ACT4_NUMERAL_SEARCHED, ACT4_PROFILE, ACT4_PR
 // boundary's third arm.
 import { ACT4_LUKE, ACT4_LUKE_AT_ROOT, ACT4_LUKE_MET } from '../../act4/ids';
 import { ACT4_LUKE_AT_ROOT_EFFECTS } from '../../act4/luke';
+// E2 task O (`docs/superpowers/specs/2026-09-19-stage-e2-prose.md` §3, §48)
+// — the boundary's fourth arm, gated on either lit frame having been used.
+import { ACT4_ESCAPE_CHAMBER, ACT4_HAB_GALLEY } from '../../act4/ids';
 
 // ---------------------------------------------------------------------------
 // §22 — the terminal. `portable: false`.
@@ -350,7 +353,11 @@ const GATE_LOOK_BEHIND_TEXT =
 const GATE_READ_LEGENDS_TEXT =
   "Engraved plastic, white on black, two screws each, in the same lettering as\nevery legend strip in this building — the S6 door's, the aisle signs upstairs,\nthe tag on a bypass switch on the reactor floor.\n\nSomebody in a workshop made these on the same machine as those, and screwed\nthem up over these, and thought no more about it.";
 
-const GATE_ENTER_TEXT =
+// Reused verbatim as the first paragraph of E2 task O's `act4_enter_escape`
+// script (§4.1/§4.2, `docs/superpowers/specs/2026-09-19-stage-e2-prose.md`)
+// — exported so that file imports this exact string rather than a second
+// copy (hard rule 5).
+export const GATE_ENTER_TEXT =
   'You put a hand on the edge of the frame, and then a foot over the sill, and the\nfloor on the other side of it is a floor.';
 
 /** §31.3 — the one system line, both entry points (§36 q10). Concatenated onto the in-world text below, same "content-only approximation" idiom `pipeChase.ts`'s own `CHASE_BOUNDARY_TEXT` uses (a `blockedText`/`say` always renders `kind: 'prose'`, never `kind: 'system'` — `effects.ts`). */
@@ -367,40 +374,78 @@ const SYSTEM_BOUNDARY_TEXT_ACT4 =
 const SYSTEM_BOUNDARY_TEXT_ACT4_E1 =
   'END OF BUILD\n\nThe frames, and the door at the bottom of the well, are later versions. The\nstair behind the door on Sublevel 5 is this one.';
 
+// E2 task O — §48, the last `system.buildBoundary` in the game: a FOURTH
+// arm, above E1's, gated on either frame having been used. Deleted with the
+// gate in E3 along with the other three (§48's own note).
+const SYSTEM_BOUNDARY_TEXT_E2 =
+  'END OF BUILD\n\nThe door at the bottom of the well is the next version. Everything above it, and\neverything through the two frames that are lit, is this one.';
+
 /**
  * Both entry points share this selection — the in-world sentence is
- * unchanged; only the system line following it is gated. Three arms, in
- * order (§29, §37.1): `act4_luke_met` (E1), then `act4_started` (E0, still
- * rendering for a player who has started Act IV and not yet met him), then
- * canon 88's shipped Act III line.
+ * unchanged; only the system line following it is gated. Four arms, in
+ * order (§48, §29, §37.1): a frame used (E2), then `act4_luke_met` (E1),
+ * then `act4_started` (E0, still rendering for a player who has started Act
+ * IV and not yet met him), then canon 88's shipped Act III line.
  */
 const boundaryRules = (inWorldText: string): ProseRule[] => [
+  { when: { any: [{ visited: ACT4_ESCAPE_CHAMBER }, { visited: ACT4_HAB_GALLEY }] }, text: `${inWorldText}\n\n${SYSTEM_BOUNDARY_TEXT_E2}` },
   { when: { flag: ACT4_LUKE_MET }, text: `${inWorldText}\n\n${SYSTEM_BOUNDARY_TEXT_ACT4_E1}` },
   { when: { flag: ACT4_STARTED }, text: `${inWorldText}\n\n${SYSTEM_BOUNDARY_TEXT_ACT4}` },
   { text: `${inWorldText}\n\n${SYSTEM_BOUNDARY_TEXT}` },
 ];
 
-export const GATE_ENTER_BOUNDARY_TEXT: ProseRule[] = boundaryRules(GATE_ENTER_TEXT);
+// E2 task O — §3.1/§3.4: the class object's `IN` handler stops being a
+// boundary (the "IN entry point is gone," §56.1) and becomes this instead.
+// §3.1's own text is unconditional prose, not an engine clarify (that
+// section's own note) — a bare "which one" answer every time, first, and
+// canon 101's three dark-frame refusals (§3.4, "one refusal each, never
+// named") are a `string[]` rotation after it (§0's own convention:
+// "numbered variants are a string[] rotation in order"), via `firstOnce`
+// (the same "first line once, then a rotation of the rest" shape greetings/
+// refusals elsewhere already use).
+const FRAME_WHICH_ONE_TEXT =
+  'Two of them have light behind them and three of them have the other thing, and\nyou cannot walk at a wall in general.\n\nWhich one.';
+
+const DARK_FRAME_THREE_TEXT =
+  'You step through it.\n\nThe far side of it is the archive hub, which is where you were, and the frame\nis now behind you, which it was not a moment ago. Nothing else about the room\nhas been altered in any way.\n\nIt has the manner of a machine returning a coin.';
+
+const DARK_FRAME_FOUR_TEXT =
+  'The slot over this one has never had a strip in it. No screws, no screw holes,\nno adhesive, no rectangle of cleaner paint.\n\nYou go through anyway, on the grounds that the other one had a legend and did\nnothing either, and come out into the same room facing the same wall at the\nsame temperature, which at least is consistent.';
+
+const DARK_FRAME_FIVE_TEXT =
+  'The last one in the row is the coldest, which means nothing: it is nearest the\nwell and the well is tiled all the way down.\n\nYou put a shoulder into it, in case it turns out to have been a question of\ncommitment.\n\nIt was not a question of commitment.';
+
+const FRAME_ENTER_PROSE: ProseRule[] = [
+  { text: [FRAME_WHICH_ONE_TEXT, DARK_FRAME_THREE_TEXT, DARK_FRAME_FOUR_TEXT, DARK_FRAME_FIVE_TEXT], firstOnce: true },
+];
+
+/** §56.1/§56.4 — the Hub's own two door-style exits, never open, sharing this same "which one" text as `blockedText`. Exported for `../s6ArchiveHub.ts`'s own `exits` array. */
+export const FRAME_ENTER_BLOCKED_TEXT: Prose = FRAME_WHICH_ONE_TEXT;
 
 const gateFramesHandlers: HandlerDef[] = [
   { verbs: [EXAMINE], effects: [{ say: GATE_EXAMINE_TEXT }, { grantClue: ACT3_CLUE_GATES }] },
   { verbs: [TOUCH], effects: [{ say: GATE_TOUCH_TEXT }, { grantClue: ACT3_CLUE_GATES }] },
   { verbs: [LOOK_UNDER], effects: [{ say: GATE_LOOK_BEHIND_TEXT }] },
   { verbs: [READ], effects: [{ say: GATE_READ_LEGENDS_TEXT }] },
-  // §27.5/§31.1 — "ENTER GATE"/"GO THROUGH FRAME"/"ENTER ESCAPE ROOM"/"ENTER
-  // HAB": `IN` already carries "enter"/"go through" as words (`act1/
-  // verbs.ts`), and this object's own handler wins outright over
-  // `traverseDoor`'s door-by-name check (`respond.ts`), since this object is
-  // never any exit's `door` — the boundary lives entirely in this handler,
-  // no `goto`, so the player stays in the Hub.
-  { verbs: [DIRECTION_VERB_IDS.in], effects: [{ say: GATE_ENTER_BOUNDARY_TEXT }, { grantClue: ACT3_CLUE_GATES }] },
+  // §3.1 — "IN"/"ENTER GATE"/"GO THROUGH FRAMES": `IN` already carries
+  // "enter"/"go through" as words (`act1/verbs.ts`), and this object's own
+  // handler wins outright over `traverseDoor`'s door-by-name check
+  // (`respond.ts`), since this object is never any exit's `door` — no
+  // `goto`, so the player stays in the Hub.
+  { verbs: [DIRECTION_VERB_IDS.in], effects: [{ say: FRAME_ENTER_PROSE }, { grantClue: ACT3_CLUE_GATES }] },
 ];
 
 export const gateFrames: ObjectDefSlice = {
   location: ACT3_S6_ARCHIVE_HUB,
   portable: false,
   name: 'gate frames',
-  nouns: ['gate', 'gates', 'frame', 'frames', 'opening', 'openings', 'doorway', 'doorways', 'legend', 'legends', 'strip', 'strips', 'escape', 'hab', 'escape room'],
+  // E2 task O — §3: loses `escape`/`hab`/`escape room` to the two new lit
+  // objects (`act4/objects/escapeChamber.ts`'s own `gateEscape`/`gateHab`).
+  // Bare singular `frame` stays here (unchanged) — the two new objects
+  // claim it only as a compound head ("first frame"/"second frame"), which
+  // never outranks this object's own bare-noun claim (`resolver.ts`'s own
+  // ranking rule), so bare "ENTER FRAME" still reaches this handler.
+  nouns: ['gate', 'gates', 'frame', 'frames', 'opening', 'openings', 'doorway', 'doorways', 'legend', 'legends', 'strip', 'strips'],
   handlers: gateFramesHandlers,
 };
 

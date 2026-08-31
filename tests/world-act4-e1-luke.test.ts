@@ -418,11 +418,16 @@ describe('the after-visit arms', () => {
   });
 });
 
+// E2 task O (`docs/superpowers/specs/2026-09-19-stage-e2-prose.md` §56.1) —
+// "the IN entry point is gone"; the class object's own `IN` handler now
+// always renders §3.1's "which one" line, never the boundary — moved to
+// the well's own `down` exit below (the same `ACT3_CLUE_ROOT_REFUSES` seed
+// this describe block's own fourth test already used).
 describe('§29 — the boundary, three arms', () => {
   it('the shipped Act III line, with none of Act IV started', () => {
     const store = new MemoryStore();
-    const { session } = enter(withState({}), ACT3_S6_ARCHIVE_HUB);
-    const { events } = say(session, 'enter gate', store);
+    const { session } = enter(withState({ clues: [ACT3_CLUE_ROOT_REFUSES] }), ACT3_S6_ARCHIVE_HUB);
+    const { events } = say(session, 'down', store);
     const rendered = text(events);
     expect(rendered).toMatch(/END OF BUILD/);
     expect(rendered).toMatch(/Act III ends here/);
@@ -430,8 +435,8 @@ describe('§29 — the boundary, three arms', () => {
 
   it("E0's Act IV line, once started but before he is met", () => {
     const store = new MemoryStore();
-    const { session } = enter(withState({ flags: { [ACT4_STARTED]: true } }), ACT3_S6_ARCHIVE_HUB);
-    const { events } = say(session, 'enter gate', store);
+    const { session } = enter(withState({ flags: { [ACT4_STARTED]: true }, clues: [ACT3_CLUE_ROOT_REFUSES] }), ACT3_S6_ARCHIVE_HUB);
+    const { events } = say(session, 'down', store);
     const rendered = text(events);
     expect(rendered).toMatch(/END OF BUILD/);
     expect(rendered).toMatch(/the man who is coming are this one/);
@@ -439,8 +444,8 @@ describe('§29 — the boundary, three arms', () => {
 
   it("E1's own line, once act4_luke_met", () => {
     const store = new MemoryStore();
-    const { session } = enter(withState({ flags: { [ACT4_STARTED]: true, [ACT4_LUKE_MET]: true } }), ACT3_S6_ARCHIVE_HUB);
-    const { events } = say(session, 'enter gate', store);
+    const { session } = enter(withState({ flags: { [ACT4_STARTED]: true, [ACT4_LUKE_MET]: true }, clues: [ACT3_CLUE_ROOT_REFUSES] }), ACT3_S6_ARCHIVE_HUB);
+    const { events } = say(session, 'down', store);
     const rendered = text(events);
     expect(rendered).toMatch(/END OF BUILD/);
     expect(rendered).toMatch(/stair behind the door on Sublevel 5 is this one/);

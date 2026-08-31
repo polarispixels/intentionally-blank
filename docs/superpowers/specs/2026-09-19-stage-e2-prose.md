@@ -1,6 +1,6 @@
 # Stage E Wave E2 — The Archive
 
-**Status (main session, 2026-08-31):** accepted whole for wiring as v0.18.0 — no cuts; §53 rulings: q1–q13 as recommended (q1: entry 104 binds the facility's floors, not the archive's environments — Sissy speaks; q9: the two tie defaults are two authors' choices and both stand; q13: report against 7,800). §58's proposals recorded as register **128–136** (the wayfinding doc claimed 126–127 first). §55 none wired. Original: draft for main-session voice review · **Author:** `narrative-writer`
+**Status (main session, 2026-08-31):** **wired and shipped v0.18.0**; accepted whole — no cuts; §53 rulings: q1–q13 as recommended (q1: entry 104 binds the facility's floors, not the archive's environments — Sissy speaks; q9: the two tie defaults are two authors' choices and both stand; q13: report against 7,800). §58's proposals recorded as register **128–136** (the wayfinding doc claimed 126–127 first). §55 none wired. Original: draft for main-session voice review · **Author:** `narrative-writer`
 · **Date:** 2026-09-19
 **Covers:** Act IV's archive thread — the two lit gate frames and the three dark
 ones; **`act4_escape_chamber`** (hero, twelve objects), the family's last day

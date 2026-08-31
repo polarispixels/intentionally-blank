@@ -1,6 +1,6 @@
 # 09 - Canon Decisions Register
 
-**Spec version:** `0.17.1`
+**Spec version:** `0.18.0`
 
 During the full-game build (see `docs/DEVELOPMENT.md`, "Full-game build
 protocol") the main session is authorized to resolve `WORKING IDEA` and

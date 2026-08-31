@@ -24,7 +24,7 @@ import type { WorldDef } from '../../engine/world';
 import { ACT1_SLICE } from './act1/slice';
 import { ACT2_SLICE, ACT2_CENSOR_PROMPT_SCRIPTS } from './act2/index';
 import { ACT3_SLICE, ACT3_HUB_PROMPT_SCRIPTS } from './act3/index';
-import { ACT4_SLICE } from './act4/index';
+import { ACT4_SLICE, ACT4_PROMPT_SCRIPTS } from './act4/index';
 
 /**
  * A `WorldSlice` is every keyed table of `WorldDef` an act can contribute,
@@ -128,4 +128,4 @@ export const WORLD: WorldDef = assemble(ACT1_SLICE, ACT2_SLICE, ACT3_SLICE, ACT4
  * E0–E3 add `ACT4_PROMPT_SCRIPTS`/`ACT5_PROMPT_SCRIPTS` to this spread in
  * the same change they add rooms.
  */
-export const PROMPT_SCRIPTS: Record<string, ScriptId> = { ...ACT2_CENSOR_PROMPT_SCRIPTS, ...ACT3_HUB_PROMPT_SCRIPTS };
+export const PROMPT_SCRIPTS: Record<string, ScriptId> = { ...ACT2_CENSOR_PROMPT_SCRIPTS, ...ACT3_HUB_PROMPT_SCRIPTS, ...ACT4_PROMPT_SCRIPTS };

@@ -15,6 +15,7 @@ import type { PersistOptions, SessionState } from '../src/session/session';
 import { MemoryStore } from '../src/session/store';
 import type { GameEvent, GameState, WorldDef } from '../src/engine/world';
 import {
+  ACT3_CLUE_ROOT_REFUSES,
   ACT3_HUB_LOGGED_IN,
   ACT3_HUB_LOGIN_SCRIPT,
   ACT3_LEDGER,
@@ -228,11 +229,16 @@ describe('R13 — the profile', () => {
   });
 });
 
-describe('the Act IV boundary — ENTER GATE', () => {
+// E2 task O (`docs/superpowers/specs/2026-09-19-stage-e2-prose.md` §56.1) —
+// "the IN entry point is gone"; the boundary now renders only on the well's
+// own `down` exit, so these two checks move there (same pattern
+// `world-act4-e1-luke.test.ts`'s own "the root door's own down exit reaches
+// the same three arms" test already uses).
+describe('the Act IV boundary — DOWN', () => {
   it("prints canon 88's line before act4_started", () => {
     const store = new MemoryStore();
-    const session = loggedInAtHub();
-    const { events } = say(session, 'enter gate', store);
+    const session = loggedInAtHub({ clues: [ACT3_CLUE_ROOT_REFUSES] });
+    const { events } = say(session, 'down', store);
     const rendered = text(events);
     expect(rendered).toMatch(/Act III ends here/);
     expect(rendered).not.toMatch(/the man who is coming are this one/);
@@ -240,8 +246,8 @@ describe('the Act IV boundary — ENTER GATE', () => {
 
   it("prints §22's line once act4_started", () => {
     const store = new MemoryStore();
-    const session = actFourHub();
-    const { events } = say(session, 'enter gate', store);
+    const session = actFourHub({ clues: [ACT3_CLUE_ROOT_REFUSES] });
+    const { events } = say(session, 'down', store);
     const rendered = text(events);
     expect(rendered).toMatch(/END OF BUILD/);
     expect(rendered).toMatch(/street, the sheriff, the ledger and the man who is coming are this one/);

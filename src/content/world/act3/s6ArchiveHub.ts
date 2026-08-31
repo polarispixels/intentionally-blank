@@ -57,6 +57,15 @@ import {
 } from './objects/s6ArchiveHub';
 // E0 task K (§16, §31.2) — the ledger's two numeral fixed phrases.
 import { ACT4_STARTED, V_ACT4_LEDGER_FOUR, V_ACT4_LEDGER_ONE } from '../act4/ids';
+// E2 task O (`docs/superpowers/specs/2026-09-19-stage-e2-prose.md` §56.1,
+// §56.4) — the Hub's two door-style exits that never open (`ACT3_GATE_
+// FRAMES`'s own `IN` handler does the real traversal on the two lit gate
+// objects; these exits exist only so the map/`GO TO` have somewhere to
+// route). `ACT4_ESCAPE_CHAMBER`/`ACT4_GATE_ESCAPE` are this task's own;
+// `ACT4_HAB_GALLEY`/`ACT4_GATE_HAB` are declared here too — the hab room is
+// task P's, the gate object is this task's own (`objects/escapeChamber.ts`).
+import { ACT4_ESCAPE_CHAMBER, ACT4_ESCAPE_EXIT_GATE, ACT4_HAB_EXIT_GATE, ACT4_HAB_GALLEY } from '../act4/ids';
+import { FRAME_ENTER_BLOCKED_TEXT } from './objects/s6ArchiveHub';
 
 // ---------------------------------------------------------------------------
 // §21.1 — description.
@@ -201,6 +210,17 @@ export const s6ArchiveHubRoom: RoomDefSlice = {
     // refusal clue, self-looped (the player stays in the Hub). Same "one
     // system.buildBoundary" idiom `pipeChase.ts`'s own `down` exit uses.
     { dir: 'down', to: ACT3_S6_ARCHIVE_HUB, door: ACT3_S6_BOUNDARY_GATE, when: { clue: ACT3_CLUE_ROOT_REFUSES }, blockedText: ROOT_DOOR_DOWN_BOUNDARY_TEXT },
+    // E2 task O — §56.1/§56.4. Never open (the stub gate objects have no
+    // `container`); real traversal is each frame's own `IN` handler
+    // (`objects/escapeChamber.ts`'s `gateEscape`/`gateHab`). The map/`GO TO`
+    // need these to exist. Deliberately NOT `door: ACT4_GATE_ESCAPE`/
+    // `ACT4_GATE_HAB` themselves — `respond.ts`'s `DOOR_TRAVERSAL_VERB_IDS`
+    // checks `traverseDoor` (a door-by-name lookup) before an object's own
+    // handlers for IN/OUT/USE, so naming the frame objects here would let
+    // this blocked exit shadow their own `IN` script (see `ids.ts`'s own
+    // comment on `ACT4_ESCAPE_EXIT_GATE`).
+    { dir: 'e', to: ACT4_ESCAPE_CHAMBER, door: ACT4_ESCAPE_EXIT_GATE, blockedText: FRAME_ENTER_BLOCKED_TEXT },
+    { dir: 'ne', to: ACT4_HAB_GALLEY, door: ACT4_HAB_EXIT_GATE, blockedText: FRAME_ENTER_BLOCKED_TEXT },
   ],
   handlers: [
     // v0.15.1 — §29.1 as a bare form: the stick is in the rig, wherever the rig is (see `objects/s6ArchiveHub.ts` §29).

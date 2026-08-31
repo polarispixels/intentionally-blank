@@ -21,6 +21,8 @@
 // work starts).
 
 import type { EventDef } from '../../../engine/world';
+import type { Cond } from '../../../engine/cond';
+import type { ProseRule } from '../../../engine/prose';
 import { JACK, MAIN_STREET, SUNDOWN_DINER } from '../act1/ids';
 import { ACT3_CLUE_REACQUIRE, ACT3_S6_MAINTENANCE_BAY, ACT3_UV_LAMP_ON } from '../act3/ids';
 import {
@@ -196,4 +198,125 @@ export const ACT4_EV_DETAIL_ARRIVES_EVENT: EventDef = {
   when: { all: [{ flag: ACT4_VISIT_ANNOUNCED }, { onOrAfterDay: ACT4_VISIT_DAY }] },
   once: true,
   effects: [{ reveal: ACT4_DETAIL }],
+};
+
+// --- E2 task O ---
+// The countdown and the completion (`docs/superpowers/specs/2026-09-19-
+// stage-e2-prose.md` §15.3, §22, §23). Text transcribed exactly (hard rule
+// 5); the countdown's own turn-count (below) is mechanical only, never
+// rendered — §52's no-digit discipline (§15.1: "no figure, ever").
+//
+// `act4_ev_chamber_timer` — repeating (`once: false`), resets on each pass.
+// One event does both jobs (the doc names exactly one event id): while the
+// count hasn't reached its own internal threshold, it just increments;
+// once it has, it fires the "runs out" text, resets the count to 0, and
+// lights the panel. `{ if }` keeps this to one `EventDef` rather than two
+// separately-dedup'd ones.
+//
+// `act4_ev_chamber_complete` — `once`, `when` the `all` of the three
+// performance flags (§23). One block; P23's own `onSolved` (`knowledge.ts`)
+// answers the question too, belt and suspenders, the same idiom
+// `act4_q_record_about_you` already uses.
+import {
+  ACT4_CHAMBER_COMPLETE,
+  ACT4_CHAMBER_COPY_FOUND,
+  ACT4_CHAMBER_FAILURES,
+  ACT4_CHAMBER_FIRST_DONE,
+  ACT4_CHAMBER_PANEL_LIVE,
+  ACT4_CHAMBER_PHRASE_SAID,
+  ACT4_CHAMBER_TIMER_TICKS,
+  ACT4_CLUE_ROOM_COMPLETED,
+  ACT4_DEEP_INDEX,
+  ACT4_ESCAPE_CHAMBER,
+  ACT4_Q_THE_ROOM,
+  EVENT_ACT4_EV_CHAMBER_COMPLETE,
+  EVENT_ACT4_EV_CHAMBER_TIMER,
+} from './ids';
+
+const TIMER_RUNS_OUT_TEXT =
+  'The timer gets to the end of its travel and lets go with a single flat note that\ngoes on a shade longer than you expect it to.\n\nBehind you the speaker over the door stops.\n\nThe panel beside the grey door comes up out of nothing into one line of pale\ncharacters, and waits.';
+
+export const ACT4_EV_CHAMBER_TIMER_EVENT: EventDef = {
+  id: EVENT_ACT4_EV_CHAMBER_TIMER,
+  when: { all: [{ at: ACT4_ESCAPE_CHAMBER }, { not: { flag: ACT4_CHAMBER_COMPLETE } }] },
+  once: false,
+  effects: [
+    {
+      if: {
+        when: { flag: ACT4_CHAMBER_TIMER_TICKS, atLeast: 2 },
+        then: [{ say: TIMER_RUNS_OUT_TEXT }, { set: [ACT4_CHAMBER_TIMER_TICKS, 0] }, { set: [ACT4_CHAMBER_PANEL_LIVE, true] }],
+        else: [{ inc: ACT4_CHAMBER_TIMER_TICKS }],
+      },
+    },
+  ],
+};
+
+const CHAMBER_COMPLETE_TEXT =
+  'The timer stops without finishing.\n\nAnd then, for about as long as it takes to breathe in, the kitchen is a kitchen.\n\nAll of it at once. Printing on every tin and a maker\'s name on the stove and a\nwater stain on the ceiling in the shape of a country. Handles, catches, a\ncalendar on the back of the door with a farm on it. The pattern in the curtain\nrunning edge to edge. Grain in the wood of the chairs and dust on the top of the\npicture rail and the particular grey of an afternoon in that county at that time\nof year, coming in through a window nobody looked out of.\n\nAnd a great deal of noise: chairs, cutlery, a door somewhere else in the house, a\ndog, all of them at once, and under it the sound a house makes with people in it,\nwhich is not the sound of any one thing.\n\nThen the lights go out.\n\nNot off — down, all of it, the way a room goes when the last person out of it has\nput a hand on the switch. It is dark, and it is not empty. Something the size of\na kitchen full of people is in here with you and it is finishing its afternoon: a\nchair going back, somebody\'s shoulder past your shoulder, the smell of coats\ncoming off hooks, a voice at the far end saying something you do not catch to\nsomebody who laughs at it.\n\nThe back door opens on a corridor with strip lights in it.\n\nBy the time you have turned round, the standby light is up. The tins have no\nlabels. The cupboards have no handles.\n\nThere is nobody in the middle of the floor and there is no gap in the light where\nnobody is.';
+
+export const ACT4_EV_CHAMBER_COMPLETE_EVENT: EventDef = {
+  id: EVENT_ACT4_EV_CHAMBER_COMPLETE,
+  when: { all: [{ flag: ACT4_CHAMBER_FIRST_DONE }, { flag: ACT4_CHAMBER_COPY_FOUND }, { flag: ACT4_CHAMBER_PHRASE_SAID }] },
+  once: true,
+  effects: [
+    { say: CHAMBER_COMPLETE_TEXT },
+    { set: [ACT4_CHAMBER_COMPLETE, true] },
+    { set: [ACT4_DEEP_INDEX, true] },
+    { grantClue: ACT4_CLUE_ROOM_COMPLETED },
+    { answerQuestion: ACT4_Q_THE_ROOM },
+  ],
+};
+
+// The assist (§22) — `act4_chamber_failures >= 2`. Three `once` events, each
+// prompting whichever performance is outstanding, in order (first / copy /
+// phrase) — gating each on the earlier ones already done keeps only one
+// live at a time, so "in the order" falls out of the conds rather than
+// needing to be sequenced by hand. The phrase's own rule 1 (`when: {
+// clue: act4_clue_lukes_word }`) substitutes for the doc's own
+// `act4_luke_said_word` — grepped and found undeclared: `act4/luke.ts`'s
+// `topicNoumena` (E1, not this task's file) promises in a comment to set
+// it and never does; granting `act4_clue_lukes_word` is the one flag this
+// wave actually sets when the player has had that conversation, so it is
+// the honest substitute rather than a phantom flag. Flagged in this task's
+// report.
+import { ACT4_CLUE_LUKES_WORD } from './ids';
+
+const ASSIST_ORDER_TEXT =
+  'The man\'s voice, into the space where nobody has answered, and for the first\ntime not to the room: "Come on. You\'re first. You\'ve been first since before she\nwas born."';
+
+const ASSIST_COPY_TEXT =
+  'The woman\'s voice, from further off, in the tone of somebody who has been asked\nthis at least once a week her whole life: "It\'s in the coffee. Where do you think\nit is."';
+
+const ASSIST_PHRASE_LUKE_TEXT =
+  'And the one who starts sentences without always landing them, to nobody, with the\nenormous patience of a man who has decided that this is a hill:\n\n"It is not a rule, it is a — there is a word for the thing behind a rule that\nmakes the rule the shape it is. Noumena. It is the noumena of the house."\n\nSomebody throws something at him. The rest of it is said by everybody at once and\nthe panel is still waiting for it.';
+
+const ASSIST_PHRASE_PLAIN_TEXT =
+  'And the slow one, quietly, to whoever is nearest, in a voice that is enjoying\nitself:\n\n"Go on. Say it. He\'s not going to open that door till somebody says it."';
+
+const ASSIST_PHRASE_PROSE: ProseRule[] = [
+  { when: { clue: ACT4_CLUE_LUKES_WORD }, text: ASSIST_PHRASE_LUKE_TEXT },
+  { text: ASSIST_PHRASE_PLAIN_TEXT },
+];
+
+const ASSIST_FAILURES: Cond = { flag: ACT4_CHAMBER_FAILURES, atLeast: 2 };
+
+export const ACT4_EV_CHAMBER_ASSIST_ORDER_EVENT: EventDef = {
+  id: 'act4_ev_chamber_assist_order',
+  when: { all: [ASSIST_FAILURES, { not: { flag: ACT4_CHAMBER_FIRST_DONE } }] },
+  once: true,
+  effects: [{ say: ASSIST_ORDER_TEXT }],
+};
+
+export const ACT4_EV_CHAMBER_ASSIST_COPY_EVENT: EventDef = {
+  id: 'act4_ev_chamber_assist_copy',
+  when: { all: [ASSIST_FAILURES, { flag: ACT4_CHAMBER_FIRST_DONE }, { not: { flag: ACT4_CHAMBER_COPY_FOUND } }] },
+  once: true,
+  effects: [{ say: ASSIST_COPY_TEXT }],
+};
+
+export const ACT4_EV_CHAMBER_ASSIST_PHRASE_EVENT: EventDef = {
+  id: 'act4_ev_chamber_assist_phrase',
+  when: { all: [ASSIST_FAILURES, { flag: ACT4_CHAMBER_FIRST_DONE }, { flag: ACT4_CHAMBER_COPY_FOUND }, { not: { flag: ACT4_CHAMBER_PHRASE_SAID } }] },
+  once: true,
+  effects: [{ say: ASSIST_PHRASE_PROSE }],
 };

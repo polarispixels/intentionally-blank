@@ -118,7 +118,14 @@ const intactPolaroids: ObjectDefSlice = {
   location: 'nowhere', // granted by the boxes' own OPEN/TURN/UNLOCK rule 1
   name: 'Polaroids',
   portable: true,
-  nouns: ['polaroids', 'polaroid', 'photos', 'photographs', 'photo', 'photograph', 'pictures', 'picture', 'prints', 'print', 'sky', 'stars', 'porch'],
+  // Stage E2, task P amendment (`docs/superpowers/specs/2026-09-19-stage-e2-
+  // prose.md` §56.2's own "sky" collision row, explicitly this task's own to
+  // resolve): "sky"/"stars" dropped — `act4_sky` (the Observation Dome) is
+  // the Dome's own object for those words, and outside the Dome bare SKY
+  // must not resolve to anything (the doc's own ruling; this object's
+  // `porch`/`polaroid`/etc. nouns are unaffected, and its `EXAMINE`/`READ`
+  // text — unedited — still describes both photographs, sky included).
+  nouns: ['polaroids', 'polaroid', 'photos', 'photographs', 'photo', 'photograph', 'pictures', 'picture', 'porch'],
   handlers: [{ verbs: [EXAMINE, READ], effects: [{ say: intactPolaroidsText }, { grantClue: CLUE_INTACT_POLAROIDS }] }],
 };
 

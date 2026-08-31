@@ -119,7 +119,7 @@ const cachePolaroidCompareText =
 const cachePolaroid: ObjectDefSlice = {
   location: 'nowhere',
   name: 'Polaroid from the box',
-  nouns: ['polaroid', 'photo', 'photograph', 'picture', 'print', 'snap'],
+  nouns: ['polaroid', 'photo', 'photograph', 'picture', 'snap'], // 'print' is the darkroom's (E2 §56.2)
   portable: true,
   plotCritical: true,
   handlers: [
