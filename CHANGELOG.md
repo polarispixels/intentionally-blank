@@ -12,6 +12,12 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.16.1] - 2026-08-31
+
+Test fix: the E0 completion test anchored two beats across the CLI's line
+wrap; v0.16.0 was tagged with one of them red (the release chain gated on
+grep's exit code, not the test runner's — corrected).
+
 ## [0.16.0] - 2026-08-31
 
 **Stage E0 — the record about you.** Act IV opens the turn the queue is read

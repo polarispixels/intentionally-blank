@@ -31,7 +31,7 @@ describe('Stage E0 — the record about you, on a clean save', () => {
     for (const beat of [
       // the machine (this route logs in before Act IV, so the profile
       // arrives on READ PROFILE, not the login menu — the menu row is unit-tested)
-      'It comes up as fast as the other three, which is to say it was already',
+      'You take the fourth heading.',
       'SUBJECT BEHAVIORAL PROFILE',
       'PRIMARY STRATEGY: ANALYTICAL',
       '◆ clue noted: SUBJECT BEHAVIORAL PROFILE',
@@ -63,7 +63,8 @@ describe('Stage E0 — the record about you, on a clean save', () => {
     const past = stdout.slice(stdout.indexOf('SUBJECT BEHAVIORAL PROFILE'));
     for (const line of past.split('\n')) {
       if (/profile/i.test(line)) {
-        expect(/PROFILE|SUBJECT BEHAVIORAL|behavioral profile|clue noted|question/.test(line)).toBe(true);
+        // the machine's lines, the clue/question ledger, and the player's own typed commands
+        expect(/^> |PROFILE|SUBJECT BEHAVIORAL|behavioral profile|clue noted|question/.test(line)).toBe(true);
       }
     }
   });
