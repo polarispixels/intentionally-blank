@@ -636,6 +636,7 @@ longer than there's been a county to put it in."
 "Marlow's got you, then." She does not make it a question. "He'll not have said
 two words. He's been quiet since he was forty."
 ```
+
 > **Three variants, not four. A fourth (about the pie) was cut in the trim pass
 > and its content survives at §4.4's `ask for pie`, where it is better placed.**
 >

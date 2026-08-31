@@ -34,12 +34,17 @@ board above is the plan. This table is what is *left*.
 
 | # | Remaining | Type |
 |---|---|---|
-| C-3 | Act I wave 3: County Library, Sundown Diner + Pearl, Town Edge | Content |
+| C-3 | Act I wave 3: County Library, Sundown Diner + Pearl, Town Edge — **prose written and approved** (`docs/superpowers/specs/2026-09-04-act1-wave3-prose.md`), needs wiring only | Content |
 | C-4 | Act I wave 4: Motel Forecourt, Jack's Room + **Jack** (the client — built alone) | Content |
 | C-5 | Act I close-out: the notebook objective, first analog-vs-digital contradiction | Content |
 | D | Acts II–III: Wall Drug cache, Dad on the USB, the facility, Sublevel 6 | Content |
 | E | Acts IV–V: identity thread, the archive environments, the root console | Content |
 | F | Hints across all acts, `playtester` agent, replay content, 1.0 polish | Content + process |
+
+**Ryan's to decide, blocking nothing:** the town still has no name. Wave 3
+dodges it with a `TOWN LIMITS / POP. 412` marker that carries no name, which
+works and can stay indefinitely — an unnamed town is defensible for a place
+this empty. Name it or leave it.
 
 Open defects and small items are in the sections below.
 
