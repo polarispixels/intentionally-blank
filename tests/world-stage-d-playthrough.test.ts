@@ -73,6 +73,10 @@ describe('Stage D — Sublevel 6 on a clean save', () => {
     ]) {
       expect(stdout).toContain(beat);
     }
+    // The first-attempt line at Nolan's chair plays once, then the rotation of two (v0.15.1).
+    expect((stdout.match(/You say his name\. Not loudly\./g) ?? []).length).toBe(1);
+    // Dad refuses the dock from wherever the rig is (§29.1, v0.15.1).
+    expect(stdout).toContain('You have the stick half out of the rig');
     // Exactly one M16 variant fires.
     expect((stdout.match(/Then white\./g) ?? []).length).toBe(1);
     // The Bay's clock, like S5's, speaks in words.

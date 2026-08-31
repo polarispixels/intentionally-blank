@@ -13,6 +13,9 @@
 
 import type { HandlerDef, OnEnterRule, RoomDefSlice } from '../../../engine/world';
 import type { ProseRule } from '../../../engine/prose';
+import { DAD_REFUSES_DOCK_TEXT } from './objects/s6ArchiveHub';
+import { ACT2_DAD_BOOTED } from '../act2/ids';
+import { V_ACT3_DOCK_DAD } from './ids';
 import { HELLO, LISTEN, SEARCH, SMELL, WAIT, YELL } from '../act1/verbs';
 import { V_TYPE_TERMINAL } from '../act1/ids';
 import {
@@ -166,6 +169,8 @@ export const s6ArchiveHubRoom: RoomDefSlice = {
     { dir: 'down', to: ACT3_S6_ARCHIVE_HUB, door: ACT3_S6_BOUNDARY_GATE, when: { clue: ACT3_CLUE_ROOT_REFUSES }, blockedText: ROOT_DOOR_DOWN_BOUNDARY_TEXT },
   ],
   handlers: [
+    // v0.15.1 — §29.1 as a bare form: the stick is in the rig, wherever the rig is (see `objects/s6ArchiveHub.ts` §29).
+    { verbs: [V_ACT3_DOCK_DAD], when: { flag: ACT2_DAD_BOOTED }, effects: [{ say: DAD_REFUSES_DOCK_TEXT }] },
     ...loginHandlers,
     bareSearchHandler,
     ...ledgerBareHandlers,

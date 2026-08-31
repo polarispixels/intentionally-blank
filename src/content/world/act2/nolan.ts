@@ -486,7 +486,7 @@ export const nolan: NpcDefSlice = {
     // D5, task F — WAKE/TALK TO at the Bay, at night (§6.3). Prepended
     // first so it wins outright while he's there (his own schedule only
     // ever puts him there at night).
-    { when: { at: ACT3_S6_MAINTENANCE_BAY }, text: nolanBayWakeRotation },
+    { when: { at: ACT3_S6_MAINTENANCE_BAY }, text: nolanBayWakeRotation, firstOnce: true },
     { when: { all: [{ at: ACT3_LOBBY }, { flag: ACT3_RODE_FENCE }] }, text: greetingFenceVariantText },
     { when: { all: [{ at: ACT3_LOBBY }, { not: { met: ACT2_NOLAN } }] }, text: greetingWorkFirstText },
     { when: { at: ACT3_LOBBY }, text: greetingWorkRotationText },
@@ -499,7 +499,7 @@ export const nolan: NpcDefSlice = {
     // D5, task F — ASK NOLAN ABOUT anything, at the Bay, at night (§6.3):
     // every one of his own topics is gated away above, so any ASK/TELL
     // there falls straight through to this rule.
-    { when: { at: ACT3_S6_MAINTENANCE_BAY }, text: nolanBayWakeRotation },
+    { when: { at: ACT3_S6_MAINTENANCE_BAY }, text: nolanBayWakeRotation, firstOnce: true },
     { when: { at: ACT3_LOBBY }, text: unknownTopicAtWork },
     { text: unknownTopic },
   ] satisfies ProseRule[],

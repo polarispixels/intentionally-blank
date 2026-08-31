@@ -36,7 +36,8 @@
 
 import type { ObjectDefSlice } from '../../../../engine/world';
 import type { ProseRule } from '../../../../engine/prose';
-import { V_COUNT, V_EAT } from '../../act1/ids';
+import { SELF_FOREARM, V_COUNT, V_EAT, V_ROLL_UP } from '../../act1/ids';
+import { SELF_OBJECTS } from '../../act1/objects/self';
 import { ACT2_NOLAN_BADGE } from '../../act2/ids';
 import { EXAMINE, HELLO, LOOK_UNDER, OPEN, PULL, READ, REMOVE, SEARCH, SIT, SMELL, TAKE, TOUCH, TURN_OFF, TURN_ON, WEAR } from '../../act1/verbs';
 import {
@@ -67,6 +68,7 @@ import {
   ACT3_UV_LAMP,
   ACT3_UV_LAMP_ON,
   ACT3_UV_SEEN_ARM,
+  ACT3_CLUE_UV_GHOST,
   ACT3_WEARING_COVERALLS,
   V_ACT3_UNDO,
 } from '../ids';
@@ -548,3 +550,23 @@ export const ACT3_S6_MAINTENANCE_BAY_OBJECTS: Record<string, ObjectDefSlice> = {
   [ACT3_SLEEPERS]: sleepers,
   [ACT3_FAR_WALL]: farWall,
 };
+
+// ---------------------------------------------------------------------------
+// v0.15.1 hygiene — §8.3 from the player's own arm (D5 doc §39.2: "ARM must
+// prefer the body"): EXAMINE ARM / ROLL UP SLEEVE in the Bay with the UV lamp
+// on is the arm under the lamp. Prepended onto Act I's forearm object, the
+// established cross-module amendment idiom.
+// ---------------------------------------------------------------------------
+{
+  const forearm = SELF_OBJECTS[SELF_FOREARM];
+  if (forearm !== undefined) {
+    forearm.handlers = [
+      {
+        verbs: [EXAMINE, V_ROLL_UP],
+        when: { all: [{ at: ACT3_S6_MAINTENANCE_BAY }, { flag: ACT3_UV_LAMP_ON }] },
+        effects: [{ say: armUnderLampRules }, { set: [ACT3_UV_SEEN_ARM, true] }, { grantClue: ACT3_CLUE_UV_GHOST }],
+      },
+      ...(forearm.handlers ?? []),
+    ];
+  }
+}

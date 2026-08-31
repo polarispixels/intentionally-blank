@@ -54,6 +54,13 @@ export interface ProseRule {
   when?: Cond;
   /** `string[]` rotates, indexed by this rule's own per-node counter. */
   text: string | string[] | ProseRef;
+  /**
+   * v0.15.1: with a `string[]`, play index 0 exactly once, then rotate
+   * among the rest forever — the "first attempt, then a rotation of two"
+   * shape the prose docs use for greetings and refusals, which a plain
+   * modulo cycle wraps back to the long first line on the fourth try.
+   */
+  firstOnce?: boolean;
 }
 
 function isProseRef(value: unknown): value is ProseRef {
@@ -132,7 +139,7 @@ function select(
   path: string,
   prose: Prose,
   visited: Set<string> = new Set(),
-): { text: string | string[]; node: string } {
+): { text: string | string[]; node: string; firstOnce: boolean } {
   if (isProseRef(prose)) {
     if (visited.has(prose.ref)) {
       throw new Error(`prose.render: "${path}" has a cyclic ref chain through "${prose.ref}"`);
@@ -144,7 +151,7 @@ function select(
     return select(world, state, path, family, new Set(visited).add(prose.ref));
   }
 
-  if (typeof prose === 'string') return { text: prose, node: path };
+  if (typeof prose === 'string') return { text: prose, node: path, firstOnce: false };
 
   if (prose.length === 0) {
     throw new Error(`prose.render: "${path}" has no variants/rules to select from`);
@@ -152,7 +159,7 @@ function select(
 
   if (typeof prose[0] === 'string') {
     // string[] rotation family — the whole array is one node.
-    return { text: prose as string[], node: path };
+    return { text: prose as string[], node: path, firstOnce: false };
   }
 
   const rules = prose as ProseRule[];
@@ -163,7 +170,7 @@ function select(
       if (isProseRef(rule.text)) {
         return select(world, state, node, rule.text, visited);
       }
-      return { text: rule.text, node };
+      return { text: rule.text, node, firstOnce: rule.firstOnce === true };
     }
   }
   throw new Error(`prose.render: no rule of "${path}" matched, and none is unconditional`);
@@ -181,7 +188,7 @@ export function render(
   prose: Prose,
   ctx: ProseContext = {},
 ): ProseResult {
-  const { text, node } = select(world, state, path, prose);
+  const { text, node, firstOnce } = select(world, state, path, prose);
 
   if (typeof text === 'string') {
     return { text: fillTemplate(text, ctx), state };
@@ -192,7 +199,7 @@ export function render(
   }
 
   const n = state.counters[node] ?? 0;
-  const chosen = text[n % text.length]!;
+  const chosen = text[firstOnce && text.length > 1 ? (n === 0 ? 0 : 1 + ((n - 1) % (text.length - 1))) : n % text.length]!;
   const counters = { ...state.counters, [node]: n + 1 };
   return { text: fillTemplate(chosen, ctx), state: { ...state, counters } };
 }

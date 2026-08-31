@@ -165,10 +165,10 @@ describe('validate — Act I room 1', () => {
   // reports cover) — included here only because this is a whole-`WORLD`
   // count and someone had to reconcile it for the suite to go green; not
   // this task's own module to review in depth.
-  it('produces exactly the 101 expected verb-noun-collision warnings, no others', () => {
+  it('produces exactly the 106 expected verb-noun-collision warnings, no others', () => {
     const warnings = validate(WORLD).filter((f) => f.severity === 'warning');
     const collisions = warnings.filter((f) => f.code === 'verb-noun-collision');
-    expect(collisions.length).toBe(101);
+    expect(collisions.length).toBe(106);
     expect(collisions.map((f) => f.message).sort()).toEqual(
       [
         "verb \"act1_check_date\" can be typed bare and its word \"date\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
@@ -208,12 +208,16 @@ describe('validate — Act I room 1', () => {
         "verb \"act2_wait_until_night\" can be typed bare and its word \"night\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act2_wait_until_night\" can be typed bare and its word \"till\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act2_write\" can be typed bare and its word \"letter\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act3_arm_under_lamp\" can be typed bare and its word \"arm\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act3_arm_under_lamp\" can be typed bare and its word \"lamp\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act3_badge_under_lamp\" can be typed bare and its word \"badge\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act3_badge_under_lamp\" can be typed bare and its word \"chair\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act3_badge_under_lamp\" can be typed bare and its word \"lamp\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act3_badge_under_lamp\" can be typed bare and its word \"polaroid\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act3_check_time\" can be typed bare and its word \"time\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act3_dock_dad\" can be typed bare and its word \"dad\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act3_dock_dad\" can be typed bare and its word \"plug\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act3_dock_dad\" can be typed bare and its word \"terminal\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act3_graph_axis\" can be typed bare and its word \"scale\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act3_hang_badge\" can be typed bare and its word \"back\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act3_hang_badge\" can be typed bare and its word \"badge\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
@@ -241,6 +245,7 @@ describe('validate — Act I room 1', () => {
         "verb \"act3_look_down_shaft\" can be typed bare and its word \"opening\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act3_look_down_shaft\" can be typed bare and its word \"shaft\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act3_look_west\" can be typed bare and its word \"west\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act3_nolan_under_lamp\" can be typed bare and its word \"arm\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act3_nolan_under_lamp\" can be typed bare and its word \"lamp\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act3_nolan_under_lamp\" can be typed bare and its word \"nolan\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act3_notebook_under_lamp\" can be typed bare and its word \"lamp\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
@@ -355,8 +360,8 @@ describe('validate — Act I room 1', () => {
   // (three concurrent tasks) adds 14 more verb-noun collisions (see that
   // test above) and 1 more `room-description-mentions-portable`
   // (`act3_lobby`/"brochures", task B): 44 + 14 + 1 = 59.
-  it('produces exactly one hundred and nine warnings total, no others', () => {
+  it('produces exactly 114 warnings total, no others', () => {
     const warnings = validate(WORLD).filter((f) => f.severity === 'warning');
-    expect(warnings.length).toBe(109);
+    expect(warnings.length).toBe(114);
   });
 });

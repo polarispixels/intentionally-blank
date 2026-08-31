@@ -87,7 +87,7 @@ const hands: ObjectDefSlice = {
 const forearm: ObjectDefSlice = {
   location: { on: SELF },
   name: 'forearm',
-  nouns: ['forearm', 'arms', 'sleeve'],
+  nouns: ['forearm', 'arm', 'arms', 'sleeve'],
   handlers: [
     {
       verbs: [EXAMINE, V_ROLL_UP],

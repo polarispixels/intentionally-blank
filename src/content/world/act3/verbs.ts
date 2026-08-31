@@ -13,6 +13,7 @@
 
 import type { VerbDef } from '../../../engine/world';
 import { VERB_DEFAULTS } from '../../responses';
+import { V_ACT3_DOCK_DAD } from './ids';
 import { ACT1_VERBS, DROP } from '../act1/verbs';
 import { V_CALL, V_MEASURE } from '../act1/ids';
 import { ACT2_DRIVE_TO_PLANT_TEXT } from '../act2/scripts';
@@ -61,6 +62,16 @@ if (!ACT1_VERBS[V_CALL]!.patterns.includes('V dobj')) {
 }
 
 export const ACT3_VERBS: Record<string, VerbDef> = {
+  // v0.15.1 hygiene — the bare form of §29 (the Hub's own handler answers it).
+  [V_ACT3_DOCK_DAD]: {
+    id: V_ACT3_DOCK_DAD,
+    // Not "put usb in terminal" itself — as a bare form that would steal the
+    // phrase from the opening room and the rig (v0.15.1).
+    words: ['plug dad in', 'dock dad', 'put dad in terminal', 'plug in dad', 'connect dad'],
+    patterns: ['V'],
+    class: 'direct',
+    default: VERB_DEFAULTS.wait,
+  },
   [V_LOOK_DOWN_AISLE]: {
     id: V_LOOK_DOWN_AISLE,
     words: ['look down aisle', 'look along row', 'look down row', 'look along aisle'],

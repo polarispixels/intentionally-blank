@@ -12,6 +12,23 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.15.1] - 2026-08-31
+
+Hygiene after Stage D.
+
+### Fixed
+
+- **A first line that plays once, then a rotation** (`ProseRule.firstOnce`,
+  engine): Nolan's chair at night gave the long first-attempt paragraph
+  again on the fourth `WAKE`; now the first line plays once and the two
+  after it rotate, which is what the doc wrote.
+- `EXAMINE ARM` / `ROLL UP SLEEVE` in the Bay with the inspection lamp on is
+  the arm under the lamp (§8.3); the forearm answers to bare `ARM`.
+- `DOCK DAD` / `PLUG DAD IN` as bare forms reach §29.1 while the stick is
+  in the rig and the rig is wherever the player left it. (`PUT USB IN
+  TERMINAL` itself still needs the rig carried — it is portable.)
+- The Stage D fixture proves both.
+
 ## [0.15.0] - 2026-08-31
 
 **Stage D5 — Sublevel 6.** Act III ends; Stage D is complete

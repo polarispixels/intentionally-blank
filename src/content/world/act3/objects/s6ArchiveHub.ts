@@ -413,7 +413,7 @@ if (!alreadyWiredBadge) {
 // for the opening room's terminal/the rig.
 // ---------------------------------------------------------------------------
 
-const DAD_REFUSES_DOCK_TEXT =
+export const DAD_REFUSES_DOCK_TEXT =
   'You have the stick half out of the rig before he says anything, and then he\nsays it fast.\n\n"No."\n\nThen, in the ordinary voice, and sorry about the first one: "Look at what\nyou\'re stood in front of, kiddo. That machine is talking to something and\nneither of us knows what. The entire point of me being a thing in your pocket\nis that I am not on the end of a wire where somebody can go through me."\n\n"Put me back. I\'ll wait. Waiting is the one thing I\'m actually built for."';
 
 const USB_NO_SOCKET_TEXT =

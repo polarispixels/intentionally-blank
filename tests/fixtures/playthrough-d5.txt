@@ -580,6 +580,7 @@ x anchor
 x uv lamp
 turn on uv lamp
 examine arm under lamp
+roll up sleeve
 put notebook under lamp
 x clock
 read clock
@@ -628,12 +629,12 @@ use badge
 open root door
 listen at door
 down
-put usb in terminal
+dock dad
 x bench
 listen
 x rig
 x usb
-put usb in terminal
+dock dad
 west
 up
 out
@@ -659,6 +660,8 @@ look
 x sleepers
 x woman
 x nolan
+wake nolan
+wake nolan
 wake nolan
 wake nolan
 examine nolan under lamp
