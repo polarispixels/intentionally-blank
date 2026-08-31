@@ -41,12 +41,24 @@ Applied to this project, the two top tiers go to **architecture** and
 
 See the table in `CLAUDE.md`. Definitions live in `.claude/agents/`. Notes:
 
-- **Main session model switches by phase.** Fable while writing specs,
-  architecture, and plans (the conversation is where the design gets made,
-  and capping it at a lower tier caps the design). Opus during execution,
-  where the job is decomposition, routing, and review — good Opus work, and
-  the main context is the worst place to run the most expensive model for
-  months. Switching is instant (`/model`) and context carries over.
+- **The outermost layer runs on Fable, in every phase** (Ryan's call,
+  2026-08-30). The earlier rule switched the main session to Opus during
+  execution on the reasoning that decomposition and review are cheaper work
+  and the main context is the worst place to run the most expensive model
+  for months.
+
+  That reasoning undervalued what the outermost layer actually does. It is
+  not only routing: it decides what to build next, reviews prose for voice,
+  rules on canon, decides what *not* to do, and catches the class of error
+  that no subagent can see because each one only sees its own task. Every
+  serious problem this build has hit — the object-listing bug, the
+  two-sided door, a plan that lost `GO NORTH`, warnings drifting into
+  noise — was a whole-project judgement, not a task.
+
+  Ryan's evidence is comparative: another game of his moved materially
+  faster with Fable at the top. Treat this as an experiment with a real
+  hypothesis — that quality *and* speed at the outer layer come from fewer,
+  better decisions rather than more, cheaper ones.
 - While main is on Fable, `game-architect` mostly idles; main does that work
   itself. The roster stays correct under both settings.
 - `narrative-writer` started life as a Haiku "content-scribe" on the theory
@@ -226,10 +238,10 @@ main session's own creative judgment, without waiting for input.
   reviews the register when he likes and may reverse anything; reversals
   are story rewrites, so earlier is cheaper. This supersedes hard rule 1
   for the duration of the build only.
-- **Model.** The main session runs on **Opus** for the marathon; the
-  `game-architect` agent (Fable) writes the story architecture, world
-  model, and plans in isolation with the full spec, and the main session
-  reviews and can send them back. Stage A is the highest-leverage moment:
+- **Model.** The main session runs on **Fable** (see the roster note above;
+  changed 2026-08-30, was Opus for execution). `game-architect` (also Fable)
+  still takes work the main session wants done in isolation with the full
+  spec, and the main session reviews and can send it back. Stage A is the highest-leverage moment:
   its spec is deployed to the docs site before any code is written so Ryan
   can read it.
 - **Stages** (targets, not promises): **A** story + engine architecture

@@ -12,6 +12,31 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.6.3] - 2026-08-30
+
+### Changed
+
+- **The outermost layer now runs on Fable in every phase** (Ryan's call).
+  The routing table previously switched the main session to Opus during
+  execution, reasoning that decomposition and review are cheaper work and
+  that the main context is a costly place to keep the top model running for
+  months.
+
+  That undervalued what the outer layer does. It is not only routing: it
+  decides what to build next, reviews prose for voice, rules on canon,
+  decides what *not* to do, and catches the errors no subagent can see
+  because each one only ever sees its own task. Every serious problem this
+  build has hit was a whole-project judgement rather than a task — a room
+  describing an object the player was holding, a door wired on one side
+  only, a 22-task plan that lost `GO NORTH`, a warning list drifting into
+  noise.
+
+  Ryan's evidence is comparative: another of his games moved materially
+  faster with Fable at the top. The hypothesis worth testing is that speed
+  at the outer layer comes from fewer, better decisions rather than more,
+  cheaper ones — and that re-work, not thinking, is what actually costs
+  time.
+
 ## [0.6.2] - 2026-08-30
 
 A hygiene pass. No game content or story canon touched.

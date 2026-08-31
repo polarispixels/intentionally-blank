@@ -71,7 +71,7 @@ prose; code is the middle.
 
 | Agent | Model | Owns |
 |---|---|---|
-| main session | **Fable** while writing specs, architecture, and plans; **Opus** during execution (switch with `/model`) | orchestration, decomposition, integration, reviewing subagent output, talking to Ryan |
+| main session | **Fable** — the default for the outermost layer, in every phase | orchestration, decomposition, integration, reviewing subagent output, talking to Ryan |
 | `game-architect` | Fable | world model, parser grammar, data schemas, save format, specs and implementation plans, bugs that span modules |
 | `narrative-writer` | Opus | all authored prose |
 | `code-reviewer` | Opus | adversarial pre-merge review, including canon-label and doc-sync checks |
@@ -82,8 +82,9 @@ prose; code is the middle.
 | `playtester` | Sonnet | *(added with the headless CLI)* plays from a script; reports parser misses and unacknowledged reasonable actions |
 
 If a Fable subagent will not spawn, run it on Opus and say so in the report.
-While the main session is on Fable, it does the architect's work itself
-rather than round-tripping to a same-tier subagent. During the full-game
+The main session is on Fable by default, so it does the architect's work
+itself rather than round-tripping to a same-tier subagent; `game-architect`
+is for work it wants done in isolation with the full spec. During the full-game
 build the main session runs on Opus and `game-architect` (Fable) writes the
 architecture and plans; see DEVELOPMENT.md.
 
