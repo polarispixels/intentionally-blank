@@ -960,4 +960,77 @@ go to library
 develop sissy film
 x sky print
 compare sky print with polaroids
+go to motel
+take rig
+go to town edge
+nw
+down
+look
+x hatch
+read number
+unlock hatch with keyring
+x hatch
+down
+look
+x stencil
+touch stencil
+x ladder
+x return b
+touch return b
+x doors
+pry doors with chair leg
+listen
+smell
+yell
+x stair door
+down
+look
+x console
+search console
+log in
+admin
+admin-password
+look
+x inner door
+open well door
+x well door
+e
+restart encounter
+look
+log in
+admin
+admin-password
+n
+look
+x terminal
+read list
+read records
+x cabinet
+search index for jules
+wake jules
+wake jules
+x tray
+take half page
+read half page
+put notebook in locker
+take notebook from locker
+put notebook in locker
+put half page in locker
+put sky print in locker
+put usb in locker
+create subject
+-
+investigator
+intentionally blank
+main st / top floor rear
+headache
+hat, lamp, terminal, page, chair
+yes
+look
+pull chain
+look
+turn on terminal
+login terminal
+admin
+admin-password
 version

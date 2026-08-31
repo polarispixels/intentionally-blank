@@ -109,25 +109,52 @@ describe('assemble', () => {
 // surviving boundary. This test's own title was never updated to say so;
 // see the E-3 update below for the honest count.
 //
-// UPDATED (Stage E, E-3 — ADR 0012 item 7, boundary retirement part 1): the
-// count is now exactly **one**. Canon 92 (v0.15's Addenda prose) made the
-// highway fully in-world — the road north/south was never actually the
-// edge of built content, just a real thirty-two-mile walk the narrator
-// refuses — so its shared gate object is renamed off the `*_boundary_gate`
-// pattern entirely (`TOWN_EDGE_BOUNDARY_GATE` → `HIGHWAY_GATE` /
-// `act1_highway_gate`, `act1/ids.ts`), and its two exits (Town Edge `north`,
-// the Emporium's own `south`) stop matching this test's own regex. The
-// Hub's well is the only `system.buildBoundary` gate left; E3 (v0.19.0)
-// retires it too, taking this count to zero (§3.4's own plan).
+// UPDATED (Stage E, E-3 part 1 — ADR 0012 item 7): the count went to
+// exactly one. Canon 92 (v0.15's Addenda prose) made the highway fully
+// in-world — the road north/south was never actually the edge of built
+// content, just a real thirty-two-mile walk the narrator refuses — so its
+// shared gate object is renamed off the `*_boundary_gate` pattern entirely
+// (`TOWN_EDGE_BOUNDARY_GATE` → `HIGHWAY_GATE` / `act1_highway_gate`,
+// `act1/ids.ts`), and its two exits (Town Edge `north`, the Emporium's own
+// `south`) stop matching this test's own regex.
+//
+// UPDATED AGAIN (Stage E, E-3 part 2 — task W, §34/§42.1): the count is now
+// **zero**, and stays zero for the rest of the game. The Hub's own
+// `s6BoundaryGate` (`ACT3_S6_BOUNDARY_GATE`) was the last `system.
+// buildBoundary` gate in the game — deleted along with `SYSTEM_BOUNDARY_
+// TEXT`/`SYSTEM_BOUNDARY_TEXT_ACT4`/`SYSTEM_BOUNDARY_TEXT_ACT4_E1`/
+// `SYSTEM_BOUNDARY_TEXT_E2`/`boundaryRules()` (`act3/objects/s6ArchiveHub.
+// ts`). The well's `down` exit is a real exit now, through `act5_well_door`,
+// gated on `act5_root_door_open` (§16.2's bolt, drawn from the inside).
 describe('system.buildBoundary', () => {
-  it('exactly one exit references a build-boundary gate — the Hub\'s well', () => {
+  it('zero exits reference a build-boundary gate — the boundary is retired (E3, §34)', () => {
     let count = 0;
     for (const room of Object.values(WORLD.rooms ?? {})) {
       for (const exit of room.exits ?? []) {
         if (exit.door && /boundary_gate/i.test(exit.door)) count++;
       }
     }
-    expect(count).toBe(1);
+    expect(count).toBe(0);
+  });
+
+  // §34's acceptance, now literal: E3 retired the last live boundary
+  // response (`act1/responses.ts`'s GO-TO generic, swapped to the shipped
+  // `VERB_DEFAULTS.move`) and deleted the dead boundary constants Act I/II
+  // still carried (`landing.ts`'s rotation, `act1/scripts.ts`, the Act II
+  // boundary script) in the same change — so no .ts file under
+  // `src/content` may contain the string again, ever (register 146).
+  it('no "END OF BUILD" string remains anywhere in src/content (§34)', () => {
+    const root = join(process.cwd(), 'src', 'content');
+    const offenders: string[] = [];
+    const walk = (dir: string): void => {
+      for (const entry of readdirSync(dir, { withFileTypes: true })) {
+        const p = join(dir, entry.name);
+        if (entry.isDirectory()) walk(p);
+        else if (entry.name.endsWith('.ts') && readFileSync(p, 'utf8').includes('END OF BUILD')) offenders.push(p);
+      }
+    };
+    walk(root);
+    expect(offenders).toEqual([]);
   });
 });
 

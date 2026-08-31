@@ -171,12 +171,55 @@ describe('validate — Act I room 1', () => {
   // reports cover) — included here only because this is a whole-`WORLD`
   // count and someone had to reconcile it for the suite to go green; not
   // this task's own module to review in depth.
-  it('produces exactly the 109 expected verb-noun-collision warnings, no others', () => {
+  // Stage E3, task V adds three more: `act5_jules_snapshot` (the Blank
+  // Room's archived-entry object, §24 — R20) is the first object anywhere
+  // in the game to declare the bare noun "jules" (every earlier instance of
+  // the word lived only inside a multi-word fixed-phrase verb — "search
+  // ledger for jules," "search rail for jules," "search queue for jules" —
+  // never as a real object noun). Adding it (required so `OPEN JULES`/`WAKE
+  // JULES` resolve at all, §42.2's own collision note) makes those same
+  // three bare verbs newly ambiguous against it. Reviewed and accepted the
+  // same way every other bare-verb collision in this list already is.
+  // Stage E3, task V also adds `act5_create_subject` (§28 — `CREATE
+  // SUBJECT`) whose word "subject" collides with the pre-existing
+  // `act1_look_up_subject`'s own noun; `act5_index_search_self` (§23.4 —
+  // "SEARCH INDEX FOR ME"/"MYSELF") whose words "index"/"me"/"myself"
+  // collide the same way `act3_ledger_self` already does for "me"/"myself";
+  // and `act5_index_search_other` (§23.4 — "SEARCH INDEX FOR JACK"/etc.)
+  // whose word "index" is new and whose eight name-words (jack, nolan,
+  // luke, sissy, whitlock, marlow, pearl, dot) each collide the same way
+  // `act3_ledger_other`'s identical roster already does ("eli" — also in
+  // that roster — does not collide, no object anywhere declares it bare).
+  // "SEARCH INDEX FOR JULES" is deliberately NOT a bare verb: it resolves
+  // through `SEARCH`'s own extended `V dobj prep iobj` pattern (`for`,
+  // `../act5/formScripts.ts`) against the index object and the snapshot
+  // object's own "jules" noun — the only name of the whole roster ever
+  // physically present in the Blank Room — costing no further collision.
+  // The other eight names have no such object to resolve against (none of
+  // those NPCs is ever in this room) and so stay bare fixed-phrase verbs,
+  // the same idiom the shipped ledger's own identical roster already uses.
+  it('produces exactly the 125 expected verb-noun-collision warnings, no others', () => {
     const warnings = validate(WORLD).filter((f) => f.severity === 'warning');
     const collisions = warnings.filter((f) => f.code === 'verb-noun-collision');
-    expect(collisions.length).toBe(109);
+    expect(collisions.length).toBe(125);
     expect(collisions.map((f) => f.message).sort()).toEqual(
       [
+        'verb "act3_ledger_jules" can be typed bare and its word "jules" is also an object/NPC noun — the single word is ambiguous between a command and a thing',
+        'verb "act3_queue_search_jules" can be typed bare and its word "jules" is also an object/NPC noun — the single word is ambiguous between a command and a thing',
+        'verb "act3_search_rail_for_jules" can be typed bare and its word "jules" is also an object/NPC noun — the single word is ambiguous between a command and a thing',
+        'verb "act5_create_subject" can be typed bare and its word "subject" is also an object/NPC noun — the single word is ambiguous between a command and a thing',
+        'verb "act5_index_search_self" can be typed bare and its word "index" is also an object/NPC noun — the single word is ambiguous between a command and a thing',
+        'verb "act5_index_search_self" can be typed bare and its word "me" is also an object/NPC noun — the single word is ambiguous between a command and a thing',
+        'verb "act5_index_search_self" can be typed bare and its word "myself" is also an object/NPC noun — the single word is ambiguous between a command and a thing',
+        'verb "act5_index_search_other" can be typed bare and its word "index" is also an object/NPC noun — the single word is ambiguous between a command and a thing',
+        'verb "act5_index_search_other" can be typed bare and its word "jack" is also an object/NPC noun — the single word is ambiguous between a command and a thing',
+        'verb "act5_index_search_other" can be typed bare and its word "nolan" is also an object/NPC noun — the single word is ambiguous between a command and a thing',
+        'verb "act5_index_search_other" can be typed bare and its word "luke" is also an object/NPC noun — the single word is ambiguous between a command and a thing',
+        'verb "act5_index_search_other" can be typed bare and its word "sissy" is also an object/NPC noun — the single word is ambiguous between a command and a thing',
+        'verb "act5_index_search_other" can be typed bare and its word "whitlock" is also an object/NPC noun — the single word is ambiguous between a command and a thing',
+        'verb "act5_index_search_other" can be typed bare and its word "marlow" is also an object/NPC noun — the single word is ambiguous between a command and a thing',
+        'verb "act5_index_search_other" can be typed bare and its word "pearl" is also an object/NPC noun — the single word is ambiguous between a command and a thing',
+        'verb "act5_index_search_other" can be typed bare and its word "dot" is also an object/NPC noun — the single word is ambiguous between a command and a thing',
         "verb \"act1_check_date\" can be typed bare and its word \"date\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act1_eat\" can be typed bare and its word \"order\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act1_eat_pie\" can be typed bare and its word \"pie\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
@@ -369,9 +412,16 @@ describe('validate — Act I room 1', () => {
   // (three concurrent tasks) adds 14 more verb-noun collisions (see that
   // test above) and 1 more `room-description-mentions-portable`
   // (`act3_lobby`/"brochures", task B): 44 + 14 + 1 = 59.
-  it('produces exactly 118 warnings total, no others', () => {
+  // Stage E3, task V: 118 + 16 (verb-noun, "jules" ×3, "subject", "index"
+  // ×2, "me", "myself", and the eight-name roster — above) + 1
+  // (`meta-recursive-ending-unreferenced`, expected the moment
+  // `act1/slice.ts`'s `meta.recursiveEnding` names `act5_recursion`: the
+  // `{ end }` effect that satisfies it lives inside a `ScriptFn`
+  // (`act5Recursion`), invisible to `validate.ts`'s static declared-effects
+  // walk by that check's own documented design) = 135.
+  it('produces exactly 135 warnings total, no others', () => {
     const warnings = validate(WORLD).filter((f) => f.severity === 'warning');
-    expect(warnings.length).toBe(118);
+    expect(warnings.length).toBe(135);
   });
 });
 

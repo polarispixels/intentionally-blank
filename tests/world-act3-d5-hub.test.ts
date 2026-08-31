@@ -278,8 +278,12 @@ describe('the gate frames and the boundary — ENTER GATE', () => {
   });
 });
 
+// E3 task W (§34/§42.1) — the boundary is retired: DOWN before the well
+// door is opened from the inside prints the shipped `ROOT_DOOR_DOWN_TEXT`
+// alone, with no `system.buildBoundary` paragraph appended, and the exit
+// stays blocked (the player stays at the Hub) until `act5_root_door_open`.
 describe('the root door and the boundary — DOWN', () => {
-  it('examine/knock/badge/listen, then DOWN prints the in-world line and the system line', () => {
+  it('examine/knock/badge/listen, then DOWN prints the in-world line alone — no boundary text remains (§34)', () => {
     const store = new MemoryStore();
     let session = loggedInAtHub({ objects: { [ACT2_NOLAN_BADGE]: { location: 'inventory' } } });
 
@@ -293,8 +297,8 @@ describe('the root door and the boundary — DOWN', () => {
     const { session: after, events } = say(session, 'down', store);
     const rendered = text(events);
     expect(rendered).toMatch(/gives you nothing back/);
-    expect(rendered).toMatch(/END OF BUILD/);
-    expect(rendered).toMatch(/Act III ends here/);
+    expect(rendered).not.toMatch(/END OF BUILD/);
+    expect(rendered).not.toMatch(/Act III ends here/);
     expect(after.state.location).toBe(ACT3_S6_ARCHIVE_HUB);
   });
 });

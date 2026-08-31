@@ -30,6 +30,18 @@ import { chaseBottomDropDownText, chaseBottomLookDownText, s6PadEffects, s6Stair
 import { ACT4_LUKE, ACT4_S5_DOWN_GATE } from '../act4/ids';
 import { V_ACT4_LISTEN_DOWN } from './ids';
 import { chaseBottomListenText } from './objects/s5ReactorInterface';
+// E3 task U, §9/§42.4 — the stair door's own far side, into the Root
+// Shaft. No `dir` (this room's own `down` — `downExit`, below — is already
+// claimed by the shipped Pipe Chase route, and `move.ts`'s own direction
+// traversal only ever finds the FIRST exit declared with a given `dir`
+// regardless of its own `when`/`door` gate, so a second `dir: 'down'` entry
+// here would either break the shipped route or never be reachable itself;
+// `ExitDefSlice.dir` is documented optional for exactly this "GO TO/door-
+// only" case). Reached by naming the door (`ENTER STAIR DOOR`/`USE STAIR
+// DOOR`, `move.ts`'s `traverseDoor`) or by `GO TO`. `s6StairText` (already
+// imported above for the shipped `downExit`'s own `blockedText`) is reused
+// as this exit's `travelText`, unedited — E1's own text, not rewritten.
+import { ACT5_ROOT_SHAFT, ACT5_STAIR_DOOR } from '../act5/ids';
 
 // ---------------------------------------------------------------------------
 // §9.1 — description. Rule 1 is gated on `act3_s5_seen` (set by `onEnter`,
@@ -99,6 +111,9 @@ const onEnter: OnEnterRule[] = [
 // into the same Sublevel 6, so nothing is actually lost by closing this one.
 const upExit: ExitDefSlice = { dir: 'up', to: ACT3_S1_MECHANICAL_GALLERY, minutes: 5 };
 const downExit: ExitDefSlice = { dir: 'down', to: ACT3_PIPE_CHASE, minutes: 1, door: ACT4_S5_DOWN_GATE, blockedText: s6StairText };
+// E3 task U, §9/§42.4 — see this file's own import note above for why this
+// exit declares no `dir`.
+const stairDoorExit: ExitDefSlice = { to: ACT5_ROOT_SHAFT, door: ACT5_STAIR_DOOR, travelText: s6StairText };
 
 // ---------------------------------------------------------------------------
 // §9.10 — room-level senses with no dobj of their own.
@@ -118,7 +133,7 @@ export const s5ReactorInterfaceRoom: RoomDefSlice = {
   aliases: ['s5', 'reactor interface', 'reactor', 'gallery'],
   description,
   onEnter,
-  exits: [upExit, downExit],
+  exits: [upExit, downExit, stairDoorExit],
   handlers: [
   // v0.17.0 — §4.2's LISTEN DOWN, room-answered (see objects file's note).
   { verbs: [V_ACT4_LISTEN_DOWN], effects: [{ say: chaseBottomListenText }] },

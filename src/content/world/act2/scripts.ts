@@ -6,7 +6,7 @@
 //
 // D2-C amendment (Stage D plan §2 D2 §23, §29.1; D2 prose doc §23) —
 // "D1's `DRIVE TO PLANT` boundary text is superseded by §23's; the single
-// END OF BUILD emission moves to §23's two doors" (this task's own
+// boundary emission moves to §23's two doors" (this task's own
 // briefing). Both the in-world truck line AND the system line below are
 // replaced with §23's own text (final prose, not a placeholder); the
 // script itself (`act2Boundary`) is unchanged — both doors call the same
@@ -17,22 +17,11 @@
 import type { Effect } from '../../../engine/effects';
 import type { ScriptId } from '../../../engine/ids';
 import type { ScriptFn } from '../../../engine/world';
-import { ACT2_BOUNDARY_SCRIPT, ACT2_TRAVEL_SCRIPT } from './ids';
+import { ACT2_TRAVEL_SCRIPT } from './ids';
 
-export { ACT2_BOUNDARY_SCRIPT };
-
-// §23 — "the system line, both cases."
-const ACT2_BOUNDARY_TEXT =
-  'END OF BUILD\n\nAct II continues past this point. The fence, the gatehouse, and what a\nborrowed badge opens are not in this version.';
-
-const act2Boundary: ScriptFn = (_world, state) => ({
-  state,
-  events: [{ type: 'line', kind: 'system', text: ACT2_BOUNDARY_TEXT }],
-});
-
-export const ACT2_D1_SCRIPTS: Record<ScriptId, ScriptFn> = {
-  [ACT2_BOUNDARY_SCRIPT]: act2Boundary,
-};
+// The D1 boundary system line was retired in E3 (register 146) — the table
+// survives empty so `act2/index.ts`'s spread needs no change.
+export const ACT2_D1_SCRIPTS: Record<ScriptId, ScriptFn> = {};
 
 // ---------------------------------------------------------------------------
 // §23's first door — "DRIVE TO PLANT"/"RIDE TO PLANT" from the motel or

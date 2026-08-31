@@ -48,11 +48,11 @@ import { NOLANS_YARD_OBJECTS } from './objects/nolansYard';
 // wired in as a mechanical completion (this task's report), not new
 // authoring: the export already existed, ready, under its own file.
 import { CLOSE_OUT_OBJECTS } from './objects/closeOut';
-import { ACT1_WAVE5_SCRIPTS } from './scripts';
 import { ACT1_RESPONSES } from './responses';
 import { yourRoom } from './room';
 import { ACT1_VERBS } from './verbs';
 import { COUNTY_LIBRARY, FRONT_DESK, GENERAL_STORE, JACK, JACKS_MOTEL, LANDING, MAIN_STREET, MARLOW, NOLANS_YARD, PEARL, POST_OFFICE, SHERIFF_OFFICE, SUNDOWN_DINER, TOWN_EDGE, WHITLOCK, YOUR_ROOM } from './ids';
+import { ACT5_ENDING_ID } from '../act5/ids';
 
 export const ACT1_SLICE: WorldDef = {
   meta: {
@@ -69,6 +69,9 @@ export const ACT1_SLICE: WorldDef = {
     // so this only fixes what the clock itself reports, not anything
     // player-visible.
     startClock: { day: 1, minute: 260 },
+    // E3 (ADR 0012; register 137): the one ending id the session treats as
+    // the recursive hand-off into a fresh game's opening render.
+    recursiveEnding: ACT5_ENDING_ID,
   },
   flags: ACT1_FLAGS,
   rooms: {
@@ -107,5 +110,5 @@ export const ACT1_SLICE: WorldDef = {
   questions: ACT1_QUESTIONS,
   puzzles: ACT1_PUZZLES,
   responses: { ...RESPONSES, ...ACT1_RESPONSES },
-  scripts: { ...RESTART_SCRIPTS, ...ACT1_WAVE5_SCRIPTS },
+  scripts: { ...RESTART_SCRIPTS },
 };

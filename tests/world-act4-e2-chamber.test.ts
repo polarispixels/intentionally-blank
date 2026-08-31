@@ -393,15 +393,21 @@ describe('§24 — COMPARE PRINT WITH ROOM', () => {
   });
 });
 
-describe('the boundary — the fourth arm (§48)', () => {
-  it('renders on the well\'s down, once a lit frame has been used, above the earlier arms', () => {
+// E3 task W (§34/§42.1) retired the boundary this arm belonged to —
+// `SYSTEM_BOUNDARY_TEXT_E2` and `boundaryRules()`'s fourth arm are deleted.
+// The well's `down` exit, even once a lit frame has been used, now prints
+// only the shipped `ROOT_DOOR_DOWN_TEXT` and stays blocked until
+// `act5_root_door_open` (§16.2) — no arm renders any more.
+describe('the boundary — the fourth arm, retired (E3 §34)', () => {
+  it('no boundary text on the well\'s down, even once a lit frame has been used', () => {
     const store = new MemoryStore();
     const { session } = inChamber({ clues: [ACT3_CLUE_ROOT_REFUSES] });
     const { session: atHub } = enter(session, ACT3_S6_ARCHIVE_HUB);
     const { events } = say(atHub, 'down', store);
     const rendered = text(events);
-    expect(rendered).toMatch(/END OF BUILD/);
-    expect(rendered).toMatch(/the two frames that are lit, is this one/);
+    expect(rendered).toMatch(/gives you nothing back/);
+    expect(rendered).not.toMatch(/END OF BUILD/);
+    expect(rendered).not.toMatch(/the two frames that are lit, is this one/);
   });
 });
 

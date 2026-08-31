@@ -74,7 +74,7 @@ const sidewaysEffects: Effect[] = [{ goto: ACT3_S5_REACTOR_INTERFACE }, { advanc
 // §13/§39.1 (D5) — the boundary is RETIRED here. `DOWN` is now a real exit
 // to the S6 Maintenance Bay, 1 minute, D4's own in-world descent paragraph
 // kept VERBATIM as the `travelText` (hard rule 5); the system line that
-// followed it ("END OF BUILD... Sublevel 6 is not in this version.") is
+// followed it (the boundary line: "Sublevel 6 is not in this version.") is
 // deleted in this same change, along with the never-open
 // `ACT3_BOUNDARY_GATE` gate on this exit — the wave's one surviving
 // boundary now lives at the Archive Hub instead (D5 prose doc §31, task

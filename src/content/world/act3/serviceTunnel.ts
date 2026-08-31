@@ -25,6 +25,13 @@ import {
   ACT3_TUNNEL_MOUTH,
   ACT3_WALKED_TUNNEL,
 } from './ids';
+// E3 task U, §3/§42.4 — the branch hatch's own `down` exit. `ACT5_BRANCH_
+// HATCH`/`ACT5_ROOT_SHAFT` only (not `objects/serviceTunnel.ts`'s own
+// exports — that file already imports `CLIMB_BACK_TEXT` from this one, and
+// importing back from it here would be a cycle); the locked-state EXAMINE
+// text is duplicated verbatim as this exit's own `blockedText` rather than
+// shared by import, same reason.
+import { ACT5_BRANCH_HATCH, ACT5_ROOT_SHAFT } from '../act5/ids';
 
 /**
  * §6's own `dark` Cond — no position flag in it (register 90): being in
@@ -87,6 +94,10 @@ const onEnter: OnEnterRule[] = [
 export const CLIMB_BACK_TEXT =
   'The mile again, the other way, with the air on your face this time instead of\nyour back.\n\nThe rectangle of night is where it was.';
 
+/** §3.1's own EXAMINE text, duplicated verbatim — see this file's own import header note on why it isn't shared by import. */
+const BRANCH_HATCH_DOWN_BLOCKED_TEXT =
+  'Twenty feet short of the plug, low down in the left-hand wall, there is a steel\nhatch about the size of a hearth, set into the pour with a rolled lip and four\ncountersunk bolts that have never been out of it.\n\nNo handle. A squared hole in the middle of the plate, and above the hole,\nstruck into the steel one blow to a digit by somebody working at an awkward\nangle:\n\n    4471\n\nThe rails run past it. Everything down here runs past it.';
+
 export const serviceTunnelRoom: RoomDefSlice = {
   name: 'Service Tunnel',
   area: 'act3',
@@ -99,6 +110,11 @@ export const serviceTunnelRoom: RoomDefSlice = {
     { dir: 'out', to: ACT3_TUNNEL_MOUTH, minutes: 25, travelText: CLIMB_BACK_TEXT },
     { dir: 's', to: ACT3_TUNNEL_MOUTH, minutes: 25, travelText: CLIMB_BACK_TEXT },
     { dir: 'n', to: ACT3_S1_MECHANICAL_GALLERY, when: { flag: ACT3_CONSTRUCTION_DOOR_OPEN } },
+    // E3 task U, §3/§42.4 — the branch hatch's own `down`, gated through the
+    // hatch's `container.open` state (`objects/serviceTunnel.ts`), so a
+    // player who tries it before unlocking gets the hatch's own locked-state
+    // EXAMINE text rather than the generic "no exit that way" family.
+    { dir: 'down', to: ACT5_ROOT_SHAFT, door: ACT5_BRANCH_HATCH, minutes: 15, blockedText: BRANCH_HATCH_DOWN_BLOCKED_TEXT },
   ],
 };
 

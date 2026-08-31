@@ -68,7 +68,6 @@ import {
   ACT3_QUEUE,
   ACT3_ROOT_DOOR,
   ACT3_S6_ARCHIVE_HUB,
-  ACT3_S6_BOUNDARY_GATE,
 } from '../ids';
 // E0 task K (§16-§18, §22, §31) — the numeral search, R13's own object, and
 // the Act IV boundary variant. `act4_profile` is namespaced `act4_*` per
@@ -76,13 +75,19 @@ import {
 // here (the plan's own note on the evidence bag applies identically).
 import { ACT4_CLUE_FILED_UNDER_ONE, ACT4_NUMERAL_SEARCHED, ACT4_PROFILE, ACT4_PROFILE_SCREEN_SCRIPT, ACT4_STARTED, V_ACT4_SELECT } from '../../act4/ids';
 // E1 task M (`docs/superpowers/specs/2026-09-18-stage-e1-prose.md` §22,
-// §29, §37.1) — R16, the reader at the bottom of the well, and the
-// boundary's third arm.
-import { ACT4_LUKE, ACT4_LUKE_AT_ROOT, ACT4_LUKE_MET } from '../../act4/ids';
+// §29, §37.1) — R16, the reader at the bottom of the well.
+import { ACT4_LUKE, ACT4_LUKE_AT_ROOT } from '../../act4/ids';
 import { ACT4_LUKE_AT_ROOT_EFFECTS } from '../../act4/luke';
-// E2 task O (`docs/superpowers/specs/2026-09-19-stage-e2-prose.md` §3, §48)
-// — the boundary's fourth arm, gated on either lit frame having been used.
-import { ACT4_ESCAPE_CHAMBER, ACT4_HAB_GALLEY } from '../../act4/ids';
+// E3 task W (`docs/superpowers/specs/2026-09-20-stage-e3-prose.md` §16,
+// §34, §42.1) — the well door opened from the inside, and the boundary's
+// deletion: the four `SYSTEM_BOUNDARY_TEXT*` constants, `boundaryRules()`,
+// `ROOT_DOOR_DOWN_BOUNDARY_TEXT` and `s6BoundaryGate` are gone (with them,
+// `ACT4_LUKE_MET`/`ACT4_ESCAPE_CHAMBER`/`ACT4_HAB_GALLEY`, which existed
+// only to select among those four arms). The root door gains one rule
+// above its shipped handlers instead, `{ flag: act5_root_door_open }`,
+// reusing the well door's own §16.3 text.
+import { ACT5_ROOT_DOOR_OPEN } from '../../act5/ids';
+import { ACT5_WELL_DOOR_OPEN_TEXT } from '../../act5/wellDoor';
 
 // ---------------------------------------------------------------------------
 // §22 — the terminal. `portable: false`.
@@ -360,40 +365,6 @@ const GATE_READ_LEGENDS_TEXT =
 export const GATE_ENTER_TEXT =
   'You put a hand on the edge of the frame, and then a foot over the sill, and the\nfloor on the other side of it is a floor.';
 
-/** §31.3 — the one system line, both entry points (§36 q10). Concatenated onto the in-world text below, same "content-only approximation" idiom `pipeChase.ts`'s own `CHASE_BOUNDARY_TEXT` uses (a `blockedText`/`say` always renders `kind: 'prose'`, never `kind: 'system'` — `effects.ts`). */
-const SYSTEM_BOUNDARY_TEXT =
-  'END OF BUILD\n\nAct III ends here. What is through the frames, and what is under the door at\nthe end of this room, are the next version.';
-
-// E0 task K — §22, the Act IV boundary line, confirmed at §28 q7: names no
-// act, replaces canon 88's line for `act4_started` saves only.
-const SYSTEM_BOUNDARY_TEXT_ACT4 =
-  'END OF BUILD\n\nThe frames, and the door at the bottom of the well, are later versions. The\nstreet, the sheriff, the ledger and the man who is coming are this one.';
-
-// E1 task M — §29, the E1 line: a THIRD arm, above E0's, gated
-// `act4_luke_met`. Deleted with its gate in E3 (§29's own note).
-const SYSTEM_BOUNDARY_TEXT_ACT4_E1 =
-  'END OF BUILD\n\nThe frames, and the door at the bottom of the well, are later versions. The\nstair behind the door on Sublevel 5 is this one.';
-
-// E2 task O — §48, the last `system.buildBoundary` in the game: a FOURTH
-// arm, above E1's, gated on either frame having been used. Deleted with the
-// gate in E3 along with the other three (§48's own note).
-const SYSTEM_BOUNDARY_TEXT_E2 =
-  'END OF BUILD\n\nThe door at the bottom of the well is the next version. Everything above it, and\neverything through the two frames that are lit, is this one.';
-
-/**
- * Both entry points share this selection — the in-world sentence is
- * unchanged; only the system line following it is gated. Four arms, in
- * order (§48, §29, §37.1): a frame used (E2), then `act4_luke_met` (E1),
- * then `act4_started` (E0, still rendering for a player who has started Act
- * IV and not yet met him), then canon 88's shipped Act III line.
- */
-const boundaryRules = (inWorldText: string): ProseRule[] => [
-  { when: { any: [{ visited: ACT4_ESCAPE_CHAMBER }, { visited: ACT4_HAB_GALLEY }] }, text: `${inWorldText}\n\n${SYSTEM_BOUNDARY_TEXT_E2}` },
-  { when: { flag: ACT4_LUKE_MET }, text: `${inWorldText}\n\n${SYSTEM_BOUNDARY_TEXT_ACT4_E1}` },
-  { when: { flag: ACT4_STARTED }, text: `${inWorldText}\n\n${SYSTEM_BOUNDARY_TEXT_ACT4}` },
-  { text: `${inWorldText}\n\n${SYSTEM_BOUNDARY_TEXT}` },
-];
-
 // E2 task O — §3.1/§3.4: the class object's `IN` handler stops being a
 // boundary (the "IN entry point is gone," §56.1) and becomes this instead.
 // §3.1's own text is unconditional prose, not an engine clarify (that
@@ -473,10 +444,12 @@ const ROOT_DOOR_LISTEN_TEXT =
 const ROOT_DOOR_WELL_TEXT =
   'A drain in the bottom of a well at the foot of a door, in a room five floors\nunder the ground, in a building that has never once been flooded and does not\nsit on anything that could flood it.\n\nThe tiling in the well is newer than the tiling in the bay, and it is the same\ntile.';
 
-const ROOT_DOOR_DOWN_TEXT =
+// E3 task W — §34's own note: this is the well's `down` exit `blockedText`
+// now (`../s6ArchiveHub.ts`'s room file), unchanged, with nothing appended
+// — the `system.buildBoundary` paragraph that used to follow it is deleted,
+// not replaced.
+export const ROOT_DOOR_DOWN_TEXT =
   "Three steps, and a door that takes your knuckles and gives you nothing back,\nand behind it a level of a building that is not on any drawing anybody has ever\nshown you, with the whole of the county's water going through it.";
-
-export const ROOT_DOOR_DOWN_BOUNDARY_TEXT: ProseRule[] = boundaryRules(ROOT_DOOR_DOWN_TEXT);
 
 // §28's four refusals (badge/terminal/knock/push-pull-pry/listen) each
 // grant the clue the first time any one of them is tried — idempotent
@@ -491,6 +464,14 @@ export const ROOT_DOOR_DOWN_BOUNDARY_TEXT: ProseRule[] = boundaryRules(ROOT_DOOR
 const lukeAtRootWhen: Cond = { all: [{ npcAt: [ACT4_LUKE, ACT3_S6_ARCHIVE_HUB] }, { not: { flag: ACT4_LUKE_AT_ROOT } }] };
 
 const rootDoorHandlers: HandlerDef[] = [
+  // E3 task W — §16.3/§42.1: one rule above every shipped handler, gated on
+  // `act5_root_door_open` (the well door's own bolt, drawn from the
+  // antechamber side). EXAMINE/OPEN/USE all render the well door's own
+  // §16.3 text (`../../act5/wellDoor.ts`) — OPEN is a no-op once the door
+  // is open, same idiom `act5_well_door`'s own object uses for its second
+  // side. Every rule below is unedited and only ever reached while this
+  // flag is unset.
+  { verbs: [EXAMINE, OPEN, USE_VERB_ID], when: { flag: ACT5_ROOT_DOOR_OPEN }, effects: [{ say: ACT5_WELL_DOOR_OPEN_TEXT }] },
   { verbs: [EXAMINE], effects: [{ say: ROOT_DOOR_EXAMINE_TEXT }] },
   { verbs: [OPEN, UNLOCK, USE_VERB_ID], when: lukeAtRootWhen, effects: ACT4_LUKE_AT_ROOT_EFFECTS },
   { verbs: [OPEN, UNLOCK], effects: [{ say: ROOT_DOOR_TERMINAL_ANSWERS_TEXT }, { grantClue: ACT3_CLUE_ROOT_REFUSES }] },
@@ -512,11 +493,6 @@ export const rootDoor: ObjectDefSlice = {
   nouns: ['door', 'root door', 'heavy door', 'well', 'steps', 'stair', 'bottom', 'reader', 'well drain'],
   handlers: rootDoorHandlers,
 };
-
-// §31 — the boundary's own gate object, referenced only by the well's
-// `down` exit (`../s6ArchiveHub.ts`). Never opens (no `container`) — same
-// minimal stub idiom `objects/coolingPlant.ts`'s own `boundaryGate` uses.
-export const s6BoundaryGate: ObjectDefSlice = { location: ACT3_S6_ARCHIVE_HUB };
 
 // ---------------------------------------------------------------------------
 // §28.2 — `USE BADGE`/`SHOW BADGE TO READER` at the root door, amending
@@ -608,7 +584,9 @@ export const act4Profile: ObjectDefSlice = {
 
 // ---------------------------------------------------------------------------
 // Export map (§21 — the Hub's own six objects, plus the terminal's screen
-// sub-part and the boundary's one gate object).
+// sub-part). E3 task W — the boundary's own gate object (`s6BoundaryGate`)
+// is deleted along with the rest of §34; the well's `down` exit takes
+// `act5_well_door` instead (`../s6ArchiveHub.ts`'s room file).
 // ---------------------------------------------------------------------------
 
 export const ACT3_S6_ARCHIVE_HUB_OBJECTS: Record<string, ObjectDefSlice> = {
@@ -619,5 +597,4 @@ export const ACT3_S6_ARCHIVE_HUB_OBJECTS: Record<string, ObjectDefSlice> = {
   [ACT3_QUEUE]: queue,
   [ACT3_GATE_FRAMES]: gateFrames,
   [ACT3_ROOT_DOOR]: rootDoor,
-  [ACT3_S6_BOUNDARY_GATE]: s6BoundaryGate,
 };

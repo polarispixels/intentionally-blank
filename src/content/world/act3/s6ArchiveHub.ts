@@ -23,13 +23,11 @@ import { V_TYPE_TERMINAL } from '../act1/ids';
 import { ACT4_LUKE, ACT4_LUKE_AT_ROOT } from '../act4/ids';
 import { ACT4_LUKE_AT_ROOT_EFFECTS } from '../act4/luke';
 import {
-  ACT3_CLUE_ROOT_REFUSES,
   ACT3_HUB_LOGGED_IN,
   ACT3_HUB_LOGIN_OPEN_SCRIPT,
   ACT3_HUB_SEEN,
   ACT3_LEDGER_SEARCH_OPEN_SCRIPT,
   ACT3_S6_ARCHIVE_HUB,
-  ACT3_S6_BOUNDARY_GATE,
   ACT3_S6_MAINTENANCE_BAY,
   V_ACT3_GRAPH_AXIS,
   V_ACT3_LEDGER_JULES,
@@ -52,9 +50,15 @@ import {
   LEDGER_SELF_EFFECTS,
   QUEUE_EDIT_REFUSED_TEXT,
   QUEUE_SEARCH_JULES_TEXT,
-  ROOT_DOOR_DOWN_BOUNDARY_TEXT,
+  ROOT_DOOR_DOWN_TEXT,
   TERMINAL_ALREADY_LOGGED_IN_TEXT,
 } from './objects/s6ArchiveHub';
+// E3 task W (§16, §34, §42.1, §42.4) — the boundary's deletion: the well's
+// `down` exit takes `act5_well_door` instead of the deleted
+// `act3_s6_boundary_gate`, gated on the door having been opened from the
+// inside. `ROOT_DOOR_DOWN_TEXT` (above) is its `blockedText`, unchanged,
+// with nothing appended (§34's own note).
+import { ACT5_ROOT_ANTECHAMBER, ACT5_WELL_DOOR } from '../act5/ids';
 // E0 task K (§16, §31.2) — the ledger's two numeral fixed phrases.
 import { ACT4_STARTED, V_ACT4_LEDGER_FOUR, V_ACT4_LEDGER_ONE } from '../act4/ids';
 // E2 task O (`docs/superpowers/specs/2026-09-19-stage-e2-prose.md` §56.1,
@@ -205,11 +209,20 @@ export const s6ArchiveHubRoom: RoomDefSlice = {
   onEnter,
   exits: [
     { dir: 'w', to: ACT3_S6_MAINTENANCE_BAY, minutes: 1 },
-    // §31.2 — the boundary's second entry point. Never open (no
-    // `container` on the gate object), gated on the root door's own
-    // refusal clue, self-looped (the player stays in the Hub). Same "one
-    // system.buildBoundary" idiom `pipeChase.ts`'s own `down` exit uses.
-    { dir: 'down', to: ACT3_S6_ARCHIVE_HUB, door: ACT3_S6_BOUNDARY_GATE, when: { clue: ACT3_CLUE_ROOT_REFUSES }, blockedText: ROOT_DOOR_DOWN_BOUNDARY_TEXT },
+    // E3 task W — §34/§42.1/§42.4: the boundary is deleted. The well's
+    // `down` exit is now a real exit to the antechamber, through
+    // `act5_well_door`, gated on the door having been opened from the
+    // inside (§16.2, permanent, two-way). `blockedText` is the shipped
+    // `ROOT_DOOR_DOWN_TEXT` alone — no `system.buildBoundary` paragraph
+    // follows it any more. Deliberately NO `when` here — `door:
+    // act5_well_door` alone is the gate (`move.ts`'s `exitIsOpen` reads the
+    // door object's own `container.open` state, which `wellDoor.ts`'s OPEN
+    // handler sets); an exit `when` means something different in this
+    // engine ("does this exit exist at all" — `exitCurrentlyExists`, the
+    // generic no-exit family, never `blockedText`) and would have hidden
+    // this blockedText behind the wrong refusal entirely. See `wellDoor.ts`'s
+    // own header for the fuller account (flagged in this task's report).
+    { dir: 'down', to: ACT5_ROOT_ANTECHAMBER, door: ACT5_WELL_DOOR, blockedText: ROOT_DOOR_DOWN_TEXT },
     // E2 task O — §56.1/§56.4. Never open (the stub gate objects have no
     // `container`); real traversal is each frame's own `IN` handler
     // (`objects/escapeChamber.ts`'s `gateEscape`/`gateHab`). The map/`GO TO`

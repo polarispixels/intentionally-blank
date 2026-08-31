@@ -22,28 +22,26 @@ import { ACT2_CENSOR_PROMPT_SCRIPTS } from '../src/content/world/act2/index';
 import { ACT3_HUB_PROMPT_SCRIPTS } from '../src/content/world/act3/index';
 import { ACT3_HUB_LOGIN_PROMPT_ID } from '../src/content/world/act3/ids';
 import { ACT4_PROMPT_SCRIPTS } from '../src/content/world/act4/index';
+import { ACT5_PROMPT_SCRIPTS } from '../src/content/world/act5/index';
+import { ACT5_ANTE_LOGIN_PROMPT_ID, ACT5_OPENING_LOGIN_PROMPT_ID } from '../src/content/world/act5/ids';
 
 /**
  * Every slice's own prompt→script table, in the same order `game.ts`
- * spreads them. E0–E3 add `ACT4_PROMPT_SCRIPTS`/`ACT5_PROMPT_SCRIPTS` to
- * both this array and `game.ts`'s own spread in the same change (`game.ts`'s
- * own header comment on `PROMPT_SCRIPTS` says so) — until then this list is
- * exactly `game.ts`'s.
+ * spreads them.
  */
-const PROMPT_SCRIPT_TABLES: Record<string, unknown>[] = [ACT2_CENSOR_PROMPT_SCRIPTS, ACT3_HUB_PROMPT_SCRIPTS, ACT4_PROMPT_SCRIPTS];
+const PROMPT_SCRIPT_TABLES: Record<string, unknown>[] = [ACT2_CENSOR_PROMPT_SCRIPTS, ACT3_HUB_PROMPT_SCRIPTS, ACT4_PROMPT_SCRIPTS, ACT5_PROMPT_SCRIPTS];
 
 /**
- * THE_THREE_LOGINS — plan §3.5's own naming. Only the Hub's login exists
- * yet (`ACT3_HUB_LOGIN_PROMPT_ID`, shipped v0.12.0); the opening terminal's
- * and the antechamber's are E3 content (`act5_opening_login`/
- * `act5_ante_login` in the plan's own prose — each becomes a real prompt id
- * in `act5/ids.ts` when E3 wires it). **E3's builder pushes both new prompt
- * ids onto this array in the same change that declares them** — this is the
- * one list "the three logins are still distinct" gets asserted against, not
- * a fresh one, so a shared id is caught here even if nothing else in the
- * suite happens to render both stations against the same fixture.
+ * THE_THREE_LOGINS — plan §3.5's own naming, finally true: the Hub's login
+ * (shipped, `ACT3_HUB_LOGIN_PROMPT_ID`), the antechamber's (`act5_ante_
+ * login`, task V), and the opening terminal's (`act5_opening_login`, task
+ * W) — three prompt ids sharing the same credentials and nothing else. This
+ * is the one list "the three logins are still distinct" gets asserted
+ * against, not a fresh one, so a shared id is caught here even if nothing
+ * else in the suite happens to render all three stations against the same
+ * fixture.
  */
-const THE_THREE_LOGINS: string[] = [ACT3_HUB_LOGIN_PROMPT_ID];
+const THE_THREE_LOGINS: string[] = [ACT3_HUB_LOGIN_PROMPT_ID, ACT5_ANTE_LOGIN_PROMPT_ID, ACT5_OPENING_LOGIN_PROMPT_ID];
 
 describe('prompt ids — no id registered twice (Stage E, E-5)', () => {
   it('no prompt id is contributed by more than one slice', () => {

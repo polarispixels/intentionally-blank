@@ -56,6 +56,7 @@ import {
   EVENT_ACT3_EV_SPOTTED_HUB,
   EVENT_ACT3_EV_SPOTTED_S5,
 } from './ids';
+import { ACT5_RECONCILIATION_RUNNING } from '../act5/ids';
 
 // ---------------------------------------------------------------------------
 // §18.1-18.4 — the four spotted events. `when`, per §18's own header:
@@ -88,7 +89,7 @@ const HUB_BEAT_3 = 'You go back through the door into the rows, and the last of 
 
 export const ACT3_EV_SPOTTED_HUB_EVENT: EventDef = {
   id: EVENT_ACT3_EV_SPOTTED_HUB,
-  when: { all: [{ at: ACT3_S6_ARCHIVE_HUB }, { npcAt: [ACT2_CUSTODIAN, ACT3_S6_ARCHIVE_HUB] }, { not: { flag: ACT3_WEARING_COVERALLS } }] },
+  when: { all: [{ at: ACT3_S6_ARCHIVE_HUB }, { npcAt: [ACT2_CUSTODIAN, ACT3_S6_ARCHIVE_HUB] }, { not: { flag: ACT3_WEARING_COVERALLS } }, { not: { flag: ACT5_RECONCILIATION_RUNNING } }] },
   once: false,
   effects: [{ say: HUB_BEAT_1 }, { say: HUB_BEAT_2 }, { say: HUB_BEAT_3 }, { goto: ACT3_S6_MAINTENANCE_BAY }, ...ALERTNESS_STEP],
 };
@@ -137,6 +138,9 @@ export const ACT3_EV_PASSED_EVENT: EventDef = {
         ],
       },
       { flag: ACT3_WEARING_COVERALLS },
+      // E3 §18 — "the coveralls do not help": once the reconciliation is
+      // running, no passing beat either; act5_ev_reacquire owns the floor.
+      { not: { flag: ACT5_RECONCILIATION_RUNNING } },
     ],
   },
   once: true,

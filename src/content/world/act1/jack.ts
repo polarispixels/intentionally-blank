@@ -160,6 +160,10 @@ import { ACT2_DAD_BOOTED, ACT2_HAS_AUDIT, ACT2_JACK_AWAY, ACT2_LETTER_OUT, ACT2_
 // cycle either way.
 import { ACT3_JACK_TOPIC_FENCE, ACT3_JACK_WILL_RAM, ACT3_PERIMETER_ROAD, ACT3_TUNNEL_MOUTH } from '../act3/ids';
 import { ACT4_CLUE_LETTERS_FROM_JACK, ACT4_EV_JACK_TUNNEL, ACT4_JACK_SAW_MARK, ACT4_JACK_WILL_COME, ACT4_STARTED } from '../act4/ids';
+// E3 task U, §17 — Jack's own offstage schedule rule, first in the list.
+// No prose, no topic, no variant anywhere (canon 102) — the motel's shipped
+// absent-Jack description renders unchanged; see this file's own schedule.
+import { ACT5_RECONCILIATION_RUNNING } from '../act5/ids';
 
 // ---------------------------------------------------------------------------
 // §6.3 — unknownTopic
@@ -310,12 +314,12 @@ const jackHandsOverKeysEffects: Effect[] = [{ set: [FLAG_JACK_GAVE_KEYS, true] }
 const jackTrashText =
   '"His bin." Jack gets there a sentence ahead of you and does not look pleased about how fast he got there. "Contractor comes for it in the morning. It\'ll be at the kerb by now."\n\nHe has the keys off the table before he has finished saying it. "I\'ll take the truck round to his front and sit there with it running. Tell him I\'ve come about my brother again. He\'ll come out on that porch and be sorry at me, and he is very good at that, and it takes a while."\n\nAt the door: "Don\'t be anywhere near me when I stop."';
 
-/** §16.1 — ASK JACK ABOUT WALL DRUG / SHOW TICKET TO JACK, once the player holds the claim ticket. Sets `offered_the_ride`; fires the one-time END OF BUILD line. */
+/** §16.1 — ASK JACK ABOUT WALL DRUG / SHOW TICKET TO JACK, once the player holds the claim ticket. Sets `offered_the_ride`; fired the one-time boundary line (retired in E3). */
 const jackWallDrugText =
   'He takes it, holds it out at arm\'s length, and reads all four words of it.\n\n"Wall Drug." He says it the way you say a place you have driven past nine hundred times. "He put something in at Wall Drug, and he kept the stub, and the stub was in a box only he could open."\n\nHe puts it back in your hand and goes and finds his boots.\n\n"Thirty-two miles. An hour, the way I drive it, and tonight I am going to drive it worse than that." The screen door goes off its spring behind him. "Get in."\n\nHe is at the driver\'s door with the keys in his fist, and the engine has not started yet.';
 
 /**
- * §16.2 (wave 5) / D1 prose doc §21's own note — the shipped END OF BUILD
+ * §16.2 (wave 5) / D1 prose doc §21's own note — the shipped boundary
  * call is superseded: the ride now exists, so this no longer ends the
  * build. Sets `offered_the_ride` on the first ask (as before) and then
  * always routes to the travel script (§3's own ruling: "ASK JACK ABOUT WALL
@@ -856,6 +860,8 @@ export const jack: NpcDefSlice = {
   // (`act2_jack_away`). Before `act2_started` the single unconditional
   // post below is the whole schedule, unchanged since v0.9.0.
   schedule: [
+    // E3 task U, §17 — first rule; see this file's own import note above.
+    { when: { flag: ACT5_RECONCILIATION_RUNNING }, room: 'offstage' },
     { when: { all: [{ flag: ACT2_STARTED }, { clockPhase: 'morning' }, { not: { flag: ACT2_JACK_AWAY } }] }, room: SUNDOWN_DINER },
     { room: JACKS_MOTEL },
   ],

@@ -473,7 +473,7 @@ export const COUNTY_LIBRARY_FRONT = O('act1_county_library_front');
 // `LANDING_BOUNDARY_GATE`/`MAIN_STREET_BOUNDARY_GATE`: no `nouns`, never
 // resolvable, never described, exists only so the direction's `ExitDefSlice.
 // door` has a real id whose `open` state is always false. Unlike the Main
-// Street gate, these never render "END OF BUILD" — their `blockedText` is
+// Street gate, these never render boundary text — their `blockedText` is
 // each room's own in-world refusal line.
 
 export const POST_OFFICE_NO_EXIT_GATE = O('act1_post_office_no_exit_gate');

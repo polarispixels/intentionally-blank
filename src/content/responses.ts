@@ -278,7 +278,7 @@ export const RESPONSES = {
   // ---------------------------------------------------------------------
   // §10 (2026-08-30, fifth pass) — the RESTART/RESET confirmation. Chrome,
   // not the narrator (docs §10's own voice ruling: it speaks from outside
-  // the fiction, like `END OF BUILD`) — fixed text, not a rotation, and
+  // the fiction, like the old boundary line) — fixed text, not a rotation, and
   // fires from every room in every act. WIRED: `src/content/scripts.ts`'s
   // `RESTART_SCRIPTS`, via `render()`.
   // ---------------------------------------------------------------------

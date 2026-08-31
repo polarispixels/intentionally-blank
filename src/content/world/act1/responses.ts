@@ -27,10 +27,10 @@ export const ACT1_DARK_REFUSAL_FAMILY = 'act1.your_room.darkRefusal';
  * travels for real, to `town_edge` (whose own `north` exit carries the
  * boundary now, `TOWN_EDGE_BOUNDARY_NORTH_TEXT`, `townEdge.ts`), and the
  * diner is a real room reached via its own scenery object's `goto`
- * effects. `ACT1_MAIN_STREET_BOUNDARY_GENERIC` is unchanged and now
- * catches only the motel/Jack's, Nolan's yard, and the alley.
+ * effects. The old `buildBoundary.generic` response (the last live boundary
+ * string in the game) was retired in E3 — §34's rule made total: V_APPROACH
+ * falls to the shipped `VERB_DEFAULTS.move` instead (register 146).
  */
-export const ACT1_MAIN_STREET_BOUNDARY_GENERIC = 'act1.main_street.buildBoundary.generic';
 
 export const ACT1_RESPONSES: Record<string, Prose> = {
   [ACT1_DARK_REFUSAL_FAMILY]: [
@@ -38,6 +38,4 @@ export const ACT1_RESPONSES: Record<string, Prose> = {
     'Whatever it looks like, it is keeping that to itself until somebody does something about the dark.',
     'You look hard at nothing and nothing looks back, competently.',
   ],
-  [ACT1_MAIN_STREET_BOUNDARY_GENERIC]:
-    'END OF BUILD\n\nThat is somewhere else in this town. This version is the street, and the house behind you.',
 };

@@ -99,6 +99,13 @@ import {
   ACT3_WALKED_TUNNEL,
 } from '../act3/ids';
 import { ACT4_EV_DAD_BREATH, ACT4_PROFILE_SEEN } from '../act4/ids';
+// E3 task U, §13 — R18's second half. `ACT5_EV_DAD_DEFAULTS_EVENT` lives
+// here (same "the `EventDef` lives with the NPC, registered in the act
+// that needs it" idiom `ACT4_EV_DAD_BREATH_EVENT` above already uses) and
+// is registered in `act5/index.ts`'s own `events` map, not here. The topic
+// is appended below D5 task H's own four, per this file's existing
+// insertion convention.
+import { ACT5_DAD_TOPIC_PASSWORD, ACT5_ROOT_ACCEPTED, ACT5_ROOT_ANTECHAMBER, EVENT_ACT5_EV_DAD_DEFAULTS } from '../act5/ids';
 import {
   ACT2_CACHE_POLAROID,
   ACT2_CLUE_DAD_BOOTS,
@@ -200,6 +207,20 @@ export const ACT4_EV_DAD_BREATH_EVENT: EventDef = {
   when: { all: [{ flag: ACT4_PROFILE_SEEN }, { npcAt: [ACT2_DAD, ACT3_S6_ARCHIVE_HUB] }, { at: ACT3_S6_ARCHIVE_HUB }] },
   once: true,
   effects: [{ say: 'The fan on the rig takes a breath in, which is a thing a fan does not need to do and has not done all week.\n\n"Well," says Dad, from a standing start. "Go on, then."' }],
+};
+
+// E3 task U, §13.1 — "Nobody ever changes the defaults." `once`, both
+// halves of the `when` required (`act5_root_accepted` and Dad actually
+// present at the antechamber) exactly as the prose doc's own Cond reads.
+export const ACT5_EV_DAD_DEFAULTS_EVENT: EventDef = {
+  id: EVENT_ACT5_EV_DAD_DEFAULTS,
+  when: { all: [{ flag: ACT5_ROOT_ACCEPTED }, { npcAt: [ACT2_DAD, ACT5_ROOT_ANTECHAMBER] }] },
+  once: true,
+  effects: [
+    {
+      say: 'The rig has been on your shoulder for a mile of tunnel and a long way down a\nladder and has not had one word to say about any of it.\n\n"Nobody ever changes the defaults," Dad says.\n\nThen the fan, and nothing else out of him for a while.',
+    },
+  ],
 };
 
 // ---------------------------------------------------------------------------
@@ -384,6 +405,17 @@ const topics: TopicDef[] = [
     words: ['sublevel', 'sublevel 6', 'six', 's6'],
     response:
       '"Sublevel six," he says, trying it. "No. There\'s five. There\'s five because\nfive is what the rock would give them and I sat through the argument about it\ntwice."\n\nA short pause, and the fan.\n\n"Mind you, I\'d not have been told, would I. I was the water and the money. If\nsomebody put a sixth in after they\'d got the licence, the first I\'d have heard\nof it is a man reading it to me off a stick."\n\n"Where\'d you get the number?"',
+  },
+  // E3 task U, §13.2 — "ASK DAD ABOUT PASSWORD"/"ABOUT DEFAULTS"/"ABOUT THE
+  // LOGIN," anywhere, after `act5_root_accepted`. He is on the rig, never
+  // docked — the breath-before-a-name device is not used here (spent in D2
+  // and again in E0 §19); the narrator adds nothing after him.
+  {
+    id: ACT5_DAD_TOPIC_PASSWORD,
+    words: ['password', 'defaults', 'the login'],
+    when: { flag: ACT5_ROOT_ACCEPTED },
+    response:
+      '"It\'s what they put in it at the works, so the fella fitting it can get in\nbefore anybody\'s decided who\'s allowed to. Then he writes it on the job sheet,\nbecause he\'s fitting four of them that week and he\'s not going to remember. And\nthe job sheet goes in the folder and the folder goes in the cupboard."\n\nA pause, of the kind he takes when he is deciding how much of a thing to say.\n\n"Then twenty years go by and there\'s nobody left in the place who knows it, and\nthe cupboard\'s the only thing in that building that\'s been telling the truth\nthe whole time. That\'s not a story about computers, kiddo. That\'s a story about\ncupboards."\n\nAnother pause.\n\n"Whoever wrote it in the back of that book of yours had it off a job sheet.\nI\'d put money on it."',
   },
 ];
 

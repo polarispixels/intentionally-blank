@@ -234,23 +234,32 @@ describe('R13 — the profile', () => {
 // own `down` exit, so these two checks move there (same pattern
 // `world-act4-e1-luke.test.ts`'s own "the root door's own down exit reaches
 // the same three arms" test already uses).
-describe('the Act IV boundary — DOWN', () => {
-  it("prints canon 88's line before act4_started", () => {
+// E3 task W (§34/§42.1) retired the boundary this describe block used to
+// cover: `SYSTEM_BOUNDARY_TEXT_ACT4` and `boundaryRules()`'s act4_started
+// arm are both deleted, and DOWN at the Hub (before the well door is opened
+// from the inside, §16.2) now prints the shipped `ROOT_DOOR_DOWN_TEXT`
+// alone regardless of `act4_started` — no `system.buildBoundary` paragraph
+// follows it in any state any more.
+describe('the Act IV boundary — DOWN (retired, E3 §34)', () => {
+  it('prints the in-world line alone before act4_started, no boundary text', () => {
     const store = new MemoryStore();
     const session = loggedInAtHub({ clues: [ACT3_CLUE_ROOT_REFUSES] });
     const { events } = say(session, 'down', store);
     const rendered = text(events);
-    expect(rendered).toMatch(/Act III ends here/);
+    expect(rendered).toMatch(/gives you nothing back/);
+    expect(rendered).not.toMatch(/END OF BUILD/);
+    expect(rendered).not.toMatch(/Act III ends here/);
     expect(rendered).not.toMatch(/the man who is coming are this one/);
   });
 
-  it("prints §22's line once act4_started", () => {
+  it('prints the same in-world line alone once act4_started — no §22 boundary line either', () => {
     const store = new MemoryStore();
     const session = actFourHub({ clues: [ACT3_CLUE_ROOT_REFUSES] });
     const { events } = say(session, 'down', store);
     const rendered = text(events);
-    expect(rendered).toMatch(/END OF BUILD/);
-    expect(rendered).toMatch(/street, the sheriff, the ledger and the man who is coming are this one/);
+    expect(rendered).toMatch(/gives you nothing back/);
+    expect(rendered).not.toMatch(/END OF BUILD/);
+    expect(rendered).not.toMatch(/street, the sheriff, the ledger and the man who is coming are this one/);
     expect(rendered).not.toMatch(/Act III ends here/);
   });
 });

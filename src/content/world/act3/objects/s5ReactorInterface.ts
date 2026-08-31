@@ -379,7 +379,7 @@ const s6StairShippedText =
 // E1 addendum §7 — `GO DOWN` at S5, second and later. `firstOnce` (the
 // `ProseRule.text` mechanism, `luke.ts`'s own `unknownTopic` idiom): the
 // shipped block plays once, then this short refusal from the second
-// attempt on. Not a build boundary (no `END OF BUILD`) — E1 §21.1's own
+// attempt on. Not a build boundary (no boundary line) — E1 §21.1's own
 // ruling holds.
 const s6StairAgainText =
   'Same steps. Same cold coming up them. Same absence of a reason to be on them.\n\nYou will know when you have got one. You have not got one standing here.';

@@ -38,7 +38,10 @@ describe('Stage E0 — the record about you, on a clean save', () => {
       '2 RESULTS',
       '◆ clue noted: SUBJECT [UNRESOLVED] — MAINTENANCE',
       'You do not open it. You have already read what is queued against it',
-      'street, the sheriff, the ledger and the man who is coming are this one.',
+      // E3 task W (§34/§42.1) retired the boundary: the beat above's own
+      // "street, the sheriff, the ledger and the man who is coming are this
+      // one." no longer renders on DOWN at the well — no `system.
+      // buildBoundary` paragraph follows the in-world line in any state.
       // the town
       'Main Street has been opened up.',
       '? question opened: What does the record say about you?',

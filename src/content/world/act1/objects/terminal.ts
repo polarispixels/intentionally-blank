@@ -20,6 +20,12 @@ import { V_UNPLUG } from '../ids';
 import { ACT2_DAD_ATTACK_TEXT } from '../../act2/dad';
 import { ACT2_USB } from '../../act2/ids';
 import type { Cond } from '../../../../engine/cond';
+// E3 task W (`docs/superpowers/specs/2026-09-20-stage-e3-prose.md` §32,
+// §42.1) — the opening terminal's login (canon 111). `V_ACT5_LOGIN_
+// TERMINAL` is a `'V dobj'` verb (`login terminal`/`enter user terminal`),
+// not bare — see `act5/ids.ts`'s own comment on why plain "log in" (already
+// claimed, bare-only, by `V_TYPE_TERMINAL`) can't also be this verb's word.
+import { ACT5_OPENING_LOGIN_OPEN_SCRIPT, V_ACT5_LOGIN_TERMINAL } from '../../act5/ids';
 
 /** "Dad is currently booted" — the same derived condition his own schedule rule 1 uses (`act2/dad.ts`). */
 const DAD_BOOTED: Cond = { all: [{ objectAt: [ACT2_USB, { in: TERMINAL }] }, { objectState: [TERMINAL, 'on', true] }] };
@@ -81,6 +87,14 @@ const terminal: ObjectDefSlice = {
         { say: 'A steady mechanical hum with something turning inside it, and under that, every forty seconds or so, a small click, as if it were checking something and finding it unchanged.' },
       ],
     },
+    // E3 task W — §32/§42.1: `LOGIN TERMINAL`/`ENTER USER TERMINAL`, only
+    // while the terminal is on, opens the opening login prompt. Off, this
+    // falls to the second rule below, which reuses this same object's own
+    // off-state EXAMINE text verbatim (`examine`, above) — the shipped
+    // description of a machine with nothing on its screen to log into is
+    // the switched-off refusal, not new prose.
+    { verbs: [V_ACT5_LOGIN_TERMINAL], when: { objectState: [TERMINAL, 'on', true] }, effects: [{ script: { id: ACT5_OPENING_LOGIN_OPEN_SCRIPT } }] },
+    { verbs: [V_ACT5_LOGIN_TERMINAL], effects: [{ say: examine }] },
   ],
 };
 

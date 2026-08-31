@@ -59,6 +59,12 @@ import {
   ACT3_S6_ARCHIVE_HUB,
   ACT3_S6_MAINTENANCE_BAY,
 } from '../act3/ids';
+// E3 task U, §17 — "the reconciliation" schedule rule: he is at the top of
+// the well, always, in every phase, once `act5_root_accepted`'s effects
+// list has also set this flag. First in the list (above every other rule,
+// including the alarm) so nothing else in his schedule can compete with
+// it. No response anywhere says why — no prose is added for him.
+import { ACT5_RECONCILIATION_RUNNING } from '../act5/ids';
 
 // ---------------------------------------------------------------------------
 // §8.1 (D1, shipped) / §18.1 (D2-C, this task) — EXAMINE.
@@ -144,6 +150,8 @@ export const custodian: NpcDefSlice = {
   // D2-C: Main Street mornings, ABOVE D1's own afternoon Emporium rule.
   // D5 task H: the alarm's override, then the rounds, ABOVE both.
   schedule: [
+    // E3 task U, §17 — first rule; see this file's own import note above.
+    { when: { flag: ACT5_RECONCILIATION_RUNNING }, room: ACT3_S6_ARCHIVE_HUB },
     { when: { flag: ACT3_ALARM_PULLED }, room: 'offstage' },
     { when: { all: [{ flag: ACT3_ALERTNESS, atLeast: 1 }, { clock: { after: 1290, before: 1320 } }] }, room: ACT3_PIPE_CHASE }, // 21:30-22:00, alert only
     { when: { all: [NIGHT, { clock: { after: 1320, before: 1410 } }] }, room: ACT3_S6_MAINTENANCE_BAY }, // 22:00-23:30

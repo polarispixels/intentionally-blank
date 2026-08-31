@@ -100,7 +100,7 @@ const travelTextOut = 'The door has a spring on it strong enough to argue with, 
 // always-closed gate (never opens, never described — `POST_OFFICE_NO_EXIT_
 // GATE`) so each of these renders this room's own refusal line rather than
 // the generic global "no exit that way" family or (wrongly) Main Street's
-// "END OF BUILD" boundary text.
+// retired boundary text.
 const otherDirections: ExitDefSlice[] = (['s', 'e', 'w', 'ne', 'nw', 'se', 'sw', 'up', 'down'] as const).map((dir) => ({
   dir,
   to: POST_OFFICE,

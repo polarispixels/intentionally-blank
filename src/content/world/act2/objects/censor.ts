@@ -448,6 +448,19 @@ const origamiRuler: ObjectDefSlice = {
 // "draft" already reach this object unambiguously whenever only one
 // "letter"-shaped thing is held, which is the common case — §29.2's own
 // analysis).
+// E3 addendum (`docs/superpowers/specs/2026-09-20-stage-e3-prose-addendum.
+// md`) — READ/EXAMINE were missing entirely and the engine's READ fallback
+// crashed on the object (found by the E3 integration playtest). The player's
+// own words are never printed (constitution §31).
+const LETTER_OUT_EXAMINE_FOLDED =
+  'Folded, it is the size of a playing card and weighs about as much as one.\nNo envelope, no gum, no string: over, under, the hard crease along the\nthird, and everything you had to say is shut inside paper by paper alone.\n\nThe box number ended up on the outside, upside down. The fold did not\nconsult you.';
+
+const LETTER_OUT_EXAMINE_FLAT =
+  'The free paper off the back of the rack, thin enough that the pen has come\nthrough in the places where you leaned on it. The lines start level and\nend up running downhill toward the right margin, which is where lines go\nwhen a man stops watching them.\n\nOn the back, the number of a box in this building, in the same pen and a\nslower hand.';
+
+const LETTER_OUT_READ =
+  'You read it back, and it is worse coming out than it was going in, which\nis what second readings are for.\n\nThe hand is small and quick and slopes to the right. It is yours. You do\nnot remember learning it. It went on being yours anyway.';
+
 const letterOut: ObjectDefSlice = {
   location: 'nowhere',
   name: 'letter',
@@ -456,6 +469,18 @@ const letterOut: ObjectDefSlice = {
   handlers: [
     { verbs: [CUT], effects: letterFoldEffects },
     { verbs: [V_UNFOLD], effects: letterUnfoldEffects },
+    {
+      verbs: [EXAMINE],
+      effects: [
+        {
+          say: [
+            { when: { prop: [ACT2_LETTER_OUT, 'folded', true] }, text: LETTER_OUT_EXAMINE_FOLDED },
+            { text: LETTER_OUT_EXAMINE_FLAT },
+          ],
+        },
+      ],
+    },
+    { verbs: [READ], effects: [{ say: LETTER_OUT_READ }] },
   ],
 };
 

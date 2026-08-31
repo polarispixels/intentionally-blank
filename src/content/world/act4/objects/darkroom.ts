@@ -29,6 +29,7 @@
 // holding both gets an honest engine clarify; this task's own report
 // covers it).
 
+import { COUNTY_LIBRARY } from '../../act1/ids';
 import type { Effect } from '../../../../engine/effects';
 import type { ObjectDefSlice } from '../../../../engine/world';
 import { EXAMINE } from '../../act1/verbs';
@@ -113,7 +114,7 @@ const sissyFilmAlreadyWired = sissyFilmObj.handlers.some((h) => h.verbs.includes
 if (!sissyFilmAlreadyWired) {
   sissyFilmObj.handlers.push({
     verbs: [V_DEVELOP],
-    when: { all: [{ flag: ACT4_DARKROOM_OPEN }, { not: { flag: ACT4_SISSY_FILM_DEVELOPED } }] },
+    when: { all: [{ at: COUNTY_LIBRARY }, { flag: ACT4_DARKROOM_OPEN }, { not: { flag: ACT4_SISSY_FILM_DEVELOPED } }] },
     effects: [{ script: { id: ACT4_DEVELOP_SCRIPT, args: { which: 'sissy' } } }],
   });
 }
@@ -130,7 +131,7 @@ const filmCanisterAlreadyWired = filmCanisterHandlers.some((h) => h.verbs.includ
 if (!filmCanisterAlreadyWired) {
   filmCanisterHandlers.push({
     verbs: [V_DEVELOP],
-    when: { all: [{ flag: ACT4_DARKROOM_OPEN }, { not: { flag: ACT4_JULES_FILM_DEVELOPED } }] },
+    when: { all: [{ at: COUNTY_LIBRARY }, { flag: ACT4_DARKROOM_OPEN }, { not: { flag: ACT4_JULES_FILM_DEVELOPED } }] },
     effects: [{ script: { id: ACT4_DEVELOP_SCRIPT, args: { which: 'jules' } } }],
   });
 }

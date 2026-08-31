@@ -12,6 +12,69 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.19.0] - 2026-08-31
+
+**Stage E3 — root.** Act V entire, and the end of the build
+(`docs/superpowers/specs/2026-09-20-stage-e3-prose.md`; canon register
+137–147). Stage E complete.
+
+### Added
+
+- **The way down**: the branch hatch in the service tunnel (`4471`, one
+  stamped figure, no narrator arithmetic — register 139), the Root Shaft
+  (the whitewash tide line, the stencil `SYSTEM REVISION 2089.4`, Return B
+  going into the wall, the lift landing with no call button — D4's blank
+  button paid), and the stair door from Sublevel 5.
+- **The Root Antechamber**: the console on a stand; **R18** — `RECOGNIZED`,
+  `ACCESS LEVEL: ROOT`, `RECONCILIATION — RUNNING`, and a door that lets go
+  across the room; **M17** (creation stratum); Dad on defaults, job sheets,
+  and cupboards; the inner door; the well door — the root door has had a
+  bolt on the inside the whole time.
+- **The re-acquire**: the Custodian's last post at the top of the well;
+  three beats, `Then white.`, one death, never mentioned again. Jack goes,
+  and nothing anywhere says so (register 140).
+- **The Blank Room**: the root terminal (station five — not asking);
+  **R19**, the creation record, one authored sentence and nothing after it;
+  the index (`COMPLETE — 1 SESSION`); **R20** — waking Jules, once,
+  lower-case, through the terminal (optional, P27); the letter in the tray;
+  the cache locker — a place, not a drop (registers 142–143).
+- **R21**: `CREATE SUBJECT` — the form with the record's placeholders, the
+  recognition beats, the suppressed line the cursor goes round,
+  `INITIALIZE?`, `> YES`, and the hand-off: the last authored line falls
+  into the opening room's own shipped first render, byte-identical, with
+  nothing between (ADR 0012; register 137).
+- **The opening terminal's login** — `ACCESS LEVEL: LOCAL`, three lines the
+  machine has been holding since turn one (register 144).
+- P25–P28 with §33's hint ladders (P26's bottom rung is the only place the
+  game ever prints the credential pair); three questions; six clues.
+- The composed letter's missing `READ`/`EXAMINE` (prose addendum,
+  commissioned when the engine's READ fallback was found to crash on it).
+
+### Changed
+
+- **The boundary is retired for the game** (register 146): every
+  `system.buildBoundary` arm, `boundaryRules()`, and the S6 gate object
+  deleted; the well's `down` is a real exit; every dead `END OF BUILD`
+  constant in Acts I–II removed and the GO-TO generic re-pointed at the
+  shipped movement default; a test now asserts the string exists nowhere in
+  `src/content`.
+- Act III's Hub spotted/passed events stand down once the reconciliation is
+  running — the re-acquire owns the floor.
+
+### Fixed
+
+- `DEVELOP` was not location-gated — the whole darkroom scene could render
+  from any room in the game. Found because the canonical e2 fixture had
+  been developing film from the hab's Dome: its walk out of the hab failed
+  at a bare `out` the galley never supported, and every later command ran
+  from the wrong room while the beat assertions stayed green. The fixture
+  now opens the airlock, and develop requires the library.
+- `READ LETTER` on the player's own composed letter crashed with an engine
+  diagnostic.
+- New canonical fixture `playthrough-e3.txt`: the full game, the ending,
+  the hand-off, and the next game's first screen in one 1,036-command
+  transcript, with a completion test asserting the seam is byte-exact.
+
 ## [0.18.0] - 2026-08-31
 
 **Stage E2 — the archive.** Through the two lit frames

@@ -11,8 +11,7 @@
 // constant regardless — so `CLIMB STAIRS` told the player the game was over
 // on a staircase `DOWN` walks them down a turn later. Fixed here, not in the
 // room file, per this task's own scope.
-// `BUILD_BOUNDARY_TEXT` stays declared/exported — harmless, unreferenced by
-// this object now — for the same reason the room file's header gives.
+// The old boundary rotation itself was deleted in E3 (register 146).
 
 import type { ObjectDefSlice } from '../../../../engine/world';
 import type { Prose, ProseRule } from '../../../../engine/prose';
@@ -31,16 +30,6 @@ import {
   YOUR_DOOR_OUTSIDE,
   YOUR_DOOR_OUTSIDE_NUMBER,
 } from '../ids';
-
-/**
- * §15.2 — "Renders, does not move the player, and changes nothing." Line 1
- * is a fixed header, identical across variants, kept in caps (the doc's own
- * instruction: "what makes the block read as chrome at a glance").
- */
-export const BUILD_BOUNDARY_TEXT: Prose = [
-  'END OF BUILD\n\nThis version ends at the top of these stairs. The rest of the house, and the town it stands in, are not in this build.',
-  'END OF BUILD\n\nThe stairs go down. This build does not. Everything past this landing belongs to a later version.',
-];
 
 const stairsExamine =
   'Wooden stairs going down in flights around a square well, to a turn you cannot see past. The treads are cupped in the middle where everybody who has ever lived up here has put a foot in the same place, and the runner on them gives out entirely three steps down, where somebody decided the carpet had gone far enough.\n\nSomewhere at the bottom a lamp is on. Its light gets all the way up here, which is more than can be said for anybody.';

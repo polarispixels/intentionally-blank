@@ -423,40 +423,50 @@ describe('the after-visit arms', () => {
 // always renders §3.1's "which one" line, never the boundary — moved to
 // the well's own `down` exit below (the same `ACT3_CLUE_ROOT_REFUSES` seed
 // this describe block's own fourth test already used).
-describe('§29 — the boundary, three arms', () => {
-  it('the shipped Act III line, with none of Act IV started', () => {
+// E3 task W (§34/§42.1) retired the boundary this describe block used to
+// cover — `SYSTEM_BOUNDARY_TEXT`/`SYSTEM_BOUNDARY_TEXT_ACT4`/`SYSTEM_
+// BOUNDARY_TEXT_ACT4_E1`/`boundaryRules()`'s four-arm selector are all
+// deleted. DOWN at the Hub, in every one of these states, now prints only
+// the shipped `ROOT_DOOR_DOWN_TEXT` and stops — no arm renders any more,
+// E1's included, and the exit stays blocked until `act5_root_door_open`
+// (§16.2).
+describe('§29 — the boundary retired (E3 §34), in every state this describe block used to distinguish', () => {
+  it('no boundary text with none of Act IV started', () => {
     const store = new MemoryStore();
     const { session } = enter(withState({ clues: [ACT3_CLUE_ROOT_REFUSES] }), ACT3_S6_ARCHIVE_HUB);
     const { events } = say(session, 'down', store);
     const rendered = text(events);
-    expect(rendered).toMatch(/END OF BUILD/);
-    expect(rendered).toMatch(/Act III ends here/);
+    expect(rendered).toMatch(/gives you nothing back/);
+    expect(rendered).not.toMatch(/END OF BUILD/);
+    expect(rendered).not.toMatch(/Act III ends here/);
   });
 
-  it("E0's Act IV line, once started but before he is met", () => {
+  it('no boundary text once Act IV started but before he is met', () => {
     const store = new MemoryStore();
     const { session } = enter(withState({ flags: { [ACT4_STARTED]: true }, clues: [ACT3_CLUE_ROOT_REFUSES] }), ACT3_S6_ARCHIVE_HUB);
     const { events } = say(session, 'down', store);
     const rendered = text(events);
-    expect(rendered).toMatch(/END OF BUILD/);
-    expect(rendered).toMatch(/the man who is coming are this one/);
+    expect(rendered).toMatch(/gives you nothing back/);
+    expect(rendered).not.toMatch(/END OF BUILD/);
+    expect(rendered).not.toMatch(/the man who is coming are this one/);
   });
 
-  it("E1's own line, once act4_luke_met", () => {
+  it('no boundary text once act4_luke_met', () => {
     const store = new MemoryStore();
     const { session } = enter(withState({ flags: { [ACT4_STARTED]: true, [ACT4_LUKE_MET]: true }, clues: [ACT3_CLUE_ROOT_REFUSES] }), ACT3_S6_ARCHIVE_HUB);
     const { events } = say(session, 'down', store);
     const rendered = text(events);
-    expect(rendered).toMatch(/END OF BUILD/);
-    expect(rendered).toMatch(/stair behind the door on Sublevel 5 is this one/);
+    expect(rendered).toMatch(/gives you nothing back/);
+    expect(rendered).not.toMatch(/END OF BUILD/);
+    expect(rendered).not.toMatch(/stair behind the door on Sublevel 5 is this one/);
   });
 
-  it('the root door\'s own down exit reaches the same three arms', () => {
+  it("the root door's own down exit stays blocked with the same in-world line in every state", () => {
     const store = new MemoryStore();
     const { session } = enter(withState({ flags: { [ACT4_STARTED]: true, [ACT4_LUKE_MET]: true }, clues: [ACT3_CLUE_ROOT_REFUSES] }), ACT3_S6_ARCHIVE_HUB);
     const { events } = say(session, 'down', store);
     const rendered = text(events);
-    expect(rendered).toMatch(/stair behind the door on Sublevel 5 is this one/);
+    expect(rendered).toMatch(/gives you nothing back/);
   });
 });
 

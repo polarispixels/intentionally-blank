@@ -13,10 +13,11 @@
 
 import type { Effect } from '../../../../engine/effects';
 import type { EventDef, ObjectDefSlice } from '../../../../engine/world';
+import type { ProseRule } from '../../../../engine/prose';
 import { DIRECTION_VERB_IDS } from '../../../../engine/move';
 import { CLIMB_BACK_TEXT } from '../serviceTunnel';
-import { V_FOLLOW, V_KNOCK } from '../../act1/ids';
-import { BREAK, CLIMB, EXAMINE, OPEN, READ, TOUCH } from '../../act1/verbs';
+import { CHAIR_LEG, KEYRING, V_FOLLOW, V_KNOCK } from '../../act1/ids';
+import { BREAK, CLOSE, EXAMINE, CLIMB, LISTEN, OPEN, PRY, READ, TOUCH, UNLOCK } from '../../act1/verbs';
 import {
   ACT3_CLUE_SEAL_FROM_INSIDE,
   ACT3_CONSTRUCTION_DOOR_OPEN,
@@ -35,6 +36,15 @@ import {
   ACT3_TUNNEL_SEAL,
   EVENT_ACT3_MATCH_TICK,
 } from '../ids';
+// E3 task U (§3) — the branch hatch. `act4_started` gates its own
+// reachability (§3's own "it was always there and nobody looked" — the
+// branch was never remarked on before Act IV; `hidden: true` by default,
+// revealed by its own event once Act IV starts, `rootShaft.ts`); no
+// `reachableInDark` (unlike the rails/ladder above) is what makes the
+// engine's own `scope()` (`world.ts`) exclude it while `TUNNEL_DARK` holds —
+// the room's shipped dark description and gate are untouched.
+import { ACT4_STARTED } from '../../act4/ids';
+import { ACT5_BRANCH_HATCH, ACT5_BRANCH_UNLOCKED, ACT5_CLUE_KEY_NUMBER } from '../../act5/ids';
 
 // ---------------------------------------------------------------------------
 // §6.4 — the rails. `reachableInDark: true` (feelable in the dark, engine
@@ -172,11 +182,98 @@ const doorHinges: ObjectDefSlice = {
   handlers: [{ verbs: [EXAMINE], effects: [{ say: hingesExamineText }] }],
 };
 
+// ---------------------------------------------------------------------------
+// E3 task U, §3 — the branch hatch. `portable: false`; `container: {open:
+// false}` (no `key` — not lockable via the generic UNLOCK/LOCK built-ins;
+// opened only by the two custom legs below, same shape as D4's own
+// `tunnelMouth.ts` hatch) so the tunnel's own `down` exit (`serviceTunnel.ts`,
+// the room file) can gate on it and get a real `blockedText` rather than the
+// generic "no exit that way" family.
+// ---------------------------------------------------------------------------
+
+const branchHatchExamineLockedText =
+  'Twenty feet short of the plug, low down in the left-hand wall, there is a steel\nhatch about the size of a hearth, set into the pour with a rolled lip and four\ncountersunk bolts that have never been out of it.\n\nNo handle. A squared hole in the middle of the plate, and above the hole,\nstruck into the steel one blow to a digit by somebody working at an awkward\nangle:\n\n    4471\n\nThe rails run past it. Everything down here runs past it.';
+
+const branchHatchExamineOpenText =
+  'Open, hanging off the bottom hinges, with the ladder behind it going down out\nof your light.\n\nThe bolts that have never been out of it are still not out of it. Whatever this\nhatch was fitted for, it was not fitted to be taken off the wall.';
+
+const branchHatchExamine: ProseRule[] = [
+  { when: { flag: ACT5_BRANCH_UNLOCKED }, text: branchHatchExamineOpenText },
+  { text: branchHatchExamineLockedText },
+];
+
+const branchHatchReadNumberText =
+  'Four digits, struck one at a time, deeper on the last one than on the first,\nthe way a man\'s arm gets tired.';
+
+const branchHatchUnlockText =
+  'The squared bit goes into the squared hole the way it went into the plate in\nthe kerb on the county road, which is to say without any of the small\nnegotiations, and you make the same quarter turn, and something behind the\nsteel lets go with the same one flat knock.\n\nThe hatch comes down on its own weight and hangs off two hinges at the bottom\nof it.\n\nBehind it there is a formed opening with a rolled edge and a handhold, and a\nladder bolted through it in four places, going down.\n\nYou put the ring back in your pocket. The number over the hole goes on being\nthe number over the hole.';
+
+const branchHatchPryText =
+  'There is a lip on the low side of the plate and the leg goes under it, and for\nabout four seconds absolutely nothing happens, and then the whole hatch leaves\nthe wall at once with the noise of a dropped tray in a large empty building,\nand goes on making it for a while.\n\nBehind it, a formed opening with a rolled edge and a handhold, and a ladder\ngoing down.\n\nThe leg has now had a drawer, a plate, a cam lock in a kerb, a door under a\nlibrary and this. It is starting to look less like a piece of a chair and more\nlike a colleague.';
+
+const branchHatchKnockListenText =
+  'Warm air on the face, coming up. Under it, faintly, water going through\nsomething at a steady rate, which is the sound this county goes to sleep to\nwith the window open.';
+
+const branchHatchCloseText =
+  'It goes back up and sits in its lip and stays there, because it was never\nholding anything out. It was holding a hole shut so that nobody put a foot in\nit in the dark.';
+
+const branchHatchUnlockEffects: Effect[] = [
+  { say: branchHatchUnlockText },
+  { set: [ACT5_BRANCH_UNLOCKED, true] },
+  { setState: [ACT5_BRANCH_HATCH, 'open', true] },
+];
+
+const branchHatchPryEffects: Effect[] = [
+  { say: branchHatchPryText },
+  { set: [ACT5_BRANCH_UNLOCKED, true] },
+  { setState: [ACT5_BRANCH_HATCH, 'open', true] },
+];
+
+const branchHatch: ObjectDefSlice = {
+  location: ACT3_SERVICE_TUNNEL,
+  name: 'hatch',
+  hidden: true,
+  portable: false,
+  container: { open: false },
+  nouns: ['hatch', 'plate', 'steel hatch', 'opening', 'square hole', 'keyhole', 'number', 'stamp'],
+  handlers: [
+    // §3.1 — grants the clue every EXAMINE; `grantClue` (`effects.ts`) is a
+    // no-op past the first (already in `state.clues`), so this needs no
+    // `once`-tracking flag of its own.
+    { verbs: [EXAMINE], effects: [{ say: branchHatchExamine }, { grantClue: ACT5_CLUE_KEY_NUMBER }] },
+    { verbs: [READ], effects: [{ say: branchHatchReadNumberText }] },
+    { verbs: [UNLOCK], when: { all: [{ not: { flag: ACT5_BRANCH_UNLOCKED } }, { has: KEYRING }] }, effects: branchHatchUnlockEffects },
+    { verbs: [OPEN], when: { all: [{ not: { flag: ACT5_BRANCH_UNLOCKED } }, { has: KEYRING }] }, effects: branchHatchUnlockEffects },
+    {
+      verbs: [PRY],
+      when: { all: [{ not: { flag: ACT5_BRANCH_UNLOCKED } }, { has: CHAIR_LEG }] },
+      effects: branchHatchPryEffects,
+    },
+    {
+      verbs: [OPEN],
+      when: { all: [{ not: { flag: ACT5_BRANCH_UNLOCKED } }, { not: { has: KEYRING } }, { has: CHAIR_LEG }] },
+      effects: branchHatchPryEffects,
+    },
+    { verbs: [UNLOCK, PRY, OPEN], when: { flag: ACT5_BRANCH_UNLOCKED }, effects: [{ say: branchHatchExamineOpenText }] },
+    { verbs: [V_KNOCK, LISTEN], effects: [{ say: branchHatchKnockListenText }] },
+    { verbs: [CLOSE], effects: [{ say: branchHatchCloseText }] },
+  ],
+};
+
+/** Reveals the hatch (`hidden: true` → false) the first tick `act4_started` holds — registered in `act5/index.ts`'s own `events` table. */
+export const ACT5_BRANCH_HATCH_REVEAL_EVENT: EventDef = {
+  id: 'act5_ev_branch_hatch_reveal',
+  when: { flag: ACT4_STARTED },
+  once: true,
+  effects: [{ reveal: ACT5_BRANCH_HATCH }],
+};
+
 export const ACT3_SERVICE_TUNNEL_OBJECTS: Record<string, ObjectDefSlice> = {
   [ACT3_RAILS]: rails,
   [ACT3_TUNNEL_SEAL]: seal,
   [ACT3_LADDER]: ladder,
   [ACT3_CONSTRUCTION_DOOR_TUNNEL]: constructionDoorTunnel,
+  [ACT5_BRANCH_HATCH]: branchHatch,
 };
 
 /** Not one of the room's own "3 objects" (§6) — uncounted sub-parts, same idiom as `ACT3_PLANT_FLOOR`/`ACT3_LOBBY_BENCH`. */

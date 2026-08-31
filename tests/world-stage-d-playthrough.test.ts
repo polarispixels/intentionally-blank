@@ -58,9 +58,11 @@ describe('Stage D — Sublevel 6 on a clean save', () => {
       'Sorry about this',
       'Then white.',
       '◆ clue noted: Openings in the wall, and nothing hung in them',
-      // Since v0.16.0 the queue's clue starts Act IV, so the gate prints §22's line
-      'street, the sheriff, the ledger and the man who is coming are this one.',
-      'END OF BUILD',
+      // E3 task W (§34/§42.1) retired the boundary: DOWN at the well now
+      // prints only the shipped in-world line, with no `system.
+      // buildBoundary` paragraph after it — the two removed beats above
+      // ('street, the sheriff...'/'END OF BUILD') no longer render in any
+      // state.
       '◆ clue noted: ACCESS LEVEL: MAINTENANCE. DENIED. There is a level under this one.',
       // the night
       'CHILLER TRIP - PULL',

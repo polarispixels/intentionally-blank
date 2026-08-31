@@ -32,7 +32,7 @@ import type { VerbDef } from '../../../engine/world';
 import { INVENTORY_VERB_ID } from '../../../engine/respond';
 import { VERB_DEFAULTS } from '../../responses';
 import { GAME_VERSION } from '../../../version';
-import { ACT1_DARK_REFUSAL_FAMILY, ACT1_MAIN_STREET_BOUNDARY_GENERIC } from './responses';
+import { ACT1_DARK_REFUSAL_FAMILY } from './responses';
 import {
   FLOOR_LAMP,
   TERMINAL,
@@ -611,7 +611,7 @@ export const ACT1_VERBS: Record<string, VerbDef> = {
     words: ['go to', 'approach', 'walk to', 'go', 'walk', 'go toward', 'go towards'],
     patterns: ['V dobj'],
     class: 'direct',
-    default: { ref: ACT1_MAIN_STREET_BOUNDARY_GENERIC },
+    default: VERB_DEFAULTS.move,
   },
   // §6's "CROSS STREET" — bare object-word, dobj resolves to `main_street_road`'s own noun "street".
   [V_CROSS]: { id: V_CROSS, words: ['cross'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.move },
