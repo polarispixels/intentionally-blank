@@ -250,6 +250,14 @@ main session's own creative judgment, without waiting for input.
   builder's work is committed deliberately as part of that release. Check
   `git status` before staging; the cost of the habit is one command and
   the cost of skipping it is a changelog that lies.
+- **Never type a date. Derive it.** Changelog entries carried fabricated
+  dates for nine releases — 2026-08-31 through 09-03, when every one of them
+  shipped on 2026-08-30 — because the date was typed from a sense of
+  narrative progression ("this feels like the next day") rather than read
+  from the clock. Release commands use `$(date +%F)`. The same applies to
+  spec-doc filenames; the ones already committed keep their names, since
+  they are identifiers and renaming them would churn two dozen references
+  for no gain.
 - **Release scripts run under `set -e`, and bookkeeping is chained to the
   commit, not merely adjacent to it.** In v0.2.25 the version bump and
   changelog edit sat on a line above `npm test && git commit`; the edit

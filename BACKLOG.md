@@ -27,20 +27,21 @@ Maintenance rules:
 Each stage: spec → plan → build → deploy. Ryan plays the live URL at his
 discretion and may interrupt; a reset resumes from the last deployed stage.
 
-## Status board
+## Status board — remaining work only
 
-| # | Item | Type | Target version | Status |
-|---|---|---|---|---|
-| P | Process foundation: CLAUDE.md, agents, ADRs, repo, Pages target | Process | — | ✅ done (unreleased) |
-| M0 | MVP "the machine goes": Vite/TS/Vue/Vitest, CI → Pages, docs-site generator, pure reducer engine, parser, modal + credentials joke, GAME OVER/RESTART, headless CLI, version test | Engine + content | 0.2.0 | ✅ shipped v0.2.0 — spec `docs/superpowers/specs/2026-08-29-mvp-design.md` (see CHANGELOG 0.2.0) |
-| M1 | ✅ **shipped 0.3.0** — Opening Room vertical slice: wake on floor, darkness, headache, fedora, lamp, pull chain, desk, terminal, one locked/hidden object, first memory fragment, first reasonable-action jokes, exit to town | Content + engine | 0.3.0 | 🎯 next up — brainstorm + spec first |
-| M2 | First exterior / town: empty street, brick buildings, horses, glow, Wall Drug billboard, uncertain era, one or two buildings, first client connection or memory path | Content | 0.4.0 | idea |
-| M3 | Client and missing sibling: remembered hiring, sibling claim, first memory discrepancy, first evidence the client may be right, notebook objective | Content | 0.5.0 | idea |
-| M4 | Notebook trail: loose page 7/8, THIS PAGE INTENTIONALLY LEFT BLANK, notebook dependency graph, first analog-vs-digital contradiction | Content | 0.6.0 | idea |
-| A1 | `playtester` agent (the headless CLI exists as of v0.2.0: `npm run play -- --script <file> --fast`) | Process | with M1 | queued |
+Shipped history lives in `CHANGELOG.md`; it is not restated here. The stage
+board above is the plan. This table is what is *left*.
 
-Milestone definitions come from `docs/spec/08-development-handoff.md` §3.
-Version targets follow the ladder in `docs/spec/README.md` and may shift.
+| # | Remaining | Type |
+|---|---|---|
+| C-3 | Act I wave 3: County Library, Sundown Diner + Pearl, Town Edge | Content |
+| C-4 | Act I wave 4: Motel Forecourt, Jack's Room + **Jack** (the client — built alone) | Content |
+| C-5 | Act I close-out: the notebook objective, first analog-vs-digital contradiction | Content |
+| D | Acts II–III: Wall Drug cache, Dad on the USB, the facility, Sublevel 6 | Content |
+| E | Acts IV–V: identity thread, the archive environments, the root console | Content |
+| F | Hints across all acts, `playtester` agent, replay content, 1.0 polish | Content + process |
+
+Open defects and small items are in the sections below.
 
 ## Notes carried out of the MVP (v0.2.0)
 

@@ -9,7 +9,8 @@ const OUT_DIR = join(ROOT, 'dist', 'docs');
 const REPO = 'https://github.com/polarispixels/intentionally-blank';
 const PLAY = '../';
 
-const version = /GAME_VERSION\s*=\s*'([^']+)'/.exec(readFileSync(join(ROOT, 'src/version.ts'), 'utf8'))?.[1] ?? '?';
+// package.json is the version authority (see src/version.ts).
+const version = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8')).version;
 
 function sorted(dir, filter = () => true) {
   if (!existsSync(join(ROOT, dir))) return [];

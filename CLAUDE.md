@@ -110,10 +110,27 @@ it goes back up to the architect, never sideways to another builder.
 
 ## Workflow
 
-`brainstorming` (main session) → `writing-plans` (architect) → per task:
-`using-git-worktrees` → `game-builder` with `test-driven-development` →
-`qa-verifier` → `code-reviewer` → `verification-before-completion` → merge →
-`CHANGELOG.md`. Features branch off `main`; `main` always deploys.
+**Process is proportional to blast radius, not to effort.** Two paths, and
+the default is the light one because most work is content.
+
+**High blast radius** — parser architecture, save schema, engine contracts,
+world-state schema, the NPC scheduler, a reusable puzzle system, canon:
+
+`brainstorming` → `writing-plans` (architect) → `game-builder` with
+`test-driven-development` → `code-reviewer` → `verification-before-completion`
+→ merge. Worktrees when two builders run at once.
+
+**Ordinary content** — rooms, NPC dialogue, object responses, clues, prose,
+local puzzle wiring, small reversible fixes. **Batch it:**
+
+story/content intent → write and wire the batch → `npm test` → **one
+meaningful playtest** → ship.
+
+**Tiny fixes**: fix → test → ship.
+
+Do not run a mini-project ceremony per room. The playtest is the part that
+is never skipped — every serious bug in this project was found by playing,
+none by the suite. Features branch off `main`; `main` always deploys.
 
 ## Layout (target; Milestone 0 makes it real)
 

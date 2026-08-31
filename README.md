@@ -6,7 +6,7 @@ REPL, a deterministic simulated world, forgiving natural-language input, and
 authored prose. You wake on the floor of a ransacked room in a silent South
 Dakota town, with a headache and no name.
 
-- **Play:** https://polarispixels.github.io/intentionally-blank/ — v0.2.0
+- **Play:** https://polarispixels.github.io/intentionally-blank/ — the current build deploys from `main`.
   is a five-minute prototype ("the machine goes"), not the story yet
 - **Docs:** https://polarispixels.github.io/intentionally-blank/docs/ —
   design canon, architecture, changelog, development process (generated

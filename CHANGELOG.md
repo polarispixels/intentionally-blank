@@ -12,7 +12,49 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
-## [0.6.1] - 2026-09-03
+## [0.6.2] - 2026-08-30
+
+A hygiene pass. No game content or story canon touched.
+
+### Changed
+
+- **The workflow in `CLAUDE.md` contradicted itself.** It prescribed the
+  full brainstorm → plan → worktree → builder → QA → review → verify chain
+  as the default while a later rule said content work should be light. Now
+  one principle, stated once: **process is proportional to blast radius.**
+  Engine contracts, schemas, the parser and canon get the full path; rooms,
+  dialogue, prose and local wiring get *intent → write and wire the batch →
+  test → one meaningful playtest → ship*; tiny fixes get *fix → test →
+  ship*. No mini-project per room.
+
+  The playtest is the step that is never skipped, because every serious bug
+  in this project was found by playing and none by the test suite.
+
+- **`package.json` is now the only place the version is written.**
+  `src/version.ts` re-exports it and the docs generator reads it directly,
+  so the number cannot drift between the manifest, the running game and the
+  published docs. Previously three hand-maintained copies guarded by a test
+  that only caught two of them.
+
+- **`BACKLOG.md`'s status board lists remaining work only.** It had M1
+  marked "✅ shipped 0.3.0" and "🎯 next up" on the same row, and M2–M4 as
+  "idea" after they had shipped. Release history lives in `CHANGELOG.md` and
+  is no longer restated.
+
+- README no longer hard-codes a version; it had advertised v0.2.0 since the
+  prototype.
+
+### Fixed
+
+- **Nine changelog entries carried fabricated dates** — 2026-08-31 through
+  09-03 — when every release shipped on 2026-08-30. Cause: the date was
+  typed from a sense of narrative progression rather than read from the
+  clock. All corrected, and `docs/DEVELOPMENT.md` now requires release
+  commands to derive it with `$(date +%F)`. Spec-doc filenames keep their
+  original dates; they are identifiers, and renaming them would churn two
+  dozen references for nothing.
+
+## [0.6.1] - 2026-08-30
 
 ### Changed
 
@@ -44,7 +86,7 @@ enforces that the version strings agree. (ADR 0005)
   has no unique noun. Same pen already on the backlog for having no listing
   line: the rule is now pointing at a genuine defect instead of at itself.
 
-## [0.6.0] - 2026-09-03
+## [0.6.0] - 2026-08-30
 
 Three rooms in one wave — written in a single pass, wired in a single pass.
 7 of 12 Act I rooms now live.
@@ -84,7 +126,7 @@ Three rooms in one wave — written in a single pass, wired in a single pass.
 reviewed as genuine shared nouns. That is approaching the threshold where a
 warning list stops being read; worth tightening before the next wave.
 
-## [0.5.0] - 2026-09-02
+## [0.5.0] - 2026-08-30
 
 ### Added
 
@@ -113,7 +155,7 @@ warning list stops being read; worth tightening before the next wave.
 - `validate` gains noun-collision and unopenable-door-on-an-exit rules, so
   the remaining 27 rooms can't ship either class again.
 
-## [0.4.1] - 2026-09-01
+## [0.4.1] - 2026-08-30
 
 Ryan got stuck talking to Marlow. Nothing was broken — twelve good topics
 existed and he had no way to find any of them. That is a design failure,
@@ -172,7 +214,7 @@ that question in `HINT` manufactures the puzzle it was meant to relieve.
 mechanism waits until an NPC exists that the pair fails. Whitlock, who is
 guarded by design, will be the test.
 
-## [0.4.0] - 2026-09-01
+## [0.4.0] - 2026-08-30
 
 **The Front Desk, and the first person in the game.** Act I begins.
 
@@ -234,7 +276,7 @@ Still open: the landing door's description leads with a keyhole and no key,
 which reads as a lockout now that the door opens. Needs an authored variant;
 a builder correctly declined to invent one.
 
-## [0.3.3] - 2026-08-31
+## [0.3.3] - 2026-08-30
 
 Everything Ryan hit in his second playtest.
 
@@ -300,7 +342,7 @@ Everything Ryan hit in his second playtest.
   Both words now reach the movement verbs, and two already-authored prose
   families that nothing had ever pointed at are finally reachable.
 
-## [0.3.2] - 2026-08-31
+## [0.3.2] - 2026-08-30
 
 Both notes from Ryan's playtest, fixed.
 
@@ -359,7 +401,7 @@ Both notes from Ryan's playtest, fixed.
   room's personality, it has overshot."* That note governs the 30 rooms
   still unwritten.
 
-## [0.3.1] - 2026-08-31
+## [0.3.1] - 2026-08-30
 
 Scope recalibrated before Act I content begins.
 
