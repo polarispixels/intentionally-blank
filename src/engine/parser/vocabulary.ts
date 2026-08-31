@@ -29,6 +29,14 @@ export interface CompiledVocabulary {
   verbForms: CompiledVerb[];
   objectNouns: Map<string, ObjectId[]>;
   objectAdjectives: Map<string, ObjectId[]>;
+  /**
+   * `ObjectDefSlice.name` by id (v0.7.0) — what a disambiguation question
+   * calls an object ("the billboard or the town limits sign?") instead of
+   * the first indexed noun the vocabulary happens to hold for it, which
+   * produced "the boards or the town number?" at Town Edge. Objects with no
+   * `name` fall back to the vocab-derived guess (`candidateName`).
+   */
+  objectNames: Map<ObjectId, string>;
   npcNouns: Map<string, NpcId[]>;
   npcAdjectives: Map<string, NpcId[]>;
   /**
@@ -83,15 +91,18 @@ function compileVerbForms(world: WorldDef): CompiledVerb[] {
 
 function compileObjectVocabulary(
   world: WorldDef,
-): Pick<CompiledVocabulary, 'objectNouns' | 'objectAdjectives'> {
+): Pick<CompiledVocabulary, 'objectNouns' | 'objectAdjectives' | 'objectNames'> {
   const objectNouns = new Map<string, ObjectId[]>();
   const objectAdjectives = new Map<string, ObjectId[]>();
+  const objectNames = new Map<ObjectId, string>();
   for (const [id, def] of Object.entries(world.objects ?? {})) {
     const objId = id as ObjectId;
     for (const noun of def!.nouns ?? []) addTo(objectNouns, noun, objId);
     for (const adj of def!.adjectives ?? []) addTo(objectAdjectives, adj, objId);
+    const name = def!.name?.toLowerCase().trim();
+    if (name) objectNames.set(objId, name);
   }
-  return { objectNouns, objectAdjectives };
+  return { objectNouns, objectAdjectives, objectNames };
 }
 
 function compileNpcVocabulary(world: WorldDef): Pick<CompiledVocabulary, 'npcNouns' | 'npcAdjectives' | 'npcPronouns'> {

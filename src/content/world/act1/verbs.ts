@@ -31,11 +31,13 @@ import type { ProseRule } from '../../../engine/prose';
 import type { VerbDef } from '../../../engine/world';
 import { INVENTORY_VERB_ID } from '../../../engine/respond';
 import { VERB_DEFAULTS } from '../../responses';
+import { GAME_VERSION } from '../../../version';
 import { ACT1_DARK_REFUSAL_FAMILY, ACT1_MAIN_STREET_BOUNDARY_GENERIC } from './responses';
 import {
   FLOOR_LAMP,
   TERMINAL,
   V_ABOUT,
+  V_VERSION,
   V_APPROACH,
   V_ATTACK,
   V_CALL,
@@ -45,19 +47,24 @@ import {
   V_CROSS,
   V_CROUCH,
   V_DRINK,
+  V_EAT,
   V_FEED,
   V_FIND_MY_NAME,
   V_HELP,
   V_HOLD_TO_LAMP,
+  V_KISS,
   V_KNOCK,
   V_FILL,
   V_FIND,
   V_FOLLOW,
   V_LEAN_OVER,
   V_LOOK_DOWN,
+  V_LOOK_FOR_FACE,
+  V_LOOK_OUT,
   V_LOOK_OUTSIDE,
   V_LOOK_UP,
   V_MEASURE,
+  V_ORDER,
   V_POST_LETTER,
   V_POUR,
   V_QUESTION,
@@ -69,8 +76,11 @@ import {
   V_SLIDE_DOWN,
   V_SUDO,
   V_SWEEP,
+  V_THINK,
+  V_LOOK_UP_SUBJECT,
   V_TILT,
   V_TIP,
+  V_TYPE_RECLAMATION,
   V_TURN_OVER,
   V_TYPE_TERMINAL,
   V_UNPLUG,
@@ -287,6 +297,55 @@ export const postLetterText =
 export const measureMapText = 'You lay a thumb along the scale bar and walk it up the highway. Thirty-two miles, near enough.';
 
 // ---------------------------------------------------------------------------
+// County Library (wave 3) — bare/shared-text verbs (same idiom as the blocks
+// above). Both texts are also reused, verbatim, by `objects/countyLibrary.ts`'s
+// own object-level handlers (`card_catalogue`'s READ/SEARCH/OPEN,
+// `catalogue_terminal`'s SEARCH/USE) so the bare-phrase and dobj-based
+// routes to the same action never drift into two copies — see that file's
+// own comment on `readCardsEffects`/`typeReclamationEffects`.
+// ---------------------------------------------------------------------------
+
+/** §9.3's "look up subject" — bare, self-contained phrase (no natural `dobj` target worth widening V_LOOK_UP's own grammar for — see `ids.ts`'s own comment on `V_LOOK_UP_SUBJECT`). */
+export const readCardsText =
+  'You pull a drawer at random and go through it the way people go through cards, which is faster than reading and slower than looking. Three kinds of stock, four hands, and the hands overlap. Subject, shelfmark, then a line for cross-references.\n\nBRIDGES — COUNTY. IRRIGATION. LIVESTOCK, DISEASES OF. WATER RIGHTS, see also GROUND WATER, see also RECLAMATION.\n\nThere is no RECLAMATION card and no RECLAMATION drawer. The heading that card sends you to is nowhere in the cabinet, and the card doing the sending has been in here long enough to go the same colour as the ones either side of it.';
+
+/** §9.4's "type reclamation"/"look up reclamation" — bare, self-contained phrase (same idiom as `readCardsText`, above). */
+export const typeReclamationText =
+  'You type RECLAMATION. It thinks for a quarter of a second.\n\n    NO RECORDS MATCH THAT SUBJECT.\n    CHECK SPELLING OR TRY A BROADER TERM.\n\nYou try the broader term. WATER RIGHTS gives eleven items, each with a title, a span and a shelfmark. GROUND WATER — which the cabinet also sends you to — gives four.\n\nThe terminal does not have the heading. It does not have cross-references at all: not empty ones, none. The cabinet has a card pointing at that heading from before anybody typed any of this in.';
+
+// ---------------------------------------------------------------------------
+// Sundown Diner (wave 3) — bare/shared-text verbs (same idiom as the blocks
+// above).
+// ---------------------------------------------------------------------------
+
+/** §5's "EAT"/"ORDER FOOD"/"ORDER BREAKFAST"/"ASK FOR FOOD" — bare, this room only. */
+export const dinerEatText =
+  'It arrives before you have finished asking, because it was already on the griddle, because she decided about it when you came in.\n\nEggs, hash, toast. You eat all of it and are surprised by how much of it there was.';
+
+/** §4.6's "look out window"/"look at street" — bare fixed phrase (see `ids.ts`'s own comment on `V_LOOK_OUT` for why). */
+export const windowStreetText =
+  'The street, the brick opposite, and one lit lamp a long way down with a man still under it.\n\nFrom in here, with a mug in front of you and a griddle behind you, it looks like weather happening to somebody else.';
+
+/** §4.5's "look for yourself"/"look for a face you know" — bare fixed phrase; "look at faces"/"search photographs" reach this same text via `diner_photos`/`diner_photos_faces`'s own handlers (`objects/sundownDiner.ts`). */
+export const dinerFacesText =
+  'You go along the rows looking at faces, which is a thing people do in a room like this without deciding to.\n\nThey are strangers, every row of them, and there was never any reason to think otherwise. You go along them twice anyway.';
+
+// ---------------------------------------------------------------------------
+// Town Edge (wave 3) — bare/shared-text verbs (same idiom as the blocks
+// above). §14's "follow strip"/"cross country"/"go west"/"walk overland"/
+// "go east" (§13.6) and "follow road"/"go to wall drug" (§13.3) are NOT new
+// verbs at all — they reuse the existing dobj-taking V_FOLLOW/V_CROSS/
+// V_APPROACH (see the words added to each, below, and `objects/townEdge.ts`
+// for the handlers) rather than a bare self-contained verb, specifically to
+// avoid the `verb-noun-collision` cost a bare verb would have (see `ids.ts`'s
+// own comment on `V_THINK`).
+// ---------------------------------------------------------------------------
+
+/** §14's "THINK"/"REMEMBER"/"CONCENTRATE" — bare, this room only; the game's one deliberate "memory system's honest not-yet" (§14's own note: no other room in this wave gets a THINK response, and none should). */
+export const townEdgeThinkText =
+  'You stand at the end of the street and give it a minute.\n\nNothing arrives. Whatever is in there is behind the part of your head that hurts, and it is not coming out tonight for a man standing in the wind.';
+
+// ---------------------------------------------------------------------------
 // The full table.
 // ---------------------------------------------------------------------------
 
@@ -324,7 +383,8 @@ export const ACT1_VERBS: Record<string, VerbDef> = {
   [EXAMINE]: { id: EXAMINE, words: ['examine', 'x', 'inspect', 'study', 'look at', 'look closely at'], patterns: ['V dobj'], class: 'analytical', default: VERB_DEFAULTS.examine },
   [SEARCH]: { id: SEARCH, words: ['search', 'look in', 'look through', 'rummage'], patterns: ['V dobj'], class: 'analytical', default: VERB_DEFAULTS.search },
   [LOOK_UNDER]: { id: LOOK_UNDER, words: ['look under', 'check under'], patterns: ['V dobj'], class: 'analytical', default: VERB_DEFAULTS.look_under },
-  [LOOK_BEHIND]: { id: LOOK_BEHIND, words: ['look behind', 'check behind'], patterns: ['V dobj'], class: 'analytical', default: VERB_DEFAULTS.look_behind },
+  // "go behind" added (Town Edge §13.1's "go behind billboard") — a general LOOK_BEHIND synonym, not billboard-specific vocabulary; safe to add with zero verb-noun-collision cost since this verb never has a bare 'V' pattern.
+  [LOOK_BEHIND]: { id: LOOK_BEHIND, words: ['look behind', 'check behind', 'go behind'], patterns: ['V dobj'], class: 'analytical', default: VERB_DEFAULTS.look_behind },
   // "pet"/"pat" added (main-street-prose §4.1's "TOUCH HORSE"/"PET HORSE"/"STROKE HORSE"/"PAT HORSE") — general TOUCH synonyms, not horse-specific vocabulary.
   [TOUCH]: { id: TOUCH, words: ['touch', 'feel', 'stroke', 'pet', 'pat'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.touch },
   // 'V' added (gap 3): bare SMELL/LISTEN now resolves grammatically and
@@ -337,7 +397,8 @@ export const ACT1_VERBS: Record<string, VerbDef> = {
   [PUSH]: { id: PUSH, words: ['push', 'press against', 'shove'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.push },
   [PULL]: { id: PULL, words: ['pull', 'tug', 'yank', 'drag'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.pull },
   // "spin" added (wave-2's General Store §9.1 "SPIN RACK") — a general TURN synonym, not rack-specific vocabulary.
-  [TURN]: { id: TURN, words: ['turn', 'rotate', 'twist', 'spin'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.turn },
+  // "wind" added (County Library §9.1's "WIND REEL") — a general TURN synonym, not reader-specific vocabulary.
+  [TURN]: { id: TURN, words: ['turn', 'rotate', 'twist', 'spin', 'wind'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.turn },
   [MOVE]: { id: MOVE, words: ['move', 'shift', 'slide', 'reposition'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.move },
   [SHAKE]: { id: SHAKE, words: ['shake', 'rattle', 'jiggle'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.shake },
   // "dust" dropped from the synonym list (validate.ts's verb-noun-collision
@@ -435,7 +496,14 @@ export const ACT1_VERBS: Record<string, VerbDef> = {
   [V_XYZZY]: { id: V_XYZZY, words: ['xyzzy'], patterns: ['V'], class: null, default: xyzzyDefault },
   [V_SUDO]: { id: V_SUDO, words: ['sudo'], patterns: ['V', 'V dobj'], class: null, default: sudoDefault },
   // "look for my name"/"search for my name" added (Post Office §5) — reach the same room-scoped WHO AM I override (`postOffice.ts`'s own room handler).
-  [V_WHOAMI]: { id: V_WHOAMI, words: ['who am i', 'whoami', 'look for my name', 'search for my name'], patterns: ['V'], class: null, default: whoamiDefault },
+  // "search my name"/"search for myself"/"look myself up" added (County Library §9.4) — reach that room's own WHO AM I override (`countyLibrary.ts`'s own room handler).
+  [V_WHOAMI]: {
+    id: V_WHOAMI,
+    words: ['who am i', 'whoami', 'look for my name', 'search for my name', 'search my name', 'search for myself', 'look myself up'],
+    patterns: ['V'],
+    class: null,
+    default: whoamiDefault,
+  },
   [V_HOLD_TO_LAMP]: { id: V_HOLD_TO_LAMP, words: ['hold to'], patterns: ['V dobj prep iobj'], preps: ['to'], class: 'analytical', default: VERB_DEFAULTS.touch },
   [V_TURN_OVER]: { id: V_TURN_OVER, words: ['turn over', 'examine other side'], patterns: ['V dobj'], class: 'analytical', default: VERB_DEFAULTS.turn },
   [V_LOOK_UP]: { id: V_LOOK_UP, words: ['look up'], patterns: ['V'], class: null, default: lookUp },
@@ -468,7 +536,38 @@ export const ACT1_VERBS: Record<string, VerbDef> = {
   // scope with no handler falls to this verb's own `default`, the generic
   // boundary variant (§8) — "any GO TO <named place> that is not the
   // boarding house".
-  [V_APPROACH]: { id: V_APPROACH, words: ['go to', 'approach', 'walk to'], patterns: ['V dobj'], class: 'direct', default: { ref: ACT1_MAIN_STREET_BOUNDARY_GENERIC } },
+  // "go"/"walk" added (Town Edge §13.3/§13.6's "go to wall drug"/"go west"/
+  // "walk overland") — this verb's own pattern is 'V dobj' only (no bare
+  // form), so these two bare-looking words cost zero verb-noun-collision
+  // warnings regardless of what nouns exist elsewhere; see this task's
+  // report.
+  // "go toward"/"go towards" added (wave-3 Main Street amendment §15.3 —
+  // "GO TOWARD GLOW"/"GO TOWARD LIGHTS") — each is its own multi-word verb
+  // form (mirrors "go to"/"walk to"), since `grammar.ts`'s `candidatesAtLength`
+  // matches a verb form's words as an exact prefix: a bare "toward" word
+  // would never fire for "go toward X" (only for "toward X" with no "go").
+  // KNOWN GAP (this task's own escalation, see its report): `interpreter.ts`'s
+  // `tryGoTo` recognizes any literal "go to <phrase>" ahead of grammar
+  // matching at all, and resolves it only through `ScopeView.travel`'s
+  // visited-room BFS — so whenever `<phrase>` also happens to be a
+  // declared room alias/name (`diner`/`sundown`/`store`/`library`/`annex`/
+  // `sheriff`/etc.), "GO TO <that phrase>" can never reach this verb's own
+  // `V dobj` handler on a first, not-yet-visited approach: it is
+  // intercepted and answered "You don't know the way there yet." instead.
+  // "GO TOWARD X"/"WALK TO X"/"GO X"/"APPROACH X"/"ENTER X" are unaffected
+  // (none of them start with the literal two-token "go"+"to" `tryGoTo`
+  // matches on, or equal a whole room alias string). Pre-existing before
+  // this task (already true of "GO TO STORE"/"GO TO SHERIFF"), not
+  // something this task's own content changes can fix from inside
+  // `mainStreet.ts`/`objects/mainStreet.ts` — an `interpreter.ts` change,
+  // out of this task's module.
+  [V_APPROACH]: {
+    id: V_APPROACH,
+    words: ['go to', 'approach', 'walk to', 'go', 'walk', 'go toward', 'go towards'],
+    patterns: ['V dobj'],
+    class: 'direct',
+    default: { ref: ACT1_MAIN_STREET_BOUNDARY_GENERIC },
+  },
   // §6's "CROSS STREET" — bare object-word, dobj resolves to `main_street_road`'s own noun "street".
   [V_CROSS]: { id: V_CROSS, words: ['cross'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.move },
   // §4.3's "WATCH GLOW" — resolves to `horizon_glow`'s own EXAMINE text via a handler; no bare form (nothing else in this room is watched).
@@ -500,6 +599,38 @@ export const ACT1_VERBS: Record<string, VerbDef> = {
   [V_ATTACK]: { id: V_ATTACK, words: ['attack'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.attack },
   // No `follow` family exists in `content/responses.ts`; this `default` reuses the closest existing authored family (`talk_to`, already the fallback for ASK/TELL misses) rather than inventing new global prose — see this task's report. `npc.whitlock.handlers` (whitlock.ts) is what a player actually reaches for "FOLLOW WHITLOCK" in this build; no other NPC is follow-able yet.
   [V_FOLLOW]: { id: V_FOLLOW, words: ['follow'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.talk_to },
+
+  // County Library (wave 3) — new verbs. Both bare, self-contained phrases
+  // (same idiom as V_MEASURE/V_CHECK_DATE); `countyLibrary.ts`'s own
+  // room-level handlers run the actual clue-granting effects alongside this
+  // same text — see this table's own header note on `readCardsText`/
+  // `typeReclamationText` for why `default` here is not dead prose the way
+  // V_TYPE_TERMINAL's own `default` is for other rooms (it is the ONLY text
+  // this bare verb ever renders, in the one room that declares it).
+  // "open card drawer" also lands here, not on `card_catalogue`'s own OPEN
+  // handler — see `objects/countyLibrary.ts`'s own comment on why that
+  // phrase can't resolve as `OPEN` + dobj without colliding with
+  // `fiche_drawers`'s own required-unique noun "drawer".
+  [V_LOOK_UP_SUBJECT]: { id: V_LOOK_UP_SUBJECT, words: ['look up subject', 'open card drawer'], patterns: ['V'], class: 'analytical', default: readCardsText },
+  [V_TYPE_RECLAMATION]: { id: V_TYPE_RECLAMATION, words: ['type reclamation', 'look up reclamation'], patterns: ['V'], class: 'analytical', default: typeReclamationText },
+
+  // Sundown Diner (wave 3) — new verbs. `default`s reuse the closest
+  // existing authored family where this room's own text doesn't apply
+  // globally (same idiom as the blocks above).
+  [V_EAT]: { id: V_EAT, words: ['eat', 'order food', 'order breakfast', 'ask for food'], patterns: ['V'], class: 'direct', default: dinerEatText },
+  // §4.3/§4.4's "order coffee"/"order pie"/"ask for pie" — generic default
+  // reuses the closest existing authored family (this verb is never reached
+  // bare in this build; `coffee_urn`'s and `pie_case`'s own handlers,
+  // `objects/sundownDiner.ts`, are what a player actually gets).
+  [V_ORDER]: { id: V_ORDER, words: ['order', 'ask for'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.examine },
+  [V_LOOK_OUT]: { id: V_LOOK_OUT, words: ['look out window', 'look at street', 'look out'], patterns: ['V'], class: 'analytical', default: windowStreetText },
+  [V_LOOK_FOR_FACE]: { id: V_LOOK_FOR_FACE, words: ['look for yourself', 'look for a face you know'], patterns: ['V'], class: 'analytical', default: dinerFacesText },
+  // §6.8's "KISS PEARL"/"HUG PEARL" — no `kiss`/`hug` family exists; reuses TOUCH's own family rather than inventing new global prose. `npc.pearl.handlers` (pearl.ts) is what a player actually reaches.
+  [V_KISS]: { id: V_KISS, words: ['kiss', 'hug'], patterns: ['V dobj'], class: 'social', default: VERB_DEFAULTS.touch },
+
+  // Town Edge (wave 3) — new verb. Bare, self-contained (no dobj, no flag,
+  // no other room declares it) — same idiom as V_WHAT_YEAR/V_CHECK_DATE.
+  [V_THINK]: { id: V_THINK, words: ['think', 'remember', 'concentrate'], patterns: ['V'], class: 'analytical', default: townEdgeThinkText },
   // §8 gap 2: the real reserved `INVENTORY_VERB_ID`, not a room-local id.
   // `default` refs the global `inventory.empty` family — `room.ts`'s own
   // handler overrides it for the empty-hands case (§8.9/§14.4).
@@ -512,7 +643,13 @@ export const ACT1_VERBS: Record<string, VerbDef> = {
   // the rest are registered so that typing a compass direction gets the
   // authored `move.noExit` answer rather than "I don't understand", which
   // is the difference between a world with edges and a broken parser.
-  [DIRECTION_VERB_IDS.n]: { id: DIRECTION_VERB_IDS.n, words: ['north', 'n'], patterns: ['V'], class: 'direct', default: { ref: 'move.noExit' } },
+  // "go north"/"walk north" added (Town Edge §13.3) — reach the same real
+  // `n` exit as bare "north" (the boundary gate's own blockedText), so no
+  // separate string is needed; both words are already-reported nouns
+  // ("north", `horizon_glow`'s own noun) — zero new verb-noun-collision
+  // warnings (the dedup is per verb+word, and "n"/"north" is already
+  // reported from the bare word above).
+  [DIRECTION_VERB_IDS.n]: { id: DIRECTION_VERB_IDS.n, words: ['north', 'n', 'go north', 'walk north'], patterns: ['V'], class: 'direct', default: { ref: 'move.noExit' } },
   [DIRECTION_VERB_IDS.s]: { id: DIRECTION_VERB_IDS.s, words: ['south', 's'], patterns: ['V'], class: 'direct', default: { ref: 'move.noExit' } },
   [DIRECTION_VERB_IDS.e]: { id: DIRECTION_VERB_IDS.e, words: ['east', 'e'], patterns: ['V'], class: 'direct', default: { ref: 'move.noExit' } },
   [DIRECTION_VERB_IDS.w]: { id: DIRECTION_VERB_IDS.w, words: ['west', 'w'], patterns: ['V'], class: 'direct', default: { ref: 'move.noExit' } },
@@ -594,6 +731,8 @@ export const ACT1_VERBS: Record<string, VerbDef> = {
   // wired into `world.responses` here; see this task's report for why).
   [V_HELP]: { id: V_HELP, words: ['help', '?', 'commands', 'what can i do'], patterns: ['V'], class: null, meta: true, default: { ref: 'meta.help' } },
   [V_ABOUT]: { id: V_ABOUT, words: ['about', 'credits', 'info'], patterns: ['V'], class: null, meta: true, default: { ref: 'meta.about' } },
+  // VERSION — a meta verb (no turn), same shape as the MVP prologue's own.
+  [V_VERSION]: { id: V_VERSION, words: ['version'], patterns: ['V'], class: null, meta: true, default: `Intentionally Blank v${GAME_VERSION}.` },
 
   // AGAIN/G (response-families doc §9's `again.nothing`, now authored):
   // `interpreter.ts`'s `resolveAgain` special-cases the resolved match to

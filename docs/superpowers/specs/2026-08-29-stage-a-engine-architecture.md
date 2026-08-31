@@ -864,8 +864,10 @@ normalize (MVP rules kept) → tokenize → match verb + pattern
 - **Articles and noise words** (`the`, `a`, `at`, `please`) are dropped.
 - **Noun-phrase resolution:** candidates = things in scope whose nouns match
   the head noun; adjectives filter; a full adjective+noun match outranks a
-  bare noun match. One candidate → resolved. Zero → miss rung 3/4 (§3.6).
-  Several → disambiguation.
+  bare noun match; among what is left, things the player is carrying or
+  wearing outrank things in the room (v0.7.0 — "show mug to pearl" with the
+  diner's shelf of mugs in view means the mug in hand). One candidate →
+  resolved. Zero → miss rung 3/4 (§3.6). Several → disambiguation.
 
 ### 3.3 Disambiguation
 

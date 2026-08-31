@@ -54,22 +54,60 @@ describe('validate — Act I room 1', () => {
   // content ambiguity a sentence's position resolves in practice, which is
   // exactly what this warning class exists to flag and let stand — asserted
   // exactly, so a genuinely new, unreviewed warning still fails this test.
-  it('produces exactly the 10 expected verb-noun-collision warnings, no others', () => {
+  // Town Edge task (wave 3) adds three more, all genuine, all deliberate
+  // (see `objects/townEdge.ts` for the content that produces each): "east"/
+  // "west" (the compass verbs' own words vs. `open_country`'s own doc-given
+  // noun list, which names the compass directions as terrain words \u2014 \u00a713.6)
+  // and "back" (the `in`/`enter` direction verb's own word vs. the
+  // billboard's own "back" sub-part, added so "examine back" resolves at
+  // all \u2014 `ids.ts`'s own comment on `BILLBOARD_BACK`).
+  //
+  // Sundown Diner and County Library (also wave 3, landed concurrently)
+  // account for most of the rest: "myself" (V_WHOAMI’s own word vs.
+  // `act1_self`’s reflexive nouns), "face" (`V_LOOK_FOR_FACE` vs. the
+  // diner’s own photo wall), "street"/"window" (`V_LOOK_OUT` vs. the
+  // diner’s own street-facing scenery), and "card"/"drawer"/"subject"
+  // (the library’s own `V_LOOK_UP_SUBJECT` vs. its card-catalogue nouns).
+  //
+  // RECONCILED (wave-3 Main Street amendments task, once all three
+  // concurrent wave-3 rooms had actually landed, per this note’s own
+  // standing instruction below): the three "my" entries a pre-landing
+  // estimate once expected here (`act1_find_my_name`/`act1_sign`/
+  // `act1_whoami`, each against a bare noun "my") never materialize — no
+  // object or NPC in the landed content declares a bare "my" noun
+  // (`act1_self`’s own reflexive list is "me"/"myself"/"self"/"body", not
+  // "my") — so the final count is 20, not 23. This task’s own Main Street
+  // changes (deleting `MAIN_STREET_BOUNDARY_GATE`; adding
+  // `county_library_front`’s nouns and "sundown" to `diner`’s; adding
+  // "go toward"/"go towards" to `V_APPROACH`, whose pattern is `V dobj`
+  // only and so never contributes here) add zero new collisions of this
+  // kind.
+  it('produces exactly the 20 expected verb-noun-collision warnings, no others', () => {
     const warnings = validate(WORLD).filter((f) => f.severity === 'warning');
     const collisions = warnings.filter((f) => f.code === 'verb-noun-collision');
-    expect(collisions.length).toBe(10);
+    expect(collisions.length).toBe(20);
     expect(collisions.map((f) => f.message).sort()).toEqual(
       [
-        "verb \"act1_look_outside\" can be typed bare and its word \"outside\" is also an object/NPC noun \u2014 the single word is ambiguous between a command and a thing",
-        "verb \"act1_measure\" can be typed bare and its word \"map\" is also an object/NPC noun \u2014 the single word is ambiguous between a command and a thing",
-        "verb \"act1_measure\" can be typed bare and its word \"scale\" is also an object/NPC noun \u2014 the single word is ambiguous between a command and a thing",
-        "verb \"act1_post_letter\" can be typed bare and its word \"mail\" is also an object/NPC noun \u2014 the single word is ambiguous between a command and a thing",
-        "verb \"act1_post_letter\" can be typed bare and its word \"post\" is also an object/NPC noun \u2014 the single word is ambiguous between a command and a thing",
-        "verb \"act1_sign\" can be typed bare and its word \"sign\" is also an object/NPC noun \u2014 the single word is ambiguous between a command and a thing",
-        "verb \"act1_type_terminal\" can be typed bare and its word \"key\" is also an object/NPC noun \u2014 the single word is ambiguous between a command and a thing",
-        "verb \"n\" can be typed bare and its word \"north\" is also an object/NPC noun \u2014 the single word is ambiguous between a command and a thing",
-        "verb \"out\" can be typed bare and its word \"outside\" is also an object/NPC noun \u2014 the single word is ambiguous between a command and a thing",
-        "verb \"stand\" can be typed bare and its word \"stand\" is also an object/NPC noun \u2014 the single word is ambiguous between a command and a thing",
+        "verb \"act1_look_for_face\" can be typed bare and its word \"face\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act1_look_out\" can be typed bare and its word \"street\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act1_look_out\" can be typed bare and its word \"window\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act1_look_outside\" can be typed bare and its word \"outside\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act1_look_up_subject\" can be typed bare and its word \"card\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act1_look_up_subject\" can be typed bare and its word \"drawer\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act1_look_up_subject\" can be typed bare and its word \"subject\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act1_measure\" can be typed bare and its word \"map\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act1_measure\" can be typed bare and its word \"scale\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act1_post_letter\" can be typed bare and its word \"mail\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act1_post_letter\" can be typed bare and its word \"post\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act1_sign\" can be typed bare and its word \"sign\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act1_type_terminal\" can be typed bare and its word \"key\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act1_whoami\" can be typed bare and its word \"myself\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"e\" can be typed bare and its word \"east\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"in\" can be typed bare and its word \"back\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"n\" can be typed bare and its word \"north\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"out\" can be typed bare and its word \"outside\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"stand\" can be typed bare and its word \"stand\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"w\" can be typed bare and its word \"west\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
       ].sort(),
     );
   });
@@ -119,20 +157,35 @@ describe('validate — Act I room 1', () => {
   //     that still answers to the same word the spool does.
   // Every one accepted, not a bug — asserted exactly, so a genuinely new,
   // unreviewed collision still fails this test.
-  it('produces exactly the 2 expected object-noun-collision warnings, no others', () => {
+  // Town Edge task (wave 3) adds one more: `paddock` lists "pen" among its
+  // own synonyms (a paddock is also called a pen \u2014 \u00a713.4's own noun list),
+  // which collides with the pre-existing portable `act1_pen` the same way
+  // `mail_drop`/`whitlock_desk` already do (the portable-object half of
+  // this rule) \u2014 genuine, reviewed, not fixed for the same reason those two
+  // weren't (touching Your Room's `act1_pen` is out of this task's module).
+  //
+  // County Library (also wave 3) adds one more: "pen" a second time,
+  // against its own `act1_sign_in_book`.
+  it('produces exactly the 4 expected object-noun-collision warnings, no others', () => {
     const warnings = validate(WORLD).filter((f) => f.severity === 'warning');
     const collisions = warnings.filter((f) => f.code === 'object-noun-collision');
-    expect(collisions.length).toBe(2);
+    expect(collisions.length).toBe(4);
     expect(collisions.map((f) => f.message).sort()).toEqual(
       [
         "\"act1_mail_drop\" and \"act1_pen\" can be in scope together and both answer to bare noun \"pen\" \u2014 a plain \"pen\" alone can never tell them apart (only a full adjective+noun phrase can); verify this is deliberate disambiguation, not an accidental shared word",
+        "\"act1_paddock\" and \"act1_pen\" can be in scope together and both answer to bare noun \"pen\" \u2014 a plain \"pen\" alone can never tell them apart (only a full adjective+noun phrase can); verify this is deliberate disambiguation, not an accidental shared word",
+        "\"act1_pen\" and \"act1_sign_in_book\" can be in scope together and both answer to bare noun \"pen\" \u2014 a plain \"pen\" alone can never tell them apart (only a full adjective+noun phrase can); verify this is deliberate disambiguation, not an accidental shared word",
         "\"act1_pen\" and \"act1_whitlock_desk\" can be in scope together and both answer to bare noun \"pen\" \u2014 a plain \"pen\" alone can never tell them apart (only a full adjective+noun phrase can); verify this is deliberate disambiguation, not an accidental shared word",
       ].sort(),
     );
   });
 
-  it('produces exactly thirteen warnings total, no others', () => {
+  // RECONCILED (wave-3 Main Street amendments task): 1 (grey/FEDORA) + 20
+  // (verb-noun) + 4 (object-noun) = 25, down from the pre-landing
+  // estimate of 28 — see the verb-noun test above for why (three "my"
+  // collisions that never materialized).
+  it('produces exactly twenty-five warnings total, no others', () => {
     const warnings = validate(WORLD).filter((f) => f.severity === 'warning');
-    expect(warnings.length).toBe(13);
+    expect(warnings.length).toBe(25);
   });
 });

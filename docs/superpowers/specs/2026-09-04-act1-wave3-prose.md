@@ -1,7 +1,10 @@
 # Act I Wave 3 — Sundown Diner, County Library, Town Edge
 
-**Status:** authored prose, awaiting main-session voice review and Ryan's
-spot-check · **Author:** `narrative-writer` · **Date:** 2026-09-04
+**Status:** **wired and shipped v0.7.0** (2026-08-30). Main-session voice
+review done; Ryan's in-game spot-check pending. Main-session decisions at
+wiring: §17 M1 **held** until Jack is placeable (option 1); the library
+shipped whole, §19's trims not taken; the carried mug gained its own
+examine (not in this document — `objects/sundownDiner.ts`, `mugInHandText`) · **Author:** `narrative-writer` · **Date:** 2026-09-04
 **Rooms:** Zone 1 rooms **4** (`sundown_diner`), **9** (`county_library`) and
 **14** (`town_edge`) — all three **standard tier** (scope cut §2: 5–7 objects,
 ~1,200 words room + objects each). **Pearl budgeted separately at ~500** as a
@@ -1191,8 +1194,6 @@ You try the broader term. WATER RIGHTS gives eleven items, each with a title, a
 span and a shelfmark. GROUND WATER — which the cabinet also sends you to —
 gives four.
 
-
-
 The terminal does not have the heading. It does not have cross-references at
 all: not empty ones, none. The cabinet has a card pointing at that heading from
 before anybody typed any of this in.
@@ -2035,6 +2036,10 @@ Four things worth his eye rather than mine:
 ---
 
 ## 17. Quarantined — **DO NOT WIRE WITHOUT SIGN-OFF**
+
+> **Decision (main session, v0.7.0):** held — option 1 below. Lands with
+> wave 4, when Jack is in the motel to be asked about it. Tracked on
+> `BACKLOG.md` C-4.
 
 ### M1 — the hiring (architecture §5)
 

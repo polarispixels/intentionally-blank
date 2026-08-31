@@ -71,6 +71,7 @@ function resolvePhraseAgainstScope(view: ScopeView, words: string[]): ResolveRes
     view.visible,
     { words, adjectives: words.slice(0, -1), noun: words[words.length - 1]! },
     'either',
+    view.location,
   );
 }
 

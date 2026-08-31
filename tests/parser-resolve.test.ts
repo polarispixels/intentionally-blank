@@ -19,6 +19,7 @@ import { compileVocabulary, introduceIt, resolveNounPhrase } from '../src/engine
 import type { UnresolvedNounPhrase } from '../src/engine/parser';
 import { initialState } from '../src/engine/world';
 import type { GameState } from '../src/engine/world';
+import type { ObjectId, PlaceId } from '../src/engine/ids';
 import {
   ASK,
   BOX,
@@ -108,6 +109,64 @@ describe('resolveNounPhrase — adjective ranking (§3.2)', () => {
 });
 
 // ---------------------------------------------------------------------------
+// resolveNounPhrase — held objects win bare-noun ties (§3.2, wave 3)
+// ---------------------------------------------------------------------------
+
+describe('resolveNounPhrase — a held object wins a bare-noun tie against room objects (§3.2)', () => {
+  const visible = [KEY, DOOR_KEY, SPARE_KEY];
+  const holdingKey = new Map<ObjectId, PlaceId>([
+    [KEY, 'inventory'],
+    [DOOR_KEY, ROOM_A],
+    [SPARE_KEY, ROOM_A],
+  ]);
+
+  it('a bare noun tying between one held object and room objects resolves to the held one', () => {
+    // Wave 3's mug: once the diner's mug is in hand, "show mug to pearl"
+    // must reach the carried mug, not ask "the shelf or the mug?". Same
+    // shape as the store's string/twine and Ryan's original key/key-rack bug.
+    expect(resolveNounPhrase(vocab, visible, phrase(['key']), 'either', holdingKey)).toEqual({ kind: 'resolved', id: KEY });
+  });
+
+  it('a worn object counts as held', () => {
+    const wearingKey = new Map(holdingKey);
+    wearingKey.set(KEY, 'worn');
+    expect(resolveNounPhrase(vocab, visible, phrase(['key']), 'either', wearingKey)).toEqual({ kind: 'resolved', id: KEY });
+  });
+
+  it('adjectives still rank first: a full adjective+noun match on a room object beats a held bare-noun match', () => {
+    expect(resolveNounPhrase(vocab, visible, phrase(['door', 'key']), 'either', holdingKey)).toEqual({ kind: 'resolved', id: DOOR_KEY });
+  });
+
+  it('several held candidates stay ambiguous, narrowed to the held ones', () => {
+    const holdingTwo = new Map(holdingKey);
+    holdingTwo.set(SPARE_KEY, 'inventory');
+    expect(resolveNounPhrase(vocab, visible, phrase(['key']), 'either', holdingTwo)).toEqual({
+      kind: 'ambiguous',
+      candidates: [KEY, SPARE_KEY],
+    });
+  });
+
+  it('with nothing held (or no location map at all) the bare-noun pool is unchanged', () => {
+    const nothingHeld = new Map<ObjectId, PlaceId>([[KEY, ROOM_A], [DOOR_KEY, ROOM_A], [SPARE_KEY, ROOM_A]]);
+    expect(resolveNounPhrase(vocab, visible, phrase(['key']), 'either', nothingHeld)).toEqual({
+      kind: 'ambiguous',
+      candidates: [KEY, DOOR_KEY, SPARE_KEY],
+    });
+    expect(resolveNounPhrase(vocab, visible, phrase(['key']), 'either')).toEqual({
+      kind: 'ambiguous',
+      candidates: [KEY, DOOR_KEY, SPARE_KEY],
+    });
+  });
+
+  it('end to end: the parser passes the scope view\'s locations through, so "take key" while holding the brass key resolves without a clarify', () => {
+    expect(parser.interpret('take key', view({ location: holdingKey }))).toEqual({
+      kind: 'actions',
+      actions: [{ verb: BUILTIN_VERB_IDS.take, dobj: KEY, raw: 'take key' }],
+    });
+  });
+});
+
+// ---------------------------------------------------------------------------
 // DeterministicParser.interpret — resolution end to end
 // ---------------------------------------------------------------------------
 
@@ -129,8 +188,8 @@ describe('DeterministicParser — noun-phrase resolution', () => {
     const outcome = parser.interpret('take key', view());
     expect(outcome.kind).toBe('clarify');
     if (outcome.kind !== 'clarify') throw new Error('expected clarify');
-    expect(outcome.options).toEqual(['brass key', 'door key', 'key']);
-    expect(outcome.question).toBe('Which do you mean, the brass key, the door key, or the key?');
+    expect(outcome.options).toEqual(['brass key', 'door key', 'spare key']);
+    expect(outcome.question).toBe('Which do you mean, the brass key, the door key, or the spare key?');
     expect(outcome.pending).toEqual({
       verb: BUILTIN_VERB_IDS.take,
       slot: 'dobj',
@@ -213,7 +272,7 @@ describe('disambiguation — answer / fresh-command / re-ask-once (§3.3)', () =
     // The re-ask's own wording differs from the first ask (numbered, not a
     // repeat) — a plain word answer already failed to distinguish these
     // once, so it asks for a number instead.
-    expect(reasked.question).toBe('Which do you mean — 1) the brass key, 2) the door key, 3) the key? Say the number.');
+    expect(reasked.question).toBe('Which do you mean — 1) the brass key, 2) the door key, 3) the spare key? Say the number.');
 
     // A second ambiguous answer in a row never nests into a third question:
     // there is no word that could ever disambiguate these three (a content

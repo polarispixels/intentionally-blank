@@ -12,8 +12,19 @@
 // considered when no full match exists at all (adjectives that match
 // nothing degrade gracefully rather than hard-failing, per the
 // forgiving-language constitution §12).
+//
+// HELD TIE-BREAK (§3.2, wave 3): after adjectives have done their work, a
+// pool that still holds more than one candidate is narrowed to the ones the
+// player is carrying or wearing, when any are. A bare "mug" with the
+// diner's shelf of mugs in view and one mug in hand means the one in hand;
+// "show mug to pearl" must not ask "the shelf or the mug?". Adjectives
+// always win first ("door key" reaches the door key on the table even with
+// a brass key in your pocket), and the narrowing never produces a worse
+// answer than the pool it started from — it only ever drops room objects
+// that share a word with something already held. Callers without a
+// `location` map (none in the engine; some tests) get the old behaviour.
 
-import type { NpcId, ObjectId } from './../ids';
+import type { NpcId, ObjectId, PlaceId } from './../ids';
 import type { CompiledVocabulary } from './vocabulary';
 import type { UnresolvedNounPhrase } from './grammar';
 
@@ -47,6 +58,9 @@ function hasAdjective(vocab: CompiledVocabulary, id: ObjectId | NpcId, adjective
 /** Every word (noun or adjective) the vocabulary indexes `id` under, object or npc — used by disambiguation-answer matching (`interpreter.ts`), which is forgiving about which word class an answer word belongs to. */
 export function knownWordsFor(vocab: CompiledVocabulary, id: ObjectId | NpcId): Set<string> {
   const words = new Set<string>();
+  // The words of the object's own display name are always an acceptable
+  // answer, since that name is exactly what the question offered.
+  for (const w of (vocab.objectNames.get(id as ObjectId) ?? '').split(/\s+/)) if (w) words.add(w);
   for (const [word, ids] of vocab.objectNouns) if (ids.includes(id as ObjectId)) words.add(word);
   for (const [word, ids] of vocab.objectAdjectives) if (ids.includes(id as ObjectId)) words.add(word);
   for (const [word, ids] of vocab.npcNouns) if (ids.includes(id as NpcId)) words.add(word);
@@ -65,26 +79,44 @@ export function resolveNounPhrase(
   visible: readonly (ObjectId | NpcId)[],
   phrase: UnresolvedNounPhrase,
   role: ResolveRole,
+  location?: ReadonlyMap<ObjectId, PlaceId>,
 ): ResolveResult {
   const nounIds = [...new Set(idsForNoun(vocab, phrase.noun, role))].filter((id) => visible.includes(id));
   if (nounIds.length === 0) return { kind: 'none' };
-  if (phrase.adjectives.length === 0) {
-    return nounIds.length === 1 ? { kind: 'resolved', id: nounIds[0]! } : { kind: 'ambiguous', candidates: nounIds };
+  let pool = nounIds;
+  if (phrase.adjectives.length > 0) {
+    const fullMatches = nounIds.filter((id) => phrase.adjectives.every((adj) => hasAdjective(vocab, id, adj)));
+    if (fullMatches.length > 0) pool = fullMatches;
   }
-  const fullMatches = nounIds.filter((id) => phrase.adjectives.every((adj) => hasAdjective(vocab, id, adj)));
-  const pool = fullMatches.length > 0 ? fullMatches : nounIds;
+  pool = preferHeld(pool, location);
   return pool.length === 1 ? { kind: 'resolved', id: pool[0]! } : { kind: 'ambiguous', candidates: pool };
 }
 
+/** The held tie-break (header note): a pool of two or more narrows to its carried/worn members when there are any. */
+function preferHeld(pool: (ObjectId | NpcId)[], location?: ReadonlyMap<ObjectId, PlaceId>): (ObjectId | NpcId)[] {
+  if (location === undefined || pool.length < 2) return pool;
+  const held = pool.filter((id) => {
+    const place = location.get(id as ObjectId);
+    return place === 'inventory' || place === 'worn';
+  });
+  return held.length > 0 ? held : pool;
+}
+
 /**
- * A display name for one candidate, synthesized from the vocabulary alone
- * (`ScopeView` carries no `WorldDef`/`name`, only compiled word tables) —
- * its first indexed noun, prefixed by its first indexed adjective if it has
- * one. Used both for the `question` text and the `options` list of a
+ * A display name for one candidate: an object's own declared `name` when
+ * it has one (compiled into `vocab.objectNames`, v0.7.0); otherwise
+ * synthesized from the vocabulary alone (`ScopeView` carries no
+ * `WorldDef`) — its first indexed noun, prefixed by its first indexed
+ * adjective if it has one. NPCs never take this path's name branch;
+ * `npc.ts`'s `npcDisplayName` owns theirs. Used both for the `question` text and the `options` list of a
  * `clarify` outcome (§3.3).
  */
 export function candidateName(vocab: CompiledVocabulary, id: ObjectId | NpcId): string {
   const npc = isNpcId(vocab, id);
+  if (!npc) {
+    const own = vocab.objectNames.get(id as ObjectId);
+    if (own !== undefined) return own;
+  }
   const nounMap = npc ? vocab.npcNouns : vocab.objectNouns;
   const adjMap = npc ? vocab.npcAdjectives : vocab.objectAdjectives;
   let noun: string | undefined;

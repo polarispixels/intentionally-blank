@@ -10,28 +10,36 @@
 import type { WorldDef } from '../../../engine/world';
 import { EXIT_TRAVEL_TEXT_LIT } from './room';
 import {
+  CLUE_BILLBOARD_SCRATCH,
   CLUE_BLANK_RECTANGLE,
   CLUE_BOLT_THROWN,
   CLUE_BOX_141,
   CLUE_CALM_SEARCH,
+  CLUE_DEAD_CROSS_REFERENCE,
   CLUE_DRAWER_HELD,
   CLUE_FIVE_FACES,
   CLUE_HORIZON_GLOW,
   CLUE_HOUSE_EMPTY,
+  CLUE_LIGHTS_RESOLVED,
   CLUE_MAP_ADDITION,
+  CLUE_MUG_SPELLING,
   CLUE_NO_COUNTY_RECORD,
   CLUE_NO_NAME_RECALLED,
   CLUE_NOTHING_NAMED,
   CLUE_PAGE_INDENTATION,
+  CLUE_RECORD_RANGE,
   CLUE_REGISTER_GAP,
   CLUE_REGISTER_IMPRESSION,
   CLUE_SAME_DISTANCE,
   CLUE_TERMINAL_BURN,
+  CLUE_TERMINAL_NO_CROSSREFS,
   CLUE_VISITOR_UNREMARKABLE,
   CLUE_WINDOW_EXIT,
   FLAG_CROSSED_STREET,
   FLAG_DOOR_BOLT_DRAWN,
   FLAG_DRANK_WATER,
+  FLAG_ENTERED_PADDOCK,
+  FLAG_HANDLED_MUG,
   FLAG_HAS_STRING,
   FLAG_HORSE_TOUCHED,
   FLAG_LAMP_FIRST_OFF_DONE,
@@ -41,25 +49,36 @@ import {
   FLAG_MARLOW_PRESSED,
   FLAG_MARLOW_TOLD_ABOUT_ROOM,
   FLAG_MET_MARLOW,
+  FLAG_MET_PEARL,
   FLAG_MET_WHITLOCK,
+  FLAG_PEARL_NOTICED_YOU,
   FLAG_POCKETS_CHECKED,
   FLAG_RANG_BELL,
+  FLAG_READ_BILLBOARD_SCRATCH,
+  FLAG_READ_LEFT_FRAME,
   FLAG_READ_POSTCARDS,
   FLAG_REGISTER_GAP_SEEN,
   FLAG_REGISTER_IMPRESSION_FOUND,
   FLAG_ROOM_SEARCHED,
+  FLAG_SAT_AT_COUNTER,
   FLAG_SAT_IN_POST_OFFICE,
   FLAG_SAW_BLANK_RECTANGLE,
+  FLAG_SAW_GRADED_STRIP,
   FLAG_SEEN_MAINTENANCE_MAN,
+  FLAG_SIGNED_THE_BOOK,
   FLAG_SPARE_KEY_GIVEN,
   FLAG_STOOD_UP,
   FLAG_TERMINAL_TRIED,
+  FLAG_TOLD_PEARL_ABOUT_ROOM,
   FLAG_TOLD_WHITLOCK_ABOUT_ROOM,
   FLAG_TOWEL_TAKEN,
+  FLAG_VISITED_DINER,
   FLAG_VISITED_GENERAL_STORE,
+  FLAG_VISITED_LIBRARY,
   FLAG_VISITED_MAIN_STREET,
   FLAG_VISITED_POST_OFFICE,
   FLAG_VISITED_SHERIFF_OFFICE,
+  FLAG_VISITED_TOWN_EDGE,
   FLAG_WHITLOCK_ASKED_YEAR,
   FLAG_WHITLOCK_RAN_YOU,
   FLAG_WINDOW_OPEN,
@@ -138,6 +157,31 @@ export const ACT1_FLAGS: WorldDef['flags'] = {
   [FLAG_WHITLOCK_RAN_YOU]: { default: false, doc: 'set by topic_records — read by the greeting rotation and WHO AM I' },
   [FLAG_TOLD_WHITLOCK_ABOUT_ROOM]: { default: false, doc: 'set by tell_room — read by nothing yet, P4/P5 should read it' },
   [FLAG_WHITLOCK_ASKED_YEAR]: { default: false, doc: 'set by topic_year rule 1 — read by topic_year rule 2' },
+
+  // -------------------------------------------------------------------
+  // County Library (wave-3 prose §7's table)
+  // -------------------------------------------------------------------
+  [FLAG_VISITED_LIBRARY]: { default: false, doc: 'set by county_library\'s own onEnter (first entry) — gates room description rule 2' },
+  [FLAG_READ_LEFT_FRAME]: { default: false, doc: 'set by READ SCREEN / EXAMINE PAGE / READ NEWSPAPER — read by nothing yet' },
+  [FLAG_SIGNED_THE_BOOK]: { default: false, doc: 'set by SIGN BOOK / WRITE IN BOOK / SIGN NAME / USE PEN — read by nothing yet' },
+
+  // -------------------------------------------------------------------
+  // Sundown Diner (wave-3 prose §2's table)
+  // -------------------------------------------------------------------
+  [FLAG_VISITED_DINER]: { default: false, doc: 'set by sundown_diner\'s own onEnter (first entry) — gates room description rule 2' },
+  [FLAG_MET_PEARL]: { default: false, doc: 'set by sundown_diner\'s own onEnter (same engine gap as met_whitlock — greeting cannot run an Effect) — gates her greeting rotation' },
+  [FLAG_HANDLED_MUG]: { default: false, doc: 'set by TAKE MUG — topic_diner_name\'s second paragraph reads better after it (not gated)' },
+  [FLAG_SAT_AT_COUNTER]: { default: false, doc: 'set by SIT — read by nothing yet' },
+  [FLAG_TOLD_PEARL_ABOUT_ROOM]: { default: false, doc: 'set by tell_room — read by nothing yet, P4/P5 should read it' },
+  [FLAG_PEARL_NOTICED_YOU]: { default: false, doc: 'set by topic_town — read by nothing in this build' },
+
+  // -------------------------------------------------------------------
+  // Town Edge (wave-3 prose §11's table)
+  // -------------------------------------------------------------------
+  [FLAG_VISITED_TOWN_EDGE]: { default: false, doc: 'set by town_edge\'s own onEnter (first entry) — gates room description rule 2' },
+  [FLAG_READ_BILLBOARD_SCRATCH]: { default: false, doc: 'set by EXAMINE/READ BILLBOARD — read by nothing yet — L10 pays off in Act II' },
+  [FLAG_ENTERED_PADDOCK]: { default: false, doc: 'set by OPEN GATE / ENTER PADDOCK / CLIMB FENCE — read by nothing yet — P9 should read it' },
+  [FLAG_SAW_GRADED_STRIP]: { default: false, doc: 'set by EXAMINE COUNTRY — read by nothing yet — P16b should read it' },
 };
 
 export const ACT1_CLUES: NonNullable<WorldDef['clues']> = {
@@ -246,6 +290,48 @@ export const ACT1_CLUES: NonNullable<WorldDef['clues']> = {
     title: 'The plant is not printed on the map',
     detail:
       'The county map in the sheriff\'s office is cloth-backed and old. North of town, past the last section line, somebody has drawn a shape onto it in pencil with a ruler, with a gate and an access road. It has no label.',
+  },
+
+  // -------------------------------------------------------------------
+  // County Library (wave-3 prose §7's table)
+  // -------------------------------------------------------------------
+  [CLUE_RECORD_RANGE]: {
+    title: 'The county on film',
+    detail:
+      'Forty-two drawers of microfilm along the annex wall, filed by span. The first is 1878–1884. The last is 2036–2039. The rail carries on past it for six more drawers\' worth and holds nothing.',
+  },
+  [CLUE_DEAD_CROSS_REFERENCE]: {
+    title: 'A heading that is not in the cabinet',
+    detail:
+      'The librarian\'s card catalogue sends WATER RIGHTS on to GROUND WATER and to RECLAMATION. There is no RECLAMATION card and no RECLAMATION drawer, and the card doing the sending is exactly as old as the cards either side of it.',
+  },
+  [CLUE_TERMINAL_NO_CROSSREFS]: {
+    title: 'The catalogue terminal has no cross-references',
+    detail:
+      'The county\'s catalogue terminal returns nothing for RECLAMATION. It also returns no cross-references for any subject at all — not empty ones, none.',
+  },
+
+  // -------------------------------------------------------------------
+  // Sundown Diner (wave-3 prose §2's table)
+  // -------------------------------------------------------------------
+  [CLUE_MUG_SPELLING]: {
+    title: 'The mugs behind the counter',
+    detail:
+      'The window, the menu and Pearl all say the Sundown. The mugs say THE SUNDOWNER — the heavy old set in a slab serif and the newer thin set in a rounder face, both of them, all of them. Pearl says a run of them came back wrong from the pottery.',
+  },
+
+  // -------------------------------------------------------------------
+  // Town Edge (wave-3 prose §11's table)
+  // -------------------------------------------------------------------
+  [CLUE_BILLBOARD_SCRATCH]: {
+    title: 'The billboard, up close',
+    detail:
+      'WALL DRUG — 32 MILES / FREE ICE WATER / PROBABLY. Low on the left leg, scratched through the paint to the wood: *It was 32 miles yesterday too.* The scratches have weathered the same brown as the wood around them.',
+  },
+  [CLUE_LIGHTS_RESOLVED]: {
+    title: 'The glow, resolved',
+    detail:
+      'From the edge of town the light on the north horizon is a great many separate white lights, low and far, in rows the same distance apart, with one red one higher up going on and off very slowly, and steam going up behind all of it. No building is visible.',
   },
 };
 

@@ -12,18 +12,25 @@ import { mainStreetRoom } from './mainStreet';
 import { postOfficeRoom } from './postOffice';
 import { generalStoreRoom } from './generalStore';
 import { sheriffOfficeRoom } from './sheriffOffice';
+import { countyLibraryRoom } from './countyLibrary';
+import { sundownDinerRoom } from './sundownDiner';
+import { townEdgeRoom } from './townEdge';
 import { marlow } from './marlow';
 import { whitlock } from './whitlock';
+import { pearl } from './pearl';
 import { ACT1_OBJECTS } from './objects/index';
 import { FRONT_DESK_OBJECTS } from './objects/frontDesk';
 import { MAIN_STREET_OBJECTS } from './objects/mainStreet';
 import { POST_OFFICE_OBJECTS } from './objects/postOffice';
 import { GENERAL_STORE_OBJECTS } from './objects/generalStore';
 import { SHERIFF_OFFICE_OBJECTS } from './objects/sheriffOffice';
+import { COUNTY_LIBRARY_OBJECTS } from './objects/countyLibrary';
+import { SUNDOWN_DINER_OBJECTS } from './objects/sundownDiner';
+import { TOWN_EDGE_OBJECTS } from './objects/townEdge';
 import { ACT1_RESPONSES } from './responses';
 import { yourRoom } from './room';
 import { ACT1_VERBS } from './verbs';
-import { FRONT_DESK, GENERAL_STORE, LANDING, MAIN_STREET, MARLOW, POST_OFFICE, SHERIFF_OFFICE, WHITLOCK, YOUR_ROOM } from './ids';
+import { COUNTY_LIBRARY, FRONT_DESK, GENERAL_STORE, LANDING, MAIN_STREET, MARLOW, PEARL, POST_OFFICE, SHERIFF_OFFICE, SUNDOWN_DINER, TOWN_EDGE, WHITLOCK, YOUR_ROOM } from './ids';
 
 export const WORLD: WorldDef = {
   meta: {
@@ -43,9 +50,22 @@ export const WORLD: WorldDef = {
     [POST_OFFICE]: postOfficeRoom,
     [GENERAL_STORE]: generalStoreRoom,
     [SHERIFF_OFFICE]: sheriffOfficeRoom,
+    [COUNTY_LIBRARY]: countyLibraryRoom,
+    [SUNDOWN_DINER]: sundownDinerRoom,
+    [TOWN_EDGE]: townEdgeRoom,
   },
-  objects: { ...ACT1_OBJECTS, ...FRONT_DESK_OBJECTS, ...MAIN_STREET_OBJECTS, ...POST_OFFICE_OBJECTS, ...GENERAL_STORE_OBJECTS, ...SHERIFF_OFFICE_OBJECTS },
-  npcs: { [MARLOW]: marlow, [WHITLOCK]: whitlock },
+  objects: {
+    ...ACT1_OBJECTS,
+    ...FRONT_DESK_OBJECTS,
+    ...MAIN_STREET_OBJECTS,
+    ...POST_OFFICE_OBJECTS,
+    ...GENERAL_STORE_OBJECTS,
+    ...SHERIFF_OFFICE_OBJECTS,
+    ...COUNTY_LIBRARY_OBJECTS,
+    ...SUNDOWN_DINER_OBJECTS,
+    ...TOWN_EDGE_OBJECTS,
+  },
+  npcs: { [MARLOW]: marlow, [WHITLOCK]: whitlock, [PEARL]: pearl },
   verbs: ACT1_VERBS,
   clues: ACT1_CLUES,
   memories: ACT1_MEMORIES,

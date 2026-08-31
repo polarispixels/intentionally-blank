@@ -532,3 +532,87 @@ describe('Front Desk & Lobby — CLI playthrough (meeting Marlow)', () => {
     expect(diagLines).toEqual([]);
   });
 });
+
+// ---------------------------------------------------------------------------
+// Main Street — wave-3 amendments (§15.3): the three new neighbours are
+// reachable from the street, and the last `system.buildBoundary` gate has
+// moved to Town Edge's own `north`. Walks: Main Street -> the diner and
+// back -> the library and back -> Town Edge -> the boundary -> back.
+//
+// NOTE (this task's own escalation): the script uses `nw`/`se`/`n` (real
+// compass exits) rather than the literal "GO TO DINER"/"GO TO LIBRARY"
+// phrasing named in this task's brief and in §15.3's own exits table.
+// `interpreter.ts`'s `tryGoTo` recognizes any "go to <phrase>" ahead of
+// grammar matching at all and answers it solely from `ScopeView.travel`'s
+// visited-room BFS — so on a first, not-yet-visited approach, "GO TO
+// DINER"/"GO TO SUNDOWN"/"GO TO LIBRARY"/"GO TO ANNEX" can never reach
+// `diner`'s/`county_library_front`'s own `V_APPROACH` handlers at all:
+// they are intercepted and answered "You don't know the way there yet."
+// instead, regardless of any noun this task adds. This is pre-existing
+// (already true of "GO TO STORE"/"GO TO SHERIFF", wave 2, verified by hand
+// against the shipped content) and out of this task's own module
+// (`interpreter.ts`, not `mainStreet.ts`) — flagged for `game-architect`,
+// not fixed here. "ENTER DINER"/"ENTER LIBRARY", "GO TOWARD GLOW"/"GO
+// TOWARD LIGHTS", "WALK NORTH" and "GO TO BILLBOARD" are all unaffected
+// (none of them is the literal two-token "go"+"to" prefix `tryGoTo`
+// matches on, or a whole string equal to a room alias) and verified by
+// hand to work.
+const WAVE3_SCRIPT = ['pull chain', 'open door', 'out', 'down', 'open street door', 'out', 'nw', 'out', 'se', 'out', 'n', 'n', 's'];
+
+describe('Main Street — wave-3 amendments (diner/library/town edge reachable, one boundary left)', () => {
+  const saveDir = mkdtempSync(join(tmpdir(), 'ib-act1-saves-'));
+  const script = writeScript(WAVE3_SCRIPT);
+  const { stdout, stderr, status } = play(['--world', worldPath, '--save-dir', saveDir, '--script', script, '--fast', '--diag']);
+
+  // Splits `stdout` into one chunk per scripted command (its own echoed
+  // `> <command>` line plus everything printed before the next one) —
+  // `indexOf('> n')`/`lastIndexOf`-style slicing breaks here, since several
+  // of this script's own commands are string-prefixes of each other
+  // ("n" of "nw", "s" of "se") and two ("out", "n") repeat.
+  const promptLine = /^> (.+)$/gm;
+  const starts: number[] = [];
+  for (const m of stdout.matchAll(promptLine)) starts.push(m.index!);
+  const chunks = WAVE3_SCRIPT.map((_, i) => stdout.slice(starts[i]!, starts[i + 1] ?? stdout.length));
+
+  it('runs cleanly to completion', () => {
+    expect(stderr).toBe('');
+    expect(status).toBe(0);
+    expect(starts.length).toBe(WAVE3_SCRIPT.length);
+  });
+
+  it('NW from Main Street reaches the Sundown Diner', () => {
+    expect(chunks[6]).toContain('THE SUNDOWN');
+    expect(chunks[6]).toContain('Behind the counter a woman in an apron');
+  });
+
+  it('OUT from the diner returns to Main Street, on its return-visit text', () => {
+    expect(chunks[7]).toContain('The street, both ways, empty.');
+    expect(chunks[7]).toContain('the diner lit at the counter end');
+  });
+
+  it('SE from Main Street reaches the County Library — Records Annex', () => {
+    expect(chunks[8]).toContain('RECORDS ANNEX');
+    expect(chunks[8]).toContain('a reader with its lamp on');
+  });
+
+  it('OUT from the library returns to Main Street, and N reaches Town Edge', () => {
+    expect(chunks[9]).toContain('The street, both ways, empty.');
+    expect(chunks[10]).toContain('The street gives up here.');
+    expect(chunks[10]).toContain('the billboard, on two legs in the dirt');
+  });
+
+  it('a second N fires the one remaining build boundary, at Town Edge', () => {
+    expect(chunks[11]).toContain('END OF BUILD');
+    expect(chunks[11]).toContain('North is the county road, thirty-two miles of it');
+  });
+
+  it('S from Town Edge returns to Main Street', () => {
+    expect(chunks[12]).toContain('You walk back in among the buildings');
+    expect(chunks[12]).toContain('The street, both ways, empty.');
+  });
+
+  it('produces no unexpected diagnostics', () => {
+    const diagLines = stdout.split('\n').filter((l) => l.startsWith('DIAG '));
+    expect(diagLines).toEqual([]);
+  });
+});

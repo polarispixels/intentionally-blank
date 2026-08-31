@@ -525,9 +525,23 @@ export class DeterministicParser implements IntentInterpreter {
     // `GO TO` (task 11, §3.5) is recognized before grammar matching at all —
     // neither "go"/"to" nor a bare room alias is ever a declared verb word,
     // so `matchGrammar` would just report `noVerb` for them otherwise.
+    //
+    // FALL-THROUGH (v0.7.0): a `GO TO` that the route-finder cannot satisfy
+    // (an unvisited or currently-cut-off room) is offered to the grammar
+    // before it is refused. "go to diner" from Main Street on a first visit
+    // is not a route request the player can't make yet — it is the street's
+    // own `diner` scenery object, whose `V_APPROACH` handler walks them in;
+    // every storefront on the street is wired that way, and the room alias
+    // sharing the scenery noun was hiding all of them. Only a grammar
+    // `miss` hands the original "You don't know the way there yet." back.
     const goTo = this.tryGoTo(tokens, input, view);
-    if (goTo !== undefined) return goTo;
+    if (goTo !== undefined && goTo.kind !== 'unreachable') return goTo;
+    const outcome = this.parseByGrammar(input, view, tokens);
+    if (goTo !== undefined && outcome.kind === 'miss') return goTo;
+    return outcome;
+  }
 
+  private parseByGrammar(input: string, view: ScopeView, tokens: string[]): InterpretOutcome {
     const result = matchGrammar(view.vocabulary, tokens, input);
 
     if (result.kind === 'noVerb') {
@@ -688,6 +702,6 @@ export class DeterministicParser implements IntentInterpreter {
       const pronoun = resolvePronoun(view.vocabulary, view.visible, view.parser, phrase.words[0]!);
       if (pronoun !== undefined) return pronoun;
     }
-    return resolveNounPhrase(view.vocabulary, view.visible, phrase, role);
+    return resolveNounPhrase(view.vocabulary, view.visible, phrase, role, view.location);
   }
 }

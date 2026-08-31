@@ -32,7 +32,6 @@ import type { ObjectDefSlice } from '../../../../engine/world';
 import type { Effect } from '../../../../engine/effects';
 import { DIRECTION_VERB_IDS } from '../../../../engine/move';
 import { crossStreetText, crouchText, EXAMINE, HELLO, OPEN, READ, SEARCH, SMELL, TAKE, TOUCH } from '../verbs';
-import { ACT1_MAIN_STREET_BOUNDARY_DINER, ACT1_MAIN_STREET_BOUNDARY_NORTH } from '../responses';
 import {
   BILLBOARD,
   BOARDING_HOUSE,
@@ -41,6 +40,8 @@ import {
   BRICK_ROW_WINDOW,
   CLUE_HORIZON_GLOW,
   CLUE_SAME_DISTANCE,
+  COUNTY_LIBRARY,
+  COUNTY_LIBRARY_FRONT,
   DINER,
   FLAG_CROSSED_STREET,
   FLAG_HORSE_TOUCHED,
@@ -51,7 +52,6 @@ import {
   HORIZON_GLOW,
   HORSES,
   MAIN_STREET,
-  MAIN_STREET_BOUNDARY_GATE,
   MAIN_STREET_PAVING,
   MAIN_STREET_ROAD,
   MAINTENANCE_MAN,
@@ -59,6 +59,8 @@ import {
   POST_OFFICE_FRONT,
   SHERIFF_OFFICE,
   SHERIFF_OFFICE_FRONT,
+  SUNDOWN_DINER,
+  TOWN_EDGE,
   V_APPROACH,
   V_COUNT,
   V_CROSS,
@@ -136,8 +138,12 @@ const billboard: ObjectDefSlice = {
   nouns: ['billboard', 'sign', 'board', 'hoarding', 'advertisement', 'ad', 'wall drug', 'drug store', 'free ice water'],
   handlers: [
     { verbs: [EXAMINE, READ], effects: [{ say: billboardText }] },
-    // "go to billboard"/"approach billboard"/"walk to sign" (§4.2) — routes to the build boundary, north. No separate string.
-    { verbs: [V_APPROACH], effects: [{ say: { ref: ACT1_MAIN_STREET_BOUNDARY_NORTH } }] },
+    // "go to billboard"/"approach billboard"/"walk to sign" (§4.2) — wave-3
+    // amendment §15.3: "GO TO BILLBOARD now routes to the town_edge exit —
+    // walking to the billboard is walking to the edge of town, which is
+    // what it always was." A bare `goto` re-renders Town Edge's own
+    // arrival description; no separate string.
+    { verbs: [V_APPROACH], effects: [{ goto: TOWN_EDGE }] },
   ],
 };
 
@@ -159,8 +165,9 @@ const horizonGlow: ObjectDefSlice = {
     { verbs: [EXAMINE], effects: glowEffects },
     // "WATCH GLOW" has no response of its own — resolves to the EXAMINE above (§4.3's own note).
     { verbs: [V_WATCH], effects: glowEffects },
-    // §8's "any attempt to walk toward the glow" — routes to the build boundary, north.
-    { verbs: [V_APPROACH], effects: [{ say: { ref: ACT1_MAIN_STREET_BOUNDARY_NORTH } }] },
+    // §8's "any attempt to walk toward the glow" — wave-3 amendment §15.3:
+    // now routes to `town_edge`, same as the billboard's own V_APPROACH.
+    { verbs: [V_APPROACH], effects: [{ goto: TOWN_EDGE }] },
   ],
 };
 
@@ -309,25 +316,18 @@ const boardingHouse: ObjectDefSlice = {
 };
 
 // ---------------------------------------------------------------------------
-// §8 — the always-closed build-boundary gate. Mirrors `LANDING_BOUNDARY_GATE`
-// (`objects/landing.ts`): no `nouns`, never resolvable, never described.
-// ---------------------------------------------------------------------------
-
-const mainStreetBoundaryGate: ObjectDefSlice = {
-  location: MAIN_STREET,
-};
-
-// ---------------------------------------------------------------------------
 // Wave-2 amendment (§13) — three new street-facing scenery objects, so
 // "ENTER STORE"/"CROSS TO STORE"/"GO TO POST OFFICE"/"FIND SHERIFF" (§13.3's
 // exits table) resolve on first visit, before `GO TO`'s visited-room BFS
-// could ever route there. No inbound `travelText` is authored anywhere in
-// the wave-2 doc (only each room's own line back out to Main Street is
-// given), so these `goto` effects carry no `say` of their own — a bare
-// `goto` already re-renders the destination's own arrival description
-// (`effects.ts`: "relocate player (with look)") — see `mainStreet.ts`'s own
-// note on the same gap for the room's plain compass exits. Flagged as a
-// `narrative-writer` opportunity in this task's report, same as there.
+// could ever route there. Wave-3 amendment (§15.3) adds a fourth
+// (`county_library_front`) and rewires the diner (below) the same way.
+// No inbound `travelText` is authored anywhere in either wave's doc (only
+// each room's own line back out to Main Street is given), so these `goto`
+// effects carry no `say` of their own — a bare `goto` already re-renders
+// the destination's own arrival description (`effects.ts`: "relocate
+// player (with look)") — see `mainStreet.ts`'s own note on the same gap
+// for the room's plain compass exits. Flagged as a `narrative-writer`
+// opportunity in this task's report, same as there.
 // ---------------------------------------------------------------------------
 
 const enterGeneralStoreEffects: Effect[] = [{ set: [FLAG_CROSSED_STREET, true] }, { goto: GENERAL_STORE }];
@@ -359,13 +359,39 @@ const sheriffOfficeFront: ObjectDefSlice = {
   handlers: [{ verbs: [DIRECTION_VERB_IDS.in, V_APPROACH, V_FIND], effects: enterSheriffOfficeEffects }],
 };
 
-// §13.3's "destination-keyed variant" — the diner is scenery only, never a room; "GO TO DINER" gets its own line instead of falling to the fully generic boundary text now that its neighbour (the store) is real.
+// Wave-3 amendment (§15.3) — the diner is real now: crossing to it from
+// the street sets `crossed_street`, same as crossing to the store
+// (`enterGeneralStoreEffects`, above). Handler shape copies
+// `general_store_front`'s own (`in`/`V_APPROACH`/`V_CROSS`), plus
+// `V_FIND` (`sheriff_office_front`'s own addition) so "FIND DINER" also
+// resolves. "sundown" is a new noun so "GO TO SUNDOWN" (§15.3's own
+// also-column) has something to resolve against — see this task's report
+// on why the literal "GO TO SUNDOWN"/"GO TO DINER" phrasing still can't
+// reach this handler on a first visit (an `interpreter.ts` gap, not a
+// missing noun).
+const crossToDinerEffects: Effect[] = [{ set: [FLAG_CROSSED_STREET, true] }, { goto: SUNDOWN_DINER }];
+
 const diner: ObjectDefSlice = {
   location: MAIN_STREET,
   name: 'diner',
   portable: false,
-  nouns: ['diner', 'cafe', 'café', 'diner window'],
-  handlers: [{ verbs: [V_APPROACH], effects: [{ say: { ref: ACT1_MAIN_STREET_BOUNDARY_DINER } }] }],
+  nouns: ['diner', 'cafe', 'café', 'diner window', 'sundown'],
+  handlers: [{ verbs: [DIRECTION_VERB_IDS.in, V_APPROACH, V_FIND, V_CROSS], effects: crossToDinerEffects }],
+};
+
+// Wave-3 amendment (§15.3) — routing-only scenery, exactly like
+// `sheriff_office_front`: no examine prose, so "GO TO LIBRARY"/"ENTER
+// LIBRARY"/"GO TO ANNEX" resolve before `COUNTY_LIBRARY` has ever been
+// visited. No `crossed_street` effect — nothing in §15.3 or the library's
+// own doc ties that flag to this crossing (unlike the store/diner, both
+// directly across the road).
+const enterCountyLibraryEffects: Effect[] = [{ goto: COUNTY_LIBRARY }];
+
+const countyLibraryFront: ObjectDefSlice = {
+  location: MAIN_STREET,
+  name: 'library',
+  nouns: ['library', 'annex', 'county library', 'records annex'],
+  handlers: [{ verbs: [DIRECTION_VERB_IDS.in, V_APPROACH, V_FIND], effects: enterCountyLibraryEffects }],
 };
 
 export const MAIN_STREET_OBJECTS: Record<string, ObjectDefSlice> = {
@@ -379,9 +405,9 @@ export const MAIN_STREET_OBJECTS: Record<string, ObjectDefSlice> = {
   [MAIN_STREET_PAVING]: mainStreetPaving,
   [MAINTENANCE_MAN]: maintenanceMan,
   [BOARDING_HOUSE]: boardingHouse,
-  [MAIN_STREET_BOUNDARY_GATE]: mainStreetBoundaryGate,
   [GENERAL_STORE_FRONT]: generalStoreFront,
   [POST_OFFICE_FRONT]: postOfficeFront,
+  [COUNTY_LIBRARY_FRONT]: countyLibraryFront,
   [SHERIFF_OFFICE_FRONT]: sheriffOfficeFront,
   [DINER]: diner,
 } satisfies Record<string, ObjectDefSlice>;

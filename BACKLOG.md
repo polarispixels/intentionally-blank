@@ -19,7 +19,7 @@ Maintenance rules:
 |---|---|---|---|
 | A | Story + engine architecture: five-act causal spine, puzzle network, room list, NPC agendas, memory system, save/undo design; canon decisions registered in `docs/spec/09` | docs site | ✅ **complete v0.2.9** — story architecture (41 rooms, 28 puzzles, 5 acts) + engine v2 architecture + ADRs 0008–0010; 15 canon decisions promoted (register entries 3–17) |
 | B | Engine v2 (world model, parser v2, save/undo/autosave, map + open-questions UI) + the opening room (M1) | 0.3.0 | ✅ **shipped v0.3.0** — 23 tasks, 729 tests; the live URL is now the real game |
-| C | Act I: town, client, missing sibling, notebook trail (M2–M4) | 0.4–0.6 | 🚧 in progress — Front Desk & Marlow shipped v0.4.0 (3 of 32 rooms; first NPC) |
+| C | Act I: town, client, missing sibling, notebook trail (M2–M4) | 0.4–0.7 | 🚧 in progress — 10 of 12 Act I rooms and three NPCs live as of v0.7.0 (wave 3: diner + Pearl, library, Town Edge); wave 4 (motel, Jack) and the close-out remain |
 | D | Acts II–III: data center, underground, Dad on the USB, contradictions | 0.7–0.8 | queued |
 | E | Acts IV–V: reality travel, identity, the recursive ending | 0.9 | queued |
 | F | Hints, playtester sweeps, replay content, polish | 1.0.0 | queued |
@@ -34,8 +34,7 @@ board above is the plan. This table is what is *left*.
 
 | # | Remaining | Type |
 |---|---|---|
-| C-3 | Act I wave 3: County Library, Sundown Diner + Pearl, Town Edge — **prose written and approved** (`docs/superpowers/specs/2026-09-04-act1-wave3-prose.md`), needs wiring only | Content |
-| C-4 | Act I wave 4: Motel Forecourt, Jack's Room + **Jack** (the client — built alone) | Content |
+| C-4 | Act I wave 4: Motel Forecourt, Jack's Room + **Jack** (the client — built alone). Carries two items held from wave 3: the **M1 memory fragment** (wave-3 doc §17, written and final, held until Jack is placeable) and **Pearl's Jack topic** (§16.4 item 5 — she is his morning neighbour; add when R1 ships, not before) | Content |
 | C-5 | Act I close-out: the notebook objective, first analog-vs-digital contradiction | Content |
 | D | Acts II–III: Wall Drug cache, Dad on the USB, the facility, Sublevel 6 | Content |
 | E | Acts IV–V: identity thread, the archive environments, the root console | Content |
@@ -146,6 +145,21 @@ scenery. Not urgent; it is invisible rather than broken.
   about the generic fallback.
 
 ## Prose gaps to batch into the next `narrative-writer` pass
+
+- **The carried mug (v0.7.0).** `DRINK COFFEE` / `DRINK FROM MUG` / `LOOK IN
+  MUG` fall to the global default while the player is holding a full cup,
+  which is the first thing anyone will try. Needs a ruling nobody has made:
+  does the coffee run out, and does Pearl refill on sight (she does in
+  `SHOW MUG TO PEARL`). Two or three strings. Flagged by `narrative-writer`
+  when writing the mug's examine.
+
+- **Validator hygiene, not a bug (v0.7.0).** 25 warnings, up from 13. The
+  ten new verb/noun collisions come from wave 3 wiring `look out`, `look for
+  a face` and `look up <subject>` as bare-phrase verbs rather than object
+  handlers, and from Town Edge's compass-word nouns (`east`/`west`/`north`
+  as terrain, `back` as the billboard's back). Rewiring the three verbs as
+  handlers on their objects would take it back under 20. Exact list pinned
+  in `tests/world-act1.test.ts`.
 
 - **Act I content beyond M1, quarantined by `narrative-writer` as proposals
   rather than written in.** The chair and its loose leg (canon 02 §2; the

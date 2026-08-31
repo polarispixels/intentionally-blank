@@ -296,6 +296,8 @@ export const V_LEAN_OVER = V('act1_lean_over');
 
 export const V_HELP = V('act1_help');
 export const V_ABOUT = V('act1_about');
+/** `VERSION` (CLAUDE.md hard rule 7: "In-game `VERSION` prints it") — the MVP prologue had one; the Act I world did not until v0.7.0. */
+export const V_VERSION = V('act1_version');
 
 // ---------------------------------------------------------------------------
 // Front Desk & Lobby — new verbs (front-desk-prose §4, §5, §6). Words chosen
@@ -355,8 +357,6 @@ export const MAIN_STREET_PAVING = O('act1_main_street_paving');
 /** The gray-coveralled man — an object with handlers (§4.6's own wiring note), not an NPC: no `NpcDefSlice`, no topics, no schedule. */
 export const MAINTENANCE_MAN = O('act1_maintenance_man');
 export const BOARDING_HOUSE = O('act1_boarding_house');
-/** §8's build boundary — always-closed door target for `north`/`south`/`west`, mirroring `LANDING_BOUNDARY_GATE` (no `nouns`: never resolvable, never described). */
-export const MAIN_STREET_BOUNDARY_GATE = O('act1_main_street_boundary_gate');
 
 // Flags — §1's table.
 export const FLAG_VISITED_MAIN_STREET = F('act1_visited_main_street');
@@ -462,6 +462,8 @@ export const GENERAL_STORE_FRONT = O('act1_general_store_front');
 export const POST_OFFICE_FRONT = O('act1_post_office_front');
 export const SHERIFF_OFFICE_FRONT = O('act1_sheriff_office_front');
 export const DINER = O('act1_diner');
+/** Wave-3 amendment (§15.3) — routing-only scenery, exactly like `SHERIFF_OFFICE_FRONT`: no examine prose, resolves "GO TO LIBRARY"/"ENTER LIBRARY"/"GO TO ANNEX" before `COUNTY_LIBRARY` has ever been visited. */
+export const COUNTY_LIBRARY_FRONT = O('act1_county_library_front');
 
 // --- "Every other direction — in-world, not the build boundary" gates
 // (§6, §10, §12.5) — one always-closed gate per room, same idiom as
@@ -539,3 +541,209 @@ export const V_FILL = V('act1_fill');
  */
 export const V_ATTACK = V('act1_attack');
 export const V_FOLLOW = V('act1_follow');
+
+// ---------------------------------------------------------------------------
+// County Library (wave 3) — `docs/superpowers/specs/2026-09-04-act1-wave3-
+// prose.md` PART TWO. Zone 1 room 9, reached southeast of Main Street (§15.3
+// — wired by a separate concurrent task, not this one). One room (the
+// records annex), six objects, one NPC-free scene.
+// ---------------------------------------------------------------------------
+
+export const COUNTY_LIBRARY = R('act1_county_library');
+
+// --- Objects (§9), plus two sub-parts for the same "which noun word
+// resolved" gap this file's own header explains (FEDORA_BAND/DOOR_BOLT/
+// etc.): the reader's own noun list mixes "reader"/"machine"/"crank" (EXAMINE
+// gives the machine description) with "screen"/"page"/"newsprint"/
+// "newspaper" (EXAMINE/READ gives the FIFTY YEARS AGO THIS WEEK text) — one
+// handler can't tell which noun word resolved, so the screen/page cluster
+// moves to its own sub-part. The drawer bank's own noun list has the same
+// split between "drawers"/"bank" (EXAMINE gives the span-range text and sets
+// `CLUE_RECORD_RANGE`) and "reels"/"tin" (EXAMINE gives the "flat tin reels"
+// text `open drawer`/`look in drawer` also reach via the parent's own OPEN/
+// SEARCH handlers) — same fix, second sub-part. ---
+
+export const MICROFICHE_READER = O('act1_microfiche_reader');
+/** Sub-part — see this block's own header comment. */
+export const MICROFICHE_READER_SCREEN = O('act1_microfiche_reader_screen');
+export const FICHE_DRAWERS = O('act1_fiche_drawers');
+/** Sub-part — see this block's own header comment. */
+export const FICHE_DRAWERS_REELS = O('act1_fiche_drawers_reels');
+/**
+ * §9.3's own wiring note: `drawer`/`drawers` bare resolve to `FICHE_DRAWERS`
+ * (above), not here — this object's own nouns are `card drawer`/`catalogue
+ * drawer` instead, so the two drawer banks in this room never share a bare
+ * noun.
+ */
+export const CARD_CATALOGUE = O('act1_card_catalogue');
+export const CATALOGUE_TERMINAL = O('act1_catalogue_terminal');
+/**
+ * §9.5's own wiring note: `register`/`book` resolve here, not to the front
+ * desk's `GUEST_REGISTER` (a different room — no shared scope, so no actual
+ * collision, just the same word reused on purpose).
+ */
+export const SIGN_IN_BOOK = O('act1_sign_in_book');
+export const DARKROOM_DOOR = O('act1_darkroom_door');
+
+/** §10's "every other direction — in-world, not the build boundary" gate — same idiom as `POST_OFFICE_NO_EXIT_GATE`/`SHERIFF_OFFICE_NO_EXIT_GATE`. */
+export const COUNTY_LIBRARY_NO_EXIT_GATE = O('act1_county_library_no_exit_gate');
+
+// --- Flags (§7's table — 3 total). ---
+
+export const FLAG_VISITED_LIBRARY = F('act1_visited_library');
+export const FLAG_READ_LEFT_FRAME = F('act1_read_left_frame');
+export const FLAG_SIGNED_THE_BOOK = F('act1_signed_the_book');
+
+// --- Clues (§7's table — 3 total). ---
+
+export const CLUE_RECORD_RANGE = C('act1_clue_record_range');
+export const CLUE_DEAD_CROSS_REFERENCE = C('act1_clue_dead_cross_reference');
+export const CLUE_TERMINAL_NO_CROSSREFS = C('act1_clue_terminal_no_crossrefs');
+
+// --- New verbs. Both are bare, self-contained phrases (same idiom as
+// V_POST_LETTER/V_FIND_MY_NAME/V_MEASURE): neither "subject" nor
+// "reclamation" is a natural `V dobj` target worth a grammar change to the
+// existing bare-only V_LOOK_UP (that verb is shared by every room that has
+// its own LOOK UP/ceiling text, and widening its own pattern to take a dobj
+// would change what "LOOK UP <anything>" does everywhere else in the game —
+// out of this task's own module). See this task's report for the resulting
+// `verb-noun-collision` warnings ("subject", already a `CARD_CATALOGUE`
+// noun). "open card drawer" also lands on this verb rather than on
+// `card_catalogue`'s own OPEN handler — see `objects/countyLibrary.ts`'s own
+// comment for why (the parser's noun-phrase grammar always takes the dobj
+// phrase's LAST word as the noun, so "OPEN CARD DRAWER" would otherwise
+// resolve to `fiche_drawers`'s own required-unique "drawer" instead) —
+// hence the two further collisions on "card" and "drawer".
+export const V_LOOK_UP_SUBJECT = V('act1_look_up_subject');
+/** "type reclamation"/"look up reclamation" — the catalogue terminal's own search. */
+export const V_TYPE_RECLAMATION = V('act1_type_reclamation');
+
+// ---------------------------------------------------------------------------
+// Town Edge (wave 3) — `docs/superpowers/specs/2026-09-04-act1-wave3-prose.md`
+// PART THREE (§11-§14). Zone 1 room 14, the north end of Main Street. This
+// task does NOT add Main Street's own `north` exit to here (a separate task
+// does, per this task's own brief) — `TOWN_EDGE` is reachable today only by
+// direct placement (this task's own test), not yet by walking from Main
+// Street.
+// ---------------------------------------------------------------------------
+
+export const TOWN_EDGE = R('act1_town_edge');
+
+// --- Objects — six (§13), plus three sub-parts the same "which noun word
+// resolved" gap this file's own header explains requires (the billboard's
+// own scratch and its unpainted back need EXAMINE text distinct from plain
+// "examine billboard"; the road's own cattle guard needs EXAMINE/CROSS text
+// distinct from plain "examine road"; the paddock's own trough needs
+// EXAMINE/BREAK/TOUCH text distinct from plain "examine paddock") — plus the
+// two always-closed gates (the build boundary, and "every other direction"),
+// same idiom as every other room in this file. ---
+
+export const BILLBOARD_CLOSE = O('act1_billboard_close');
+/** Sub-part — "scratch"/"scratches"/"scratched" need EXAMINE/TOUCH/READ text distinct from plain "examine billboard" (§13.1's own second response block). */
+export const BILLBOARD_SCRATCH = O('act1_billboard_scratch');
+/** Sub-part — "back" needs EXAMINE text distinct from plain "examine billboard" (§13.1's third response block, shared with the parent's own LOOK_BEHIND handler — see `objects/townEdge.ts`). */
+export const BILLBOARD_BACK = O('act1_billboard_back');
+export const TOWN_SIGN = O('act1_town_sign');
+export const ROAD_NORTH = O('act1_road_north');
+/** Sub-part — "cattle guard"/"cattleguard"/"pit"/"grid"/"culvert" need EXAMINE/CROSS text distinct from plain "examine road" (§13.3's second response block). */
+export const ROAD_NORTH_CATTLE_GUARD = O('act1_road_north_cattle_guard');
+export const PADDOCK = O('act1_paddock');
+/** Sub-part — "trough"/"water"/"ice" need EXAMINE/BREAK/TOUCH text distinct from plain "examine paddock" (§13.4's second response block). */
+export const PADDOCK_TROUGH = O('act1_paddock_trough');
+export const FAR_LIGHTS = O('act1_far_lights');
+export const OPEN_COUNTRY = O('act1_open_country');
+/** §14's build boundary — always-closed door target for `north`, mirroring `MAIN_STREET_BOUNDARY_GATE` (no `nouns`: never resolvable, never described). This is now the boundary's north edge; Main Street's own `north` variant is deleted by a separate task (§15's own ruling — see this task's report). */
+export const TOWN_EDGE_BOUNDARY_GATE = O('act1_town_edge_boundary_gate');
+/** §14's "every other direction — in-world, not the build boundary" gate — mirrors `POST_OFFICE_NO_EXIT_GATE`/`SHERIFF_OFFICE_NO_EXIT_GATE`. */
+export const TOWN_EDGE_NO_EXIT_GATE = O('act1_town_edge_no_exit_gate');
+
+// --- Flags (§11's table). ---
+
+export const FLAG_VISITED_TOWN_EDGE = F('act1_visited_town_edge');
+export const FLAG_READ_BILLBOARD_SCRATCH = F('act1_read_billboard_scratch');
+export const FLAG_ENTERED_PADDOCK = F('act1_entered_paddock');
+export const FLAG_SAW_GRADED_STRIP = F('act1_saw_graded_strip');
+
+// --- Clues (§11's table). ---
+
+export const CLUE_BILLBOARD_SCRATCH = C('act1_clue_billboard_scratch');
+export const CLUE_LIGHTS_RESOLVED = C('act1_clue_lights_resolved');
+
+// --- New verbs. `THINK`/`REMEMBER`/`CONCENTRATE` (§14) is a brand-new bare,
+// self-contained verb (same idiom as `V_WHAT_YEAR`/`V_CHECK_DATE`: no dobj,
+// sets no flag, no other room declares it, so a plain verb-level `default`
+// is the whole wiring). `follow strip`/`cross country`/`go west`/`walk
+// overland`/`go east` (§13.6) and `follow road`/`go to wall drug` (§13.3)
+// deliberately do NOT get new verb ids — they reuse the existing dobj-taking
+// `V_FOLLOW`/`V_CROSS`/`V_APPROACH` (words extended in `verbs.ts`), since
+// each of those already-existing verbs takes a `dobj` and never a bare
+// form — reusing them costs zero new `verb-noun-collision` warnings (the
+// rule only fires for a verb typable bare), where a bare self-contained verb
+// covering the same five phrasings would have cost four. See this task's
+// report. ---
+
+export const V_THINK = V('act1_think');
+
+// ---------------------------------------------------------------------------
+// Sundown Diner (wave 3) — `docs/superpowers/specs/2026-09-04-act1-wave3-
+// prose.md` PART ONE. Zone 1 room 4, and Pearl, the game's third NPC.
+// ---------------------------------------------------------------------------
+
+export const SUNDOWN_DINER = R('act1_sundown_diner');
+
+// --- Objects (§4's six), plus one sub-part for the photographs ('faces'
+// needs EXAMINE text distinct from plain "examine photos" — the same
+// "which noun word resolved" gap this file's own header explains for
+// FEDORA_BAND/DOOR_BOLT/etc.) and one new portable item (`mug`, §4.1 — the
+// player can hold one mug; the shelf itself, `DINER_MUGS`, stays
+// non-portable, same split as General Store's TWINE/STRING_ITEM). ---
+
+export const DINER_MUGS = O('act1_diner_mugs');
+/** §4.1's new portable item, granted by `TAKE MUG` — see `objects/sundownDiner.ts`. */
+export const MUG = O('act1_mug');
+export const DINER_COUNTER = O('act1_diner_counter');
+export const COFFEE_URN = O('act1_coffee_urn');
+export const PIE_CASE = O('act1_pie_case');
+export const DINER_PHOTOS = O('act1_diner_photos');
+/** Sub-part — "faces" needs EXAMINE/SEARCH/"look for yourself" text distinct from plain "examine photos". */
+export const DINER_PHOTOS_FACES = O('act1_diner_photos_faces');
+export const DINER_WINDOW = O('act1_diner_window');
+
+// §5's always-closed "every other direction" gate — mirrors `SHERIFF_OFFICE_NO_EXIT_GATE`.
+export const SUNDOWN_DINER_NO_EXIT_GATE = O('act1_sundown_diner_no_exit_gate');
+
+// --- Pearl (§6) — the game's third NPC. ---
+
+export const PEARL = N('act1_pearl');
+
+// --- Flags (§2's table — 6 total). ---
+
+export const FLAG_VISITED_DINER = F('act1_visited_diner');
+export const FLAG_MET_PEARL = F('act1_met_pearl');
+export const FLAG_HANDLED_MUG = F('act1_handled_mug');
+export const FLAG_SAT_AT_COUNTER = F('act1_sat_at_counter');
+export const FLAG_TOLD_PEARL_ABOUT_ROOM = F('act1_told_pearl_about_room');
+export const FLAG_PEARL_NOTICED_YOU = F('act1_pearl_noticed_you');
+
+// --- Clues (§2's table — 1 total). ---
+
+export const CLUE_MUG_SPELLING = C('act1_clue_mug_spelling');
+
+// --- New verbs. Words chosen by this builder where the doc doesn't specify
+// them, following this file's established convention — see this task's
+// report for the vocabulary calls made (in particular: "buy pie" stays a
+// TAKE synonym, per the pre-existing global "buy" word, rather than joining
+// "order pie"/"ask for pie" — the engine cannot distinguish which literal
+// synonym of one VerbId a player typed, the same class of gap this file's
+// FEDORA_BAND/DOOR_BOLT header already names). ---
+
+/** §5's bare "EAT"/"ORDER FOOD"/"ORDER BREAKFAST"/"ASK FOR FOOD" — one fixed-phrase bare verb, this room only (same idiom as V_POST_LETTER/V_CHECK_DATE: no real "food"/"breakfast" object exists to hang a dobj handler on). */
+export const V_EAT = V('act1_eat');
+/** §4.3/§4.4's "order coffee"/"order pie"/"ask for pie" — dobj-taking, shared by the urn and the pie case. */
+export const V_ORDER = V('act1_order');
+/** §4.6's "look out window"/"look at street" — a fixed bare phrase (same idiom as V_CHECK_DATE) rather than a `street` sub-part on `DINER_WINDOW`, since "street" is also a real noun on Main Street's own road object and baking the whole phrase into this verb's own words avoids a cross-room noun ambiguity a sub-part could not. */
+export const V_LOOK_OUT = V('act1_look_out');
+/** §4.5's "look for yourself"/"look for a face you know" — bare fixed phrases, no natural object (same idiom as V_CHECK_DATE); "look at faces"/"search photographs" reach the same text via `diner_photos`'/`diner_photos_faces`'s own EXAMINE/SEARCH handlers instead. */
+export const V_LOOK_FOR_FACE = V('act1_look_for_face');
+/** §6.8's "KISS PEARL"/"HUG PEARL" — one shared response, one verb id (same idiom as HELLO's own multi-word rotation). */
+export const V_KISS = V('act1_kiss');

@@ -12,6 +12,86 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.7.0] - 2026-08-30
+
+### Added
+
+- **Three rooms and the third character: the Sundown Diner with Pearl
+  behind the counter, the County Library's records annex, and Town Edge.**
+  Act I wave 3, wired from the approved prose
+  (`docs/superpowers/specs/2026-09-04-act1-wave3-prose.md`). Ten of Act I's
+  twelve rooms are live. Main Street's last build boundary is gone: north
+  now walks to the edge of town, and the one `END OF BUILD` left in the
+  game is the county road out of Town Edge, thirty-two miles of it.
+
+  Pearl is the cheapest working NPC so far (seven topics, a tell, two
+  shows, three handlers, four greeting states) and the only one who
+  volunteers. The mug is the first physical evidence a player can carry out
+  of the room that produced it. Six new clues, all of them P14's Act I
+  footprint or the billboard up close. Main Street's description, exits
+  and `GO TO BILLBOARD` are amended exactly as §15 specifies.
+
+- **`VERSION` works in the Act I world.** It had only ever been wired into
+  the MVP prologue; the playtest caught it printing a parser miss.
+
+- **The carried mug has its own examine.** The wave-3 document supplies
+  only the shelf's, and `READ MUG` in hand threw an engine diagnostic. One
+  string, written by `narrative-writer` for this release, reviewed for
+  voice by the main session. **Ryan has not spot-checked this one yet** —
+  it is the only new prose in this release that predates his approval.
+
+### Changed
+
+- **Parser: a held object wins a bare-noun tie.** With the diner's shelf of
+  mugs in view and one mug in hand, `SHOW MUG TO PEARL` used to ask "the
+  shelf or the mug?". The resolver now narrows a still-ambiguous pool to
+  what the player is carrying or wearing, after adjectives have had their
+  say (`door key` still reaches the door key on the table with a brass key
+  in your pocket). This is the same shape as the store's `string`/`twine`
+  and the original key/key-rack loop, fixed once in the engine instead of
+  per object. Engine-architecture spec §3.2 amended.
+
+- **Parser: `GO TO <place>` is offered to the grammar before it is
+  refused.** `go to diner` on a first visit answered "You don't know the
+  way there yet." because the room alias shadowed the street's own diner
+  scenery object, whose approach handler is what walks you in. Every
+  storefront on Main Street had this problem since v0.6.0 (`go to store`,
+  `go to sheriff`); `enter store` worked, `go to store` did not. Only a
+  grammar miss now hands the original refusal back.
+
+- **Disambiguation questions call objects by their declared name.** Town
+  Edge asked "Which do you mean, the boards or the town number?" — the
+  vocabulary's first indexed noun for each. It now asks "the billboard or
+  the town limits sign?", and whatever name the question offers is always
+  accepted as the answer.
+
+### Fixed
+
+- **Library: bare `TYPE` reached Your Room's `USER NOT RECOGNIZED`** —
+  the opening room's global default leaking into a room whose only keyboard
+  is the catalogue's. Overridden at the room, same idiom as the sheriff's.
+- A stray double paragraph break in the catalogue terminal's response
+  (present in the spec as a formatting artifact; normalized in both).
+
+### Decisions (main session, full-game build protocol)
+
+- **M1 — the hiring — stays quarantined until Jack is placeable** (wave 3
+  doc §17, the writer's option 1). Not a canon change; recorded there and
+  on `BACKLOG.md` C-4. The memory system therefore still opens with nothing.
+- **The library ships whole**, at +11% on budget, three clues and all.
+  §19's suggested trims are one-line deletions if Ryan wants them after
+  playing it.
+- **The validator is back up to 25 warnings from 13**, every one listed
+  exactly in `tests/world-act1.test.ts`: ten new verb/noun collisions from
+  the wave's bare-phrase verbs (`look out`, `look for a face`, `look up
+  <subject>`) and Town Edge's compass-word nouns, and two more bare-`pen`
+  collisions (the sign-in book's pen, the paddock as a pen). None is a
+  player-facing bug — every one was tried in play — but the list is
+  longer than the v0.6.1 target, and rewiring the bare-phrase verbs as
+  object handlers is on the backlog as hygiene, not a blocker.
+
+941 tests (from 836).
+
 ## [0.6.3] - 2026-08-30
 
 ### Changed
