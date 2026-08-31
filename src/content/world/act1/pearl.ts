@@ -23,6 +23,8 @@ import { FLAG_MET_PEARL, FLAG_PEARL_NOTICED_YOU, FLAG_TOLD_PEARL_ABOUT_ROOM, MUG
 import { ACT2_CACHE_FOUND, ACT2_CLUE_REPAVING, ACT2_HORSE_BORROWED, ACT2_STARTED } from '../act2/ids';
 import { POKER_NIGHT } from '../act2/calendar';
 import { POKER_NIGHT_PEARL_GREETING } from '../act2/poker';
+// E0 task I (§6) — `topic_visit` rule 1, once the visit is announced.
+import { ACT4_CLUE_VISIT_COMING, ACT4_VISIT_ANNOUNCED } from '../act4/ids';
 
 // ---------------------------------------------------------------------------
 // §6.3 — unknownTopic
@@ -158,13 +160,24 @@ const topics: TopicDef[] = [
     effects: [{ set: [ACT2_HORSE_BORROWED, true] }],
   },
   // D2-C amendment (D2 prose doc §21.1, L20 — "the buzz") — gated on the cache being found; grants `act2_clue_repaving`.
+  // E0 task I (`docs/superpowers/specs/2026-09-17-stage-e0-prose.md` §6) —
+  // rule 1, prepended above the D2 rule, once the visit is announced.
+  // Grants `act4_clue_visit_coming`; the shipped rule (still granting
+  // `act2_clue_repaving`) stays underneath and still answers before Act IV.
   {
     id: TOPIC_VISIT,
     words: ['visit', 'president', 'buzz', 'road', 'repaving', 'resurfacing', 'crews', 'work', 'gravel', 'stone'],
     when: { flag: ACT2_CACHE_FOUND },
-    response:
-      '"Now, there\'s a thing." She is pleased to have a thing. "County\'s asked about\nthe road. Not asked *us* — asked the state, and the state\'s asked about\ncrushed stone, and Elmer\'s boy at the yard\'s been told to hold what he\'s got\nback."\n\nThe cloth goes along a stretch that does not need it. "Milling and resurfacing,\nfull length of Main. Nobody\'s said why, and I\'ll tell you what — nobody\'s\nsaying they don\'t know why, either, which is different."\n\nShe looks up. "It\'s been that road my whole life and it has never once been\nworth doing."',
-    effects: [{ grantClue: ACT2_CLUE_REPAVING }],
+    response: [
+      {
+        when: { flag: ACT4_VISIT_ANNOUNCED },
+        text: '"Day after tomorrow." She has had that question all morning and it comes out\nflat. "Comes down Main, stops at that door, goes on out to the plant."\n\nShe lets you look at the door.\n\n"The President," she says, as though checking you had got there on your own.\n\n"They\'ve called it a spray. A young man in a very good coat came in and told me\nit would be a spray, and that it would be four minutes, and that I was not to\nput anything new on the menu." The cloth goes along a stretch of counter that\ndoes not need it. "So I fed him. He had the rhubarb and he ate it standing\nup, which is how you can tell."\n\nThe pan comes off the heat. "I\'ve had two governors and a senator on those\nstools and not one of them sent a boy ahead to talk to me about pie."',
+      },
+      {
+        text: '"Now, there\'s a thing." She is pleased to have a thing. "County\'s asked about\nthe road. Not asked *us* — asked the state, and the state\'s asked about\ncrushed stone, and Elmer\'s boy at the yard\'s been told to hold what he\'s got\nback."\n\nThe cloth goes along a stretch that does not need it. "Milling and resurfacing,\nfull length of Main. Nobody\'s said why, and I\'ll tell you what — nobody\'s\nsaying they don\'t know why, either, which is different."\n\nShe looks up. "It\'s been that road my whole life and it has never once been\nworth doing."',
+      },
+    ] satisfies ProseRule[],
+    effects: [{ if: { when: { flag: ACT4_VISIT_ANNOUNCED }, then: [{ grantClue: ACT4_CLUE_VISIT_COMING }], else: [{ grantClue: ACT2_CLUE_REPAVING }] } }],
   },
 ];
 

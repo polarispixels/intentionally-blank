@@ -44,6 +44,10 @@ import type { ProseRule } from '../../../../engine/prose';
 import { BREAK, EXAMINE, LOOK_UNDER, OPEN, PUSH, READ, RUB, SEARCH, SIT, TAKE, TOUCH } from '../../act1/verbs';
 import { V_COUNT, V_FIND, V_RIGHT, V_RING } from '../../act1/ids';
 import { ACT2_NOLAN_BADGE, V_FIT } from '../../act2/ids';
+// E0 task I (`docs/superpowers/specs/2026-09-17-stage-e0-prose.md` §9) —
+// the staging doors gain one appended sentence once the visit is
+// announced. E1 opens these doors.
+import { ACT4_VISIT_ANNOUNCED } from '../../act4/ids';
 import {
   ACT3_BROCHURES,
   ACT3_CLUE_MODEL_SHORT,
@@ -244,8 +248,18 @@ const reception: ObjectDefSlice = {
 const stagingExamine =
   'A pair of doors in the left-hand wall with a push bar across both leaves and a\nsign at eye height:\n\n    CONTRACTORS — STAGING\n    ALL VISITORS SIGN IN\n\nThere is no book to sign and nothing to sign it with. Through the wired glass\nthere is a corridor, a stack of folded tables against one wall, and a\nwhiteboard with a grid ruled on it in permanent marker and nothing written in\nthe grid.';
 
-export const STAGING_DOOR_BLOCKED_TEXT =
+const stagingDoorBlockedShipped =
   'The bar goes down and the doors do not, because they are on a maglock and the\nmaglock is not broken, tired or negotiable; it is simply on.\n\nFire law says a maglock has to drop when the panel says so. Nothing in this\nbuilding is on fire.';
+
+// E0 task I (§9) — one sentence appended, once the visit is announced; the
+// shipped two paragraphs above are kept word for word (not counted in the
+// prose doc's own §34, per that section's note).
+const stagingDoorBlockedAnnounced = `${stagingDoorBlockedShipped}\n\nThis time somebody on the far side of the wired glass looks up from a folding\ntable to check that they did not.`;
+
+export const STAGING_DOOR_BLOCKED_TEXT: ProseRule[] = [
+  { when: { flag: ACT4_VISIT_ANNOUNCED }, text: stagingDoorBlockedAnnounced },
+  { text: stagingDoorBlockedShipped },
+];
 
 const stagingDoor: ObjectDefSlice = {
   location: ACT3_LOBBY,

@@ -37,13 +37,13 @@ import {
   FLAG_ENTERED_PADDOCK,
   FLAG_READ_BILLBOARD_SCRATCH,
   FLAG_SAW_GRADED_STRIP,
+  HIGHWAY_GATE,
   OPEN_COUNTRY,
   PADDOCK,
   PADDOCK_TROUGH,
   ROAD_NORTH,
   ROAD_NORTH_CATTLE_GUARD,
   TOWN_EDGE,
-  TOWN_EDGE_BOUNDARY_GATE,
   TOWN_EDGE_NO_EXIT_GATE,
   TOWN_EDGE_TUNNEL_BOUNDARY_GATE,
   TOWN_SIGN,
@@ -302,7 +302,7 @@ const openCountry: ObjectDefSlice = {
 // `SHERIFF_OFFICE_NO_EXIT_GATE`: no nouns, never resolvable, never described.
 // ---------------------------------------------------------------------------
 
-const townEdgeBoundaryGate: ObjectDefSlice = { location: TOWN_EDGE };
+const highwayGate: ObjectDefSlice = { location: TOWN_EDGE };
 const townEdgeNoExitGate: ObjectDefSlice = { location: TOWN_EDGE };
 // D2-C amendment (`ids.ts`'s own comment on this id) — never opens in this build.
 const townEdgeTunnelBoundaryGate: ObjectDefSlice = { location: TOWN_EDGE };
@@ -318,7 +318,7 @@ export const TOWN_EDGE_OBJECTS: Record<string, ObjectDefSlice> = {
   [PADDOCK_TROUGH]: paddockTrough,
   [FAR_LIGHTS]: farLights,
   [OPEN_COUNTRY]: openCountry,
-  [TOWN_EDGE_BOUNDARY_GATE]: townEdgeBoundaryGate,
+  [HIGHWAY_GATE]: highwayGate,
   [TOWN_EDGE_NO_EXIT_GATE]: townEdgeNoExitGate,
   [TOWN_EDGE_TUNNEL_BOUNDARY_GATE]: townEdgeTunnelBoundaryGate,
 } satisfies Record<string, ObjectDefSlice>;

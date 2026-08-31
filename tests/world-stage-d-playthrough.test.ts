@@ -8,7 +8,7 @@
 // the machinery past the far wall.
 
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, rmSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
@@ -58,7 +58,8 @@ describe('Stage D — Sublevel 6 on a clean save', () => {
       'Sorry about this',
       'Then white.',
       '◆ clue noted: Openings in the wall, and nothing hung in them',
-      'Act III ends here.',
+      // Since v0.16.0 the queue's clue starts Act IV, so the gate prints §22's line
+      'street, the sheriff, the ledger and the man who is coming are this one.',
       'END OF BUILD',
       '◆ clue noted: ACCESS LEVEL: MAINTENANCE. DENIED. There is a level under this one.',
       // the night
@@ -93,5 +94,44 @@ describe('Stage D — Sublevel 6 on a clean save', () => {
     for (const miss of ['Which do you mean', 'You are not wearing', 'There is a badge here', 'There is a badge on the floor']) {
       expect(belowTheFence).not.toContain(miss);
     }
+  });
+
+  // Stage E, E-2 (ADR 0012 item 6): the twelve direction verbs and GO TO are
+  // `class: null` — the profile tallies choices, not footsteps, over this
+  // whole 681-command route. Same fixture, `export`ed at the end (`EXPORT`
+  // prints the live `SaveFile` as one JSON line, `tests/cli.test.ts`'s own
+  // pattern) so the real final `state.profile` can be asserted directly,
+  // rather than re-deriving it from prose. Recorded once, by this task, from
+  // the actual run — before this change (movement still `'direct'`) the same
+  // route tallied `direct: 30` at the tattoo ask (line 105) and `direct` a
+  // good deal higher by the end; the change only ever removes tallies, never
+  // adds or reassigns one, so `analytical`/`social` are identical before and
+  // after and only `direct` drops.
+  it("the run's final behavioral profile tallies choices, not movement", () => {
+    const scriptPath = join(dir, 'e2-profile-script.txt');
+    writeFileSync(scriptPath, `${readFileSync(FIXTURE, 'utf8')}\nexport\n`);
+    const exportResult = spawnSync(
+      'npx',
+      ['tsx', 'src/cli/repl.ts', '--script', scriptPath, '--fast', '--save-dir', dir],
+      { cwd: process.cwd(), encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 300_000 },
+    );
+    expect(exportResult.status).toBe(0);
+    const jsonLine = (exportResult.stdout ?? '')
+      .split('\n')
+      .map((l) => l.trim())
+      .find((l) => l.startsWith('{'));
+    expect(jsonLine).toBeDefined();
+    const parsed = JSON.parse(jsonLine!);
+    expect(parsed.state.profile).toEqual({ analytical: 214, social: 84, direct: 118 });
+    // The plan's own expectation for this route (§3.3): analytical leads direct.
+    expect(parsed.state.profile.analytical).toBeGreaterThanOrEqual(parsed.state.profile.direct);
+    // M3 (`world-act1-wave4-jack.test.ts`'s own `ask jack about tattoo`, line
+    // 105 of this fixture) fires by `profileLeader` at the moment it's asked,
+    // not at the end of the run — `analytical` (38) already led `direct` (16
+    // after this change, 30 before it) there, so the variant this route
+    // fires, by name, is unchanged by E-2: `act1_mem_m3_analytical`.
+    expect(parsed.state.memories).toContain('act1_mem_m3_analytical');
+    expect(parsed.state.memories).not.toContain('act1_mem_m3_social');
+    expect(parsed.state.memories).not.toContain('act1_mem_m3_direct');
   });
 });

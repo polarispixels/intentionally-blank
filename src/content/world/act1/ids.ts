@@ -659,15 +659,21 @@ export const OPEN_COUNTRY = O('act1_open_country');
  * is now also the highway door on the Emporium's own `south` exit
  * (`act2/wallDrugEmporium.ts`, task B's module) — one physical door,
  * blocked from both ends, each side with its own authored `blockedText`.
- * `ids.ts`'s own ruling 5 offered a rename (dropping "_boundary_gate" from
- * this id, since the highway is now a permanent in-fiction obstruction
- * rather than "the edge of built content") as an alternative; task B's own
- * concurrent edit to `tests/world-game.test.ts` had already landed and
- * tested the simpler "two exits, one shared gate object" reading first, so
- * this task kept the shipped name rather than overwrite that integrated
- * work — see this task's report.
+ *
+ * RENAMED (Stage E, E-3 — ADR 0012 item 7, boundary retirement part 1):
+ * `TOWN_EDGE_BOUNDARY_GATE` / `act1_town_edge_boundary_gate` →
+ * `HIGHWAY_GATE` / `act1_highway_gate`. Canon 92: since v0.15's Addenda
+ * prose, the road north is fully in-world — a real thirty-two-mile highway
+ * the narrator refuses on foot, not a marker for the edge of built content.
+ * `ids.ts`'s own ruling 5 offered this same rename back when the object was
+ * first shared between two exits (see the superseded note this replaces)
+ * and was deferred then only to avoid overwriting a concurrent test edit;
+ * nothing about that reason survives once the road itself is canon.
+ * `tests/world-game.test.ts`'s `/boundary_gate/i` exit-count test drops
+ * from three to one in the same change (this object's two exits no longer
+ * match the pattern; only the Hub's well, `ACT3_S6_BOUNDARY_GATE`, does).
  */
-export const TOWN_EDGE_BOUNDARY_GATE = O('act1_town_edge_boundary_gate');
+export const HIGHWAY_GATE = O('act1_highway_gate');
 /** §14's "every other direction — in-world, not the build boundary" gate — mirrors `POST_OFFICE_NO_EXIT_GATE`/`SHERIFF_OFFICE_NO_EXIT_GATE`. */
 export const TOWN_EDGE_NO_EXIT_GATE = O('act1_town_edge_no_exit_gate');
 /**
@@ -676,12 +682,14 @@ export const TOWN_EDGE_NO_EXIT_GATE = O('act1_town_edge_no_exit_gate');
  * direction only exists once the player has learned the tunnel is there
  * (before that, "nw" falls to the ordinary no-exit-that-way family, same
  * as any unlearned direction). Once it exists, this gate — always closed,
- * no `container` declared, same shape as `TOWN_EDGE_BOUNDARY_GATE` — never
- * opens in this build; `blockedText` is §23's country line + the system
- * line. Named with "boundary_gate" (not "tunnel_gate") on purpose: it is
- * a THIRD `system.buildBoundary`-class gate, not a plain "no exit that
- * way" — `tests/world-game.test.ts`'s own boundary-count test is updated
- * from two to three in the same change, with this note pointed at.
+ * no `container` declared, same shape as `HIGHWAY_GATE` — never opens in
+ * this build; `blockedText` is §23's country line + the system line.
+ * Named with "boundary_gate" on purpose, unlike `HIGHWAY_GATE`'s own E-3
+ * rename above: this object is orphaned from any exit since Stage D4 (the
+ * `nw` exit itself now runs through `ACT3_TUNNEL_APPROACH_GATE` instead,
+ * `act1/townEdge.ts`) and so is out of E-3's scope — flagged in that
+ * task's report as a misnomer, not renamed, per that task's own
+ * instruction not to rename beyond the plan.
  */
 export const TOWN_EDGE_TUNNEL_BOUNDARY_GATE = O('act1_town_edge_tunnel_boundary_gate');
 

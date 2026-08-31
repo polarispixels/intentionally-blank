@@ -98,15 +98,36 @@ describe('assemble', () => {
 // straight to the Pipe Chase with no gate at all. `system.buildBoundary`'s
 // one remaining gate moved to the Pipe Chase's own `down` exit (§13,
 // `ACT3_BOUNDARY_GATE`, unchanged id) — Sublevel 6 is the build's new edge.
+//
+// UPDATED AGAIN (Stage D5, task F — the Archive Hub): the count stayed
+// three, but which three changed. The Pipe Chase's own `down` exit "became
+// real" too (D5's own descent to the S6 Maintenance Bay, `ACT3_BOUNDARY_
+// GATE` deleted from that exit — `pipeChase.ts`'s own header), and the
+// Archive Hub's well gained a new `down` exit of its own, gated behind
+// `ACT3_CLUE_ROOT_REFUSES`, through a new gate object
+// (`ACT3_S6_BOUNDARY_GATE`, `act3/s6ArchiveHub.ts`) — the wave's one
+// surviving boundary. This test's own title was never updated to say so;
+// see the E-3 update below for the honest count.
+//
+// UPDATED (Stage E, E-3 — ADR 0012 item 7, boundary retirement part 1): the
+// count is now exactly **one**. Canon 92 (v0.15's Addenda prose) made the
+// highway fully in-world — the road north/south was never actually the
+// edge of built content, just a real thirty-two-mile walk the narrator
+// refuses — so its shared gate object is renamed off the `*_boundary_gate`
+// pattern entirely (`TOWN_EDGE_BOUNDARY_GATE` → `HIGHWAY_GATE` /
+// `act1_highway_gate`, `act1/ids.ts`), and its two exits (Town Edge `north`,
+// the Emporium's own `south`) stop matching this test's own regex. The
+// Hub's well is the only `system.buildBoundary` gate left; E3 (v0.19.0)
+// retires it too, taking this count to zero (§3.4's own plan).
 describe('system.buildBoundary', () => {
-  it('exactly three exits reference a build-boundary gate (Town Edge north, Emporium south, the Pipe Chase down — two gate objects)', () => {
+  it('exactly one exit references a build-boundary gate — the Hub\'s well', () => {
     let count = 0;
     for (const room of Object.values(WORLD.rooms ?? {})) {
       for (const exit of room.exits ?? []) {
         if (exit.door && /boundary_gate/i.test(exit.door)) count++;
       }
     }
-    expect(count).toBe(3);
+    expect(count).toBe(1);
   });
 });
 

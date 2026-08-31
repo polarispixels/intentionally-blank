@@ -18,9 +18,12 @@
 //      death-menu option actually working.
 
 import { describe, expect, it } from 'vitest';
+import { apply } from '../src/engine/effects';
 import { DeterministicParser } from '../src/engine/interpreter';
+import { R, S, V } from '../src/engine/ids';
 import type { ScriptId } from '../src/engine/ids';
 import { compileVocabulary } from '../src/engine/parser';
+import type { WorldDef } from '../src/engine/world';
 import { MemoryStore } from '../src/session/store';
 import { WORLD as ACT1_WORLD } from '../src/content/world/act1';
 import { WORLD as PROLOGUE_WORLD, PROMPT_SCRIPTS } from '../src/content/scenes/mvp-prologue';
@@ -305,8 +308,100 @@ describe('browser-facing path: the prompt round-trip and the death menu', () => 
   });
 });
 
+describe('the recursive ending hand-off through the browser prompt round-trip (ADR 0012, Stage E E-1)', () => {
+  // A tiny WorldDef of this describe block's own — not ACT1_WORLD/PROLOGUE_WORLD
+  // — a room-level bare-verb handler (mirroring `tests/fixtures/world.ts`'s
+  // own SIGH pattern) opens a prompt whose respond script fires a real
+  // `{ end }` effect through `apply()`, exactly like a content prompt-respond
+  // script (P28's form, R13's screen) will.
+  const ROOM = R('handoff_ui_room');
+  const INITIALIZE = V('handoff_ui_initialize');
+  const OPEN_SCRIPT = S('handoff_ui_open');
+  const RESPOND_SCRIPT = S('handoff_ui_respond');
+  const PROMPT_ID = 'handoff_ui_prompt';
+  const ENDING_ID = 'handoff_ui_ending';
+  const OPENING_MARKER = 'The opening arrival, rendered once, ever, at the true start of a fresh game.';
+
+  const WORLD: WorldDef = {
+    meta: {
+      phases: { morning: 360, afternoon: 720, evening: 1080, night: 1320 },
+      weekLength: 7,
+      startRoom: ROOM,
+      recursiveEnding: ENDING_ID,
+    },
+    flags: {},
+    rooms: {
+      [ROOM]: {
+        name: 'Terminal Room',
+        description: 'A plain room with a terminal.',
+        firstVisit: OPENING_MARKER,
+        handlers: [{ verbs: [INITIALIZE], effects: [{ script: { id: OPEN_SCRIPT } }] }],
+      },
+    },
+    verbs: {
+      [INITIALIZE]: { id: INITIALIZE, words: ['initialize'], patterns: ['V'], class: 'direct', default: 'Nothing happens.' },
+    },
+    scripts: {
+      [OPEN_SCRIPT]: (_world, state) => ({
+        state,
+        events: [{ type: 'prompt', id: PROMPT_ID, title: 'INITIALIZE', body: 'Confirm?', fields: [{ name: 'confirm' }] }],
+      }),
+      [RESPOND_SCRIPT]: (world, state) =>
+        apply(world, state, [{ say: 'Darkness.' }, { say: 'Your head hurts.' }, { end: ENDING_ID }], { path: 'script.handoff_ui_respond' }),
+    },
+    responses: { 'ended.refused': 'Nothing more now.' },
+  };
+
+  function opts(store: MemoryStore): ControllerOpts {
+    return {
+      world: WORLD,
+      vocab: compileVocabulary(WORLD),
+      parser: new DeterministicParser(),
+      store,
+      now: () => '2026-08-31T00:00:00.000Z',
+      gameVersion: 'test',
+      promptScripts: { [PROMPT_ID]: RESPOND_SCRIPT },
+    };
+  }
+
+  it("submitPrompt on the recursive ending keeps the transcript (lines are not cleared) and appends the fresh game's own opening", () => {
+    const store = new MemoryStore();
+    const o = opts(store);
+    let ui: UiState = createUiState(o);
+    ui = submitCommand(ui, 'initialize', o);
+    expect(ui.prompt).toBeDefined();
+    const linesBeforePrompt = ui.lines;
+
+    ui = submitPrompt(ui, { confirm: 'yes' }, o);
+
+    expect(ui.prompt).toBeUndefined();
+    expect(ui.session.state.turn).toBe(0); // a fresh game, not the one that just ended
+    expect(ui.session.state.location).toBe(ROOM);
+
+    // The transcript is NOT cleared — every line already there stays,
+    // unlike a confirmed RESTART's `freshUi` (this file's own "a confirmed
+    // RESTART clears the transcript" test, above) — no `restarted` event
+    // is ever involved in the recursive-ending hand-off.
+    expect(ui.lines.slice(0, linesBeforePrompt.length)).toEqual(linesBeforePrompt);
+
+    const appended = ui.lines.slice(linesBeforePrompt.length);
+    expect(appended.some((l) => l.text === 'Darkness.')).toBe(true);
+    expect(appended.some((l) => l.text === 'Your head hurts.')).toBe(true);
+    expect(appended.some((l) => l.text === OPENING_MARKER)).toBe(true);
+    // Neither shell gains ending logic (ADR 0012's own consequence): no
+    // generic 'ended' rendering ("THE END") leaks through, because the
+    // `ended` event itself never reaches this event loop.
+    expect(appended.some((l) => l.text === 'THE END')).toBe(false);
+
+    expect(store.get('ending')).toBeDefined();
+    expect(store.get('undo')).toBeUndefined();
+    expect(store.get('checkpoint')).toBeUndefined();
+    expect(store.get('auto')).toBeDefined();
+  });
+});
+
 describe('LocalStorageStore (the one real browser API this shell touches)', () => {
-  it('round-trips get/put/list/delete through a minimal fake localStorage', () => {
+  it('round-trips get/put/list/remove through a minimal fake localStorage', () => {
     const data = new Map<string, string>();
     const fakeLocalStorage = {
       getItem: (k: string) => data.get(k) ?? null,
@@ -325,7 +420,7 @@ describe('LocalStorageStore (the one real browser API this shell touches)', () =
       store.put('auto', '{"a":1}');
       expect(store.get('auto')).toBe('{"a":1}');
       expect(store.list()).toEqual(['auto']);
-      store.delete('auto');
+      store.remove('auto');
       expect(store.get('auto')).toBeUndefined();
       expect(store.list()).toEqual([]);
     } finally {

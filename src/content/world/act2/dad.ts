@@ -98,6 +98,7 @@ import {
   ACT3_SAW_SEAL,
   ACT3_WALKED_TUNNEL,
 } from '../act3/ids';
+import { ACT4_EV_DAD_BREATH, ACT4_PROFILE_SEEN } from '../act4/ids';
 import {
   ACT2_CACHE_POLAROID,
   ACT2_CLUE_DAD_BOOTS,
@@ -180,6 +181,25 @@ export const ACT2_DAD_MANNERISM_EVENT: EventDef = {
   when: { met: ACT2_DAD },
   once: true,
   effects: [{ set: [ACT2_DAD_SAID_MANNERISM, true] }],
+};
+
+// E0 task J — §19, canon 59's Act IV instance. `act4_ev_dad_breath` is
+// namespaced `act4_*` (declared in `act4/ids.ts`, this task's own labelled
+// block) but the `EventDef` itself lives here, per this file's own "events
+// export" idiom above, and is registered in `act4/index.ts`'s own `events`
+// map (not `act2/index.ts` — this is Act IV content). One beat, no name, no
+// camera, no gloss. `{ at: ACT3_S6_ARCHIVE_HUB }` is a builder addition
+// beyond the prose doc's own literal `when` (`{ all: [{ flag:
+// act4_profile_seen }, { npcAt: [act2_dad, act3_s6_archive_hub] }] }`): the
+// doc's Cond alone never checks the *player's* own location, and this
+// codebase's other ambient NPC-witnessed events (e.g. the custodian rounds,
+// `act3/events.ts`) all gate on player presence explicitly for exactly this
+// reason — flagged in this task's report.
+export const ACT4_EV_DAD_BREATH_EVENT: EventDef = {
+  id: ACT4_EV_DAD_BREATH,
+  when: { all: [{ flag: ACT4_PROFILE_SEEN }, { npcAt: [ACT2_DAD, ACT3_S6_ARCHIVE_HUB] }, { at: ACT3_S6_ARCHIVE_HUB }] },
+  once: true,
+  effects: [{ say: 'The fan on the rig takes a breath in, which is a thing a fan does not need to do and has not done all week.\n\n"Well," says Dad, from a standing start. "Go on, then."' }],
 };
 
 // ---------------------------------------------------------------------------

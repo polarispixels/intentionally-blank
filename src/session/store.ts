@@ -12,12 +12,18 @@
 // do that itself (a `localStorage` adapter would likely prefix every key
 // with a game id) without this module needing to know.
 
-/** Persistence over string blobs — `get`/`put`/`list`/`delete` by slot name (ADR 0010). */
+/**
+ * Persistence over string blobs — `get`/`put`/`list`/`remove` by slot name
+ * (ADR 0010). `remove` (ADR 0012 item 4, Stage E `E-1`) is what the
+ * recursive-ending hand-off uses to clear slots `'undo'`/`'checkpoint'`
+ * before starting the next game — without it, a stale `'undo'` save would
+ * let one `UNDO` jump from the fresh opening room back into the ending.
+ */
 export interface SaveStore {
   get(key: string): string | undefined;
   put(key: string, value: string): void;
   list(): string[];
-  delete(key: string): void;
+  remove(key: string): void;
 }
 
 /** In-memory `SaveStore` (ADR 0010): what `tests/session.test.ts` and the CLI/tests use in place of `localStorage`. */
@@ -36,7 +42,7 @@ export class MemoryStore implements SaveStore {
     return [...this.data.keys()];
   }
 
-  delete(key: string): void {
+  remove(key: string): void {
     this.data.delete(key);
   }
 }

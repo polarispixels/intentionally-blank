@@ -31,8 +31,9 @@
 import type { ObjectDefSlice } from '../../../../engine/world';
 import type { Effect } from '../../../../engine/effects';
 import type { ProseRule } from '../../../../engine/prose';
-import { DIRECTION_VERB_IDS } from '../../../../engine/move';
-import { crossStreetText, crouchText, EXAMINE, HELLO, OPEN, READ, SEARCH, SMELL, TAKE, TOUCH } from '../verbs';
+import { DIRECTION_VERB_IDS, USE_VERB_ID } from '../../../../engine/move';
+import { crossStreetText, crouchText, EXAMINE, HELLO, MOVE, OPEN, READ, SEARCH, SMELL, TAKE, TOUCH } from '../verbs';
+import { ACT4_CREWS } from '../../act4/ids';
 import { ACT2_HORSE, ACT2_STARTED } from '../../act2/ids';
 import { POKER_NIGHT } from '../../act2/calendar';
 import { POKER_NIGHT_WINDOW_TEXT } from '../../act2/poker';
@@ -454,7 +455,67 @@ const motelSignFront: ObjectDefSlice = {
   handlers: [{ verbs: [DIRECTION_VERB_IDS.in, V_APPROACH, V_FIND], effects: enterMotelEffects }],
 };
 
+// ---------------------------------------------------------------------------
+// E0 task I — the crews (`docs/superpowers/specs/2026-09-17-stage-e0-
+// prose.md` §4, §31, §32). `hidden: true` by default; the overlay is kept
+// in sync with `CREWS_VISIBLE_WHEN` every turn the player is on Main Street
+// by `act4_ev_crews_visible`/`act4CrewsVisibility` (`act4/events.ts`/
+// `act4/scripts.ts`) — see that script's own doc comment for why a
+// declared `hidden` boolean and the one-way `{ reveal }` effect aren't
+// enough here (the crews go hidden again on/after `act4_visit_over_day`,
+// and at night before the day's work starts).
+//
+// Five handlers (§4.1-§4.5). §4.2's "ASK CREW ABOUT VISIT"/"ASK CREW ABOUT
+// ROAD" cannot resolve as worded — "ask" is exclusively `NPC_VERB_IDS.ask`
+// (`V npc about topic`, resolving only against `world.npcs`; `verbs.ts`'s
+// own comment on `maintenanceMan`, above, documents the identical gap for
+// "ask man about") — so this task follows that same file's precedent:
+// `HELLO` ("talk to crew") and `V_QUESTION` ("question crew") share §4.2's
+// text. §4.3's "HELP CREW" cannot resolve either: `help` is exclusively
+// `V_HELP`'s, a meta verb with pattern `['V']` only (no dobj slot) — so
+// "TAKE"/`USE_VERB_ID`/`TOUCH` (covering "USE MACHINE"/"TOUCH MILL", and
+// "TAKE MACHINE"/"TAKE MILL"/"TAKE BARRIER") carry §4.3's text instead;
+// "TAKE SHOVEL" was never a real noun on this object (no "shovel" exists
+// anywhere in the game) and falls to the ordinary unknown-noun response,
+// same as before this task. §4.4's "WALK ON ROAD" resolves its dobj
+// against `main_street_road`'s own bare noun "road" (declared long before
+// this task), not against this object, so it is not wired here either —
+// `V_CROSS`/`MOVE`/`DIRECTION_VERB_IDS.in` cover "CROSS BARRIER"/"MOVE
+// BARRIER"/"ENTER WORKS". All three gaps are reported, not guessed around.
+// ---------------------------------------------------------------------------
+
+const crewsExamine =
+  "County stripes on the doors and a contractor's name on the machine, and the two\ndo not match, which on a road job is normal.\n\nA crew of them, and none of them hurrying: one on the mill, one walking backwards\nin front of it with a spray can, one on the sweeper, and three doing the part\nof the job that consists of standing where they can see all of it.\n\nThe man with the spray can has marked the manholes, the valve covers and one\nlong straight line up the middle of the street that has never been there\nbefore.";
+
+const crewsTalk =
+  'The one on the sweeper takes an earplug out for you, listens, puts it back in,\nand points at the man standing furthest from the work, who is the one with the\nfolder.\n\nThe man with the folder has been asked all morning. "Milling and resurfacing,"\nhe says. "Full length. It\'s on the county\'s notice." He looks at his folder in\ncase it has changed. "That\'s what I\'ve got."';
+
+const crewsHelp =
+  'There is a way of standing near working men that gets you asked to hold\nsomething, and you find it, and you are asked to hold something. It is a tape\nend. You hold it for a minute and a half and then the job moves up the street\nwithout you.';
+
+const crewsCrossBarrier =
+  'The barriers are the sort you fill with water so that they cannot be moved by\none person, and you are one person.\n\nThe gap at the nearest door is four feet wide and the crew have left one at\nevery door on the street, so there is nowhere on Main you cannot get to. There\nis only nowhere on Main you can get to down the middle.';
+
+const crewsCount =
+  'You get as far as the second machine before a man in a hard hat asks you,\nwithout heat, whether you are from the county.\n\nYou are not, and it turns out there is no other kind of person who counts\nthings on a road.';
+
+const crews: ObjectDefSlice = {
+  location: MAIN_STREET,
+  name: 'crew',
+  portable: false,
+  hidden: true,
+  nouns: ['crew', 'crews', 'men', 'workmen', 'machine', 'milling machine', 'mill', 'sweeper', 'roller', 'barriers', 'barrier', 'cones', 'generator', 'lamp', 'tripod', 'works', 'road work'],
+  handlers: [
+    { verbs: [EXAMINE], effects: [{ say: crewsExamine }] },
+    { verbs: [HELLO, V_QUESTION], effects: [{ say: crewsTalk }] },
+    { verbs: [TAKE, TOUCH, USE_VERB_ID], effects: [{ say: crewsHelp }] },
+    { verbs: [V_CROSS, MOVE, DIRECTION_VERB_IDS.in], effects: [{ say: crewsCrossBarrier }] },
+    { verbs: [V_COUNT], effects: [{ say: crewsCount }] },
+  ],
+};
+
 export const MAIN_STREET_OBJECTS: Record<string, ObjectDefSlice> = {
+  [ACT4_CREWS]: crews,
   [HORSES]: horses,
   [BILLBOARD]: billboard,
   [HORIZON_GLOW]: horizonGlow,

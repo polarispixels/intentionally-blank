@@ -33,7 +33,7 @@ export class FileStore implements SaveStore {
       .map((f) => f.slice(0, -EXT.length));
   }
 
-  delete(key: string): void {
+  remove(key: string): void {
     const path = this.path(key);
     if (existsSync(path)) rmSync(path);
   }

@@ -24,6 +24,7 @@ import type { WorldDef } from '../../engine/world';
 import { ACT1_SLICE } from './act1/slice';
 import { ACT2_SLICE, ACT2_CENSOR_PROMPT_SCRIPTS } from './act2/index';
 import { ACT3_SLICE, ACT3_HUB_PROMPT_SCRIPTS } from './act3/index';
+import { ACT4_SLICE } from './act4/index';
 
 /**
  * A `WorldSlice` is every keyed table of `WorldDef` an act can contribute,
@@ -109,12 +110,22 @@ export function assemble(...slices: WorldSlice[]): WorldDef {
   };
 }
 
-export const WORLD: WorldDef = assemble(ACT1_SLICE, ACT2_SLICE, ACT3_SLICE);
+export const WORLD: WorldDef = assemble(ACT1_SLICE, ACT2_SLICE, ACT3_SLICE, ACT4_SLICE);
 
 /**
  * The shipped game's prompt → script table (v0.12.0). A prompt id emitted by
  * content (the letter's `act2_compose_letter`) maps to the script that closes
  * it; the CLI and the shell merge this over the session layer's own RESTART
  * prompts. Each act's slice exports its own entries; they are merged here.
+ *
+ * Stage E, E-5 (plan §3.5, "three logins, three ids"): the opening
+ * terminal's login, the Hub's login, and the antechamber's login (E0–E3;
+ * the Hub's is shipped) share the same credentials and NOTHING else — not
+ * this prompt id, not the success text, not the flag. A plain object spread
+ * (unlike `assemble`'s `mergeTable`, above) never throws on a repeated key,
+ * so a shared prompt id here would silently route one station's LOG IN to
+ * another's respond script — `tests/world-prompt-ids.test.ts` is the guard.
+ * E0–E3 add `ACT4_PROMPT_SCRIPTS`/`ACT5_PROMPT_SCRIPTS` to this spread in
+ * the same change they add rooms.
  */
 export const PROMPT_SCRIPTS: Record<string, ScriptId> = { ...ACT2_CENSOR_PROMPT_SCRIPTS, ...ACT3_HUB_PROMPT_SCRIPTS };

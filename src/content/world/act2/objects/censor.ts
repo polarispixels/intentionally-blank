@@ -51,6 +51,7 @@ import {
   EVENT_ACT2_ELI_REPLY,
   V_UNFOLD,
 } from '../ids';
+import { ACT4_CLUE_ELIS_REASON, ACT4_REPLY_ELI_NUMERALS, ACT4_STARTED } from '../../act4/ids';
 
 // ---------------------------------------------------------------------------
 // §10.3 — away from the drop (also `V_WRITE`'s own bare `default`,
@@ -191,17 +192,37 @@ const letterUnfoldEffects: Effect[] = [{ say: UNFOLD_TEXT }, { setProp: [ACT2_LE
 const POST_TEXT =
   "OUT OF TOWN takes it. The felt in the flap means the brass does not bang, so\nthe last thing you get is the sound of a sheet of paper landing on other\nsheets of paper somewhere below the floor.\n\nThat is the whole of it. It is now somebody else's for a while.";
 
+// E0 task J — §21, canon 110's third slot. Checked BEFORE `censorVerdict`'s
+// own result is used (below): `censorVerdict` is still called, unmodified,
+// pure, table-tested; this override only replaces which value the caller
+// goes on to use. The five tokens are §21's own, transcribed exactly (hard
+// rule 5 applies to the mechanical threshold's exact wording, same
+// reasoning `act2/censor.ts`'s own header gives for its word lists). "No
+// flagged token" (the doc's own phrase) is `baseVerdict !== 'rewritten'` —
+// `censorVerdict` already returns `'rewritten'` iff the message contains a
+// `CENSOR_FLAGGED` token, so a non-`'rewritten'` base verdict is exactly a
+// message with none.
+const NUMERALS_TOKENS = ['tattoo', 'tattoos', 'numeral', 'numerals', 'ink'];
+
+function mentionsNumerals(message: string): boolean {
+  const tokens = message.toLowerCase().match(/[a-z0-9']+/g) ?? [];
+  return tokens.some((t) => NUMERALS_TOKENS.includes(t));
+}
+
 /**
  * `act2_post_letter` (plan §2 D2, ruling 1): `censorVerdict` → status, due
  * day (`+1` rewritten/blank, `+4` answered), `act2_awaiting_reply`,
  * consumes the letter. The rule itself is never stated in any response
- * here (plan §4.5's own constraint).
+ * here (plan §4.5's own constraint). E0 task J's own amendment: a
+ * `'numerals'` status, gated `act4_started`, sits alongside `'answered'` on
+ * the four-day due day — see the note above `NUMERALS_TOKENS`.
  */
 export const act2PostLetter: ScriptFn = (world, state) => {
   const message = String(prop(world, state, ACT2_LETTER_OUT, 'message') ?? '');
   const folded = Boolean(prop(world, state, ACT2_LETTER_OUT, 'folded') ?? false);
-  const verdict = censorVerdict(message, folded);
-  const dueDay = state.clock.day + (verdict === 'answered' ? 4 : 1);
+  const baseVerdict = censorVerdict(message, folded);
+  const verdict = flag(world, state, ACT4_STARTED) && baseVerdict !== 'rewritten' && mentionsNumerals(message) ? 'numerals' : baseVerdict;
+  const dueDay = state.clock.day + (verdict === 'answered' || verdict === 'numerals' ? 4 : 1);
   return apply(
     world,
     state,
@@ -223,11 +244,13 @@ export const act2PostLetter: ScriptFn = (world, state) => {
  * was folded) from `nowhere` into `{ in: PO_BOXES }`, and clears
  * `act2_awaiting_reply`. No text of its own (plan §2 D2, ruling 4) — §12.2's
  * arrival line renders on the player's next look at box 141
- * (`act1/objects/postOffice.ts`'s own amendment).
+ * (`act1/objects/postOffice.ts`'s own amendment). E0 task J adds the
+ * `'numerals'` branch, sibling to `'answered'`/`'rewritten'`.
  */
 export const act2DeliverReply: ScriptFn = (world, state) => {
   const status = flag(world, state, ACT2_LETTER_STATUS);
-  const replyObj = status === 'rewritten' ? ACT2_REPLY_REWRITTEN : status === 'answered' ? ACT2_REPLY_AUDIT : ACT2_REPLY_BLANK;
+  const replyObj =
+    status === 'rewritten' ? ACT2_REPLY_REWRITTEN : status === 'answered' ? ACT2_REPLY_AUDIT : status === 'numerals' ? ACT4_REPLY_ELI_NUMERALS : ACT2_REPLY_BLANK;
   const wasFolded = flag(world, state, ACT2_LAST_LETTER_FOLDED);
   const effects: Effect[] = [{ move: [replyObj, { in: PO_BOXES }] }, { set: [ACT2_AWAITING_REPLY, false] }];
   if (wasFolded) effects.push({ move: [ACT2_ORIGAMI_RULER, { in: PO_BOXES }] });
@@ -294,7 +317,7 @@ const REPLY_REWRITTEN_EXAMINE_TEXT =
 // reel objects covers the same mechanism in more detail).
 const replyRewritten: ObjectDefSlice = {
   location: 'nowhere',
-  name: 'reply',
+  name: 'first reply', // distinct names (v0.16.0): four replies can be held at once and a clarify must tell them apart
   portable: true,
   nouns: ['reply', 'answer', 'first reply'],
   adjectives: ['first'],
@@ -317,7 +340,7 @@ const REPLY_BLANK_READ_TEXT =
 
 const replyBlank: ObjectDefSlice = {
   location: 'nowhere',
-  name: 'reply',
+  name: 'short reply', // distinct names (v0.16.0): four replies can be held at once and a clarify must tell them apart
   portable: true,
   nouns: ['reply', 'answer', 'short reply'],
   adjectives: ['short'],
@@ -359,7 +382,7 @@ const REPLY_AUDIT_EXAMINE_TEXT =
 
 const replyAudit: ObjectDefSlice = {
   location: 'nowhere',
-  name: 'reply',
+  name: 'audit reply', // distinct names (v0.16.0): four replies can be held at once and a clarify must tell them apart
   portable: true,
   nouns: ['reply', 'audit', 'numbers', 'filing', 'audit reply'],
   adjectives: ['audit'],
@@ -446,3 +469,46 @@ export const ACT2_CENSOR_OBJECTS: Record<string, ObjectDefSlice> = {
   [ACT2_REPLY_AUDIT_FOLD]: replyFold(ACT2_REPLY_AUDIT),
   [ACT2_ORIGAMI_RULER]: origamiRuler,
 };
+
+// ---------------------------------------------------------------------------
+// E0 task J — §21, Eli's reply to the numerals letter. Kept OUT of
+// `ACT2_CENSOR_OBJECTS` above (that map is merged into Act II's own slice
+// by `act2/index.ts`, a file this task does not touch) and registered
+// instead via `act4/index.ts`'s own `objects` map — same reason
+// `act1/objects/sheriffOffice.ts`'s own `ACT4_J_SHERIFF_OBJECTS` gives. No
+// `fold` sub-part (unlike the three shipped replies) — not named in §21,
+// and out of scope for this task to invent.
+// ---------------------------------------------------------------------------
+
+const REPLY_NUMERALS_READ_TEXT =
+  'Four days, and it is one sheet.\n\n' +
+  '    You have asked a strange question and I will answer it, because you have\n' +
+  '    not yet asked me a stupid one.\n\n' +
+  '    There is no I. There was never an I. Dad drove us to a place on a side\n' +
+  '    street in Rapid City and the man there would not do it — a single upright\n' +
+  '    is a line, and a line on skin is a scar or a smudge inside ten years, and\n' +
+  '    he had a card on the wall about it. So the sheet started at two, and Dad\n' +
+  '    paid for four, and complained about the money the whole way home.\n\n' +
+  '    I was six. I remember the card and I remember the complaining. I could not\n' +
+  '    tell you that man\'s face.\n\n' +
+  '    Ask me something I can look up.\n\n' +
+  '    E.';
+
+const REPLY_NUMERALS_EXAMINE_TEXT =
+  'He has written it on the back of a filing schedule. The printed grid comes through from the other side, faint, under everything he has said, and he has used the ruled lines without appearing to notice that he was using them.';
+
+const replyEliNumerals: ObjectDefSlice = {
+  location: 'nowhere',
+  name: 'numerals reply', // distinct names (v0.16.0): four replies can be held at once and a clarify must tell them apart
+  portable: true,
+  nouns: ['reply', 'answer', 'numerals reply'],
+  adjectives: ['third', 'numerals'],
+  handlers: [
+    { verbs: [READ], effects: [{ say: REPLY_NUMERALS_READ_TEXT }, { grantClue: ACT4_CLUE_ELIS_REASON }] },
+    { verbs: [EXAMINE], effects: [{ say: REPLY_NUMERALS_EXAMINE_TEXT }] },
+  ],
+};
+
+export const ACT4_J_CENSOR_OBJECTS: Record<string, ObjectDefSlice> = {
+  [ACT4_REPLY_ELI_NUMERALS]: replyEliNumerals,
+} satisfies Record<string, ObjectDefSlice>;

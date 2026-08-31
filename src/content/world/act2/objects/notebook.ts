@@ -34,6 +34,8 @@ import {
   ACT2_SHORTHAND_DECODED,
   V_FIT,
 } from '../ids';
+import { ACT4_CASE_NOTES } from '../../act4/ids';
+import { CASE_NOTES_COMPARISON_EFFECTS } from '../../act1/objects/sheriffOffice';
 
 // ---------------------------------------------------------------------------
 // §13.1 — examine
@@ -97,7 +99,15 @@ const notebook: ObjectDefSlice = {
   // word "log" (act1/ids.ts) already collides with it, adding a new
   // `verb-noun-collision` warning `tests/world-act1.test.ts` counts
   // exactly — "journal"/"diary"/"jotter"/"notebook" already cover the word.
-  nouns: ['notebook', 'note book', 'book', 'journal', 'diary', 'jotter', 'notes', 'band', 'elastic', 'rubber band'],
+  //
+  // "notes" dropped, E0 task J: `act1/objects/sheriffOffice.ts`'s new
+  // `act4_case_notes` also claims it, and §31.2's own wiring-summary row
+  // requires "COMPARE NOTES WITH NOTEBOOK" to resolve dobj -> case notes,
+  // instrument -> this object — impossible while both objects share the
+  // bare noun "notes" (a genuine two-candidate ambiguity whenever both are
+  // held, found running this task's own test suite). "journal"/"diary"/
+  // "jotter"/"notebook"/"book" already cover the word for this object.
+  nouns: ['notebook', 'note book', 'book', 'journal', 'diary', 'jotter', 'band', 'elastic', 'rubber band'],
   portable: true,
   plotCritical: true,
   description: notebookExamine,
@@ -110,6 +120,13 @@ const notebook: ObjectDefSlice = {
     // ("FIT PAGE IN NOTEBOOK"/"PUT PAGE IN NOTEBOOK"/"COMPARE PAGE WITH
     // NOTEBOOK", dobj=page, iobj=notebook) is on `page78.ts`.
     { verbs: [V_FIT, PUT_IN], withInstrument: [PAGE_78], effects: NOTEBOOK_FIT_EFFECTS },
+    // E0 task J, §15 — the mirror of `act1/objects/sheriffOffice.ts`'s own
+    // `caseNotes` handler ("COMPARE NOTES WITH NOTEBOOK", dobj=notes,
+    // iobj=notebook): "COMPARE NOTEBOOK WITH NOTES" (dobj=notebook,
+    // iobj=notes), same established idiom as the page-fitting pair above.
+    // Not `PUT_IN` here — comparing two hands side by side is not a
+    // containment action the way fitting a page into a spine is.
+    { verbs: [V_FIT], withInstrument: [ACT4_CASE_NOTES], effects: CASE_NOTES_COMPARISON_EFFECTS },
     { verbs: [BURN], effects: [{ say: burnText }] },
     { verbs: [CUT], effects: [{ say: tearCutText }] },
     // "EAT NOTEBOOK" is deliberately not wired — the engine has no generic

@@ -33,6 +33,11 @@ import { ACT2_CUSTODIAN, ACT2_HORSE_BORROWED, ACT2_MEM_M15, ACT2_STARTED, ACT2_T
 // D3, task A — "RIDE TO PLANT" (§3, ruling 1), the horse's own boundary
 // door, mirroring "DRIVE TO PLANT" at the motel/Town Edge.
 import { V_ACT3_RIDE_TO_PLANT } from '../act3/ids';
+// E0 task I — the town before the visit (`docs/superpowers/specs/2026-09-
+// 17-stage-e0-prose.md` §3). Three description rules, prepended above the
+// D2 daytime rules, in the doc's own order (rule 3 first, so the finished
+// road wins once the crews have gone).
+import { ACT4_VISIT_ANNOUNCED, ACT4_VISIT_OVER_DAY } from '../act4/ids';
 
 // ---------------------------------------------------------------------------
 // §2.2 — description
@@ -73,7 +78,22 @@ const DAYTIME_TEXT =
 
 const DAYTIME_TEXT_WITH_M15 = `${DAYTIME_TEXT}\n\n${M15_CLAUSE}`;
 
+// E0 task I (§3) — the visit's three rules. Rule 3 (§3.1) wins once the
+// crews have gone (`act4_visit_over_day`); rule 1 (§3.2) is the day's work;
+// rule 2 (§3.3) is evening/night, the shut street with nobody on it.
+const ROAD_FINISHED_TEXT =
+  'Main Street is black and even from the store to the motel, and there is a white\nline down the middle of it that nobody in this county has ever had to look at\nbefore.\n\nThe barriers are gone. The horses are back at their own rail.';
+
+const ROAD_WORK_DAY_TEXT =
+  'Main Street has been opened up.\n\nA milling machine is eating the crown of the road in a strip eight feet wide,\nnorthbound, at about the speed of a man walking to a job he does not much like.\nBehind it a sweeper, and behind the sweeper a length of road the colour road is\nbefore anybody has driven on it.\n\nOrange plastic barriers, weighted with water, run the length of the west side\nin front of the poles, with a gap left at every door.\n\nThe horses have been moved. They are at the rail outside the post office now,\nwhich is thirty feet from where they were, and two of them are asleep standing\nup.';
+
+const ROAD_WORK_NIGHT_TEXT =
+  'The street is shut and lit. Barriers down the west side, a lamp on a tripod at\neach end of the works, and a generator on a pallet boxed in with plywood\nagainst the noise it is not making much of.\n\nThe milled strip goes north out of the lamplight, ribbed and pale, and stops\nbeing visible some way before it stops.\n\nThe machines are parked nose to tail behind the barriers with their beds down\nand their lights off, which is how a crew leaves a road it means to come back\nto.';
+
 const description: ProseRule[] = [
+  { when: { all: [{ flag: ACT4_VISIT_ANNOUNCED }, { onOrAfterDay: ACT4_VISIT_OVER_DAY }] }, text: ROAD_FINISHED_TEXT },
+  { when: { all: [{ flag: ACT4_VISIT_ANNOUNCED }, { any: [{ clockPhase: 'morning' }, { clockPhase: 'afternoon' }] }] }, text: ROAD_WORK_DAY_TEXT },
+  { when: { flag: ACT4_VISIT_ANNOUNCED }, text: ROAD_WORK_NIGHT_TEXT },
   // The M15 clause describes him at the rail (mornings), so it rides on the daytime text while he is there.
   { when: { all: [{ memory: ACT2_MEM_M15 }, { npcAt: [ACT2_CUSTODIAN, MAIN_STREET] }, { flag: ACT2_STARTED }, { any: [{ clockPhase: 'morning' }, { clockPhase: 'afternoon' }] }] }, text: DAYTIME_TEXT_WITH_M15 },
   { when: { all: [{ flag: ACT2_STARTED }, { any: [{ clockPhase: 'morning' }, { clockPhase: 'afternoon' }] }] }, text: DAYTIME_TEXT },

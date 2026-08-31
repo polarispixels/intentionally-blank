@@ -107,6 +107,10 @@ function repoPath(relativeToTests: string): string {
  *   - a "note" object whose TAKE handler opens `QUESTION_PUZZLE`, so the
  *     `HINT` command has something to list without needing new engine
  *     wiring.
+ *   - `meta.recursiveEnding` plus a "recursion console" object whose TAKE
+ *     handler fires it (ADR 0012, Stage E `E-1`) — the CLI-level hand-off
+ *     check below: no engine change needed to reach this from a real
+ *     parsed command, just a world that declares one.
  * `PROMPT_SCRIPTS` closes the prompt-round-trip gap `repl.ts`'s own header
  * documents (no `WorldDef` table maps a prompt id to its response script).
  */
@@ -125,9 +129,12 @@ function writeWorldModule(d: string): string {
       'const { dark: _unused, ...roomAWithoutDark } = FIXTURE_WORLD.rooms[ROOM_A];',
       "const DEATH_TRAP = 'fixture_cli_death_trap';",
       "const HINT_TRIGGER = 'fixture_cli_hint_trigger';",
+      "const RECURSIVE_ENDING_TRIGGER = 'fixture_cli_recursive_ending_trigger';",
+      "const RECURSIVE_ENDING_ID = 'fixture_cli_recursive_ending';",
       '',
       'export const WORLD = {',
       '  ...FIXTURE_WORLD,',
+      '  meta: { ...FIXTURE_WORLD.meta, recursiveEnding: RECURSIVE_ENDING_ID },',
       '  rooms: { ...FIXTURE_WORLD.rooms, [ROOM_A]: roomAWithoutDark },',
       '  objects: {',
       '    ...FIXTURE_WORLD.objects,',
@@ -141,8 +148,13 @@ function writeWorldModule(d: string): string {
       '      handlers: [{ verbs: [BUILTIN_VERB_IDS.take], class: "analytical",',
       "        effects: [{ say: 'A note falls out, raising a question.' }, { openQuestion: QUESTION_PUZZLE }, { move: [HINT_TRIGGER, 'inventory'] }] }],",
       '    },',
+      '    [RECURSIVE_ENDING_TRIGGER]: {',
+      '      location: ROOM_A, name: "recursion console", nouns: ["console"], portable: false,',
+      '      handlers: [{ verbs: [BUILTIN_VERB_IDS.take], class: "direct",',
+      "        effects: [{ say: 'Darkness.' }, { say: 'Your head hurts.' }, { end: RECURSIVE_ENDING_ID }] }],",
+      '    },',
       '  },',
-      '  responses: { ...FIXTURE_WORLD.responses, ...RESPONSES, "dead.refused": "You are dead. There is nothing more to do here." },',
+      '  responses: { ...FIXTURE_WORLD.responses, ...RESPONSES, "dead.refused": "You are dead. There is nothing more to do here.", "ended.refused": "There is nothing more to do now." },',
       '};',
       '',
       'export const PROMPT_SCRIPTS = { [FIXTURE_PROMPT_ID]: PROMPT_RESPOND_SCRIPT };',
@@ -258,6 +270,26 @@ describe('CLI v2 (session-backed REPL)', () => {
     expect(stdout).toContain('You are dead. There is nothing more to do here.'); // dead.refused, on the next command
     expect(stdout).toMatch(/you may:.*UNDO.*RESTART ENCOUNTER.*RESTART/);
     expect(stdout).toContain('(restarted from checkpoint)');
+  });
+
+  it('a recursive ending hands off in one transcript: the ending\'s own beats lead straight into the fresh game\'s opening, with no restarted/ended banner or system line between (ADR 0012)', () => {
+    const saveDir = mkdtempSync(join(tmpdir(), 'ib-cli-v2-'));
+    const script = writeScript(dir, 'ending.txt', ['take console']);
+    const { stdout, status } = playV2(['--world', worldPath, '--save-dir', saveDir, '--script', script, '--fast']);
+    expect(status).toBe(0);
+    expect(stdout).toContain('Darkness.');
+    expect(stdout).toContain('Your head hurts.');
+    // The opening room's own firstVisit text renders once at [start] and,
+    // since the hand-off starts a genuinely fresh game, exactly once more
+    // right after "Your head hurts." — the only thing that follows it.
+    const marker = 'fixture room alpha — firstVisit (never shown at game start)';
+    expect(stdout.split(marker).length - 1).toBe(2);
+    const afterHeadHurts = stdout.split('Your head hurts.')[1]!;
+    expect(afterHeadHurts).toContain(marker);
+    expect(afterHeadHurts).not.toContain('RESTARTED');
+    // No engine "ended"/"THE END" rendering leaks into the merged
+    // transcript either — the ended event itself never reaches renderEvent.
+    expect(stdout).not.toContain('THE END');
   });
 
   it('--diag dumps a greppable line per diag event; without it, diags are silent', () => {

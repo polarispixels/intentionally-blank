@@ -719,15 +719,15 @@ export const ACT1_VERBS: Record<string, VerbDef> = {
   // ("north", `horizon_glow`'s own noun) — zero new verb-noun-collision
   // warnings (the dedup is per verb+word, and "n"/"north" is already
   // reported from the bare word above).
-  [DIRECTION_VERB_IDS.n]: { id: DIRECTION_VERB_IDS.n, words: ['north', 'n', 'go north', 'walk north'], patterns: ['V'], class: 'direct', default: { ref: 'move.noExit' } },
-  [DIRECTION_VERB_IDS.s]: { id: DIRECTION_VERB_IDS.s, words: ['south', 's'], patterns: ['V'], class: 'direct', default: { ref: 'move.noExit' } },
-  [DIRECTION_VERB_IDS.e]: { id: DIRECTION_VERB_IDS.e, words: ['east', 'e'], patterns: ['V'], class: 'direct', default: { ref: 'move.noExit' } },
-  [DIRECTION_VERB_IDS.w]: { id: DIRECTION_VERB_IDS.w, words: ['west', 'w'], patterns: ['V'], class: 'direct', default: { ref: 'move.noExit' } },
-  [DIRECTION_VERB_IDS.ne]: { id: DIRECTION_VERB_IDS.ne, words: ['northeast', 'ne'], patterns: ['V'], class: 'direct', default: { ref: 'move.noExit' } },
-  [DIRECTION_VERB_IDS.nw]: { id: DIRECTION_VERB_IDS.nw, words: ['northwest', 'nw'], patterns: ['V'], class: 'direct', default: { ref: 'move.noExit' } },
-  [DIRECTION_VERB_IDS.se]: { id: DIRECTION_VERB_IDS.se, words: ['southeast', 'se'], patterns: ['V'], class: 'direct', default: { ref: 'move.noExit' } },
-  [DIRECTION_VERB_IDS.sw]: { id: DIRECTION_VERB_IDS.sw, words: ['southwest', 'sw'], patterns: ['V'], class: 'direct', default: { ref: 'move.noExit' } },
-  [DIRECTION_VERB_IDS.up]: { id: DIRECTION_VERB_IDS.up, words: ['up', 'u', 'upstairs'], patterns: ['V'], class: 'direct', default: { ref: 'move.noExit' } },
+  [DIRECTION_VERB_IDS.n]: { id: DIRECTION_VERB_IDS.n, words: ['north', 'n', 'go north', 'walk north'], patterns: ['V'], class: null, default: { ref: 'move.noExit' } },
+  [DIRECTION_VERB_IDS.s]: { id: DIRECTION_VERB_IDS.s, words: ['south', 's'], patterns: ['V'], class: null, default: { ref: 'move.noExit' } },
+  [DIRECTION_VERB_IDS.e]: { id: DIRECTION_VERB_IDS.e, words: ['east', 'e'], patterns: ['V'], class: null, default: { ref: 'move.noExit' } },
+  [DIRECTION_VERB_IDS.w]: { id: DIRECTION_VERB_IDS.w, words: ['west', 'w'], patterns: ['V'], class: null, default: { ref: 'move.noExit' } },
+  [DIRECTION_VERB_IDS.ne]: { id: DIRECTION_VERB_IDS.ne, words: ['northeast', 'ne'], patterns: ['V'], class: null, default: { ref: 'move.noExit' } },
+  [DIRECTION_VERB_IDS.nw]: { id: DIRECTION_VERB_IDS.nw, words: ['northwest', 'nw'], patterns: ['V'], class: null, default: { ref: 'move.noExit' } },
+  [DIRECTION_VERB_IDS.se]: { id: DIRECTION_VERB_IDS.se, words: ['southeast', 'se'], patterns: ['V'], class: null, default: { ref: 'move.noExit' } },
+  [DIRECTION_VERB_IDS.sw]: { id: DIRECTION_VERB_IDS.sw, words: ['southwest', 'sw'], patterns: ['V'], class: null, default: { ref: 'move.noExit' } },
+  [DIRECTION_VERB_IDS.up]: { id: DIRECTION_VERB_IDS.up, words: ['up', 'u', 'upstairs'], patterns: ['V'], class: null, default: { ref: 'move.noExit' } },
   // §15.2's fire list adds `descend`/`climb down` as synonyms for DOWN —
   // both reach the landing's own `down` exit (§15.1.6: neither is declared
   // on `your_room`, which has no `down` exit at all, so they fall to the
@@ -742,7 +742,7 @@ export const ACT1_VERBS: Record<string, VerbDef> = {
     id: DIRECTION_VERB_IDS.down,
     words: ['down', 'd', 'downstairs', 'descend', 'climb down'],
     patterns: ['V'],
-    class: 'direct',
+    class: null,
     default: { ref: 'move.noExit' },
   },
   // §15.1.6's own note: "back" also returns through the door. Literal
@@ -769,7 +769,7 @@ export const ACT1_VERBS: Record<string, VerbDef> = {
     id: DIRECTION_VERB_IDS.in,
     words: ['in', 'inside', 'enter', 'back', 'go through', 'get in'],
     patterns: ['V', 'V dobj'],
-    class: 'direct',
+    class: null,
     default: VERB_DEFAULTS.enter,
   },
   // "exit" added (fix 2: EXIT was captured by CLIMB and required an
@@ -781,7 +781,7 @@ export const ACT1_VERBS: Record<string, VerbDef> = {
     id: DIRECTION_VERB_IDS.out,
     words: ['out', 'outside', 'leave', 'exit'],
     patterns: ['V', 'V dobj'],
-    class: 'direct',
+    class: null,
     default: VERB_DEFAULTS.exit,
   },
   // Ryan's v0.3.2 playtest, fix 2: USE didn't exist at all before (any

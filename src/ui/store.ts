@@ -27,7 +27,7 @@ export class LocalStorageStore implements SaveStore {
     return keys;
   }
 
-  delete(key: string): void {
+  remove(key: string): void {
     localStorage.removeItem(PREFIX + key);
   }
 }

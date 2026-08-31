@@ -60,6 +60,7 @@ export function validate(world: WorldDef): Finding[] {
   checkDeathEndingResponseFamilies(world, findings);
   checkDoorExitsCanReopen(world, findings);
   checkObjectNounCollisions(world, findings);
+  checkRecursiveEndingReferenced(world, findings);
 
   return findings;
 }
@@ -727,6 +728,36 @@ function checkDeathEndingResponseFamilies(world: WorldDef, findings: Finding[]):
       error(
         'missing-ended-refused-family',
         `world authors an {end} effect somewhere but responses["${ENDED_REFUSED_FAMILY}"] is not declared — the phase gate (turn.ts) has nothing to say once the story has ended`,
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// `meta.recursiveEnding` referential integrity (ADR 0012 item 1, Stage E
+// `E-1`). A warning, not an error: a world mid-authoring may declare the id
+// before wiring the `{ end }` effect that fires it, and this rule cannot
+// see a script-built `{ end }` at all (the same `{ script }`-is-opaque
+// caveat `checkDeathEndingResponseFamilies` above already lives with) — so
+// a false positive is possible and this stays advisory rather than fatal.
+// Reuses `collectAllEffectLists`/`walkEffects` (declared-effects sites
+// only), same as that rule.
+// ---------------------------------------------------------------------------
+
+function checkRecursiveEndingReferenced(world: WorldDef, findings: Finding[]): void {
+  const id = world.meta.recursiveEnding;
+  if (id === undefined) return;
+  let found = false;
+  for (const { effects } of collectAllEffectLists(world)) {
+    walkEffects(effects, (effect) => {
+      if ('end' in effect && effect.end === id) found = true;
+    });
+  }
+  if (!found) {
+    findings.push(
+      warning(
+        'meta-recursive-ending-unreferenced',
+        `meta.recursiveEnding "${id}" names no {end} effect declared anywhere in the world (this check only walks declared effects lists — a script-built {end} effect is invisible to it)`,
       ),
     );
   }

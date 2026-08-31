@@ -4,6 +4,12 @@
 import { describe, expect, it } from 'vitest';
 import { validate } from '../src/engine/validate';
 import { WORLD } from '../src/content/world/act1';
+import { LANDING } from '../src/content/world/act1/ids';
+import { compileVocabulary } from '../src/engine/parser';
+import { DeterministicParser } from '../src/engine/interpreter';
+import { buildScopeView } from '../src/cli/scope';
+import { createSession, takeTurn } from '../src/session/session';
+import { MemoryStore } from '../src/session/store';
 
 describe('validate — Act I room 1', () => {
   it('produces zero errors', () => {
@@ -165,10 +171,10 @@ describe('validate — Act I room 1', () => {
   // reports cover) — included here only because this is a whole-`WORLD`
   // count and someone had to reconcile it for the suite to go green; not
   // this task's own module to review in depth.
-  it('produces exactly the 106 expected verb-noun-collision warnings, no others', () => {
+  it('produces exactly the 109 expected verb-noun-collision warnings, no others', () => {
     const warnings = validate(WORLD).filter((f) => f.severity === 'warning');
     const collisions = warnings.filter((f) => f.code === 'verb-noun-collision');
-    expect(collisions.length).toBe(106);
+    expect(collisions.length).toBe(109);
     expect(collisions.map((f) => f.message).sort()).toEqual(
       [
         "verb \"act1_check_date\" can be typed bare and its word \"date\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
@@ -266,6 +272,9 @@ describe('validate — Act I room 1', () => {
         "verb \"act3_turn_to_normal\" can be typed bare and its word \"keyswitch\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act3_turn_to_normal\" can be typed bare and its word \"switch\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act3_write_vendor_number\" can be typed bare and its word \"number\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act4_ledger_four\" can be typed bare and its word \"four\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act4_ledger_four\" can be typed bare and its word \"ledger\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act4_ledger_one\" can be typed bare and its word \"ledger\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"down\" can be typed bare and its word \"down\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"e\" can be typed bare and its word \"east\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"in\" can be typed bare and its word \"back\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
@@ -360,8 +369,32 @@ describe('validate — Act I room 1', () => {
   // (three concurrent tasks) adds 14 more verb-noun collisions (see that
   // test above) and 1 more `room-description-mentions-portable`
   // (`act3_lobby`/"brochures", task B): 44 + 14 + 1 = 59.
-  it('produces exactly 114 warnings total, no others', () => {
+  it('produces exactly 117 warnings total, no others', () => {
     const warnings = validate(WORLD).filter((f) => f.severity === 'warning');
-    expect(warnings.length).toBe(114);
+    expect(warnings.length).toBe(117);
+  });
+});
+
+// Stage E, E-2 (ADR 0012 item 6): the twelve direction verbs are `class:
+// null` — the behavioral profile tallies choices, not logistics. The
+// Landing has no `north` exit at all (`landing.ts`'s own exits: `in`,
+// `down`, `out`), so this both proves the refusal path still tallies
+// nothing (`traverseDirection`'s `NO_EXIT_FAMILY` branch) and stands in for
+// every other direction verb, which share one `verbClass` lookup.
+describe('movement verbs are profile-neutral (ADR 0012 item 6)', () => {
+  const vocab = compileVocabulary(WORLD);
+
+  it('north from the landing tallies nothing', () => {
+    const fresh = createSession(WORLD);
+    const session = { ...fresh, state: { ...fresh.state, location: LANDING } };
+    const store = new MemoryStore();
+    const opts = { store, now: '2026-09-16T04:00:00.000Z', gameVersion: 'test-0.0.0' };
+
+    const view = buildScopeView(WORLD, session.state, vocab);
+    const outcome = new DeterministicParser().interpret('north', view);
+    const result = takeTurn(WORLD, session, vocab, outcome, opts);
+
+    expect(result.class).toBeNull();
+    expect(result.session.state.profile).toEqual(session.state.profile);
   });
 });

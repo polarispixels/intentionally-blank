@@ -1,12 +1,15 @@
 // Town Edge (`docs/superpowers/specs/2026-09-04-act1-wave3-prose.md` PART
 // THREE) — Zone 1 room 14, the north end of Main Street. §14's build
 // boundary moved here (from Main Street's own `north` — that room's §8/
-// wave-2 amendment §13.3). `system.buildBoundary` is now declared exactly
-// once, on this room's own `north` exit, via an always-closed gate object
-// (`TOWN_EDGE_BOUNDARY_GATE`, `objects/townEdge.ts` — the only
-// `system.buildBoundary` gate left in the game since a separate task
-// deleted Main Street's own `MAIN_STREET_BOUNDARY_GATE` outright, its
-// `north` variant now a real exit down to here — §15.3's own ruling).
+// wave-2 amendment §13.3), via an always-closed gate object
+// (`objects/townEdge.ts` — Main Street's own `MAIN_STREET_BOUNDARY_GATE`
+// was deleted outright, its `north` variant now a real exit down to here —
+// §15.3's own ruling). RENAMED (Stage E, E-3): the gate is `HIGHWAY_GATE`
+// / `act1_highway_gate` now, not `TOWN_EDGE_BOUNDARY_GATE` — canon 92
+// (v0.15's Addenda prose) made the road north fully in-world, a real
+// highway the narrator refuses on foot, not the edge of built content.
+// `system.buildBoundary` proper now renders only at the Hub's well
+// (`ACT3_S6_BOUNDARY_GATE`, `act3/s6ArchiveHub.ts`).
 // ENGINE GAP (same one already flagged on that former boundary):
 // `ExitDefSlice.blockedText` always renders `kind: 'prose'`, never the
 // doc's own instructed `kind: 'system'` — a content-only approximation,
@@ -21,7 +24,7 @@
 import type { ExitDefSlice, HandlerDef, RoomDefSlice } from '../../../engine/world';
 import type { ProseRule } from '../../../engine/prose';
 import { HELLO, LISTEN, SMELL, WAIT, YELL } from './verbs';
-import { CLAIM_TICKET, FLAG_OFFERED_THE_RIDE, FLAG_VISITED_TOWN_EDGE, MAIN_STREET, MONSTER_TRUCK, NOLANS_YARD, TOWN_EDGE, TOWN_EDGE_BOUNDARY_GATE, TOWN_EDGE_NO_EXIT_GATE, V_LOOK_UP } from './ids';
+import { CLAIM_TICKET, FLAG_OFFERED_THE_RIDE, FLAG_VISITED_TOWN_EDGE, HIGHWAY_GATE, MAIN_STREET, MONSTER_TRUCK, NOLANS_YARD, TOWN_EDGE, TOWN_EDGE_NO_EXIT_GATE, V_LOOK_UP } from './ids';
 import { ACT2_HORSE_BORROWED, ACT2_KNOWS_TUNNEL_MOUTH, ACT2_MEM_M15, ACT2_STARTED, ACT2_TRAVEL_SCRIPT, ACT2_WALL_DRUG_EMPORIUM, V_ACT2_DRIVE_TO_PLANT } from '../act2/ids';
 import { ACT2_DRIVE_TO_PLANT_EFFECTS } from '../act2/scripts';
 // D3, task A — "RIDE TO PLANT" (§3, ruling 1), mirroring "DRIVE TO PLANT" just below.
@@ -245,13 +248,13 @@ export const townEdgeRoom: RoomDefSlice = {
     { dir: 'in', to: MAIN_STREET, travelText: travelTextOut },
     // D1 amendment — `to` now points at the real Emporium (`ACT2_WALL_DRUG_
     // EMPORIUM`), not a self-loop, so the map draws the highway link (D1
-    // prose doc §18's own note). The door never opens (`TOWN_EDGE_BOUNDARY_
-    // GATE` has no `container` declared, so its own `open` state defaults
-    // false — see that id's own comment), and `cli/scope.ts`'s `travelGraph`
-    // only ever routes `GO TO` through already-*visited* rooms with an
-    // *open* door — so this change is inert for pathfinding until the doors
-    // actually open (never, in this build) and purely cosmetic for the map.
-    { dir: 'n', to: ACT2_WALL_DRUG_EMPORIUM, door: TOWN_EDGE_BOUNDARY_GATE, blockedText: northBlockedText },
+    // prose doc §18's own note). The door never opens (`HIGHWAY_GATE` has
+    // no `container` declared, so its own `open` state defaults false — see
+    // that id's own comment), and `cli/scope.ts`'s `travelGraph` only ever
+    // routes `GO TO` through already-*visited* rooms with an *open* door —
+    // so this change is inert for pathfinding until the doors actually open
+    // (never, in this build) and purely cosmetic for the map.
+    { dir: 'n', to: ACT2_WALL_DRUG_EMPORIUM, door: HIGHWAY_GATE, blockedText: northBlockedText },
     // §13.3 (wave 5) — the real east exit, Nolan's Yard.
     { dir: 'e', to: NOLANS_YARD, travelText: travelTextToYard },
     // D4 task A amendment (§3, §21.1, §21.4; register 90) — the tunnel's

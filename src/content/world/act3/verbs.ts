@@ -595,3 +595,43 @@ export const ACT3_D5_TASK_G_VERBS: Record<string, VerbDef> = {
     default: VERB_DEFAULTS.wait,
   },
 };
+
+// -----------------------------------------------------------------------------
+// E0 task K — the numeral search's fixed-phrase forms (§16, §31.2) and
+// "SELECT PROFILE" (§18). "i"/"iv"/"one"/"four" are not objects, so — same
+// reasoning as `V_ACT3_LEDGER_JULES` etc. above — each pair is its own bare
+// `'V'` fixed-phrase verb, reaching the same effects as the typed prompt
+// (wired on the room, `../act3/s6ArchiveHub.ts`, not an object handler —
+// bare verbs only ever reach a ROOM's own `handlers`, this file's own
+// header note). "SELECT" genuinely has a noun to land on (`act4_profile`),
+// so it is registered here as an ordinary `'V dobj'` verb instead, same
+// borrowed-default idiom `V_FIT` uses (`act2/verbs.ts`) — only living in
+// this file because this is where this wave's other new verb ids already
+// are, and the object it resolves against sits in this same room.
+// -----------------------------------------------------------------------------
+
+import { V_ACT4_LEDGER_FOUR, V_ACT4_LEDGER_ONE, V_ACT4_SELECT } from '../act4/ids';
+
+export const ACT4_E0_TASK_K_VERBS: Record<string, VerbDef> = {
+  [V_ACT4_LEDGER_ONE]: {
+    id: V_ACT4_LEDGER_ONE,
+    words: ['search ledger for i', 'search ledger for one'],
+    patterns: ['V'],
+    class: 'analytical',
+    default: VERB_DEFAULTS.touch,
+  },
+  [V_ACT4_LEDGER_FOUR]: {
+    id: V_ACT4_LEDGER_FOUR,
+    words: ['search ledger for iv', 'search ledger for four'],
+    patterns: ['V'],
+    class: 'analytical',
+    default: VERB_DEFAULTS.touch,
+  },
+  [V_ACT4_SELECT]: {
+    id: V_ACT4_SELECT,
+    words: ['select'],
+    patterns: ['V dobj'],
+    class: 'analytical',
+    default: VERB_DEFAULTS.touch,
+  },
+};

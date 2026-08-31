@@ -7,7 +7,12 @@
 
 import type { Effect } from '../../../../engine/effects';
 import type { ObjectDefSlice } from '../../../../engine/world';
+import type { ProseRule } from '../../../../engine/prose';
 import { USE_VERB_ID } from '../../../../engine/move';
+// E0 task I (`docs/superpowers/specs/2026-09-17-stage-e0-prose.md` §8) —
+// the window's EXAMINE gains one appended paragraph once the visit is
+// announced.
+import { ACT4_VISIT_ANNOUNCED } from '../../act4/ids';
 import { EXAMINE, OPEN, READ, SEARCH, SIT, TAKE } from '../verbs';
 import { dinerFacesText } from '../verbs';
 import {
@@ -213,12 +218,23 @@ const dinerPhotosFaces: ObjectDefSlice = {
 const windowExamine =
   'Plate glass with the gold arc across it, read backwards from in here: NWODNUS EHT, with all the shadow lines on the wrong side of the letters.\n\nHooked inside the door, a two-sided card. From here it says OPEN. It has been turned to OPEN since before the hour the Sundown opens, because Pearl is in and the door is not locked, and in this building those two facts have always settled it.';
 
+// E0 task I (§8) — rule 1, the shipped text plus one appended paragraph,
+// once the visit is announced; rule 2 is the shipped text, unedited. No
+// response anywhere in the game remarks on it (§8's own note — do not add
+// a reaction).
+const windowExamineAnnounced = `${windowExamine}\n\nThere is a signwriter on a stepladder outside with a mahl stick and a pot of\ngold, going over the arc letter by letter, and the letters he is going over are\nTHE SUNDOWNER.`;
+
+const windowExamineRule: ProseRule[] = [
+  { when: { flag: ACT4_VISIT_ANNOUNCED }, text: windowExamineAnnounced },
+  { text: windowExamine },
+];
+
 const dinerWindow: ObjectDefSlice = {
   location: SUNDOWN_DINER,
   name: 'window',
   portable: false,
   nouns: ['window', 'glass', 'gold', 'gilt', 'lettering', 'letters', 'sign', 'arc', 'door', 'card', 'open sign', 'closed sign', 'street'],
-  handlers: [{ verbs: [EXAMINE], effects: [{ say: windowExamine }] }],
+  handlers: [{ verbs: [EXAMINE], effects: [{ say: windowExamineRule }] }],
   // §4.6's "look out window"/"look at street" reach `windowStreetText` via
   // the bare `V_LOOK_OUT` verb (`verbs.ts`), not a handler here — see
   // `ids.ts`'s own comment on `V_LOOK_OUT` for why "street" stays a plain

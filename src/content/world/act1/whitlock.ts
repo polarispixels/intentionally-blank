@@ -38,8 +38,10 @@ import {
   V_FOLLOW,
   WHITLOCK,
 } from './ids';
-import { ACT2_STARTED } from '../act2/ids';
+import { ACT2_CLUE_PAGE_FITS, ACT2_HAS_AUDIT, ACT2_NOTEBOOK, ACT2_REPLY_AUDIT, ACT2_STARTED } from '../act2/ids';
 import { POKER_NIGHT } from '../act2/calendar';
+import { ACT4_CASE_NOTES, ACT4_STARTED, ACT4_WHITLOCK_CONVINCED, ACT4_WHITLOCK_READER_TOLD } from '../act4/ids';
+import { CAGE_OPENS_STATE_EFFECTS, CAGE_OPENS_TEXT } from './objects/sheriffOffice';
 
 // ---------------------------------------------------------------------------
 // §12.6.2 — unknownTopic
@@ -118,7 +120,92 @@ const yearResponse: ProseRule[] = [
   { text: yearRule2 },
 ];
 
+// ---------------------------------------------------------------------------
+// E0 task J — §10, Whitlock's Act IV (four topics, prepended above the
+// shipped list); §11, the two show-responses; §12, the cage opens. Topic
+// ids declared locally (sidecar style — matches this file's own established
+// idiom for `act1_*` topics above, not a central `ids.ts`).
+// ---------------------------------------------------------------------------
+
+const TOPIC_ACT4_READER = T('act4_whitlock_topic_reader');
+const TOPIC_ACT4_NOTEBOOK = T('act4_whitlock_topic_notebook');
+const TOPIC_ACT4_CAGE = T('act4_whitlock_topic_cage');
+const TOPIC_ACT4_VISIT = T('act4_whitlock_topic_visit');
+
+// §10.1 — ASK WHITLOCK ABOUT READER / ABOUT LIBRARY / ABOUT MICROFILM / ABOUT THE LAMP.
+const topicAct4Reader: TopicDef = {
+  id: TOPIC_ACT4_READER,
+  words: ['reader', 'library', 'microfilm', 'lamp', 'reel', 'film'],
+  when: { flag: ACT4_STARTED },
+  response:
+    '"That was mine." She has been waiting for somebody to ask her something she can answer. "I put the reel up and I leave the lamp on, and somebody will have said so."\n\nThe form gets squared. "I go over there when I want to read a thing that can\'t be changed while I\'m reading it."\n\nShe does not say what was on the screen, and she does not make a performance of not saying it.',
+  effects: [{ set: [ACT4_WHITLOCK_READER_TOLD, true] }],
+};
+
+// §10.2 — ASK WHITLOCK ABOUT HER NOTEBOOK / ABOUT NOTES / ABOUT WHAT SHE WRITES.
+const topicAct4Notebook: TopicDef = {
+  id: TOPIC_ACT4_NOTEBOOK,
+  words: ['notebook', 'her notebook', 'her own notebook', 'notes', 'her notes', 'writes', 'writing', 'what she writes'],
+  when: { flag: ACT4_STARTED },
+  response:
+    '"I keep my own." She says it the way you would name a tool. "It\'s been in that drawer eleven years. It isn\'t the county\'s and it isn\'t yours."\n\nThe drawer does not open. "Ask me the thing you actually came in to ask me."',
+};
+
+// §12 — the words shared by both `topic_cage` declarations (before and
+// after conviction): the cage, and (once she is convinced) the bag inside
+// it — `ASK WHITLOCK ABOUT CAGE` / `ABOUT BAG`.
+const CAGE_TOPIC_WORDS = ['cage', 'bag', 'bags', 'sack', 'sacks', 'evidence', 'property', 'my notes', 'my things'];
+
+// §12 — declared FIRST (same "supersede while the flag holds" idiom as
+// `topicDadV2`, this codebase's own precedent): once convinced, ANY of the
+// cage words reach the opening scene instead of §10.3's refusal below.
+const topicAct4CageOpens: TopicDef = {
+  id: TOPIC_ACT4_CAGE,
+  words: CAGE_TOPIC_WORDS,
+  when: { flag: ACT4_WHITLOCK_CONVINCED },
+  response: CAGE_OPENS_TEXT,
+  effects: CAGE_OPENS_STATE_EFFECTS,
+};
+
+// §10.3 — before conviction, gated `act4_started` (the same overarching
+// gate as the other three new topics).
+const topicAct4CageBefore: TopicDef = {
+  id: TOPIC_ACT4_CAGE,
+  words: CAGE_TOPIC_WORDS,
+  when: { flag: ACT4_STARTED },
+  response:
+    '"Same answer as the first night." She does not look at it. "A judge, a form, nine days, and a name on the top of it."\n\nThen, because she is fair: "Bring me something I can hold."',
+};
+
+// §10.4 — ASK WHITLOCK ABOUT VISIT / ABOUT PRESIDENT / ABOUT SCHEDULE / ABOUT ROAD.
+const topicAct4Visit: TopicDef = {
+  id: TOPIC_ACT4_VISIT,
+  words: ['visit', 'the visit', 'president', 'schedule', 'road', 'the road', 'coming', 'principal'],
+  when: { flag: ACT4_STARTED },
+  response:
+    '"I\'m liaison." She puts into the word about what it deserves. "Which means a man half my age sent me a schedule with my own county in it and told me where I\'d be standing in it."\n\nA box ticked. "There\'s a page about which of my two deputies is allowed where. There\'s a page about the horses."\n\nThe pen stops. "There is not a page anywhere in it about who\'s coming. It says PRINCIPAL all the way through, like the road\'s being done for nobody."',
+};
+
+// §11.1 — SHOW NOTEBOOK TO WHITLOCK, the page fitted back in. Either
+// show-response sets `act4_whitlock_convinced`; §12's own effects are the
+// ones that grant her actually opening the cage, on a later turn.
+const showNotebookConvincedText =
+  'She takes it before you have finished offering it, and she does not read a word of it. She looks at the spine, and at the gap in the spine, and then she takes the loose sheet out of your other hand and holds it up against the tear, and the two of them do what they do.\n\n"Whose is this?"\n\nYou tell her the name. She writes it down, which she has not done once since you walked in here with a head.';
+
+// §11.2 — SHOW AUDIT TO WHITLOCK.
+const showAuditConvincedText =
+  'She reads all of it, both sheets, at the speed of somebody who reads for a living, and she goes back over the annotations down the side twice.\n\n"That\'s a working hand," she says. "And that\'s a stranger telling me so in writing, on his own paper, for nothing."\n\nShe hands it back squared. "I\'ve had two of you in eleven years bring me paper."';
+
+// §14.2 — SHOW NOTES TO WHITLOCK. Unconditional flavor; grants nothing.
+const showCaseNotesText =
+  '"I read them the morning I bagged them," she says. "It\'s a working file. It\'s tidier than mine."\n\nShe goes back down to the form. "There isn\'t a name in it anywhere, including on the front, and I have thought about that more than I\'ve told you."';
+
 const topics: TopicDef[] = [
+  topicAct4Reader,
+  topicAct4Notebook,
+  topicAct4CageOpens,
+  topicAct4CageBefore,
+  topicAct4Visit,
   {
     id: TOPIC_RECORDS,
     words: ['me', 'myself', 'who am i', 'am i', 'record', 'records', 'file', 'files', 'database', 'system', 'look me up', 'check', 'search', 'identity', 'identify'],
@@ -203,6 +290,25 @@ const tellTopics: TopicDef[] = [
 // ---------------------------------------------------------------------------
 
 const showResponses: ShowResponseDef[] = [
+  // E0 task J — §11's two show-responses (either sets `act4_whitlock_convinced`;
+  // §12's own cage-opening is a separate, later action). §14.2 is a third,
+  // unconditional show-response — flavor only, grants nothing.
+  {
+    objects: [ACT2_NOTEBOOK],
+    when: { clue: ACT2_CLUE_PAGE_FITS },
+    response: showNotebookConvincedText,
+    effects: [{ set: [ACT4_WHITLOCK_CONVINCED, true] }],
+  },
+  {
+    objects: [ACT2_REPLY_AUDIT],
+    when: { flag: ACT2_HAS_AUDIT },
+    response: showAuditConvincedText,
+    effects: [{ set: [ACT4_WHITLOCK_CONVINCED, true] }],
+  },
+  {
+    objects: [ACT4_CASE_NOTES],
+    response: showCaseNotesText,
+  },
   {
     objects: [FEDORA],
     response: '"That\'s a hat." She looks at it for as long as it takes to establish that. "It\'s a good one."',

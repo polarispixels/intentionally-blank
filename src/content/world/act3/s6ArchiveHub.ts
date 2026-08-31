@@ -41,6 +41,8 @@ import {
   GRAPH_AXIS_TEXT,
   LEDGER_JULES_EFFECTS,
   LEDGER_NOLAN_EFFECTS,
+  LEDGER_NUMERAL_FOUR_EFFECTS,
+  LEDGER_NUMERAL_ONE_EFFECTS,
   LEDGER_OTHER_EFFECTS,
   LEDGER_PRINT_TEXT,
   LEDGER_SELF_EFFECTS,
@@ -49,6 +51,8 @@ import {
   ROOT_DOOR_DOWN_BOUNDARY_TEXT,
   TERMINAL_ALREADY_LOGGED_IN_TEXT,
 } from './objects/s6ArchiveHub';
+// E0 task K (§16, §31.2) — the ledger's two numeral fixed phrases.
+import { ACT4_STARTED, V_ACT4_LEDGER_FOUR, V_ACT4_LEDGER_ONE } from '../act4/ids';
 
 // ---------------------------------------------------------------------------
 // §21.1 — description.
@@ -148,6 +152,22 @@ const queueBareHandlers: HandlerDef[] = [
 ];
 
 // ---------------------------------------------------------------------------
+// E0 task K — §16, the ledger's two fixed-phrase numeral searches, reaching
+// the same effects as the typed prompt (`act3LedgerSearchRespond`,
+// `../scripts.ts`). Gated on `act4_started`: rule 1 answers with the
+// numeral effects once Act IV has started; rule 2 (no `act4_started`
+// check) falls to `LEDGER_OTHER_EFFECTS`, matching the typed-prompt path's
+// own pre-Act-IV fallback exactly (§16.3, §31.1).
+// ---------------------------------------------------------------------------
+
+const ledgerNumeralBareHandlers: HandlerDef[] = [
+  { verbs: [V_ACT4_LEDGER_ONE], when: { all: [{ flag: ACT3_HUB_LOGGED_IN }, { flag: ACT4_STARTED }] }, effects: LEDGER_NUMERAL_ONE_EFFECTS },
+  { verbs: [V_ACT4_LEDGER_ONE], when: { flag: ACT3_HUB_LOGGED_IN }, effects: LEDGER_OTHER_EFFECTS },
+  { verbs: [V_ACT4_LEDGER_FOUR], when: { all: [{ flag: ACT3_HUB_LOGGED_IN }, { flag: ACT4_STARTED }] }, effects: LEDGER_NUMERAL_FOUR_EFFECTS },
+  { verbs: [V_ACT4_LEDGER_FOUR], when: { flag: ACT3_HUB_LOGGED_IN }, effects: LEDGER_OTHER_EFFECTS },
+];
+
+// ---------------------------------------------------------------------------
 // §39.4 — exits. `west` is the ordinary, tested route back to the Bay;
 // `V_ACT3_TO_BAY` ("BAY") is a bare-phrase synonym. "back" is deliberately
 // not wired here — see `ids.ts`'s own doc comment on `V_ACT3_TO_BAY`.
@@ -174,6 +194,7 @@ export const s6ArchiveHubRoom: RoomDefSlice = {
     ...loginHandlers,
     bareSearchHandler,
     ...ledgerBareHandlers,
+    ...ledgerNumeralBareHandlers,
     graphBareHandler,
     ...queueBareHandlers,
     bayExitHandler,

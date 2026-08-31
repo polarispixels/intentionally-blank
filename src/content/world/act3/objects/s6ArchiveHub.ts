@@ -69,6 +69,11 @@ import {
   ACT3_S6_ARCHIVE_HUB,
   ACT3_S6_BOUNDARY_GATE,
 } from '../ids';
+// E0 task K (§16-§18, §22, §31) — the numeral search, R13's own object, and
+// the Act IV boundary variant. `act4_profile` is namespaced `act4_*` per
+// `act4/ids.ts`'s own header rule even though its `ObjectDefSlice` lives
+// here (the plan's own note on the evidence bag applies identically).
+import { ACT4_CLUE_FILED_UNDER_ONE, ACT4_NUMERAL_SEARCHED, ACT4_PROFILE, ACT4_PROFILE_SCREEN_SCRIPT, ACT4_STARTED, V_ACT4_SELECT } from '../../act4/ids';
 
 // ---------------------------------------------------------------------------
 // §22 — the terminal. `portable: false`.
@@ -102,7 +107,18 @@ const HUB_BENCH_TEXT =
 export const TERMINAL_ALREADY_LOGGED_IN_TEXT = 'The session is already open. ACCESS LEVEL: MAINTENANCE.';
 
 const terminalHandlers: HandlerDef[] = [
-  { verbs: [EXAMINE], effects: [{ say: TERMINAL_EXAMINE }] },
+  {
+    verbs: [EXAMINE],
+    effects: [
+      { say: TERMINAL_EXAMINE },
+      // E0 task K — §31.3's reveal timing: if the session was already open
+      // when Act IV began, `act4_profile` is revealed on the next EXAMINE
+      // TERMINAL (the login script, `../scripts.ts`, covers the other
+      // case). Invisible — `reveal` prints nothing — so this is a no-op
+      // before `act4_started`, and a no-op again once already revealed.
+      { if: { when: { all: [{ flag: ACT4_STARTED }, { flag: ACT3_HUB_LOGGED_IN }] }, then: [{ reveal: ACT4_PROFILE }] } },
+    ],
+  },
   {
     verbs: [USE_VERB_ID],
     when: { not: { flag: ACT3_HUB_LOGGED_IN } },
@@ -136,7 +152,9 @@ export const hubTerminalScreen: ObjectDefSlice = {
   name: 'screen',
   portable: false,
   nouns: ['screen', 'burn'],
-  handlers: [{ verbs: [EXAMINE], effects: [{ say: TERMINAL_SCREEN_TEXT }] }],
+  // READ too (v0.16.0 playtest): bare READ TERMINAL raised an engine [error]
+  // (no text/description fallback).
+  handlers: [{ verbs: [EXAMINE, READ], effects: [{ say: TERMINAL_SCREEN_TEXT }] }],
 };
 
 // ---------------------------------------------------------------------------
@@ -169,6 +187,31 @@ export const LEDGER_NOLAN_EFFECTS: Effect[] = [{ say: LEDGER_NOLAN_TEXT }];
 export const LEDGER_SELF_EFFECTS: Effect[] = [{ say: LEDGER_SELF_TEXT }];
 /** §23.5 — any other name the player knows. */
 export const LEDGER_OTHER_EFFECTS: Effect[] = [{ say: LEDGER_OTHER_TEXT }];
+
+// ---------------------------------------------------------------------------
+// E0 task K — §16, the ledger's numeral branch. Gated `{ flag: act4_started
+// }` in the script that reads these (`act3LedgerSearchRespond`,
+// `../scripts.ts`); before Act IV a numeral falls to `LEDGER_OTHER_EFFECTS`
+// above, exactly as shipped.
+// ---------------------------------------------------------------------------
+
+/** §16.1 — `I`/`1`/`ONE`. */
+export const LEDGER_NUMERAL_ONE_TEXT =
+  '    SEARCH: I\n\n    2 RESULTS\n\n    SUBJECT JULES I ..................... DEPRECATED\n    SUBJECT [UNRESOLVED] ................ MAINTENANCE\n\nThe first line you have read before and it has not improved.\n\nThe second is filed under the same numeral, at the level you are logged in at,\nand in the field where a name goes the machine has put what it puts when there\nis not one.';
+
+/** §16.2 — `IV`/`4`/`FOUR`. The Nolan idiom reused (*you do not open it*), a different reason underneath: with Nolan it was not wanting to know, with Jack it is already knowing. */
+export const LEDGER_NUMERAL_FOUR_TEXT =
+  '    SEARCH: IV\n\n    1 RESULT\n\n    SUBJECT JACK IV ....................... CURRENT\n\nYou do not open it. You have already read what is queued against it in the\nother room, and opening the file would only be reading that again with his name\non the top of it.';
+
+/** §16.1 — sets `act4_numeral_searched`, grants `act4_clue_filed_under_one`. The screen block and the two paragraphs are one response; nothing else fires this turn. */
+export const LEDGER_NUMERAL_ONE_EFFECTS: Effect[] = [
+  { say: LEDGER_NUMERAL_ONE_TEXT },
+  { set: [ACT4_NUMERAL_SEARCHED, true] },
+  { grantClue: ACT4_CLUE_FILED_UNDER_ONE },
+];
+
+/** §16.2 — no flag, no clue: Jack's row is read, not investigated. */
+export const LEDGER_NUMERAL_FOUR_EFFECTS: Effect[] = [{ say: LEDGER_NUMERAL_FOUR_TEXT }];
 
 const ledgerHandlers: HandlerDef[] = [
   { verbs: [READ, EXAMINE], effects: [{ say: LEDGER_READ_TEXT }] },
@@ -308,7 +351,18 @@ const GATE_ENTER_TEXT =
 const SYSTEM_BOUNDARY_TEXT =
   'END OF BUILD\n\nAct III ends here. What is through the frames, and what is under the door at\nthe end of this room, are the next version.';
 
-export const GATE_ENTER_BOUNDARY_TEXT = `${GATE_ENTER_TEXT}\n\n${SYSTEM_BOUNDARY_TEXT}`;
+// E0 task K — §22, the Act IV boundary line, confirmed at §28 q7: names no
+// act, replaces canon 88's line for `act4_started` saves only.
+const SYSTEM_BOUNDARY_TEXT_ACT4 =
+  'END OF BUILD\n\nThe frames, and the door at the bottom of the well, are later versions. The\nstreet, the sheriff, the ledger and the man who is coming are this one.';
+
+/** Both entry points share this selection — the in-world sentence is unchanged; only the system line following it is gated `{ flag: act4_started }`. */
+const boundaryRules = (inWorldText: string): ProseRule[] => [
+  { when: { flag: ACT4_STARTED }, text: `${inWorldText}\n\n${SYSTEM_BOUNDARY_TEXT_ACT4}` },
+  { text: `${inWorldText}\n\n${SYSTEM_BOUNDARY_TEXT}` },
+];
+
+export const GATE_ENTER_BOUNDARY_TEXT: ProseRule[] = boundaryRules(GATE_ENTER_TEXT);
 
 const gateFramesHandlers: HandlerDef[] = [
   { verbs: [EXAMINE], effects: [{ say: GATE_EXAMINE_TEXT }, { grantClue: ACT3_CLUE_GATES }] },
@@ -359,7 +413,7 @@ const ROOT_DOOR_WELL_TEXT =
 const ROOT_DOOR_DOWN_TEXT =
   "Three steps, and a door that takes your knuckles and gives you nothing back,\nand behind it a level of a building that is not on any drawing anybody has ever\nshown you, with the whole of the county's water going through it.";
 
-export const ROOT_DOOR_DOWN_BOUNDARY_TEXT = `${ROOT_DOOR_DOWN_TEXT}\n\n${SYSTEM_BOUNDARY_TEXT}`;
+export const ROOT_DOOR_DOWN_BOUNDARY_TEXT: ProseRule[] = boundaryRules(ROOT_DOOR_DOWN_TEXT);
 
 // §28's four refusals (badge/terminal/knock/push-pull-pry/listen) each
 // grant the clue the first time any one of them is tried — idempotent
@@ -457,6 +511,29 @@ if (!alreadyWiredNotebook) {
     effects: [{ say: GRAPH_COMPARE_NOTEBOOK_TEXT }],
   });
 }
+
+// ---------------------------------------------------------------------------
+// E0 task K — §18, R13's own object. `hidden: true`; revealed on login
+// (`act3HubLoginRespond`, `../scripts.ts`) once `act4_started`, or on the
+// next EXAMINE TERMINAL if the session was already open (this file's own
+// terminal handler, above). Before either reveal, `READ PROFILE` (and every
+// other verb below) must be the ordinary unknown-noun miss — nothing here
+// does anything special; that is entirely `hidden`'s job. Not registered in
+// `ACT3_S6_ARCHIVE_HUB_OBJECTS` below: per `act4/ids.ts`'s own header rule
+// this id is namespaced `act4_*`, so it is wired into `WORLD.objects` from
+// `act4/index.ts` instead (imported from here), the same "id lives in one
+// act's namespace, the `ObjectDefSlice` lives where the room is" split the
+// Stage E plan documents for the evidence bag.
+// ---------------------------------------------------------------------------
+
+export const act4Profile: ObjectDefSlice = {
+  location: ACT3_S6_ARCHIVE_HUB,
+  hidden: true,
+  name: 'profile',
+  portable: false,
+  nouns: ['profile', 'heading', 'fourth heading', 'behavioral profile'],
+  handlers: [{ verbs: [READ, OPEN, EXAMINE, V_ACT4_SELECT], effects: [{ script: { id: ACT4_PROFILE_SCREEN_SCRIPT } }] }],
+};
 
 // ---------------------------------------------------------------------------
 // Export map (§21 — the Hub's own six objects, plus the terminal's screen

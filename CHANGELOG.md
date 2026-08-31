@@ -12,6 +12,52 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.16.0] - 2026-08-31
+
+**Stage E0 — the record about you.** Act IV opens the turn the queue is read
+(`docs/superpowers/specs/2026-09-17-stage-e0-prose.md`, plus the cage
+addendum; engine per ADR 0012).
+
+### Added
+
+- **R13.** The archive terminal grows a fourth heading; `READ PROFILE`
+  prints three percentages and a `PRIMARY STRATEGY`, computed from three
+  weeks of the player's own verbs, with one sentence before the block and
+  nothing after, ever. Repeat reads print the block alone, and the numbers
+  will have moved.
+- **The ledger under a numeral.** `SEARCH LEDGER FOR I`: two rows — Jules,
+  and an unresolved subject at `MAINTENANCE` with nothing in the name
+  field. `IV`: Jack's row, unopened.
+- **R14, the analog leg.** The county bagged three weeks of the player's
+  case notes off the floor of his room; Whitlock opens the cage for analog
+  proof and never says what she now believes; `COMPARE NOTES WITH NOTEBOOK`
+  ends on *Everybody's cursive looks alike* and nobody answers it. P21
+  solves on the three legs together.
+- **The town before the visit.** Main Street opened up and resurfaced end
+  to end; the crews; the notice; Pearl's four minutes; Marlow's *one hand
+  wrote all three*; Whitlock's protection schedule (`PRINCIPAL`); Jack's
+  two numbers on a table; Dad's breath; Eli's numerals letter (register
+  113). The Act IV boundary line at the Hub's two doors.
+
+### Changed (engine, ADR 0012)
+
+- **The recursive ending's session contract**: a world can declare an
+  ending that continues into the opening room in one transcript; the
+  `'ending'` save slot; `SaveStore.remove`; nothing crosses (register 99).
+- Movement verbs are profile-neutral (register 100); the road gates lost
+  their boundary naming (one build gate remains, at the Hub); no prompt id
+  registers twice; the four censor replies got distinct names; `READ
+  TERMINAL` no longer raises an engine error.
+
+### Decisions
+
+Canon register 104–118 (the Stage E plan's nine and the E0 doc's six: no
+living voice below S5, the two rows under `I`, the blank designation,
+P25's legs, the cache, the darkroom scene, the three rationalizations, the
+opening screen's constraint, the hab's clock; Eli's reason, *profile* as
+system vocabulary, R13's frame, Whitlock's conviction, the road job,
+`PRINCIPAL`).
+
 ## [0.15.2] - 2026-08-31
 
 Docs only: the endgame integrity review and its rulings.

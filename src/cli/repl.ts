@@ -322,7 +322,7 @@ async function feed(line: string): Promise<void> {
     if (pendingPrompt.index < pendingPrompt.fields.length) return; // more fields to collect
     const { id: promptId, scriptId, values } = pendingPrompt;
     pendingPrompt = undefined;
-    const result = respondToPrompt(WORLD, session, scriptId, values);
+    const result = respondToPrompt(WORLD, session, scriptId, values, persistOpts());
     // A confirmed RESTART/RESET: `RESTART_CONFIRM_RESPOND_SCRIPT` is the
     // only script that ever emits a bare `restarted` event (`scripts.ts`'s
     // own doc comment). Discard everything the round trip touched — the

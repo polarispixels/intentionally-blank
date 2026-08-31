@@ -29,7 +29,7 @@ BACKLOG's stage board still says D = 0.7–0.8. Act I is finishing at 0.9.0, so:
 | D4 the descent (S1, tunnel, S5, chase) | v0.14.0 | MINOR |
 | D5 Sublevel 6 — the Act III boundary | v0.15.0 | MINOR |
 
-Stage E then runs 0.16–0.18, Stage F closes at 1.0.0. Fix releases are PATCH between. The board row for D should read `0.10–0.15`.
+Stage E then runs 0.16–0.19 (per the Stage E plan), Stage F closes at 1.0.0. Fix releases are PATCH between. The board row for D should read `0.10–0.15`.
 
 ### 0.3 Where the code goes
 

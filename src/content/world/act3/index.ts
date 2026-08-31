@@ -114,6 +114,8 @@ import { ACT3_READ_BAY_CLOCK_SCRIPT, ACT3_S6_MAINTENANCE_BAY } from './ids';
 // definitions (`knowledge.ts`).
 import { ACT3_D5_TASK_G_CLUES, ACT3_D5_TASK_G_FLAGS, ACT3_D5_TASK_G_MEMORIES, ACT3_D5_TASK_G_PUZZLES } from './knowledge';
 import { ACT3_D5_TASK_G_VERBS } from './verbs';
+// E0 task K (§16, §18, §31) — the ledger's numeral fixed phrases and SELECT PROFILE.
+import { ACT4_E0_TASK_K_VERBS } from './verbs';
 import { s6ArchiveHubRoom } from './s6ArchiveHub';
 import { ACT3_S6_ARCHIVE_HUB_OBJECTS } from './objects/s6ArchiveHub';
 import { act3HubLoginOpen, act3HubLoginRespond, act3LedgerSearchOpen, act3LedgerSearchRespond } from './scripts';
@@ -201,7 +203,7 @@ export const ACT3_SLICE: WorldSlice = {
   questions: { ...ACT3_D3C_QUESTIONS, ...ACT3_D4_QUESTIONS, ...ACT3_D5_QUESTIONS },
   puzzles: { ...ACT3_PUZZLES, ...ACT3_D3C_PUZZLES, ...ACT3_D4_PUZZLES, ...ACT3_D5_TASK_F_PUZZLES, ...ACT3_D5_TASK_G_PUZZLES },
   memories: { ...ACT3_MEMORIES, ...ACT3_D3C_MEMORIES, ...ACT3_D5_TASK_F_MEMORIES, ...ACT3_D5_TASK_G_MEMORIES },
-  verbs: { ...ACT3_VERBS, ...ACT3_D4_TASK_A_VERBS, ...ACT3_D5_TASK_H_VERBS, ...ACT3_D5_TASK_F_VERBS, ...ACT3_D5_TASK_G_VERBS },
+  verbs: { ...ACT3_VERBS, ...ACT3_D4_TASK_A_VERBS, ...ACT3_D5_TASK_H_VERBS, ...ACT3_D5_TASK_F_VERBS, ...ACT3_D5_TASK_G_VERBS, ...ACT4_E0_TASK_K_VERBS },
   rooms: {
     [ACT3_LOBBY]: lobbyRoom,
     [ACT3_DATA_HALL_A]: dataHallARoom,

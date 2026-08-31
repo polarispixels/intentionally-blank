@@ -18,7 +18,7 @@
 
 import { apply } from '../../../engine/effects';
 import type { Effect } from '../../../engine/effects';
-import type { GameEvent, ScriptFn } from '../../../engine/world';
+import type { GameEvent, GameState, ScriptFn, WorldDef } from '../../../engine/world';
 import type { RoomId } from '../../../engine/ids';
 import { ACT2_Q_INSIDE_THE_PLANT } from '../act2/ids';
 import {
@@ -273,6 +273,8 @@ export const act3ReadBayClock: ScriptFn = (world, state) => {
 
 import { ACT3_HUB_LOGIN_OPEN_SCRIPT, ACT3_HUB_LOGIN_PROMPT_ID, ACT3_HUB_LOGGED_IN, ACT3_LEDGER, ACT3_LOAD_GRAPH, ACT3_QUEUE } from './ids';
 import { ACT3_HUB_LOGIN_SCRIPT } from './ids';
+// E0 task K (§17, §31) — the fourth heading, selected on `act4_started`.
+import { ACT4_PROFILE, ACT4_STARTED } from '../act4/ids';
 
 function hubLoginFields(): { name: string; placeholder?: string; secret?: boolean }[] {
   return [
@@ -290,6 +292,11 @@ export const act3HubLoginOpen: ScriptFn = (_world, state) => ({ state, events: [
 const HUB_LOGIN_SUCCESS_TEXT =
   'The cursor sits still for a moment, which the machine in your room never did.\n\n    ACCESS LEVEL: MAINTENANCE\n\n    ARCHIVE ..... SUBJECT LEDGER\n    LOAD ........ ALLOCATION, ROLLING\n    QUEUE ....... RECONCILIATION, PENDING\n\nUpstairs that was the whole answer. Down here it is a heading.';
 
+// E0 task K — §17, the fourth heading. First and last sentences unchanged;
+// `PROFILE ..... BEHAVIORAL, CURRENT` is the new fourth row.
+const HUB_LOGIN_SUCCESS_TEXT_ACT4 =
+  'The cursor sits still for a moment, which the machine in your room never did.\n\n    ACCESS LEVEL: MAINTENANCE\n\n    ARCHIVE ..... SUBJECT LEDGER\n    LOAD ........ ALLOCATION, ROLLING\n    QUEUE ....... RECONCILIATION, PENDING\n    PROFILE ..... BEHAVIORAL, CURRENT\n\nUpstairs that was the whole answer. Down here it is a heading.';
+
 const HUB_LOGIN_FAIL_TEXT =
   '    ACCESS LEVEL: NONE\n\nThe cursor goes back up to USER: and waits, and it will go on doing that for\nas long as you want it to.';
 
@@ -298,6 +305,11 @@ export const act3HubLoginRespond: ScriptFn = (world, state, args) => {
   const password = String(args?.['password'] ?? '').trim().toLowerCase();
 
   if (user === 'admin' && password === 'admin-password') {
+    // E0 task K — §17/§31.3: `act4_profile` is revealed here too, once Act
+    // IV has started (a no-op `reveal` before then — the terminal's own
+    // EXAMINE handler, `objects/s6ArchiveHub.ts`, covers the other reveal
+    // case, a session already open when Act IV began).
+    const act4Started = flag(world, state, ACT4_STARTED) === true;
     const applied = apply(
       world,
       state,
@@ -306,7 +318,8 @@ export const act3HubLoginRespond: ScriptFn = (world, state, args) => {
         { reveal: ACT3_LEDGER },
         { reveal: ACT3_LOAD_GRAPH },
         { reveal: ACT3_QUEUE },
-        { say: HUB_LOGIN_SUCCESS_TEXT },
+        { if: { when: { flag: ACT4_STARTED }, then: [{ reveal: ACT4_PROFILE }] } },
+        { say: act4Started ? HUB_LOGIN_SUCCESS_TEXT_ACT4 : HUB_LOGIN_SUCCESS_TEXT },
       ],
       { path: 'script.act3_hub_login.success' },
     );
@@ -339,6 +352,8 @@ import { ACT3_LEDGER_SEARCH_OPEN_SCRIPT, ACT3_LEDGER_SEARCH_PROMPT_ID, ACT3_LEDG
 import {
   LEDGER_JULES_EFFECTS,
   LEDGER_NOLAN_EFFECTS,
+  LEDGER_NUMERAL_FOUR_EFFECTS,
+  LEDGER_NUMERAL_ONE_EFFECTS,
   LEDGER_OTHER_EFFECTS,
   LEDGER_SELF_EFFECTS,
 } from './objects/s6ArchiveHub';
@@ -351,11 +366,95 @@ export const act3LedgerSearchOpen: ScriptFn = (_world, state) => ({ state, event
 
 const SELF_WORDS = new Set(['me', 'myself', 'the investigator', 'investigator']);
 
+// E0 task K — §16, the numeral branch. `i`/`1`/`one` and `iv`/`4`/`four`
+// are free text typed at this prompt (§31.2's own note — no resolver
+// involved here); gated `{ flag: act4_started }` so a numeral before Act IV
+// still falls all the way through to `LEDGER_OTHER_EFFECTS`, exactly as
+// shipped (§16.3).
+const NUMERAL_ONE_WORDS = new Set(['i', '1', 'one']);
+const NUMERAL_FOUR_WORDS = new Set(['iv', '4', 'four']);
+
 export const act3LedgerSearchRespond: ScriptFn = (world, state, args) => {
   const input = String(args?.['search'] ?? '').trim().toLowerCase();
-  const effects = input === 'jules' ? LEDGER_JULES_EFFECTS : input === 'nolan' ? LEDGER_NOLAN_EFFECTS : input === '' || SELF_WORDS.has(input) ? LEDGER_SELF_EFFECTS : LEDGER_OTHER_EFFECTS;
+  const act4Started = flag(world, state, ACT4_STARTED) === true;
+  const effects =
+    act4Started && NUMERAL_ONE_WORDS.has(input)
+      ? LEDGER_NUMERAL_ONE_EFFECTS
+      : act4Started && NUMERAL_FOUR_WORDS.has(input)
+        ? LEDGER_NUMERAL_FOUR_EFFECTS
+        : input === 'jules'
+          ? LEDGER_JULES_EFFECTS
+          : input === 'nolan'
+            ? LEDGER_NOLAN_EFFECTS
+            : input === '' || SELF_WORDS.has(input)
+              ? LEDGER_SELF_EFFECTS
+              : LEDGER_OTHER_EFFECTS;
   const applied = apply(world, state, effects, { path: 'script.act3_ledger_search_respond' });
   return { state: applied.state, events: [{ type: 'promptClosed', id: ACT3_LEDGER_SEARCH_PROMPT_ID }, ...applied.events] };
 };
 
 export { ACT3_LEDGER_SEARCH_OPEN_SCRIPT, ACT3_LEDGER_SEARCH_RESPOND_SCRIPT };
+
+// ---------------------------------------------------------------------------
+// E0 task K — §18, R13's own script (`act4_profile_screen`). `nn%` is
+// `Math.round(100 * n / total)`, right-aligned to a 4-character field (the
+// note's own "fits `100%`" — the placeholder's literal 3-character `nn%`
+// only holds for a 2-digit value; a leading space or two makes up the
+// difference, and `100%` fills the field with none to spare). `PRIMARY
+// STRATEGY` reuses `cond.ts`'s own `profileLeader` (strict max only — a tie
+// has no leader, exactly `engine/cond.ts`'s own comment on why: picking one
+// by declaration order would silently bias the reveal), so this script's
+// notion of "leads" never drifts from D5's own M16-A/S/D selection
+// (`objects/s6ArchiveHub.ts`'s `QUEUE_READ_EFFECTS`/`../knowledge.ts`).
+// First read: the sentence, then the block, then the flag, then the clue,
+// in that order (§31.3) — one `say` (sentence+block are one string), then
+// `set`, then `grantClue`. Every read after: the block alone, nothing set
+// or granted again.
+// ---------------------------------------------------------------------------
+
+import { evaluate } from '../../../engine/cond';
+import { ACT4_CLUE_PROFILED, ACT4_PROFILE_SCREEN_SCRIPT, ACT4_PROFILE_SEEN } from '../act4/ids';
+
+const PROFILE_FIRST_READ_SENTENCE =
+  'You take the fourth heading. It comes up as fast as the other three, which is\nto say it was already there.';
+
+function profileStrategyWord(world: WorldDef, state: GameState): string {
+  const { analytical, social, direct } = state.profile;
+  if (analytical + social + direct === 0) return 'NONE';
+  if (evaluate(world, state, { profileLeader: 'analytical' })) return 'ANALYTICAL';
+  if (evaluate(world, state, { profileLeader: 'social' })) return 'SOCIAL';
+  if (evaluate(world, state, { profileLeader: 'direct' })) return 'DIRECT';
+  return 'UNDETERMINED';
+}
+
+function profilePercentField(n: number, total: number): string {
+  const pct = total === 0 ? 0 : Math.round((100 * n) / total);
+  return `${String(pct).padStart(3)}%`;
+}
+
+function profileBlock(world: WorldDef, state: GameState): string {
+  const { analytical, social, direct } = state.profile;
+  const total = analytical + social + direct;
+  return (
+    `    SUBJECT BEHAVIORAL PROFILE\n\n` +
+    `    OBSERVATION:      ${profilePercentField(analytical, total)}\n` +
+    `    SOCIAL INFERENCE: ${profilePercentField(social, total)}\n` +
+    `    DIRECT ACTION:    ${profilePercentField(direct, total)}\n\n` +
+    `    PRIMARY STRATEGY: ${profileStrategyWord(world, state)}`
+  );
+}
+
+export const act4ProfileScreen: ScriptFn = (world, state) => {
+  const block = profileBlock(world, state);
+  if (flag(world, state, ACT4_PROFILE_SEEN) === true) {
+    return apply(world, state, [{ say: block }], { path: 'script.act4_profile_screen' });
+  }
+  return apply(
+    world,
+    state,
+    [{ say: `${PROFILE_FIRST_READ_SENTENCE}\n\n${block}` }, { set: [ACT4_PROFILE_SEEN, true] }, { grantClue: ACT4_CLUE_PROFILED }],
+    { path: 'script.act4_profile_screen' },
+  );
+};
+
+export { ACT4_PROFILE_SCREEN_SCRIPT };

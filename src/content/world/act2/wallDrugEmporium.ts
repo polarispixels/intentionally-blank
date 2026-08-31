@@ -6,7 +6,7 @@
 import type { ExitDefSlice, HandlerDef, RoomDefSlice } from '../../../engine/world';
 import type { ProseRule } from '../../../engine/prose';
 import { HELLO, LISTEN, SLEEP, SMELL, YELL } from '../act1/verbs';
-import { TOWN_EDGE, TOWN_EDGE_BOUNDARY_GATE, V_LOOK_UP } from '../act1/ids';
+import { HIGHWAY_GATE, TOWN_EDGE, V_LOOK_UP } from '../act1/ids';
 import { ACT2_DOT, ACT2_MEM_M15, ACT2_VISITED_EMPORIUM, ACT2_WALL_DRUG_BACK_CORRIDOR, ACT2_WALL_DRUG_EMPORIUM, ACT2_WALL_DRUG_EMPORIUM_NO_EXIT_GATE , ACT2_CUSTODIAN } from './ids';
 
 // ---------------------------------------------------------------------------
@@ -93,7 +93,7 @@ const outText = 'You go out as far as the boards. Signs, lot, road, and about a 
 const exits: ExitDefSlice[] = [
   { dir: 'n', to: ACT2_WALL_DRUG_BACK_CORRIDOR, travelText: travelTextToCorridor },
   { dir: 'in', to: ACT2_WALL_DRUG_BACK_CORRIDOR, travelText: travelTextToCorridor },
-  { dir: 's', to: TOWN_EDGE, door: TOWN_EDGE_BOUNDARY_GATE, blockedText: southBlockedText },
+  { dir: 's', to: TOWN_EDGE, door: HIGHWAY_GATE, blockedText: southBlockedText },
   { dir: 'out', to: ACT2_WALL_DRUG_EMPORIUM, door: ACT2_WALL_DRUG_EMPORIUM_NO_EXIT_GATE, blockedText: outText },
 ];
 

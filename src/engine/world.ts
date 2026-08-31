@@ -86,6 +86,22 @@ export interface WorldMeta {
    * `[0, 1440)`.
    */
   startClock?: Clock;
+  /**
+   * The one ending id (an `{ end: id }` effect's `id`, matched against
+   * `GameEvent`'s `{ type: 'ended', endingId }`) the session treats as the
+   * game's recursive hand-off (ADR 0012 item 1; Stage E `E-1`): on
+   * observing it, `session.ts`'s `takeTurn`/`respondToPrompt` write the
+   * ended state to the reserved save slot `'ending'`, remove `'undo'` and
+   * `'checkpoint'`, and start a fresh game into `'auto'` — no world outside
+   * this one name-check needs to know the hand-off exists at all.
+   * `validate.ts`'s `meta-recursive-ending-unreferenced` warns when a world
+   * declares this but no `{ end }` effect anywhere carries a matching id
+   * (declared effects only — a script-built `{ end }` is invisible to that
+   * walk, same caveat as every other effect-list rule in that file).
+   * Optional: a world with no recursive ending (every fixture, every world
+   * before Act V) simply never triggers the hand-off.
+   */
+  recursiveEnding?: string;
 }
 
 /**

@@ -15,5 +15,7 @@ write a new ADR that supersedes it; do not edit history.
 | [0008](0008-declarative-content-with-script-escape-hatch.md) | Content is declarative data with a pure-script escape hatch | accepted |
 | [0009](0009-overlay-state-and-versioned-saves.md) | Runtime state is an overlay; saves are versioned with fixtures | accepted |
 | [0010](0010-session-layer-owns-persistence.md) | A pure session layer owns persistence, undo, and checkpoints | accepted |
+| [0011](0011-calendar-and-world-assembly.md) | The calendar, and one world assembled from act slices | accepted |
+| [0012](0012-the-ending-that-continues.md) | The recursive ending continues into the opening room; nothing crosses it | accepted |
 
 Format: Context → Decision → Consequences. Keep each under a page.

@@ -339,7 +339,7 @@ export function submitCommand(ui: UiState, text: string, opts: ControllerOpts): 
 export function submitPrompt(ui: UiState, values: Record<string, string>, opts: ControllerOpts): UiState {
   if (ui.prompt === undefined) return ui;
   const scriptId = ui.prompt.scriptId;
-  const result = respondToPrompt(opts.world, ui.session, scriptId, values);
+  const result = respondToPrompt(opts.world, ui.session, scriptId, values, persistOpts(opts));
 
   // A confirmed RESTART/RESET: `RESTART_CONFIRM_RESPOND_SCRIPT` is the only
   // script that ever emits a bare `restarted` event (`scripts.ts`'s own doc

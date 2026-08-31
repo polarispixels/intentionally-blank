@@ -103,6 +103,7 @@ import { ACT2_DAD_BOOTED, ACT2_HAS_AUDIT, ACT2_JACK_AWAY, ACT2_LUKE_REFERENCED, 
 // room/NPC file importing an id constant from `act3/ids.ts` creates no
 // cycle either way.
 import { ACT3_JACK_TOPIC_FENCE, ACT3_JACK_WILL_RAM, ACT3_PERIMETER_ROAD } from '../act3/ids';
+import { ACT4_STARTED } from '../act4/ids';
 
 // ---------------------------------------------------------------------------
 // §6.3 — unknownTopic
@@ -360,6 +361,33 @@ const topicFence: TopicDef = {
     'He looks at it the way a man looks at a job.\n\n"Eight foot. Posts at eight foot, set in about two and a half by the look of\nthe spoil they never took away." He is not boasting; he is estimating. "It\'d\ngo. It\'d cost me a bumper and a headlamp and I\'d not do it for a maybe."',
 };
 
+// ---------------------------------------------------------------------------
+// E0 task J — §20. `TOPIC_ACT4_WEEKS` is a new topic, declared ABOVE
+// `topic_jules` (this file's own header note on `topic_jules`'s existing
+// word claims, and the E0 wiring summary's own instruction: "the new weeks
+// topic goes above topic_jules"). `topicJulesV2` supersedes the shipped
+// `TOPIC_JULES` entry while `act4_started` holds — the same "same id,
+// gated, declared first" idiom `topicDadV2` (`act2/dad.ts`) already uses.
+// ---------------------------------------------------------------------------
+
+const TOPIC_ACT4_WEEKS = T('act4_jack_topic_weeks');
+
+const topicAct4Weeks: TopicDef = {
+  id: TOPIC_ACT4_WEEKS,
+  words: ['weeks', 'time', 'how long', 'five weeks', 'how much time'],
+  when: { flag: ACT4_STARTED },
+  response:
+    '"Five weeks he\'s been gone." Jack has this by heart and it costs him nothing to say. "Three weeks you\'ve been looking for him."\n\nTwo numbers, on a table, with nobody putting them together.\n\nHe gets up and does something to the coffee machine that the coffee machine did not need.',
+};
+
+const topicJulesV2: TopicDef = {
+  id: TOPIC_JULES,
+  words: ['jules', 'brother', 'sibling', 'missing', 'disappear', 'disappeared', 'gone', 'case', 'who'],
+  when: { flag: ACT4_STARTED },
+  response:
+    '"Nothing\'s changed here." He says it fast, to get to the next part. "Luke\'s coming out. To the plant. Twenty years, and he\'s coming to this county, and it isn\'t for me."\n\nThe folder has been on the table the whole time you have been in this room and he has not opened it once.\n\n"I\'ll be at that road."',
+};
+
 const topics: TopicDef[] = [
   // D3, task A — declared first; shadows `topicPlant`'s own bare "fence"
   // word while its own `when` holds (see `topicFence`'s own comment above).
@@ -398,6 +426,8 @@ const topics: TopicDef[] = [
     response:
       '"You never gave me one." He says it like a man reading back an invoice. "First morning. I asked, you didn\'t answer, and I took it that it was part of what I was paying for."\n\n"I\'ve called you nothing at all for three weeks. You\'d be amazed how far you get."',
   },
+  topicAct4Weeks,
+  topicJulesV2,
   {
     id: TOPIC_JULES,
     words: ['jules', 'brother', 'sibling', 'missing', 'disappear', 'disappeared', 'gone', 'case', 'who'],

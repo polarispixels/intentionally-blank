@@ -64,7 +64,7 @@ export const ACT3_GATEHOUSE_CALENDAR = O('act3_gatehouse_calendar');
 
 /**
  * Mechanism-only, never named/examinable (no `nouns`, same idiom as
- * `TOWN_EDGE_NO_EXIT_GATE`/`TOWN_EDGE_BOUNDARY_GATE`, `act1/objects/
+ * `TOWN_EDGE_NO_EXIT_GATE`/`HIGHWAY_GATE`, `act1/objects/
  * townEdge.ts`): the perimeter's `north`/`in` exit door, closed until any
  * P16 route sets it open. Builder addition (not in the pre-approved id
  * list), needed so a plain `NORTH`/`IN` after a route completes reaches the

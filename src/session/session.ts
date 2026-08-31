@@ -24,8 +24,15 @@ import { migrateSaveFile } from './migrate';
 /** §5.5: "an in-memory ring of the last 15 pre-action states." */
 export const UNDO_RING_SIZE = 15;
 
-/** Slots `takeTurn`/`Session` itself writes — never surfaced by `listSaves` (§5.3's `SAVES` lists the player's own named saves, not bookkeeping slots). */
-const RESERVED_SLOTS: readonly string[] = ['auto', 'undo', 'checkpoint'];
+/**
+ * Slots `takeTurn`/`Session` itself writes — never surfaced by `listSaves`
+ * (§5.3's `SAVES` lists the player's own named saves, not bookkeeping
+ * slots). `'ending'` (ADR 0012 item 3, Stage E `E-1`) is the recursive
+ * hand-off's own reserved slot — the ended state, written immediately
+ * before the hand-off, resumable by `LOAD ending` (an ordinary `load()`
+ * call; no engine change needed for that half) but never listed.
+ */
+const RESERVED_SLOTS: readonly string[] = ['auto', 'undo', 'checkpoint', 'ending'];
 
 /**
  * The session's own state: the `GameState` in play, the undo ring, and the
@@ -137,6 +144,53 @@ function toSaveFile(session: SessionState, slot: string, opts: { gameVersion: st
   };
 }
 
+/**
+ * ADR 0012 item 1: true iff `events` carries the one `{ type: 'ended' }`
+ * whose `endingId` matches `world.meta.recursiveEnding` — a world that
+ * never declares one (every world before Act V) never hands off.
+ */
+function isRecursiveEnding(world: WorldDef, events: readonly GameEvent[]): boolean {
+  const id = world.meta.recursiveEnding;
+  return id !== undefined && events.some((e) => e.type === 'ended' && e.endingId === id);
+}
+
+/**
+ * ADR 0012 items 2-5, Stage E `E-1`: the recursive ending's hand-off,
+ * shared by `takeTurn` and `respondToPrompt` (the only two places an
+ * `{ end }` effect can ever fire from). `endedSession` is the session
+ * exactly as it stood the instant the ending effect applied — `phase:
+ * 'ended'`, `state.ending` set — the state this function writes to slot
+ * `'ending'` before discarding it. `events` is that same turn's/prompt's
+ * own event list; the caller gets back the ending's own events (everything
+ * but the bare `{ type: 'ended' }` marker itself — a shell has no use for
+ * it once the fresh game's opening follows immediately) with the fresh
+ * game's opening arrival appended, **in one list** — no `restarted` event,
+ * so neither shell's transcript is cleared (that event exists precisely to
+ * clear one, which the hand-off must not do).
+ *
+ * `opts` is optional (`respondToPrompt`'s fixtures/tests call it with
+ * none): without it the hand-off still happens in memory — a fresh session
+ * comes back either way — but nothing is written to any store, matching
+ * every other persisting call in this file that takes `PersistOptions`.
+ *
+ * The replay invariant (`migrate.ts`'s `replay()`) is per cycle, not
+ * global (ADR 0012 item 5, register 99): `startSession` always begins a
+ * new, empty `history`, so nothing about *this* playthrough's history ever
+ * threads into the next one.
+ */
+function handOff(world: WorldDef, endedSession: SessionState, events: readonly GameEvent[], opts?: PersistOptions): { session: SessionState; events: GameEvent[] } {
+  if (opts !== undefined) {
+    opts.store.put('ending', serializeSave(toSaveFile(endedSession, 'ending', opts)));
+    opts.store.remove('undo');
+    opts.store.remove('checkpoint');
+  }
+  const fresh = startSession(world);
+  if (opts !== undefined) {
+    opts.store.put('auto', serializeSave(toSaveFile(fresh.session, 'auto', opts)));
+  }
+  return { session: fresh.session, events: [...events.filter((e) => e.type !== 'ended'), ...fresh.events] };
+}
+
 /** §5.5: "`LOAD`/`IMPORT` reseeds the ring" — with an empty one; a loaded save carries no pre-action states of its own. */
 function fromSaveFile(save: SaveFile): SessionState {
   return { state: save.state, undoRing: [], history: save.history, historyTruncated: save.historyTruncated ?? false };
@@ -218,6 +272,8 @@ export interface TakeTurnResult {
   session: SessionState;
   events: GameEvent[];
   class: ActionClass | null;
+  /** Set only when this turn triggered the recursive-ending hand-off (ADR 0012) — `session`/`events` are already the fresh game's; neither shell needs to branch on this to render correctly. */
+  handedOff?: true;
 }
 
 /**
@@ -240,6 +296,12 @@ export interface TakeTurnResult {
  * `'auto'` (the post-action save) and slot `'undo'` (the *pre*-action
  * save, §5.5's post-reload fallback) — and, if a `checkpoint` event fired
  * this turn, slot `'checkpoint'` too (§5.6, "keeping the latest").
+ *
+ * Unless the turn's own events include the world's declared recursive
+ * ending (ADR 0012 items 1-5, Stage E `E-1`) — in which case none of the
+ * above autosave/undo/checkpoint bookkeeping happens at all: `handOff`
+ * replaces it, writing `'ending'`, removing `'undo'`/`'checkpoint'`, and
+ * starting the next game into `'auto'` instead.
  */
 export function takeTurn(
   world: WorldDef,
@@ -262,6 +324,11 @@ export function takeTurn(
     session.historyTruncated,
   );
   const next: SessionState = { state: result.state, undoRing, history, historyTruncated };
+
+  if (isRecursiveEnding(world, result.events)) {
+    const handed = handOff(world, next, result.events, opts);
+    return { session: handed.session, events: handed.events, class: result.class, handedOff: true };
+  }
 
   opts.store.put('auto', serializeSave(toSaveFile(next, 'auto', opts)));
   const preTurn: SessionState = { ...next, state: before, history: session.history, historyTruncated: session.historyTruncated };
@@ -295,6 +362,8 @@ function commandRaw(outcome: InterpretOutcome): string {
 export interface RespondToPromptResult {
   session: SessionState;
   events: GameEvent[];
+  /** Set only when this prompt answer triggered the recursive-ending hand-off (ADR 0012) — `session`/`events` are already the fresh game's; neither shell needs to branch on this to render correctly. */
+  handedOff?: true;
 }
 
 /**
@@ -310,10 +379,24 @@ export interface RespondToPromptResult {
  * turn — no clock advance, no profile tally, no undo-ring entry, no
  * `history` record — mirroring the MVP's own separate, non-turn-consuming
  * prompt phase (`src/engine/step.ts`'s `prompt()`).
+ *
+ * `opts` is optional (ADR 0012 item 2, Stage E `E-1`) — supplied by both
+ * shells so a prompt-closing script that fires the world's declared
+ * recursive ending (P28's form, R13's screen, and every other script-built
+ * `{ end }` are content-side, per `effects.ts`'s own `openPrompt` doc
+ * comment) hands off exactly like `takeTurn` does; omitted, the round trip
+ * still resolves in memory (a fresh session comes back on a recursive
+ * ending either way) but nothing is written to any store — what every
+ * fixture/test that doesn't care about persistence already expects.
  */
-export function respondToPrompt(world: WorldDef, session: SessionState, scriptId: ScriptId, values: Record<string, string>): RespondToPromptResult {
+export function respondToPrompt(world: WorldDef, session: SessionState, scriptId: ScriptId, values: Record<string, string>, opts?: PersistOptions): RespondToPromptResult {
   const result = apply(world, session.state, [{ script: { id: scriptId, args: values } }]);
-  return { session: { ...session, state: result.state }, events: result.events };
+  const next: SessionState = { ...session, state: result.state };
+  if (isRecursiveEnding(world, result.events)) {
+    const handed = handOff(world, next, result.events, opts);
+    return { session: handed.session, events: handed.events, handedOff: true };
+  }
+  return { session: next, events: result.events };
 }
 
 // ---------------------------------------------------------------------------

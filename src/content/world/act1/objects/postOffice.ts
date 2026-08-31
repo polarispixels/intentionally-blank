@@ -38,7 +38,11 @@ import {
 // D2-B — box 141 grows a state machine of its own (Stage D plan §2 D2; prose
 // doc 2026-09-10-stage-d2-prose.md §12.2–§12.4): waiting/arrived, on top of
 // Act I's own always-there text, plus a reply/ruler pickup on OPEN.
+import { ACT4_REPLY_ELI_NUMERALS } from '../../act4/ids';
 import { ACT2_CACHE_FOUND, ACT2_ORIGAMI_RULER, ACT2_REPLY_AUDIT, ACT2_REPLY_BLANK, ACT2_REPLY_REWRITTEN, ACT2_SAW_REPAVING_NOTICE, ACT2_STARTED } from '../../act2/ids';
+// E0 task I (`docs/superpowers/specs/2026-09-17-stage-e0-prose.md` §5) —
+// the second, closure notice, once the visit is announced.
+import { ACT4_VISIT_ANNOUNCED, ACT4_VISIT_NOTICE } from '../../act4/ids';
 
 // ---------------------------------------------------------------------------
 // §4.1 — The boxes
@@ -60,6 +64,7 @@ const box141HasSomethingWaiting: Cond = {
     { objectAt: [ACT2_REPLY_REWRITTEN, { in: PO_BOXES }] },
     { objectAt: [ACT2_REPLY_BLANK, { in: PO_BOXES }] },
     { objectAt: [ACT2_REPLY_AUDIT, { in: PO_BOXES }] },
+    { objectAt: [ACT4_REPLY_ELI_NUMERALS, { in: PO_BOXES }] },
     { objectAt: [ACT2_ORIGAMI_RULER, { in: PO_BOXES }] },
   ],
 };
@@ -122,6 +127,8 @@ const boxesOpenEffects: Effect[] = [
   { if: { when: { all: [{ objectAt: [ACT2_REPLY_REWRITTEN, { in: PO_BOXES }] }, { has: KEYRING }] }, then: [{ move: [ACT2_REPLY_REWRITTEN, 'inventory'] }] } },
   { if: { when: { all: [{ objectAt: [ACT2_REPLY_BLANK, { in: PO_BOXES }] }, { has: KEYRING }] }, then: [{ move: [ACT2_REPLY_BLANK, 'inventory'] }] } },
   { if: { when: { all: [{ objectAt: [ACT2_REPLY_AUDIT, { in: PO_BOXES }] }, { has: KEYRING }] }, then: [{ move: [ACT2_REPLY_AUDIT, 'inventory'] }] } },
+  // E0 (v0.16.0): the numerals reply arrives the same way — added at integration (task J flagged it; this is task I's file).
+  { if: { when: { all: [{ objectAt: [ACT4_REPLY_ELI_NUMERALS, { in: PO_BOXES }] }, { has: KEYRING }] }, then: [{ move: [ACT4_REPLY_ELI_NUMERALS, 'inventory'] }] } },
   { if: { when: { all: [{ objectAt: [ACT2_ORIGAMI_RULER, { in: PO_BOXES }] }, { has: KEYRING }] }, then: [{ move: [ACT2_ORIGAMI_RULER, 'inventory'] }] } },
 ];
 
@@ -183,10 +190,35 @@ const notesText =
 const notesWithNoticeText =
   `${notesText}\n\nAnd one that has gone up since you were last in here, on county stock, pinned\nthrough all four corners by somebody who does that:\n\n    NOTICE OF ROAD WORK\n    COUNTY HIGHWAY - MAIN STREET, FULL LENGTH\n    MILLING AND RESURFACING\n    SCHEDULE TO FOLLOW\n\nIt is pinned over the corner of the culvert-permit form, which has been up long\nenough to curl.\n\nAbove and to the left of it, the rectangle where the cork has never gone brown\nis still the colour cork starts out. Four pins hold nothing. Whatever a town\nputs on a board, it has not put anything there.`;
 
+// E0 task I (§5.1) — rule 1, above the D2 cache rule: the second, closure
+// notice pinned beside the road-work one, once the visit is announced.
+const visitNoticeText =
+  'A burn ban. A livestock sale with the date filled in by hand. A card offering\nfence work, with a row of tear-off tabs along the bottom and every tab still on\nit. A county form about culvert permits that has been up long enough to curl.\n\nAnd a photograph of a dog, printed at home, above the word FOUND and a\ntelephone number. Not lost. Found.\n\nBeside the road-work notice, on the same county stock, pinned through all four\ncorners by the same somebody, a second one:\n\n    NOTICE OF ROAD CLOSURE\n    COUNTY HIGHWAY - MAIN STREET, FULL LENGTH\n    NO STANDING, BOTH SIDES\n    FROM FIRST LIGHT UNTIL RELEASED\n\n    BY ORDER OF THE COUNTY\n\nAbove the two of them and to the left, the rectangle where the cork has never\ngone brown is still the colour cork starts out. Four pins hold nothing.';
+
 const notesRule: ProseRule[] = [
+  { when: { flag: ACT4_VISIT_ANNOUNCED }, text: visitNoticeText },
   { when: { flag: ACT2_CACHE_FOUND }, text: notesWithNoticeText },
   { text: notesText },
 ];
+
+// E0 task I (§5) — `act4_visit_notice`, a sub-part on the notice board (not
+// a new object in the blank rectangle, §5's own note) so "EXAMINE CLOSURE
+// NOTICE" resolves. `hidden: true` by default; revealed by `act4_ev_start`
+// (`act4/events.ts`) alongside `act4_visit_announced` — a one-way reveal is
+// enough here (unlike the crews, §4) because a posted notice never comes
+// back down. Nouns are three compound phrases so the resolver indexes
+// "notice"/"closure" as head words with "closure"/"second"/"road" as their
+// compound adjectives (§31.2's own "CLOSURE NOTICE, SECOND NOTICE, ROAD
+// CLOSURE via adjectives: ['closure', 'second', 'road']") — no bare noun of
+// its own, so it never competes with the board's own bare "notice".
+const noticeBoardVisitNotice: ObjectDefSlice = {
+  location: { on: NOTICE_BOARD },
+  name: 'closure notice',
+  portable: false,
+  hidden: true,
+  nouns: ['closure notice', 'second notice', 'road closure'],
+  handlers: [{ verbs: [EXAMINE, READ], effects: [{ say: visitNoticeText }] }],
+};
 
 const cornerText = 'It comes away from the pin without any trouble at all. Paper, one pinhole, and a fifth of an inch of printed rule along two edges.\n\nYou put it back under the pin.';
 
@@ -306,6 +338,7 @@ export const POST_OFFICE_OBJECTS: Record<string, ObjectDefSlice> = {
   [PO_BOXES_WINDOW]: poBoxesWindow,
   [NOTICE_BOARD]: noticeBoard,
   [NOTICE_BOARD_CORNER]: noticeBoardCorner,
+  [ACT4_VISIT_NOTICE]: noticeBoardVisitNotice,
   [SERVICE_COUNTER]: serviceCounter,
   [MAIL_DROP]: mailDrop,
   [MAIL_DROP_FORMS]: mailDropForms,

@@ -68,6 +68,8 @@ import {
 } from './ids';
 import { ACT2_HORSE_BORROWED, ACT2_STARTED } from '../act2/ids';
 import type { Cond } from '../../../engine/cond';
+// E0 task I (§7) — `topic_register` rule 1, once the visit is announced.
+import { ACT4_VISIT_ANNOUNCED } from '../act4/ids';
 
 // ---------------------------------------------------------------------------
 // §5.2 — unknownTopic, most load-bearing string in the room. Order matters
@@ -198,7 +200,14 @@ const topics: TopicDef[] = [
   {
     id: TOPIC_REGISTER,
     words: ['register', 'book', 'guest book', 'ledger', 'page', 'gap', 'tear', 'missing page'],
+    // E0 task I (`docs/superpowers/specs/2026-09-17-stage-e0-prose.md` §7)
+    // — rule 1, prepended above the shipped three, once the visit is
+    // announced. No effect, no flag, no clue (§7's own note).
     response: [
+      {
+        when: { flag: ACT4_VISIT_ANNOUNCED },
+        text: '"Three names went in Tuesday." He has both hands on the book and does not open\nit. "Three rooms, a week in advance, paid."\n\nHe turns the register a quarter turn towards you, which from him is a speech,\nand then turns it back.\n\n"One hand wrote all three."',
+      },
       {
         when: { flag: FLAG_REGISTER_IMPRESSION_FOUND },
         text: 'You tell him what is pressed into the page under the one that is missing.\n\nMarlow does not deny it and does not confirm it. He sits with both hands flat on the counter and looks at the middle distance until the radio has changed to something else. Then he says, "You\'ll want that towel," and gets it, and that is all he says about the book tonight.',
