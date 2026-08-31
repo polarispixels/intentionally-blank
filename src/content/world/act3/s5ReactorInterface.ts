@@ -52,13 +52,13 @@ import { ACT5_ROOT_SHAFT, ACT5_STAIR_DOOR } from '../act5/ids';
 // ---------------------------------------------------------------------------
 
 const firstSight =
-  'The stair comes out on a landing and the landing is the room.\n\nIt is a gallery, long and narrow and lit like a corridor, and it has the\nbuilding\'s reactor on the other side of the left-hand wall behind a\nthickness of concrete you can read off the doorframes.\n\nThe right-hand wall is gauges. Two ranks of them, round-faced, white on\nblack, each in its own bezel with its own brass tag, and every needle in the\nplace is sitting still. Under the gauges runs a bench, and on the bench, under\na hinged cover, there is a dial. Over them, high up, there is a clock.\n\nThe left-hand wall has one door in it: a shield door with a wheel in the middle\nof it, a lamp above the wheel, and a small steel panel beside the lamp.\n\nThe gallery ends in a blank wall with a second door in it, and that door has a\nreader and a keypad, which makes it the only door you have seen in this\nbuilding that wants two things.\n\nIn the floor at that end, where the two big returns come through and turn\ndown, there is a formed opening with a ladder in it.\n\nIt is quiet in here. Not empty quiet — there is a note in it, low, that you\nget in the back of the jaw before the ear — but after the hall and the plant\nit reads as quiet, and the whole of the gallery is lit and long and nobody is\nstanding in it.';
+  'The stair comes out on a landing and the landing is the room.\n\nIt is a gallery, long and narrow and lit like a corridor, and it has the building\'s reactor on the other side of the left-hand wall behind a thickness of concrete you can read off the doorframes.\n\nThe right-hand wall is gauges. Two ranks of them, round-faced, white on black, each in its own bezel with its own brass tag, and every needle in the place is sitting still. Under the gauges runs a bench, and on the bench, under a hinged cover, there is a dial. Over them, high up, there is a clock.\n\nThe left-hand wall has one door in it: a shield door with a wheel in the middle of it, a lamp above the wheel, and a small steel panel beside the lamp.\n\nThe gallery ends in a blank wall with a second door in it, and that door has a reader and a keypad, which makes it the only door you have seen in this building that wants two things.\n\nIn the floor at that end, where the two big returns come through and turn down, there is a formed opening with a ladder in it.\n\nIt is quiet in here. Not empty quiet — there is a note in it, low, that you get in the back of the jaw before the ear — but after the hall and the plant it reads as quiet, and the whole of the gallery is lit and long and nobody is standing in it.';
 
 const nightVisit =
-  'The gallery, lit exactly as it is lit at every other hour, because nothing\ndown here has an opinion about the time.\n\nThe gauges. The bench and the dial. The shield door on the left with its lamp\nout. The second door at the end with its reader and its pad. The opening in\nthe floor with the ladder in it and the warm one of the two pipes going past\nit and down.\n\nThe clock is above the gauges and is the only thing in the room that is not\nmeasuring the building.';
+  'The gallery, lit exactly as it is lit at every other hour, because nothing down here has an opinion about the time.\n\nThe gauges. The bench and the dial. The shield door on the left with its lamp out. The second door at the end with its reader and its pad. The opening in the floor with the ladder in it and the warm one of the two pipes going past it and down.\n\nThe clock is above the gauges and is the only thing in the room that is not measuring the building.';
 
 const otherwiseVisit =
-  'Gauges on the right, the shield door on the left, the pad door at the end, and\nthe opening in the floor beside it.\n\nStill nobody.';
+  'Gauges on the right, the shield door on the left, the pad door at the end, and the opening in the floor beside it.\n\nStill nobody.';
 
 // E1 task M, §20 — the escort's own "arriving" paragraph ("He walks the
 // length of the gallery once...") is wired here, gated on Luke's presence,
@@ -69,7 +69,7 @@ const otherwiseVisit =
 // `otherwiseVisit`/`nightVisit` contradicting him standing right there.
 // Prepended above every other rule so it wins outright while he is here.
 export const lukeAtS5Text =
-  'He walks the length of the gallery once, slowly, hands behind his back, past a\nhundred round faces he has no way of reading, and stops at the end wall.';
+  'He walks the length of the gallery once, slowly, hands behind his back, past a hundred round faces he has no way of reading, and stops at the end wall.';
 
 const description: ProseRule[] = [
   { when: { npcAt: [ACT4_LUKE, ACT3_S5_REACTOR_INTERFACE] }, text: lukeAtS5Text },
@@ -120,11 +120,11 @@ const stairDoorExit: ExitDefSlice = { to: ACT5_ROOT_SHAFT, door: ACT5_STAIR_DOOR
 // ---------------------------------------------------------------------------
 
 const listenText =
-  'The note. It is low enough that most of it arrives through the floor and the\nbench rather than through the air, and it does not change, and after a minute\nof standing still you can no longer tell whether you are hearing it or\nremembering it.';
+  'The note. It is low enough that most of it arrives through the floor and the bench rather than through the air, and it does not change, and after a minute of standing still you can no longer tell whether you are hearing it or remembering it.';
 
-const smellText = 'Warm paint, warm dust on warm metal, and something faintly like the inside of\na kettle.';
+const smellText = 'Warm paint, warm dust on warm metal, and something faintly like the inside of a kettle.';
 
-const shoutText = 'It goes down the gallery, comes back off the end wall, and is the loudest\nthing that has happened on this floor in some time.';
+const shoutText = 'It goes down the gallery, comes back off the end wall, and is the loudest thing that has happened on this floor in some time.';
 
 const waitText = 'Nothing moves. That is not the room being ominous; that is the room working.';
 

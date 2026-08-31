@@ -75,9 +75,9 @@ const box141HasSomethingWaiting: Cond = {
   ],
 };
 
-const box141ArrivalText = 'Behind the yellowed glass of 141 there is the pale edge of something standing\non end.';
+const box141ArrivalText = 'Behind the yellowed glass of 141 there is the pale edge of something standing on end.';
 
-const box141WaitingText = 'Nine dark windows and one that has had something in it. Nothing has changed\nabout 141 since the last time you looked, and looking is free.';
+const box141WaitingText = 'Nine dark windows and one that has had something in it. Nothing has changed about 141 since the last time you looked, and looking is free.';
 
 const boxesWindowEffects: Effect[] = [
   {
@@ -115,7 +115,7 @@ const boxesOpenWithKeyText =
 // prepended above wave 5's own two-line family so a reply's arrival takes
 // precedence over both the with-key and without-key shipped text.
 const box141OpenWithReplyText =
-  'The dial goes round to the three letters and the door comes a quarter of an\ninch out of its frame under its own weight.\n\nInside: one sheet, folded small enough that the post office has stamped the\noutside of it rather than an envelope, because there is no envelope.';
+  'The dial goes round to the three letters and the door comes a quarter of an inch out of its frame under its own weight.\n\nInside: one sheet, folded small enough that the post office has stamped the outside of it rather than an envelope, because there is no envelope.';
 
 const box141ReplyPickupWithKey: Cond = { all: [box141HasSomethingWaiting, { has: KEYRING }] };
 
@@ -204,12 +204,12 @@ const notesText =
 // notice is a NEW pin, separate from `noticeBoardCorner`'s own blank
 // rectangle, so this is one rule, not a sub-part).
 const notesWithNoticeText =
-  `${notesText}\n\nAnd one that has gone up since you were last in here, on county stock, pinned\nthrough all four corners by somebody who does that:\n\n    NOTICE OF ROAD WORK\n    COUNTY HIGHWAY - MAIN STREET, FULL LENGTH\n    MILLING AND RESURFACING\n    SCHEDULE TO FOLLOW\n\nIt is pinned over the corner of the culvert-permit form, which has been up long\nenough to curl.\n\nAbove and to the left of it, the rectangle where the cork has never gone brown\nis still the colour cork starts out. Four pins hold nothing. Whatever a town\nputs on a board, it has not put anything there.`;
+  `${notesText}\n\nAnd one that has gone up since you were last in here, on county stock, pinned through all four corners by somebody who does that:\n\n    NOTICE OF ROAD WORK COUNTY HIGHWAY - MAIN STREET, FULL LENGTH MILLING AND RESURFACING SCHEDULE TO FOLLOW\n\nIt is pinned over the corner of the culvert-permit form, which has been up long enough to curl.\n\nAbove and to the left of it, the rectangle where the cork has never gone brown is still the colour cork starts out. Four pins hold nothing. Whatever a town puts on a board, it has not put anything there.`;
 
 // E0 task I (§5.1) — rule 1, above the D2 cache rule: the second, closure
 // notice pinned beside the road-work one, once the visit is announced.
 const visitNoticeText =
-  'A burn ban. A livestock sale with the date filled in by hand. A card offering\nfence work, with a row of tear-off tabs along the bottom and every tab still on\nit. A county form about culvert permits that has been up long enough to curl.\n\nAnd a photograph of a dog, printed at home, above the word FOUND and a\ntelephone number. Not lost. Found.\n\nBeside the road-work notice, on the same county stock, pinned through all four\ncorners by the same somebody, a second one:\n\n    NOTICE OF ROAD CLOSURE\n    COUNTY HIGHWAY - MAIN STREET, FULL LENGTH\n    NO STANDING, BOTH SIDES\n    FROM FIRST LIGHT UNTIL RELEASED\n\n    BY ORDER OF THE COUNTY\n\nAbove the two of them and to the left, the rectangle where the cork has never\ngone brown is still the colour cork starts out. Four pins hold nothing.';
+  'A burn ban. A livestock sale with the date filled in by hand. A card offering fence work, with a row of tear-off tabs along the bottom and every tab still on it. A county form about culvert permits that has been up long enough to curl.\n\nAnd a photograph of a dog, printed at home, above the word FOUND and a telephone number. Not lost. Found.\n\nBeside the road-work notice, on the same county stock, pinned through all four corners by the same somebody, a second one:\n\n    NOTICE OF ROAD CLOSURE COUNTY HIGHWAY - MAIN STREET, FULL LENGTH NO STANDING, BOTH SIDES FROM FIRST LIGHT UNTIL RELEASED\n\n    BY ORDER OF THE COUNTY\n\nAbove the two of them and to the left, the rectangle where the cork has never gone brown is still the colour cork starts out. Four pins hold nothing.';
 
 const notesRule: ProseRule[] = [
   { when: { flag: ACT4_VISIT_ANNOUNCED }, text: visitNoticeText },
@@ -299,7 +299,7 @@ const formsText =
 // D2-B — §10.1. A second `ProseRule`, above the shipped `formsText`, gated
 // `{ flag: ACT2_STARTED }` (plan §2 D2's own table entry for this file).
 const act2FormsText =
-  'A wooden rack of them, four deep. Change of address. Hold mail. Redirect to a\ntemporary address. Application for a post-office box, with a line for two\nforms of identification and a line under that for a witness.\n\nAnd, folded in behind all of it where the rack meets the wall, a short stack of\nthe plainest thing the government makes: a sheet of paper with a printed rule\ndown one side, an aerogramme fold marked in dots, and no line at the top for\nanything.\n\nThey are for people with something to say and no letterhead to say it on.\nThere is a pen on a chain nine inches away.';
+  'A wooden rack of them, four deep. Change of address. Hold mail. Redirect to a temporary address. Application for a post-office box, with a line for two forms of identification and a line under that for a witness.\n\nAnd, folded in behind all of it where the rack meets the wall, a short stack of the plainest thing the government makes: a sheet of paper with a printed rule down one side, an aerogramme fold marked in dots, and no line at the top for anything.\n\nThey are for people with something to say and no letterhead to say it on. There is a pen on a chain nine inches away.';
 
 const mailDrop: ObjectDefSlice = {
   location: POST_OFFICE,

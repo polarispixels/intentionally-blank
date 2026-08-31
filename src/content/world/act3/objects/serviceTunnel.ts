@@ -52,10 +52,10 @@ import { ACT5_BRANCH_HATCH, ACT5_BRANCH_UNLOCKED, ACT5_CLUE_KEY_NUMBER } from '.
 // ---------------------------------------------------------------------------
 
 const railsExamineText =
-  'Narrow gauge, laid straight and set directly into the pour so that the heads\nstand a half inch proud and everything below them is buried. Somebody meant to\ntake the track up afterwards, or somebody costed taking it up and stopped\nthere.\n\nThe heads are dull along their whole length except along the crown, where\nwhatever ran on them has not quite finished being polished off by the years\nsince.';
+  'Narrow gauge, laid straight and set directly into the pour so that the heads stand a half inch proud and everything below them is buried. Somebody meant to take the track up afterwards, or somebody costed taking it up and stopped there.\n\nThe heads are dull along their whole length except along the crown, where whatever ran on them has not quite finished being polished off by the years since.';
 
 const touchRailsText =
-  'Cold, flat on top, and greasy in the way old steel is greasy without anybody\nhaving greased it.\n\nYou can walk with a boot on each one and never look up, which is presumably\nhow it was done.';
+  'Cold, flat on top, and greasy in the way old steel is greasy without anybody having greased it.\n\nYou can walk with a boot on each one and never look up, which is presumably how it was done.';
 
 const followRailsText = 'They go where the tunnel goes, which is the point of them and of it.';
 
@@ -77,11 +77,11 @@ const rails: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const sealExamineText =
-  'The tunnel stops.\n\nWhere it stops there is concrete filling it from floor to arch — a plug of it\na good yard thick, poured against shuttering that left the grain of the boards\non this face and was never rubbed off afterwards.\n\nThrough the middle of the plug there is a hole. It is not a crack and it is\nnot a failure. It is about two feet by three, and its edges were cut, and the\ncutting went in from the far side: every broken edge on this face is turned\ntowards you, and every spall on this face has fallen this way, at your feet.\n\nThere is nothing at your feet. There has not been anything at your feet for a\nlong time.';
+  'The tunnel stops.\n\nWhere it stops there is concrete filling it from floor to arch — a plug of it a good yard thick, poured against shuttering that left the grain of the boards on this face and was never rubbed off afterwards.\n\nThrough the middle of the plug there is a hole. It is not a crack and it is not a failure. It is about two feet by three, and its edges were cut, and the cutting went in from the far side: every broken edge on this face is turned towards you, and every spall on this face has fallen this way, at your feet.\n\nThere is nothing at your feet. There has not been anything at your feet for a long time.';
 
-const touchSealText = 'The cut edges are not sharp. Somebody went round them afterwards with\nsomething, the way you do when a thing is going to be used more than once.';
+const touchSealText = 'The cut edges are not sharp. Somebody went round them afterwards with something, the way you do when a thing is going to be used more than once.';
 
-const lookThroughHoleText = 'Twenty feet of tunnel that is newer than the rest of it, squarer, with a\nskim on the walls, and then a steel door.';
+const lookThroughHoleText = 'Twenty feet of tunnel that is newer than the rest of it, squarer, with a skim on the walls, and then a steel door.';
 
 const sealExamineEffects: Effect[] = [{ say: sealExamineText }, { grantClue: ACT3_CLUE_SEAL_FROM_INSIDE }, { set: [ACT3_SAW_SEAL, true] }];
 
@@ -138,12 +138,12 @@ const ladder: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const doorExamineTunnelSideText =
-  'Steel, in a steel frame, set into block: a proper door, hung on three hinges,\nwith a lever handle at waist height and a fabricator\'s plate riveted to the\nframe at eye height carrying a name you do not know and a year you do.\n\n    2030\n\nIt is not locked. There is no keyhole in it and no reader beside it and no\ncard of instructions screwed anywhere near it.\n\nThe hinges have been oiled, and not by weather, and not long ago.';
+  'Steel, in a steel frame, set into block: a proper door, hung on three hinges, with a lever handle at waist height and a fabricator\'s plate riveted to the frame at eye height carrying a name you do not know and a year you do.\n\n    2030\n\nIt is not locked. There is no keyhole in it and no reader beside it and no card of instructions screwed anywhere near it.\n\nThe hinges have been oiled, and not by weather, and not long ago.';
 
 const doorOpenText =
-  'The lever goes down and the leaf comes towards you without a sound, which is\nnot something a door of this age and this weight should be able to do.\n\nBehind it: light. Painted block, a run of conduit along the top of the wall,\nand the back of a rank of pumps.';
+  'The lever goes down and the leaf comes towards you without a sound, which is not something a door of this age and this weight should be able to do.\n\nBehind it: light. Painted block, a run of conduit along the top of the wall, and the back of a rank of pumps.';
 
-const knockOnDoorText = 'Four inches of steel in a block wall answers a knock the way a bank vault\ndoes, which is by not passing it on.';
+const knockOnDoorText = 'Four inches of steel in a block wall answers a knock the way a bank vault does, which is by not passing it on.';
 
 const doorOpenEffects: Effect[] = [{ say: doorOpenText }, { set: [ACT3_CONSTRUCTION_DOOR_OPEN, true] }];
 
@@ -162,9 +162,9 @@ const constructionDoorTunnel: ObjectDefSlice = {
 // --- Uncounted sub-parts: the fabricator's plate and the hinges (§7.4). ---
 
 const platReadText =
-  'Aluminium, riveted at four corners, stamped rather than engraved: a\nfabricator\'s name, a works town, and a year.\n\n    2030\n\nIt is the same year that is on the plaque in the lobby, which is a hundred\nyards and a mile away in two different directions.';
+  'Aluminium, riveted at four corners, stamped rather than engraved: a fabricator\'s name, a works town, and a year.\n\n    2030\n\nIt is the same year that is on the plaque in the lobby, which is a hundred yards and a mile away in two different directions.';
 
-const hingesExamineText = 'Three hinges, wiped rather than dripping, with the oil gone dark on the\nknuckle and still bright in the pin.';
+const hingesExamineText = 'Three hinges, wiped rather than dripping, with the oil gone dark on the knuckle and still bright in the pin.';
 
 const doorPlate: ObjectDefSlice = {
   location: ACT3_SERVICE_TUNNEL,
@@ -192,10 +192,10 @@ const doorHinges: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const branchHatchExamineLockedText =
-  'Twenty feet short of the plug, low down in the left-hand wall, there is a steel\nhatch about the size of a hearth, set into the pour with a rolled lip and four\ncountersunk bolts that have never been out of it.\n\nNo handle. A squared hole in the middle of the plate, and above the hole,\nstruck into the steel one blow to a digit by somebody working at an awkward\nangle:\n\n    4471\n\nThe rails run past it. Everything down here runs past it.';
+  'Twenty feet short of the plug, low down in the left-hand wall, there is a steel hatch about the size of a hearth, set into the pour with a rolled lip and four countersunk bolts that have never been out of it.\n\nNo handle. A squared hole in the middle of the plate, and above the hole, struck into the steel one blow to a digit by somebody working at an awkward angle:\n\n    4471\n\nThe rails run past it. Everything down here runs past it.';
 
 const branchHatchExamineOpenText =
-  'Open, hanging off the bottom hinges, with the ladder behind it going down out\nof your light.\n\nThe bolts that have never been out of it are still not out of it. Whatever this\nhatch was fitted for, it was not fitted to be taken off the wall.';
+  'Open, hanging off the bottom hinges, with the ladder behind it going down out of your light.\n\nThe bolts that have never been out of it are still not out of it. Whatever this hatch was fitted for, it was not fitted to be taken off the wall.';
 
 const branchHatchExamine: ProseRule[] = [
   { when: { flag: ACT5_BRANCH_UNLOCKED }, text: branchHatchExamineOpenText },
@@ -203,19 +203,19 @@ const branchHatchExamine: ProseRule[] = [
 ];
 
 const branchHatchReadNumberText =
-  'Four digits, struck one at a time, deeper on the last one than on the first,\nthe way a man\'s arm gets tired.';
+  'Four digits, struck one at a time, deeper on the last one than on the first, the way a man\'s arm gets tired.';
 
 const branchHatchUnlockText =
-  'The squared bit goes into the squared hole the way it went into the plate in\nthe kerb on the county road, which is to say without any of the small\nnegotiations, and you make the same quarter turn, and something behind the\nsteel lets go with the same one flat knock.\n\nThe hatch comes down on its own weight and hangs off two hinges at the bottom\nof it.\n\nBehind it there is a formed opening with a rolled edge and a handhold, and a\nladder bolted through it in four places, going down.\n\nYou put the ring back in your pocket. The number over the hole goes on being\nthe number over the hole.';
+  'The squared bit goes into the squared hole the way it went into the plate in the kerb on the county road, which is to say without any of the small negotiations, and you make the same quarter turn, and something behind the steel lets go with the same one flat knock.\n\nThe hatch comes down on its own weight and hangs off two hinges at the bottom of it.\n\nBehind it there is a formed opening with a rolled edge and a handhold, and a ladder bolted through it in four places, going down.\n\nYou put the ring back in your pocket. The number over the hole goes on being the number over the hole.';
 
 const branchHatchPryText =
-  'There is a lip on the low side of the plate and the leg goes under it, and for\nabout four seconds absolutely nothing happens, and then the whole hatch leaves\nthe wall at once with the noise of a dropped tray in a large empty building,\nand goes on making it for a while.\n\nBehind it, a formed opening with a rolled edge and a handhold, and a ladder\ngoing down.\n\nThe leg has now had a drawer, a plate, a cam lock in a kerb, a door under a\nlibrary and this. It is starting to look less like a piece of a chair and more\nlike a colleague.';
+  'There is a lip on the low side of the plate and the leg goes under it, and for about four seconds absolutely nothing happens, and then the whole hatch leaves the wall at once with the noise of a dropped tray in a large empty building, and goes on making it for a while.\n\nBehind it, a formed opening with a rolled edge and a handhold, and a ladder going down.\n\nThe leg has now had a drawer, a plate, a cam lock in a kerb, a door under a library and this. It is starting to look less like a piece of a chair and more like a colleague.';
 
 const branchHatchKnockListenText =
-  'Warm air on the face, coming up. Under it, faintly, water going through\nsomething at a steady rate, which is the sound this county goes to sleep to\nwith the window open.';
+  'Warm air on the face, coming up. Under it, faintly, water going through something at a steady rate, which is the sound this county goes to sleep to with the window open.';
 
 const branchHatchCloseText =
-  'It goes back up and sits in its lip and stays there, because it was never\nholding anything out. It was holding a hole shut so that nobody put a foot in\nit in the dark.';
+  'It goes back up and sits in its lip and stays there, because it was never holding anything out. It was holding a hole shut so that nobody put a foot in it in the dark.';
 
 const branchHatchUnlockEffects: Effect[] = [
   { say: branchHatchUnlockText },
@@ -293,7 +293,7 @@ export const ACT3_SERVICE_TUNNEL_EXTRA_OBJECTS: Record<string, ObjectDefSlice> =
 
 const matchWarningText = 'The match is down to the fingers.';
 const matchOutText =
-  'Out. The dark comes back in the way it does, all at once and from every\ndirection at the same speed.\n\nThe book has plenty left in it and none of them last any longer than that one\ndid.';
+  'Out. The dark comes back in the way it does, all at once and from every direction at the same speed.\n\nThe book has plenty left in it and none of them last any longer than that one did.';
 
 export const ACT3_MATCH_TICK_EVENT: EventDef = {
   id: EVENT_ACT3_MATCH_TICK,

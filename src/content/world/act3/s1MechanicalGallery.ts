@@ -23,13 +23,13 @@ import { S1_DOOR_OPEN_BEFORE_TEXT, S1_SEARCH_BEHIND_PUMPS_TEXT } from './objects
 // ---------------------------------------------------------------------------
 
 const arriveThroughTunnel =
-  'A mile of tunnel puts you out behind a rank of pumps into a room lit like an\noffice.\n\nThe gallery runs the width of the building and is about the height of two\nrooms, painted out in the same grey to the same standard as everything\nupstairs, with the cable tray combed along the top of one wall and the pipes\ncombed along the top of the other.\n\nFour pumps on the near side, on inertia bases, three of them running. On the\nfar side a mesh crib with a bench in it and a board of tools over the bench,\nand against the crib\'s back wall a rack of tapes.\n\nThere is a stair at the end going down, and a lift door beside the stair.\n\nNobody is in here. Nothing in here is untidy. Behind you the door you came out\nof is, from this side, a shape in a wall.';
+  'A mile of tunnel puts you out behind a rank of pumps into a room lit like an office.\n\nThe gallery runs the width of the building and is about the height of two rooms, painted out in the same grey to the same standard as everything upstairs, with the cable tray combed along the top of one wall and the pipes combed along the top of the other.\n\nFour pumps on the near side, on inertia bases, three of them running. On the far side a mesh crib with a bench in it and a board of tools over the bench, and against the crib\'s back wall a rack of tapes.\n\nThere is a stair at the end going down, and a lift door beside the stair.\n\nNobody is in here. Nothing in here is untidy. Behind you the door you came out of is, from this side, a shape in a wall.';
 
 const arriveByLift =
-  'The leaves go back on a gallery that runs the width of the building and is lit\nlike an office.\n\nPumps down the near wall on their bases, three of four running. A mesh crib on\nthe far wall with a bench and a board of tools and a rack of tapes behind it.\nA stair at the end going down.\n\nIt is cool in here and very well lit and there is nobody in it, and the two\nfacts do not sit together as comfortably as they ought to.';
+  'The leaves go back on a gallery that runs the width of the building and is lit like an office.\n\nPumps down the near wall on their bases, three of four running. A mesh crib on the far wall with a bench and a board of tools and a rack of tapes behind it. A stair at the end going down.\n\nIt is cool in here and very well lit and there is nobody in it, and the two facts do not sit together as comfortably as they ought to.';
 
 const returnVisit =
-  'The pumps, the crib, the rack, the stair, and the lift.\n\nSomebody keeps this floor the way somebody kept the plant, and it is starting\nto look less like a standard and more like a habit.';
+  'The pumps, the crib, the rack, the stair, and the lift.\n\nSomebody keeps this floor the way somebody kept the plant, and it is starting to look less like a standard and more like a habit.';
 
 const description: ProseRule[] = [
   { when: { all: [{ not: { visited: ACT3_S1_MECHANICAL_GALLERY } }, { flag: ACT3_CONSTRUCTION_DOOR_OPEN }] }, text: arriveThroughTunnel },
@@ -63,20 +63,20 @@ const onEnter: OnEnterRule[] = [
 // ---------------------------------------------------------------------------
 
 const stairDownText =
-  'Four flights and three landings, and at each landing the same grey, the same\ntray, the same tidy, and no door.';
+  'Four flights and three landings, and at each landing the same grey, the same tray, the same tidy, and no door.';
 
 // ---------------------------------------------------------------------------
 // §8.8 — room-level senses and responses.
 // ---------------------------------------------------------------------------
 
 const roomListenText =
-  'Three pumps, a ventilation note somewhere above the light fittings, and the\nlong soft sound a big lit room makes when it is empty and does not know it.';
+  'Three pumps, a ventilation note somewhere above the light fittings, and the long soft sound a big lit room makes when it is empty and does not know it.';
 
 const roomSmellText =
-  'Clean concrete, warm electrics, and the ghost of the same grey paint that is on\nevery surface in this building including, by now, probably you.';
+  'Clean concrete, warm electrics, and the ghost of the same grey paint that is on every surface in this building including, by now, probably you.';
 
 const shoutText =
-  'It goes up into the height of the room, comes back off the tray, and is\nanswered by nothing, in a building where you have now been for some hours\nwithout being asked a single question.';
+  'It goes up into the height of the room, comes back off the tray, and is answered by nothing, in a building where you have now been for some hours without being asked a single question.';
 
 export const s1MechanicalGalleryRoom: RoomDefSlice = {
   name: 'S1 Mechanical Gallery',

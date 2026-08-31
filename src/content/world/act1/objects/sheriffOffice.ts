@@ -304,13 +304,13 @@ const sheriffCell: ObjectDefSlice = {
 
 // §1 — `EXAMINE RACK` / `EXAMINE PAMPHLETS`.
 const pamphletRackExamine =
-  'A wire rack of the kind that spins. This one does not: somebody has put a\nscrew through the base of it into the shelf, so that it faces the counter and\ngoes on facing it.\n\nCounty stock, the same buff paper as the forms on her desk, the pockets\nlabelled with tape and a marker in a hand that stopped bothering partway\nalong. Burn permits, which are nearly out. Livestock at large. What a well\ndoes after a wet spring. The edges that face the window have gone the colour\nof weak tea.\n\nThe pocket on the end says MISSING PERSONS, and the copy on top of that stack\nis exactly as yellow as the ones underneath it.';
+  'A wire rack of the kind that spins. This one does not: somebody has put a screw through the base of it into the shelf, so that it faces the counter and goes on facing it.\n\nCounty stock, the same buff paper as the forms on her desk, the pockets labelled with tape and a marker in a hand that stopped bothering partway along. Burn permits, which are nearly out. Livestock at large. What a well does after a wet spring. The edges that face the window have gone the colour of weak tea.\n\nThe pocket on the end says MISSING PERSONS, and the copy on top of that stack is exactly as yellow as the ones underneath it.';
 
 // §2 — `READ PAMPHLETS` / `READ PAMPHLET` / `READ RACK` (a player who types
 // the container means the contents, §8.2). Its own text, not shared with
 // EXAMINE.
 const pamphletRead =
-  'The one from the end pocket comes out stiff, the way paper does when it has\nsat in one position since it was printed.\n\n    WHEN SOMEBODY IS MISSING\n    WHAT THE COUNTY WILL NEED FROM YOU\n\nIt opens out flat into the plain patient type the county uses on anything it\nexpects to be read by somebody who is not at their best.\n\n    Before you telephone, have ready:\n\n        Full name\n        Date of birth\n        Last known address\n        A recent photograph\n\nThen a box for the name of the person making the report, and under the box, in\nthe same type, the sentence that a report cannot be opened without one.\n\nYou fold it back along its own creases and it does not want to go.';
+  'The one from the end pocket comes out stiff, the way paper does when it has sat in one position since it was printed.\n\n    WHEN SOMEBODY IS MISSING WHAT THE COUNTY WILL NEED FROM YOU\n\nIt opens out flat into the plain patient type the county uses on anything it expects to be read by somebody who is not at their best.\n\n    Before you telephone, have ready:\n\n        Full name Date of birth Last known address A recent photograph\n\nThen a box for the name of the person making the report, and under the box, in the same type, the sentence that a report cannot be opened without one.\n\nYou fold it back along its own creases and it does not want to go.';
 
 // §8.2 — `TAKE PAMPHLET`, drafted and commissioned alongside §1/§2. A flavor
 // response only (no inventory effect) — same idiom as this room's own
@@ -335,7 +335,7 @@ const pamphletRack: ObjectDefSlice = {
 // no object of its own (only the Act II empty-office prose mentions it) —
 // §3's text reads fine either way, so the room's own gate is not touched.
 const chairsExamine =
-  'Steel frames and moulded seats in a brown chosen so that nothing would ever\nshow on it, all of them facing the counter and none of them facing each other.\nSomebody has folded a piece of card under one foot; the tile beside that foot\nis worn pale in a half circle, because a chair that rocks gets rocked.\n\nThe blind is an inch short of the sill above them, and the cold comes off the\nglass and down the backs of the seats. The one nearest the door has been sat\nin until the finish went off it. The others have not.';
+  'Steel frames and moulded seats in a brown chosen so that nothing would ever show on it, all of them facing the counter and none of them facing each other. Somebody has folded a piece of card under one foot; the tile beside that foot is worn pale in a half circle, because a chair that rocks gets rocked.\n\nThe blind is an inch short of the sill above them, and the cold comes off the glass and down the backs of the seats. The one nearest the door has been sat in until the finish went off it. The others have not.';
 
 // §8.2 — `SIT` / `SIT ON CHAIRS`, drafted alongside §3. Must not reuse the
 // lobby's own SIT text (`frontDesk`'s ten-or-eleven chairs) — this is a

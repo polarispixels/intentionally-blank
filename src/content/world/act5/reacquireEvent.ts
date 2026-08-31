@@ -13,13 +13,13 @@ import { ACT3_S6_ARCHIVE_HUB } from '../act3/ids';
 import { ACT5_DEATH_REACQUIRE, ACT5_RECONCILIATION_RUNNING, EVENT_ACT5_EV_REACQUIRE } from './ids';
 
 const BEAT_1 =
-  'He is at the top of the well.\n\nNot doing anything to anything. Standing at the metal edging where the carpet\nstops, with his hands loose and his back to the room, facing the three steps\ndown, which is where a man stands when he has been told where to stand.';
+  'He is at the top of the well.\n\nNot doing anything to anything. Standing at the metal edging where the carpet stops, with his hands loose and his back to the room, facing the three steps down, which is where a man stands when he has been told where to stand.';
 
 const BEAT_2 =
-  'He turns round before you are all the way up the steps.\n\nThe coveralls get the attention they have got all week, which is none. He is\nnot looking for a man who does not work here. He has been given one address and\none description and this is the last place on the sheet.';
+  'He turns round before you are all the way up the steps.\n\nThe coveralls get the attention they have got all week, which is none. He is not looking for a man who does not work here. He has been given one address and one description and this is the last place on the sheet.';
 
 const BEAT_3 =
-  'He comes across the carpet at the pace he does everything at, and does not\nhurry at the end of it, and somewhere in the middle of it there is a moment\nwhen you could have gone back down the steps and you spend it watching him\ninstead.\n\nThen white.';
+  'He comes across the carpet at the pace he does everything at, and does not hurry at the end of it, and somewhere in the middle of it there is a moment when you could have gone back down the steps and you spend it watching him instead.\n\nThen white.';
 
 export const ACT5_EV_REACQUIRE_EVENT: EventDef = {
   id: EVENT_ACT5_EV_REACQUIRE,

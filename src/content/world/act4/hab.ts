@@ -38,13 +38,13 @@ import { HAB_TERMINAL_TYPE_TEXT } from './objects/hab';
 // ---------------------------------------------------------------------------
 
 const GALLEY_FIRST_SIGHT_TEXT =
-  'The inner door comes off its seal with the noise of a jar being opened, and you\nare in a galley.\n\nIt is small and everything in it is doing at least two jobs. A table folds down\noff the bulkhead with a lip round the edge of it and restraints on the seats that\nnobody has used in a long time; one of them has been tied out of the way with a\nbootlace. Overhead, a run of stowage in soft bags, each with a printed square on\nit and a handwritten word under the printed square.\n\nAlong the far bulkhead, a comms rig, awake, with one green light on it.\n\nUnder the rig, on a shelf, there is a terminal, and it is on.\n\nYou have seen this terminal before. It was in a room with a bed in it and a\nwindow onto a street. It was behind a curtain at the back of a gift shop with a\ngenerator running outside. It was on a steel bench under a building, with a well\nat the end of the room.\n\nHere it is showing a clock.\n\nUnder a lamp on the end of the counter, a shallow tray of something green, and\nbeside it a shallow tray of something that was.\n\nThere is a ladder up through a hatch in the ceiling, and through the hatch it is\nblack.';
+  'The inner door comes off its seal with the noise of a jar being opened, and you are in a galley.\n\nIt is small and everything in it is doing at least two jobs. A table folds down off the bulkhead with a lip round the edge of it and restraints on the seats that nobody has used in a long time; one of them has been tied out of the way with a bootlace. Overhead, a run of stowage in soft bags, each with a printed square on it and a handwritten word under the printed square.\n\nAlong the far bulkhead, a comms rig, awake, with one green light on it.\n\nUnder the rig, on a shelf, there is a terminal, and it is on.\n\nYou have seen this terminal before. It was in a room with a bed in it and a window onto a street. It was behind a curtain at the back of a gift shop with a generator running outside. It was on a steel bench under a building, with a well at the end of the room.\n\nHere it is showing a clock.\n\nUnder a lamp on the end of the counter, a shallow tray of something green, and beside it a shallow tray of something that was.\n\nThere is a ladder up through a hatch in the ceiling, and through the hatch it is black.';
 
 const GALLEY_SISSY_PRESENT_TEXT =
-  'The galley: the fold-down table, the stowage overhead, the rig with its green\nlight, the terminal with its clock, the trays under the lamp, and the ladder up\nthrough the hatch.\n\nShe is at the table with her feet hooked under the seat rail.';
+  'The galley: the fold-down table, the stowage overhead, the rig with its green light, the terminal with its clock, the trays under the lamp, and the ladder up through the hatch.\n\nShe is at the table with her feet hooked under the seat rail.';
 
 const GALLEY_UNCONDITIONAL_TEXT =
-  'The fold-down table with the bootlace on the restraint, the stowage bags\noverhead, the rig, the terminal, the trays, and the ladder going up into the\ndark.\n\nThe fan runs. It is the loudest thing in here by a distance, and it is not loud.';
+  'The fold-down table with the bootlace on the restraint, the stowage bags overhead, the rig, the terminal, the trays, and the ladder going up into the dark.\n\nThe fan runs. It is the loudest thing in here by a distance, and it is not loud.';
 
 const galleyDescription: ProseRule[] = [
   { when: { not: { visited: ACT4_HAB_GALLEY } }, text: GALLEY_FIRST_SIGHT_TEXT },
@@ -57,13 +57,13 @@ const galleyDescription: ProseRule[] = [
 // ---------------------------------------------------------------------------
 
 const GALLEY_SMELL_TEXT =
-  'Warm plastic, a lamp over damp soil, and — a long way under those — the smell of\nsomebody\'s cooking from a while ago that has nowhere in this building to go.';
+  'Warm plastic, a lamp over damp soil, and — a long way under those — the smell of somebody\'s cooking from a while ago that has nowhere in this building to go.';
 
 const GALLEY_LISTEN_TEXT =
-  'The fan. Something cycling behind a panel every so often and cutting out again.\n\nAnd a sound so far down under both of them that you have to stop breathing to\nhave it, which is the pump in the airlock keeping the seal you came through where\nit ought to be.';
+  'The fan. Something cycling behind a panel every so often and cutting out again.\n\nAnd a sound so far down under both of them that you have to stop breathing to have it, which is the pump in the airlock keeping the seal you came through where it ought to be.';
 
 const GALLEY_LOOK_UP_TEXT =
-  'Stowage, cable runs in a tray, a light with a wire cage on it, and a hatch with a\nladder going up through it into a room that has no light on in it.';
+  'Stowage, cable runs in a tray, a light with a wire cage on it, and a hatch with a ladder going up through it into a room that has no light on in it.';
 
 const galleyHandlers: HandlerDef[] = [
   { verbs: [SMELL], effects: [{ say: GALLEY_SMELL_TEXT }] },
@@ -93,12 +93,12 @@ export const habGalleyRoom: RoomDefSlice = {
 // ---------------------------------------------------------------------------
 
 const DOME_FIRST_SIGHT_TEXT =
-  'Up the ladder, and then there is nothing over your head.\n\nThe dome is one piece of whatever glass is when it has to do this job, seamed\ninto a steel ring at hip height, and above the ring it is all sky, and it comes\ndown past you on every side until it stops at the ring, so that you are standing\nin the sky up to the waist.\n\nBelow the ring, all the way round, the ground. Regolith the colour of a brick\nleft out in the weather, going away flat and then not flat, with a wheel track\ncut across the near part of it and the track\'s own shadow lying in it.\n\nUnder the dome: a chair, bolted down, set back from the ring so that a person in\nit is looking up and not out. Beside the chair a tripod, and on the tripod a\ncamera with its lens straight up at the top of the dome and a cable release\nhanging off it in a loop.\n\nThere is no fan in this room. That is the first thing you notice about it after\nthe sky and it is the thing you keep noticing.';
+  'Up the ladder, and then there is nothing over your head.\n\nThe dome is one piece of whatever glass is when it has to do this job, seamed into a steel ring at hip height, and above the ring it is all sky, and it comes down past you on every side until it stops at the ring, so that you are standing in the sky up to the waist.\n\nBelow the ring, all the way round, the ground. Regolith the colour of a brick left out in the weather, going away flat and then not flat, with a wheel track cut across the near part of it and the track\'s own shadow lying in it.\n\nUnder the dome: a chair, bolted down, set back from the ring so that a person in it is looking up and not out. Beside the chair a tripod, and on the tripod a camera with its lens straight up at the top of the dome and a cable release hanging off it in a loop.\n\nThere is no fan in this room. That is the first thing you notice about it after the sky and it is the thing you keep noticing.';
 
 const DOME_SISSY_PRESENT_TEXT =
-  'The dome, the ring, the ground going away under it, the tripod and the chair.\n\nShe is in the chair with her head back and her hands in her lap and she does not\nturn round.';
+  'The dome, the ring, the ground going away under it, the tripod and the chair.\n\nShe is in the chair with her head back and her hands in her lap and she does not turn round.';
 
-const DOME_UNCONDITIONAL_TEXT = 'The sky, the ring, the ground, the chair, the tripod, and no sound at all except\nthe ones you are making.';
+const DOME_UNCONDITIONAL_TEXT = 'The sky, the ring, the ground, the chair, the tripod, and no sound at all except the ones you are making.';
 
 const domeDescription: ProseRule[] = [
   { when: { not: { visited: ACT4_HAB_DOME } }, text: DOME_FIRST_SIGHT_TEXT },
@@ -111,9 +111,9 @@ const domeDescription: ProseRule[] = [
 // ---------------------------------------------------------------------------
 
 const DOME_LISTEN_TEXT =
-  'Nothing.\n\nNot quiet — there is no fan up here and no pump and no cycling and no hum in the\nstructure, and what you get instead is your own body, which is loud, and which\nyou are not used to being the loudest thing in a room.';
+  'Nothing.\n\nNot quiet — there is no fan up here and no pump and no cycling and no hum in the structure, and what you get instead is your own body, which is loud, and which you are not used to being the loudest thing in a room.';
 
-const DOME_SMELL_TEXT = 'Cold glass and clean steel, and the galley\'s cooking a long way down the ladder\nbehind you.';
+const DOME_SMELL_TEXT = 'Cold glass and clean steel, and the galley\'s cooking a long way down the ladder behind you.';
 
 const domeHandlers: HandlerDef[] = [
   { verbs: [LISTEN], effects: [{ say: DOME_LISTEN_TEXT }] },

@@ -104,7 +104,7 @@ const horsesExamineShipped =
 const horsesExamine: ProseRule[] = [
   {
     when: { not: { objectAt: [ACT2_HORSE, MAIN_STREET] } },
-    text: 'Two, at a rail put there for three, and the gap in the middle of them has the\nshape of a horse in it that neither of them appears to find remarkable.\n\nThey are saddled. The tack is worn, mended, and looked after.',
+    text: 'Two, at a rail put there for three, and the gap in the middle of them has the shape of a horse in it that neither of them appears to find remarkable.\n\nThey are saddled. The tack is worn, mended, and looked after.',
   },
   { text: horsesExamineShipped },
 ];
@@ -166,7 +166,7 @@ const horses: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const billboardText =
-  'It stands where the street runs out, north, on two legs in the dirt. It faces the road rather than the horizon, and what light there is off the north sky comes across it at enough of an angle to read by.\n\n    WALL DRUG - 32 MILES\n    FREE ICE WATER\n    PROBABLY\n\nThe paint is old. The board under the paint is older.';
+  'It stands where the street runs out, north, on two legs in the dirt. It faces the road rather than the horizon, and what light there is off the north sky comes across it at enough of an angle to read by.\n\n    WALL DRUG - 32 MILES FREE ICE WATER PROBABLY\n\nThe paint is old. The board under the paint is older.';
 
 const billboard: ObjectDefSlice = {
   location: MAIN_STREET,
@@ -485,19 +485,19 @@ const motelSignFront: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const crewsExamine =
-  "County stripes on the doors and a contractor's name on the machine, and the two\ndo not match, which on a road job is normal.\n\nA crew of them, and none of them hurrying: one on the mill, one walking backwards\nin front of it with a spray can, one on the sweeper, and three doing the part\nof the job that consists of standing where they can see all of it.\n\nThe man with the spray can has marked the manholes, the valve covers and one\nlong straight line up the middle of the street that has never been there\nbefore.";
+  "County stripes on the doors and a contractor's name on the machine, and the two do not match, which on a road job is normal.\n\nA crew of them, and none of them hurrying: one on the mill, one walking backwards in front of it with a spray can, one on the sweeper, and three doing the part of the job that consists of standing where they can see all of it.\n\nThe man with the spray can has marked the manholes, the valve covers and one long straight line up the middle of the street that has never been there before.";
 
 const crewsTalk =
-  'The one on the sweeper takes an earplug out for you, listens, puts it back in,\nand points at the man standing furthest from the work, who is the one with the\nfolder.\n\nThe man with the folder has been asked all morning. "Milling and resurfacing,"\nhe says. "Full length. It\'s on the county\'s notice." He looks at his folder in\ncase it has changed. "That\'s what I\'ve got."';
+  'The one on the sweeper takes an earplug out for you, listens, puts it back in, and points at the man standing furthest from the work, who is the one with the folder.\n\nThe man with the folder has been asked all morning. "Milling and resurfacing," he says. "Full length. It\'s on the county\'s notice." He looks at his folder in case it has changed. "That\'s what I\'ve got."';
 
 const crewsHelp =
-  'There is a way of standing near working men that gets you asked to hold\nsomething, and you find it, and you are asked to hold something. It is a tape\nend. You hold it for a minute and a half and then the job moves up the street\nwithout you.';
+  'There is a way of standing near working men that gets you asked to hold something, and you find it, and you are asked to hold something. It is a tape end. You hold it for a minute and a half and then the job moves up the street without you.';
 
 const crewsCrossBarrier =
-  'The barriers are the sort you fill with water so that they cannot be moved by\none person, and you are one person.\n\nThe gap at the nearest door is four feet wide and the crew have left one at\nevery door on the street, so there is nowhere on Main you cannot get to. There\nis only nowhere on Main you can get to down the middle.';
+  'The barriers are the sort you fill with water so that they cannot be moved by one person, and you are one person.\n\nThe gap at the nearest door is four feet wide and the crew have left one at every door on the street, so there is nowhere on Main you cannot get to. There is only nowhere on Main you can get to down the middle.';
 
 const crewsCount =
-  'You get as far as the second machine before a man in a hard hat asks you,\nwithout heat, whether you are from the county.\n\nYou are not, and it turns out there is no other kind of person who counts\nthings on a road.';
+  'You get as far as the second machine before a man in a hard hat asks you, without heat, whether you are from the county.\n\nYou are not, and it turns out there is no other kind of person who counts things on a road.';
 
 const crews: ObjectDefSlice = {
   location: MAIN_STREET,

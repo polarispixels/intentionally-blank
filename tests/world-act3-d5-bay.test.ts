@@ -165,7 +165,7 @@ describe('The badge hooks — the rail, Nolan\'s hook, the peeled hook (§5)', (
     const store = new MemoryStore();
     const session = atBay({ clock: { day: 1, minute: NIGHT_MINUTE } });
     const result = say(session, 'x nolan hook', store);
-    expect(text(result.events)).toMatch(/hanging on the hook by\nits lanyard/);
+    expect(text(result.events)).toMatch(/hanging on the hook by its lanyard/);
   });
 
   it('X PEELED HOOK grants act3_clue_peeled_hook', () => {
@@ -182,7 +182,7 @@ describe('Nolan asleep — EXAMINE, WAKE, TAKE BADGE (§6)', () => {
     const store = new MemoryStore();
     const session = atBay({ clock: { day: 1, minute: NIGHT_MINUTE } });
     const result = say(session, 'x nolan', store);
-    expect(text(result.events)).toMatch(/Nolan is in\nit/);
+    expect(text(result.events)).toMatch(/Nolan is in it/);
     expect(text(result.events)).toMatch(/asleep well/);
     expect(result.session.state.clues).toContain(ACT3_CLUE_NOLAN_CHAIR);
   });
@@ -209,7 +209,7 @@ describe('The UV lamp — turning it on and the arm reveal (§8)', () => {
     const store = new MemoryStore();
     const session = atBay({ clock: { day: 1, minute: DAY_MINUTE } });
     const result = say(session, 'turn on lamp', store);
-    expect(text(result.events)).toMatch(/fills the shade with a\nlight that is barely a colour/);
+    expect(text(result.events)).toMatch(/fills the shade with a light that is barely a colour/);
     expect(result.session.state.flags?.[ACT3_UV_LAMP_ON]).toBe(true);
   });
 
@@ -247,7 +247,7 @@ describe('The coveralls — WEAR/REMOVE (§12)', () => {
     const store = new MemoryStore();
     const session = atBay({ clock: { day: 1, minute: DAY_MINUTE } });
     const result = say(session, 'wear coveralls', store);
-    expect(text(result.events)).toMatch(/entire\nspecification/);
+    expect(text(result.events)).toMatch(/entire specification/);
     expect(result.session.state.flags?.[ACT3_WEARING_COVERALLS]).toBe(true);
   });
 

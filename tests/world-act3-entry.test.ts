@@ -130,7 +130,7 @@ describe('P16 — route (a\'), the tailgate', () => {
     const { events, session: after } = say(session, 'follow nolan', store);
     expect(after.state.location).toBe(ACT3_LOBBY);
     expect(after.state.flags[ACT3_FLAG_TAILGATED]).toBe(true);
-    expect(text(events)).toContain('holding\nthe door on the flat of his foot');
+    expect(text(events)).toContain('holding the door on the flat of his foot');
   });
 
   it('FOLLOW NOLAN at 08:00 (outside the tailgate window) is refused — Nolan is no longer there', () => {

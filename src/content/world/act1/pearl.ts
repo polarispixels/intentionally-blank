@@ -165,7 +165,7 @@ const topics: TopicDef[] = [
   {
     id: TOPIC_HORSES,
     words: ['horse', 'horses', 'rail', 'hitching rail', 'whose horses', 'owner'],
-    response: '"Whose?" She thinks about it while doing three other things. "They\'re at the\nrail. They\'ve been at the rail since I\'ve been looking at that rail." A pan\ncomes off the heat. "Somebody feeds them, because they\'re fed."',
+    response: '"Whose?" She thinks about it while doing three other things. "They\'re at the rail. They\'ve been at the rail since I\'ve been looking at that rail." A pan comes off the heat. "Somebody feeds them, because they\'re fed."',
     effects: [{ set: [ACT2_HORSE_BORROWED, true] }],
   },
   // D2-C amendment (D2 prose doc §21.1, L20 — "the buzz") — gated on the cache being found; grants `act2_clue_repaving`.
@@ -180,10 +180,10 @@ const topics: TopicDef[] = [
     response: [
       {
         when: { flag: ACT4_VISIT_ANNOUNCED },
-        text: '"Day after tomorrow." She has had that question all morning and it comes out\nflat. "Comes down Main, stops at that door, goes on out to the plant."\n\nShe lets you look at the door.\n\n"The President," she says, as though checking you had got there on your own.\n\n"They\'ve called it a spray. A young man in a very good coat came in and told me\nit would be a spray, and that it would be four minutes, and that I was not to\nput anything new on the menu." The cloth goes along a stretch of counter that\ndoes not need it. "So I fed him. He had the rhubarb and he ate it standing\nup, which is how you can tell."\n\nThe pan comes off the heat. "I\'ve had two governors and a senator on those\nstools and not one of them sent a boy ahead to talk to me about pie."',
+        text: '"Day after tomorrow." She has had that question all morning and it comes out flat. "Comes down Main, stops at that door, goes on out to the plant."\n\nShe lets you look at the door.\n\n"The President," she says, as though checking you had got there on your own.\n\n"They\'ve called it a spray. A young man in a very good coat came in and told me it would be a spray, and that it would be four minutes, and that I was not to put anything new on the menu." The cloth goes along a stretch of counter that does not need it. "So I fed him. He had the rhubarb and he ate it standing up, which is how you can tell."\n\nThe pan comes off the heat. "I\'ve had two governors and a senator on those stools and not one of them sent a boy ahead to talk to me about pie."',
       },
       {
-        text: '"Now, there\'s a thing." She is pleased to have a thing. "County\'s asked about\nthe road. Not asked *us* — asked the state, and the state\'s asked about\ncrushed stone, and Elmer\'s boy at the yard\'s been told to hold what he\'s got\nback."\n\nThe cloth goes along a stretch that does not need it. "Milling and resurfacing,\nfull length of Main. Nobody\'s said why, and I\'ll tell you what — nobody\'s\nsaying they don\'t know why, either, which is different."\n\nShe looks up. "It\'s been that road my whole life and it has never once been\nworth doing."',
+        text: '"Now, there\'s a thing." She is pleased to have a thing. "County\'s asked about the road. Not asked *us* — asked the state, and the state\'s asked about crushed stone, and Elmer\'s boy at the yard\'s been told to hold what he\'s got back."\n\nThe cloth goes along a stretch that does not need it. "Milling and resurfacing, full length of Main. Nobody\'s said why, and I\'ll tell you what — nobody\'s saying they don\'t know why, either, which is different."\n\nShe looks up. "It\'s been that road my whole life and it has never once been worth doing."',
       },
     ] satisfies ProseRule[],
     effects: [{ if: { when: { flag: ACT4_VISIT_ANNOUNCED }, then: [{ grantClue: ACT4_CLUE_VISIT_COMING }], else: [{ grantClue: ACT2_CLUE_REPAVING }] } }],
@@ -212,7 +212,7 @@ const tellTopics: TopicDef[] = [
     words: ['urn', 'coffee', 'spray'],
     when: { flag: ACT4_LUKE_MET },
     response:
-      '"They sent a boy out for the urn," she says, before you are anywhere near the\nend of it. "I know. He was very nice about it."\n\nThe cloth goes along the counter.\n\n"You\'ll want the rhubarb," she says. "There\'s a lot of it."',
+      '"They sent a boy out for the urn," she says, before you are anywhere near the end of it. "I know. He was very nice about it."\n\nThe cloth goes along the counter.\n\n"You\'ll want the rhubarb," she says. "There\'s a lot of it."',
   },
 ];
 
@@ -256,7 +256,7 @@ const followText = '"I\'m behind the counter." She is, in fact, in four places b
 // ---------------------------------------------------------------------------
 
 const GIVE_LETTER_TEXT =
-  'Pearl reads the outside of it, which is you, and not the inside of it, which is\nnone of her business.\n\n"The boy in the good coat\'s coming back for that urn himself," she says. "He\'d\nnot send anybody."\n\nShe puts it in her apron pocket, flat, with her hand over it, and goes back\ndown the counter and starts wiping a stretch of it that is already clean.\n\n"I have fed that family since before there was a plant out there. If this comes\nback to me unopened, you\'ll hear it from me and from nobody else."';
+  'Pearl reads the outside of it, which is you, and not the inside of it, which is none of her business.\n\n"The boy in the good coat\'s coming back for that urn himself," she says. "He\'d not send anybody."\n\nShe puts it in her apron pocket, flat, with her hand over it, and goes back down the counter and starts wiping a stretch of it that is already clean.\n\n"I have fed that family since before there was a plant out there. If this comes back to me unopened, you\'ll hear it from me and from nobody else."';
 
 const giveResponses: ShowResponseDef[] = [
   {

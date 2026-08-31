@@ -131,7 +131,7 @@ export const ACT2_D1_QUESTIONS: NonNullable<WorldSlice['questions']> = {
     openWhen: { flag: ACT2_READ_NOTEBOOK },
     // F0 (register 150) — settles when the shorthand is decoded, either route.
     answerWhen: { flag: ACT2_SHORTHAND_DECODED },
-    answer: 'A hook is a valve. A doubled stroke is a shift. With that much, two thirds of\nit is a man\'s working week over and over: bearings, a door that sticks, a\ncontractor who does not come.\n\nAnd then, from about the middle, in among the valves, never underlined and\nnever set apart — a corridor longer inside than on the plans, a second\nchilled-water return that nobody drew, a floor with no drawing at all, and the\nmanager saying kindly that there is no such floor.\n\nAnd one line in capitals. The only one in the book, with the pencil through the\npaper on the S.',
+    answer: 'A hook is a valve. A doubled stroke is a shift. With that much, two thirds of it is a man\'s working week over and over: bearings, a door that sticks, a contractor who does not come.\n\nAnd then, from about the middle, in among the valves, never underlined and never set apart — a corridor longer inside than on the plans, a second chilled-water return that nobody drew, a floor with no drawing at all, and the manager saying kindly that there is no such floor.\n\nAnd one line in capitals. The only one in the book, with the pencil through the paper on the S.',
   },
   [ACT2_Q_HOW_WAS_IT_HERE]: {
     text: 'The page in your hatband was torn out of this notebook. How did it get from a box in Wall Drug into that room?',

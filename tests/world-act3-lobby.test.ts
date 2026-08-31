@@ -100,7 +100,7 @@ describe('The plaque', () => {
 
   it('TOUCH PLAQUE and READ NAMES answer differently', () => {
     const touch = say(inLobby(), 'touch plaque', new MemoryStore());
-    expect(textOf(touch.events)).toContain('the newest thing in this\nroom');
+    expect(textOf(touch.events)).toContain('the newest thing in this room');
     const read = say(inLobby(), 'read plaque', new MemoryStore());
     expect(textOf(read.events)).toContain('the plaque assumes you know');
   });
@@ -148,7 +148,7 @@ describe('The brochures', () => {
 
   it('COMPARE BROCHURE WITH MODEL', () => {
     const { events } = say(inLobby(), 'compare brochure with model', new MemoryStore());
-    expect(textOf(events)).toContain('nowhere on it does the dotted line go\ndown');
+    expect(textOf(events)).toContain('nowhere on it does the dotted line go down');
   });
 });
 
@@ -195,7 +195,7 @@ describe('The inner turnstile', () => {
   it('EXAMINE WEDGE (as vendor) shows the propped-door text', () => {
     const session = inLobby({ flags: { [ACT3_FLAG_ENTERED_AS_VENDOR]: true } });
     const { events } = say(session, 'examine wedge', new MemoryStore());
-    expect(textOf(events)).toContain('holding open a door that cost more than the\ntruck');
+    expect(textOf(events)).toContain('holding open a door that cost more than the truck');
   });
 });
 
@@ -206,7 +206,7 @@ describe('The inner turnstile', () => {
 describe('The bell', () => {
   it('RING BELL renders the two-rings line', () => {
     const { events } = say(inLobby(), 'ring bell', new MemoryStore());
-    expect(textOf(events)).toContain('it turns\nout that you are');
+    expect(textOf(events)).toContain('it turns out that you are');
   });
 
   it('SEARCH DESK finds the drawers', () => {
@@ -218,7 +218,7 @@ describe('The bell', () => {
 describe('The staging doors', () => {
   it('OPEN STAGING DOOR is blocked in-world (the maglock)', () => {
     const { events } = say(inLobby(), 'open staging door', new MemoryStore());
-    expect(textOf(events)).toContain('on a maglock and the\nmaglock is not broken');
+    expect(textOf(events)).toContain('on a maglock and the maglock is not broken');
   });
 });
 

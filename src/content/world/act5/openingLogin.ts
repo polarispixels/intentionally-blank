@@ -59,11 +59,11 @@ export const act5OpeningLoginOpen: ScriptFn = (_world, state) => ({ state, event
 
 /** §32.1 — first success. */
 const OPENING_LOGIN_FIRST_TEXT =
-  'The cursor sits still for a moment, which it has not done before.\n\n    ACCESS LEVEL: LOCAL\n\n    ENVIRONMENT ......... MAIN ST / TOP FLOOR REAR\n    STATUS .............. RUNNING\n    PHYSICAL PARAMETERS . RANDOMIZED — 1 EXCEPTION, SUPPRESSED\n\nThe screen holds that for as long as you want it, and there is nothing else\nunder it, and no way further in, and nothing on it that is any use to anybody\nlooking for a man.';
+  'The cursor sits still for a moment, which it has not done before.\n\n    ACCESS LEVEL: LOCAL\n\n    ENVIRONMENT ......... MAIN ST / TOP FLOOR REAR STATUS .............. RUNNING PHYSICAL PARAMETERS . RANDOMIZED — 1 EXCEPTION, SUPPRESSED\n\nThe screen holds that for as long as you want it, and there is nothing else under it, and no way further in, and nothing on it that is any use to anybody looking for a man.';
 
 /** §32.2 — every success after the first. */
 const OPENING_LOGIN_AGAIN_TEXT =
-  '    ACCESS LEVEL: LOCAL\n\n    ENVIRONMENT ......... MAIN ST / TOP FLOOR REAR\n    STATUS .............. RUNNING\n    PHYSICAL PARAMETERS . RANDOMIZED — 1 EXCEPTION, SUPPRESSED\n\nThe same three lines. The cursor goes back to where it started.';
+  '    ACCESS LEVEL: LOCAL\n\n    ENVIRONMENT ......... MAIN ST / TOP FLOOR REAR STATUS .............. RUNNING PHYSICAL PARAMETERS . RANDOMIZED — 1 EXCEPTION, SUPPRESSED\n\nThe same three lines. The cursor goes back to where it started.';
 
 export const act5OpeningLoginRespond: ScriptFn = (world, state, args) => {
   const user = String(args?.['user'] ?? '').trim().toLowerCase();

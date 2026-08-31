@@ -20,12 +20,12 @@ import { noiseListenHandlers, PLANT_DOOR_PASS_TEXT } from './objects/dataHallA';
 // ---------------------------------------------------------------------------
 
 const firstSightText =
-  'The door gives you cold and noise in the same instant, and then it gives you a\nlength of building with nothing in it that resembles an end.\n\nRacks. In rows, in aisles, floor to a ceiling of cable tray and busbar, going\naway in both directions until the perspective shuts them. Every one of them\nhas lights on it. Not one of them has a person at it.\n\nThe air comes down out of the ceiling cold enough to find the back of your\nneck and goes away under the floor, which is not a floor but a plenum on\npedestals, and the noise the whole arrangement makes doing that is the room.\n\nAt the near end an aisle head carries a signpost with three vanes on it. Past\nthe signpost, a long way past it, there is a steel door with a reader beside\nit and PLANT stencilled at eye height.';
+  'The door gives you cold and noise in the same instant, and then it gives you a length of building with nothing in it that resembles an end.\n\nRacks. In rows, in aisles, floor to a ceiling of cable tray and busbar, going away in both directions until the perspective shuts them. Every one of them has lights on it. Not one of them has a person at it.\n\nThe air comes down out of the ceiling cold enough to find the back of your neck and goes away under the floor, which is not a floor but a plenum on pedestals, and the noise the whole arrangement makes doing that is the room.\n\nAt the near end an aisle head carries a signpost with three vanes on it. Past the signpost, a long way past it, there is a steel door with a reader beside it and PLANT stencilled at eye height.';
 
-const nightText = 'The same, with the overheads on their night setting, which is every third\nfitting.\n\nThe lights on the racks do not have a night setting.';
+const nightText = 'The same, with the overheads on their night setting, which is every third fitting.\n\nThe lights on the racks do not have a night setting.';
 
 const otherwiseText =
-  'Rows to the vanishing point, cold air coming down, warm air going away under\nthe floor. The signpost at the aisle head. The plant door at the far end.\n\nBehind you the lobby, warm, with a bell in it.';
+  'Rows to the vanishing point, cold air coming down, warm air going away under the floor. The signpost at the aisle head. The plant door at the far end.\n\nBehind you the lobby, warm, with a bell in it.';
 
 const description: ProseRule[] = [
   { when: { not: { visited: ACT3_DATA_HALL_A } }, text: firstSightText },
@@ -38,11 +38,11 @@ const description: ProseRule[] = [
 // ---------------------------------------------------------------------------
 
 const smellText =
-  'Nothing. Filtered air, a trace of hot dust off electronics, and nothing\norganic at all — no paper, no coffee, no people, no outside.\n\nYou have not been anywhere in weeks that smelled of this little.';
+  'Nothing. Filtered air, a trace of hot dust off electronics, and nothing organic at all — no paper, no coffee, no people, no outside.\n\nYou have not been anywhere in weeks that smelled of this little.';
 
-const shoutText = 'The noise takes it. It does not come back off anything and it does not carry,\nand about six feet away from you the room is exactly as it was.';
+const shoutText = 'The noise takes it. It does not come back off anything and it does not carry, and about six feet away from you the room is exactly as it was.';
 
-const sitSleepText = 'It is cold in here on purpose and it is loud in here as a side effect, and\nbetween the two of them this is the least restful room in the county.';
+const sitSleepText = 'It is cold in here on purpose and it is loud in here as a side effect, and between the two of them this is the least restful room in the county.';
 
 const roomHandlers: HandlerDef[] = [
   ...noiseListenHandlers,

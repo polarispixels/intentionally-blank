@@ -34,18 +34,18 @@ import { ACT4_S6_DOOR_OPEN, ACT4_VISIT_OVER_DAY } from './ids';
 // ---------------------------------------------------------------------------
 
 const FIRST_SIGHT_TEXT =
-  'A long room off the lobby with one window in it, lit by the same downlights as\nthe lobby and colder than the lobby by enough to notice.\n\nThe folding tables are not stacked against the wall any more. They are down the\nmiddle of the room, end to end, under a roll of white paper off a dispenser,\nwhich is what a building does with an hour\'s notice and no linen. There are\nchairs down both sides of them and nobody in any of them but one, and over the\nback of that one there is a coat.\n\nAt the far end, the county\'s whiteboard, with the grid still ruled on it in\npermanent marker and, this week, something written in the grid.\n\nOn a card table by the door, an urn, with a lead running from it along the\nskirting to a socket somebody had to go and find.\n\nThere is a man at the door you came in by and a man at the door you did not,\nand neither has looked at you since, and both know exactly where you are.';
+  'A long room off the lobby with one window in it, lit by the same downlights as the lobby and colder than the lobby by enough to notice.\n\nThe folding tables are not stacked against the wall any more. They are down the middle of the room, end to end, under a roll of white paper off a dispenser, which is what a building does with an hour\'s notice and no linen. There are chairs down both sides of them and nobody in any of them but one, and over the back of that one there is a coat.\n\nAt the far end, the county\'s whiteboard, with the grid still ruled on it in permanent marker and, this week, something written in the grid.\n\nOn a card table by the door, an urn, with a lead running from it along the skirting to a socket somebody had to go and find.\n\nThere is a man at the door you came in by and a man at the door you did not, and neither has looked at you since, and both know exactly where you are.';
 
 const LUKE_PRESENT_TEXT =
-  'Trestles under white paper, chairs down both sides, a whiteboard at the far\nend with somebody else\'s handwriting in the county\'s grid, and an urn on a card\ntable with a lead running to the skirting.\n\nHe is in the chair with the coat over the back of it. The two men are where the\ntwo doors are.';
+  'Trestles under white paper, chairs down both sides, a whiteboard at the far end with somebody else\'s handwriting in the county\'s grid, and an urn on a card table with a lead running to the skirting.\n\nHe is in the chair with the coat over the back of it. The two men are where the two doors are.';
 
 const LUKE_GONE_TEXT =
-  'The paper has been rolled off the trestles and put in a bin that was not in\nhere before. The chairs are back along the wall in a row. The tables are folded\nand stacked where they were the first time you looked at them through wired\nglass.\n\nThe urn is still on the card table with its lead still along the skirting.\nThere is about an inch left in it and it is cold.\n\nNobody has touched the whiteboard.';
+  'The paper has been rolled off the trestles and put in a bin that was not in here before. The chairs are back along the wall in a row. The tables are folded and stacked where they were the first time you looked at them through wired glass.\n\nThe urn is still on the card table with its lead still along the skirting. There is about an inch left in it and it is cold.\n\nNobody has touched the whiteboard.';
 
 // E1 task M, §23's alternate arm — the visit ended without the player ever
 // bringing him to the door.
 const LUKE_GONE_WITHOUT_DOOR_TEXT =
-  'The tables are folded and stacked against the wall. The chairs are in a row.\nThe urn is cold.\n\nHe was here for two days, and then the two days were over, which is what a\nvisit is.';
+  'The tables are folded and stacked against the wall. The chairs are in a row. The urn is cold.\n\nHe was here for two days, and then the two days were over, which is what a visit is.';
 
 const description: ProseRule[] = [
   { when: { not: { visited: ACT4_STAGING_AREA } }, text: FIRST_SIGHT_TEXT },
@@ -79,10 +79,10 @@ export { FOLLOW_LUKE_GONE_TEXT };
 // ---------------------------------------------------------------------------
 
 const SMELL_TEXT =
-  'Coffee that has been standing, marker pen, and the particular smell of a room\nthat has had its carpet shampooed inside the last day.';
+  'Coffee that has been standing, marker pen, and the particular smell of a room that has had its carpet shampooed inside the last day.';
 
 const LISTEN_TEXT =
-  'The downlights. The urn, ticking as it cools and then deciding not to. A radio\nbeing listened to by somebody wearing an earpiece, which sounds like nothing at\nall until you know what you are listening for.';
+  'The downlights. The urn, ticking as it cools and then deciding not to. A radio being listened to by somebody wearing an earpiece, which sounds like nothing at all until you know what you are listening for.';
 
 // ---------------------------------------------------------------------------
 // §9.2 — SHOW <anything> TO DETAIL (room-level instrument handler; see

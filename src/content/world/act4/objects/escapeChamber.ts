@@ -73,7 +73,7 @@ import {
 // ---------------------------------------------------------------------------
 
 const GATE_ESCAPE_EXAMINE_TEXT =
-  'Standing right under it, the light behind it has a floor in it.\n\nNot much of one. A line, low down, running left to right across the whole width\nof the opening, where a floor would meet a wall if there were a floor and a\nwall. Above the line the standby glow is even. Below it, it is fractionally\nwarmer, the way light is warmer coming off something laid down flat.\n\nFrom the middle of the room you cannot see it at all. It is the sort of detail\nthat goes away if you look at it directly and comes back if you look at the\nstrip of plastic over it instead.';
+  'Standing right under it, the light behind it has a floor in it.\n\nNot much of one. A line, low down, running left to right across the whole width of the opening, where a floor would meet a wall if there were a floor and a wall. Above the line the standby glow is even. Below it, it is fractionally warmer, the way light is warmer coming off something laid down flat.\n\nFrom the middle of the room you cannot see it at all. It is the sort of detail that goes away if you look at it directly and comes back if you look at the strip of plastic over it instead.';
 
 export const gateEscape: ObjectDefSlice = {
   location: ACT3_S6_ARCHIVE_HUB,
@@ -94,7 +94,7 @@ export const gateEscape: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const GATE_HAB_EXAMINE_TEXT =
-  'The second one is dark and the sill under it is not.\n\nCast into the concrete under this opening, and under no other opening in the\nrow, there is a shallow trough: a rounded channel about two fingers wide,\nrunning the width of the frame, with a lip on the far side of it.\n\nIt is the shape a floor is given when something with a rubber seal on the\nbottom of it is going to come down on it, over and over, and be expected to\nhold pressure.';
+  'The second one is dark and the sill under it is not.\n\nCast into the concrete under this opening, and under no other opening in the row, there is a shallow trough: a rounded channel about two fingers wide, running the width of the frame, with a lip on the far side of it.\n\nIt is the shape a floor is given when something with a rubber seal on the bottom of it is going to come down on it, over and over, and be expected to hold pressure.';
 
 export const gateHab: ObjectDefSlice = {
   location: ACT3_S6_ARCHIVE_HUB,
@@ -113,13 +113,13 @@ export const gateHab: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const COATS_EXAMINE_TEXT =
-  'Working coats and one that is not.\n\nA man\'s canvas chore coat, gone soft, with a rule pocket on the thigh and the\nrule still in it. A parka with the fur off the hood on one side. A denim jacket\nwith a patch sewn on badly and a second patch sewn on over the bad sewing. A\nlong wool thing, black, far too good for this room, on the hook nearest the door\nso that it can be got at fastest. And a child\'s anorak, red, which has been let\ndown at the cuffs and is still too short.\n\nThey are all on the hook and none of them is on the hook properly. Every one of\nthem is hung by the collar rather than the loop, which is what people do to\ncoats and what nobody does to a coat they are describing to somebody.';
+  'Working coats and one that is not.\n\nA man\'s canvas chore coat, gone soft, with a rule pocket on the thigh and the rule still in it. A parka with the fur off the hood on one side. A denim jacket with a patch sewn on badly and a second patch sewn on over the bad sewing. A long wool thing, black, far too good for this room, on the hook nearest the door so that it can be got at fastest. And a child\'s anorak, red, which has been let down at the cuffs and is still too short.\n\nThey are all on the hook and none of them is on the hook properly. Every one of them is hung by the collar rather than the loop, which is what people do to coats and what nobody does to a coat they are describing to somebody.';
 
 const COATS_SEARCH_TEXT =
-  'Cigarette papers in the chore coat, and a rule that pulls out to a foot and\nlocks. A boiled sweet in the parka, gone to liquid inside the wrapper. Nothing\nin the denim.\n\nThe black wool coat has an inside pocket with a stitched line where a label goes\nand no label in it, which is a thing about expensive coats and not a thing about\nthis room.\n\nThe red anorak has a mitten in it. One.';
+  'Cigarette papers in the chore coat, and a rule that pulls out to a foot and locks. A boiled sweet in the parka, gone to liquid inside the wrapper. Nothing in the denim.\n\nThe black wool coat has an inside pocket with a stitched line where a label goes and no label in it, which is a thing about expensive coats and not a thing about this room.\n\nThe red anorak has a mitten in it. One.';
 
 const COATS_TAKE_TEXT =
-  'It comes off the hook and it has the weight of a coat and the smell of one, and\nyou stand in a stranger\'s kitchen holding it.\n\nYou put it back on the hook. By the collar, because that is how the others are\non.';
+  'It comes off the hook and it has the weight of a coat and the smell of one, and you stand in a stranger\'s kitchen holding it.\n\nYou put it back on the hook. By the collar, because that is how the others are on.';
 
 export const coats: ObjectDefSlice = {
   location: ACT4_ESCAPE_CHAMBER,
@@ -140,10 +140,10 @@ export const coats: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const BARE_HOOK_EXAMINE_TEXT =
-  'The hook is the same as the others: a screwed-on cast thing with two arms, and\nthe paint on it is the paint on all of them.\n\nWhat is different is the wall behind it.\n\nBehind each of the other hooks there is a shadow of a coat — a soft grey outline\npushed into the paint by years of the same shoulder in the same place, which is\na thing that happens to a wall in a hall whether anybody wants it to or not.\n\nBehind this one the paint is clean. Not wiped clean. The same age as the paint\neverywhere else in the room, and nothing has ever been against it.';
+  'The hook is the same as the others: a screwed-on cast thing with two arms, and the paint on it is the paint on all of them.\n\nWhat is different is the wall behind it.\n\nBehind each of the other hooks there is a shadow of a coat — a soft grey outline pushed into the paint by years of the same shoulder in the same place, which is a thing that happens to a wall in a hall whether anybody wants it to or not.\n\nBehind this one the paint is clean. Not wiped clean. The same age as the paint everywhere else in the room, and nothing has ever been against it.';
 
 const BARE_HOOK_TOUCH_TEXT =
-  'You take the black wool coat off its own hook and put it on this one, and it\nhangs there, and it is a coat on a hook.\n\nNothing about the room acknowledges it. You put it back.';
+  'You take the black wool coat off its own hook and put it on this one, and it hangs there, and it is a coat on a hook.\n\nNothing about the room acknowledges it. You put it back.';
 
 export const bareHook: ObjectDefSlice = {
   location: ACT4_ESCAPE_CHAMBER,
@@ -165,13 +165,13 @@ export const bareHook: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const SILHOUETTE_EXAMINE_TEXT =
-  'There is nothing there. That is the first and most reliable thing about it and\nit goes on being true however long you look.\n\nWhat there is, is what the room is doing around a place where nothing is. The\nlight off the window falls across the linoleum and stops on a line, and starts\nagain on the far side of a gap about the width of a person, and the edge of the\ngap is soft the way the edge of a shadow is soft and not the way the edge of a\ncut-out is.\n\nThe chair at that end of the table is pushed back from the table by about the\ndistance a chair goes when somebody has stood up out of it in a hurry and has\nnot come back for it.\n\nIt is standing height. It is not doing anything. It has no front and no back.';
+  'There is nothing there. That is the first and most reliable thing about it and it goes on being true however long you look.\n\nWhat there is, is what the room is doing around a place where nothing is. The light off the window falls across the linoleum and stops on a line, and starts again on the far side of a gap about the width of a person, and the edge of the gap is soft the way the edge of a shadow is soft and not the way the edge of a cut-out is.\n\nThe chair at that end of the table is pushed back from the table by about the distance a chair goes when somebody has stood up out of it in a hurry and has not come back for it.\n\nIt is standing height. It is not doing anything. It has no front and no back.';
 
 const SILHOUETTE_TOUCH_TEXT =
-  'Your hand goes through the place where the light is not, and comes out the far\nside of it, and is a hand.\n\nThere is no cold spot, no resistance, no hum, and nothing in the room changes\nits mind about anything. Whatever is being withheld here is being withheld at\nthe level of the record, and the record does not care what you do with your arm.';
+  'Your hand goes through the place where the light is not, and comes out the far side of it, and is a hand.\n\nThere is no cold spot, no resistance, no hum, and nothing in the room changes its mind about anything. Whatever is being withheld here is being withheld at the level of the record, and the record does not care what you do with your arm.';
 
 const SILHOUETTE_STAND_TEXT =
-  'You step into it.\n\nThe light closes over you the way water does not — instantly, with no edge — and\nthe gap in it is gone, and now the room has a person in the middle of it and the\nperson is you.\n\nFrom in here you can see the whole of the table, the door, the hooks, and the\nback of the stove. It is the standing place in this kitchen from which the most\nof it is visible, which is either a fact about a room or a fact about a man, and\nthe room is not saying which.\n\nNothing else happens. Standing in the place is not the same as doing what was\ndone in it.';
+  'You step into it.\n\nThe light closes over you the way water does not — instantly, with no edge — and the gap in it is gone, and now the room has a person in the middle of it and the person is you.\n\nFrom in here you can see the whole of the table, the door, the hooks, and the back of the stove. It is the standing place in this kitchen from which the most of it is visible, which is either a fact about a room or a fact about a man, and the room is not saying which.\n\nNothing else happens. Standing in the place is not the same as doing what was done in it.';
 
 export const silhouette: ObjectDefSlice = {
   location: ACT4_ESCAPE_CHAMBER,
@@ -194,13 +194,13 @@ export const silhouette: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const TABLE_EXAMINE_TEXT =
-  'A rectangular deal table, scrubbed pale, with the grain standing proud of the\nsoft wood between the grain — sixty years of scrubbing takes a table down that\nway and nothing else does.\n\nSet for a meal that has been eaten. Plates stacked at one end, cutlery gathered\non the top plate, a jug with an inch of water left in it and the light going\nthrough it onto the wood.\n\nThere are rings on the table and ink on the table and one place where something\nwas cut against it and the cut was not deep enough to matter and deep enough to\nlast.\n\nThe good cloth is not on it. It is on the dresser behind, folded in a square with\nthe crease of the fold gone shiny, the way a cloth goes when it lives folded.';
+  'A rectangular deal table, scrubbed pale, with the grain standing proud of the soft wood between the grain — sixty years of scrubbing takes a table down that way and nothing else does.\n\nSet for a meal that has been eaten. Plates stacked at one end, cutlery gathered on the top plate, a jug with an inch of water left in it and the light going through it onto the wood.\n\nThere are rings on the table and ink on the table and one place where something was cut against it and the cut was not deep enough to matter and deep enough to last.\n\nThe good cloth is not on it. It is on the dresser behind, folded in a square with the crease of the fold gone shiny, the way a cloth goes when it lives folded.';
 
 const TABLE_LOOK_UNDER_TEXT =
-  'Four legs, a stretcher, and the underside of a table top, which is the part of a\ntable nobody scrubs.\n\nThere is a wad of something dried on under there, high up in the corner, in\nabout the position a hand goes if a hand is going to do that, and it has been\nthere long enough to be the colour of the wood.';
+  'Four legs, a stretcher, and the underside of a table top, which is the part of a table nobody scrubs.\n\nThere is a wad of something dried on under there, high up in the corner, in about the position a hand goes if a hand is going to do that, and it has been there long enough to be the colour of the wood.';
 
 const TABLE_CLOTH_TEXT =
-  'You shake it out and lay it over the table and square it up at the corners, and\nit fits, because it is that table\'s cloth.\n\nThe room does not object and does not care. It is not the cloth that is wrong\nhere, and putting it on does not make it right; it makes two things wrong at\nonce.\n\nYou take it off and fold it back down to its own creases.';
+  'You shake it out and lay it over the table and square it up at the corners, and it fits, because it is that table\'s cloth.\n\nThe room does not object and does not care. It is not the cloth that is wrong here, and putting it on does not make it right; it makes two things wrong at once.\n\nYou take it off and fold it back down to its own creases.';
 
 export const familyTable: ObjectDefSlice = {
   location: ACT4_ESCAPE_CHAMBER,
@@ -221,21 +221,21 @@ export const familyTable: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const DRAWER_EXAMINE_TEXT =
-  'A single shallow drawer in the long side of the table, with a wooden knob and a\nbrass escutcheon round a keyhole that somebody once thought a kitchen table\nneeded.\n\nThe knob is worn bright down one side. Whoever opened this most came at it from\nthe left, and did it often, and did not stop to think about it once.';
+  'A single shallow drawer in the long side of the table, with a wooden knob and a brass escutcheon round a keyhole that somebody once thought a kitchen table needed.\n\nThe knob is worn bright down one side. Whoever opened this most came at it from the left, and did it often, and did not stop to think about it once.';
 
 const DRAWER_LOCKED_TEXT =
-  'Locked. Properly locked — the drawer moves the eighth of an inch that a drawer\nmoves against its own lock and then stops dead on it.\n\nThere is no key in the escutcheon and no key on the table and no key on any of\nthe hooks, which is unusual, because a locked drawer in a kitchen is not a\nsecurity arrangement. It is a place where something goes so that nobody has to\nask where it went.';
+  'Locked. Properly locked — the drawer moves the eighth of an inch that a drawer moves against its own lock and then stops dead on it.\n\nThere is no key in the escutcheon and no key on the table and no key on any of the hooks, which is unusual, because a locked drawer in a kitchen is not a security arrangement. It is a place where something goes so that nobody has to ask where it went.';
 
 const DRAWER_PRY_TEXT =
-  'You get the end of the leg into the gap over the drawer front and lean on it,\nand the table comes up off two of its feet, and the drawer does not.\n\nThe leg is too thick to go past the rail, the front is oak and the top is deal\nand the deal will go first, and you can feel the whole table telling you so\nthrough the wood.\n\nThis drawer has a key. You have not yet been anywhere in this room that a key is\nkept.';
+  'You get the end of the leg into the gap over the drawer front and lean on it, and the table comes up off two of its feet, and the drawer does not.\n\nThe leg is too thick to go past the rail, the front is oak and the top is deal and the deal will go first, and you can feel the whole table telling you so through the wood.\n\nThis drawer has a key. You have not yet been anywhere in this room that a key is kept.';
 
-const DRAWER_UNLOCK_TEXT = 'The key goes in, turns a quarter turn against a lock that has one spring in it,\nand the drawer comes out on wooden runners with the noise wooden runners make.';
+const DRAWER_UNLOCK_TEXT = 'The key goes in, turns a quarter turn against a lock that has one spring in it, and the drawer comes out on wooden runners with the noise wooden runners make.';
 
 const DRAWER_CONTENTS_TEXT =
-  'Inside: a ball of string. Batteries, dead, kept. A church key. A tin of\nplasters with a hinge that has gone. A photograph wallet, empty, with a\nchemist\'s name on it that does not exist any more.\n\nAnd a camera.\n\nA plastic thirty-five-millimetre compact, the automatic kind, with a wrist strap\nand a scratch across the front of the lens housing where it has been in and out\nof this drawer for years.\n\nThe back is open, and it is empty, and the take-up spool has the little curl of\nleader on it that a film leaves behind when somebody has rewound it and taken it\nout.';
+  'Inside: a ball of string. Batteries, dead, kept. A church key. A tin of plasters with a hinge that has gone. A photograph wallet, empty, with a chemist\'s name on it that does not exist any more.\n\nAnd a camera.\n\nA plastic thirty-five-millimetre compact, the automatic kind, with a wrist strap and a scratch across the front of the lens housing where it has been in and out of this drawer for years.\n\nThe back is open, and it is empty, and the take-up spool has the little curl of leader on it that a film leaves behind when somebody has rewound it and taken it out.';
 
 const DRAWER_SEARCH_AGAIN_TEXT =
-  'You go over the drawer again. String, batteries, a church key, an empty wallet,\nand a camera with nothing in it.\n\nThere is no second thing in here. There was never going to be; it is a kitchen\ndrawer.';
+  'You go over the drawer again. String, batteries, a church key, an empty wallet, and a camera with nothing in it.\n\nThere is no second thing in here. There was never going to be; it is a kitchen drawer.';
 
 const DRAWER_UNLOCK_EFFECTS: Effect[] = [
   { say: DRAWER_UNLOCK_TEXT },
@@ -280,10 +280,10 @@ export const tableDrawer: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const CAMERA_FIRST_CHECK_TEXT =
-  'You have the drawer open and your hand on the camera, checking a thing that\nwanted checking before anybody sat down, and the room takes it.\n\nThe handles come on the cupboard doors. Not one after another: they are on, and\nthey are the wrong shade of the same colour as the doors, the way a handle is\nwhen it has been replaced once.\n\nFrom the speaker, the slow one, quietly, to somebody who is not you: "He\'s\nchecked it. He always checks it."';
+  'You have the drawer open and your hand on the camera, checking a thing that wanted checking before anybody sat down, and the room takes it.\n\nThe handles come on the cupboard doors. Not one after another: they are on, and they are the wrong shade of the same colour as the doors, the way a handle is when it has been replaced once.\n\nFrom the speaker, the slow one, quietly, to somebody who is not you: "He\'s checked it. He always checks it."';
 
 const CAMERA_DESCRIBE_TEXT =
-  'A plastic thirty-five-millimetre compact, the automatic kind, with a wrist strap\nand a scratch across the front of the lens housing where it has been in and out\nof this drawer for years.\n\nThe back is open, and it is empty, and the take-up spool has the little curl of\nleader on it that a film leaves behind when somebody has rewound it and taken it\nout.';
+  'A plastic thirty-five-millimetre compact, the automatic kind, with a wrist strap and a scratch across the front of the lens housing where it has been in and out of this drawer for years.\n\nThe back is open, and it is empty, and the take-up spool has the little curl of leader on it that a film leaves behind when somebody has rewound it and taken it out.';
 
 const CAMERA_PROSE: ProseRule[] = [
   { when: { not: { flag: ACT4_CHAMBER_COPY_FOUND } }, text: CAMERA_FIRST_CHECK_TEXT },
@@ -305,12 +305,12 @@ export const familyCamera: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const JAR_EXAMINE_TEXT =
-  'On the shelf over the stove, between a tin with a blank label and a tin with a\nblank label, a squat glass jar with a screw lid and about two inches of ground\ncoffee in the bottom of it.\n\nThe lid is the only lid in this kitchen that anybody has bothered to keep clean.';
+  'On the shelf over the stove, between a tin with a blank label and a tin with a blank label, a squat glass jar with a screw lid and about two inches of ground coffee in the bottom of it.\n\nThe lid is the only lid in this kitchen that anybody has bothered to keep clean.';
 
 const JAR_REVEAL_TEXT =
-  'The lid comes off in the half-turn of a lid that gets taken off a lot.\n\nCoffee, and the smell of coffee, which in here is the first smell that has come\nfrom the thing it ought to be coming from.\n\nAnd down the side of the jar, pushed in against the glass where a hand going in\nfor a spoonful would go round it rather than through it, a small flat key on a\nloop of green string.\n\nYou have been told about this jar. Not this jar. The principle of it, in a\ngarage, by a man who thought it was the most obvious thing in the world and\ncould not understand why it had to be said twice.';
+  'The lid comes off in the half-turn of a lid that gets taken off a lot.\n\nCoffee, and the smell of coffee, which in here is the first smell that has come from the thing it ought to be coming from.\n\nAnd down the side of the jar, pushed in against the glass where a hand going in for a spoonful would go round it rather than through it, a small flat key on a loop of green string.\n\nYou have been told about this jar. Not this jar. The principle of it, in a garage, by a man who thought it was the most obvious thing in the world and could not understand why it had to be said twice.';
 
-const JAR_EMPTY_TEXT = 'The jar has coffee in it and a smell of coffee and nothing else. Whatever was\nkept down the side of the glass is on a green string in your pocket.';
+const JAR_EMPTY_TEXT = 'The jar has coffee in it and a smell of coffee and nothing else. Whatever was kept down the side of the glass is on a green string in your pocket.';
 
 // Two handlers, not one `ProseRule` — §19.4's "after it is empty" soft fail
 // increments `act4_chamber_failures` (the doc's own flag table), and only
@@ -340,7 +340,7 @@ export const coffeeJar: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const KEY_EXAMINE_TEXT =
-  'A flat steel key about the length of a thumb joint, with the wards cut shallow\nand a stamped number in the bow that is not stamped on anything else in this room.\n\nThe string is green and is tied in a granny knot, which is a knot tied by\nsomebody who did not care and did not have to.';
+  'A flat steel key about the length of a thumb joint, with the wards cut shallow and a stamped number in the bow that is not stamped on anything else in this room.\n\nThe string is green and is tied in a granny knot, which is a knot tied by somebody who did not care and did not have to.';
 
 export const spareKey: ObjectDefSlice = {
   location: { in: ACT4_COFFEE_JAR },
@@ -357,13 +357,13 @@ export const spareKey: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const CHAIRS_EXAMINE_TEXT =
-  'Kitchen chairs, and no two of them out of the same set, which is what happens to\na kitchen over a long enough run of children.\n\nA pair of spindle-backs with the varnish gone off the top rail. One has a woven\nseat with a hole starting in the middle of it and a magazine underneath the\nweave holding the hole shut. One is a bentwood with a wire round the joint of\nthe back leg, wound tight and twisted off with pliers, and the twist has been\nflattened over with a hammer so it will not take anybody\'s leg.\n\nAnd the one at the end with its back to the window is pushed out from the table\nand nobody is in it.';
+  'Kitchen chairs, and no two of them out of the same set, which is what happens to a kitchen over a long enough run of children.\n\nA pair of spindle-backs with the varnish gone off the top rail. One has a woven seat with a hole starting in the middle of it and a magazine underneath the weave holding the hole shut. One is a bentwood with a wire round the joint of the back leg, wound tight and twisted off with pliers, and the twist has been flattened over with a hammer so it will not take anybody\'s leg.\n\nAnd the one at the end with its back to the window is pushed out from the table and nobody is in it.';
 
 export const CHAIRS_SIT_FIRST_TEXT =
-  'You pull the end chair in under you with your back to the window and put both\nhands flat on the table, which is not a decision you remember making.\n\nThe speaker does not react. Nothing announces anything.\n\nWhat happens is that the room gets slightly more real at the edges. The pattern\non the curtain runs a hand\'s width further in from the hem than it did. There is\nprinting on one of the tins now — a brand, in a typeface that stopped being made\na long time ago — and there was not before.\n\nFrom the speaker, the woman\'s voice, entirely unbothered: "Finally."';
+  'You pull the end chair in under you with your back to the window and put both hands flat on the table, which is not a decision you remember making.\n\nThe speaker does not react. Nothing announces anything.\n\nWhat happens is that the room gets slightly more real at the edges. The pattern on the curtain runs a hand\'s width further in from the hem than it did. There is printing on one of the tins now — a brand, in a typeface that stopped being made a long time ago — and there was not before.\n\nFrom the speaker, the woman\'s voice, entirely unbothered: "Finally."';
 
 const CHAIRS_SIT_FAIL_TEXT =
-  'You take one of the other chairs.\n\nThe voices go on. Nobody objects and nobody says anything to you, because there\nis nothing in this recording about somebody sitting in the wrong chair; there\nwas never an occasion on which anybody did.\n\nThe space at the end of the sentence comes round again, and again nothing goes\ninto it, and the timer on the sill goes on doing what it is doing.\n\nWhatever is supposed to happen next in this kitchen has not started.';
+  'You take one of the other chairs.\n\nThe voices go on. Nobody objects and nobody says anything to you, because there is nothing in this recording about somebody sitting in the wrong chair; there was never an occasion on which anybody did.\n\nThe space at the end of the sentence comes round again, and again nothing goes into it, and the timer on the sill goes on doing what it is doing.\n\nWhatever is supposed to happen next in this kitchen has not started.';
 
 /** §18.1 — shared by the chairs' own SIT handler and the room's bare "GO FIRST"/"TAKE THE FIRST TURN" handler (`../escapeChamber.ts`). */
 export const CHAMBER_SIT_FIRST_EFFECTS: Effect[] = [{ say: CHAIRS_SIT_FIRST_TEXT }, { set: [ACT4_CHAMBER_FIRST_DONE, true] }];
@@ -388,10 +388,10 @@ export const chairs: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const COUNTDOWN_EXAMINE_TEXT =
-  'A clockwork kitchen timer on the sill over the sink: a chrome dome the size of a\nfist with a bakelite dial, wound round to where somebody wound it to.\n\nThe dial has the marks a dial has and there is nothing readable on any of them —\nnot worn off, not scratched out. The paint that would be numbers has been laid\non and never made into anything.\n\nIt is going. You can hear it from the door.';
+  'A clockwork kitchen timer on the sill over the sink: a chrome dome the size of a fist with a bakelite dial, wound round to where somebody wound it to.\n\nThe dial has the marks a dial has and there is nothing readable on any of them — not worn off, not scratched out. The paint that would be numbers has been laid on and never made into anything.\n\nIt is going. You can hear it from the door.';
 
 const COUNTDOWN_TURN_TEXT =
-  'It winds. It goes round under your fingers with the ratchet noise timers make\nand stops where you stop, and starts again the instant you let go.\n\nYou cannot put more time on this than it wants and you cannot take it off. What\nyou can do is stand at a sink in a house you have never been in, holding the\nneck of a timer, listening to it decide.';
+  'It winds. It goes round under your fingers with the ratchet noise timers make and stops where you stop, and starts again the instant you let go.\n\nYou cannot put more time on this than it wants and you cannot take it off. What you can do is stand at a sink in a house you have never been in, holding the neck of a timer, listening to it decide.';
 
 export const countdown: ObjectDefSlice = {
   location: ACT4_ESCAPE_CHAMBER,
@@ -412,9 +412,9 @@ export const countdown: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const GAME_BOX_EXAMINE_TEXT =
-  'On the dresser under the folded cloth, a game box with the corners gone soft and\none corner mended with electrical tape.\n\nThe lid is on. Somebody has written on the end of the box, in marker, in a\nchild\'s capitals, the words HOUSE RULES, and underneath them nothing at all,\nbecause whoever started writing them down found out how long they were going to\ntake.';
+  'On the dresser under the folded cloth, a game box with the corners gone soft and one corner mended with electrical tape.\n\nThe lid is on. Somebody has written on the end of the box, in marker, in a child\'s capitals, the words HOUSE RULES, and underneath them nothing at all, because whoever started writing them down found out how long they were going to take.';
 
-const GAME_BOX_OPEN_TEXT = 'Cardboard, a lot of small wooden pieces in a bag, and a rule book with a coffee\nring on it.\n\nNobody in this room is going to play a game with you and the timer is going.';
+const GAME_BOX_OPEN_TEXT = 'Cardboard, a lot of small wooden pieces in a bag, and a rule book with a coffee ring on it.\n\nNobody in this room is going to play a game with you and the timer is going.';
 
 export const gameBox: ObjectDefSlice = {
   location: ACT4_ESCAPE_CHAMBER,
@@ -432,7 +432,7 @@ export const gameBox: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const VOICES_TEXT =
-  'There is a speaker over the door, a paper cone in a pressed grille, painted over\nwith the wall in a way that means it was never meant to be seen, and it is\ncarrying a kitchen.\n\nA man\'s voice with a lot of the county still in it, saying something about the\ndrive back. A woman\'s, younger than the rest of it, going\nstraight over the top of him. A slow one, being funny very quietly and being\nmissed. And one that starts sentences and does not always land them.\n\nThey talk across each other and finish each other and go quiet in the same\nplaces, which is what a family does and what four people recorded separately do\nnot.\n\nNone of them is talking to you. And every so often all of them leave a space, of\nabout the length a short answer takes, and then carry on from the other side of\nit.';
+  'There is a speaker over the door, a paper cone in a pressed grille, painted over with the wall in a way that means it was never meant to be seen, and it is carrying a kitchen.\n\nA man\'s voice with a lot of the county still in it, saying something about the drive back. A woman\'s, younger than the rest of it, going straight over the top of him. A slow one, being funny very quietly and being missed. And one that starts sentences and does not always land them.\n\nThey talk across each other and finish each other and go quiet in the same places, which is what a family does and what four people recorded separately do not.\n\nNone of them is talking to you. And every so often all of them leave a space, of about the length a short answer takes, and then carry on from the other side of it.';
 
 export const voices: ObjectDefSlice = {
   location: ACT4_ESCAPE_CHAMBER,
@@ -447,10 +447,10 @@ export const voices: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const WINDOW_EXAMINE_TEXT =
-  'A sash window over the table with a curtain drawn across the whole of it, hem to\nrail, on a wire.\n\nThe pattern is small flowers for about a foot in from each edge and then it gives\nup and is a colour — a soft mid-green with nothing in it — all the way across the\nmiddle.\n\nBehind the curtain the glass is glass. There is light coming through it, the even\nsort, off nothing.';
+  'A sash window over the table with a curtain drawn across the whole of it, hem to rail, on a wire.\n\nThe pattern is small flowers for about a foot in from each edge and then it gives up and is a colour — a soft mid-green with nothing in it — all the way across the middle.\n\nBehind the curtain the glass is glass. There is light coming through it, the even sort, off nothing.';
 
 const WINDOW_OPEN_TEXT =
-  'You take the edge of it and pull, and the rings go along the wire the way rings\ndo, and the curtain gathers, and behind it the pattern of the curtain carries on.\n\nYou pull it further. It carries on further.\n\nWhatever is on the other side of that glass was not in anybody\'s memory of this\nafternoon, because nobody sitting at this table looked out of this window, and\nthe room has done the only honest thing available to it, which is to keep drawing\ncurtain for as long as you keep asking for window.\n\nYou let go and it goes back to where it was.';
+  'You take the edge of it and pull, and the rings go along the wire the way rings do, and the curtain gathers, and behind it the pattern of the curtain carries on.\n\nYou pull it further. It carries on further.\n\nWhatever is on the other side of that glass was not in anybody\'s memory of this afternoon, because nobody sitting at this table looked out of this window, and the room has done the only honest thing available to it, which is to keep drawing curtain for as long as you keep asking for window.\n\nYou let go and it goes back to where it was.';
 
 export const chamberWindow: ObjectDefSlice = {
   location: ACT4_ESCAPE_CHAMBER,
@@ -473,7 +473,7 @@ export const chamberWindow: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const CHAMBER_DOOR_EXAMINE_TEXT =
-  'A flush grey door where a back door should be, hung on a frame that has been let\ninto the plaster and made good and painted the kitchen\'s colour, so that the wall\nis a lie for about four inches all the way round it and then stops being one.\n\nNo handle. A panel beside it at shoulder height, dark, with a bevel round it.\n\nWhen the timer runs out the panel has one line on it. The rest of the time it has\nnothing on it, and there is no cursor.';
+  'A flush grey door where a back door should be, hung on a frame that has been let into the plaster and made good and painted the kitchen\'s colour, so that the wall is a lie for about four inches all the way round it and then stops being one.\n\nNo handle. A panel beside it at shoulder height, dark, with a bevel round it.\n\nWhen the timer runs out the panel has one line on it. The rest of the time it has nothing on it, and there is no cursor.';
 
 export const chamberDoor: ObjectDefSlice = {
   location: ACT4_ESCAPE_CHAMBER,
@@ -502,7 +502,7 @@ export const chamberDoor: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const COMPARE_PRINT_ROOM_TEXT =
-  'You hold it up and stand where the camera stood, which is not difficult, because\nthere is only one place in this kitchen a camera can have been.\n\nEverything lines up. The window in the same place, the dresser in the same place,\nthe chip in the beading, the stove, the hooks with a coat on every one of them,\nthe burn on the counter beside the ring.\n\nThe good cloth is on the table.\n\nOn the table, laid on, squared up at the corners, with the plates on top of it.\nIt is four feet from you, folded on the dresser, with the crease gone shiny.\n\nThe people this room was built out of were not looking at the tablecloth,\nbecause none of them had to be: it was on, the way it was always\non when the good cloth went on, and a thing that is always true is the first\nthing to go.';
+  'You hold it up and stand where the camera stood, which is not difficult, because there is only one place in this kitchen a camera can have been.\n\nEverything lines up. The window in the same place, the dresser in the same place, the chip in the beading, the stove, the hooks with a coat on every one of them, the burn on the counter beside the ring.\n\nThe good cloth is on the table.\n\nOn the table, laid on, squared up at the corners, with the plates on top of it. It is four feet from you, folded on the dresser, with the crease gone shiny.\n\nThe people this room was built out of were not looking at the tablecloth, because none of them had to be: it was on, the way it was always on when the good cloth went on, and a thing that is always true is the first thing to go.';
 
 export const chamberRoomRef: ObjectDefSlice = {
   location: ACT4_ESCAPE_CHAMBER,

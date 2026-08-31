@@ -34,21 +34,21 @@ import { usb } from './cache';
 // ---------------------------------------------------------------------------
 
 const noChainText =
-  'The ports are behind the machine, which means doing this by feel, with your\ncheek against warm beige and your arm somewhere you cannot see.\n\nThe stick is the wrong shape. Not a little wrong. Wrong by about forty years:\nit wants a slot with the pins in the socket, and this machine offers you two\nmouths full of pins that want a plug with holes.\n\nYou stop before you make it a matter of force. Somewhere in this county there\nis a drawer with the in-between in it.';
+  'The ports are behind the machine, which means doing this by feel, with your cheek against warm beige and your arm somewhere you cannot see.\n\nThe stick is the wrong shape. Not a little wrong. Wrong by about forty years: it wants a slot with the pins in the socket, and this machine offers you two mouths full of pins that want a plug with holes.\n\nYou stop before you make it a matter of force. Somewhere in this county there is a drawer with the in-between in it.';
 
 // ---------------------------------------------------------------------------
 // §3.4 — `TAKE USB` while Dad is booted (docked + terminal on).
 // ---------------------------------------------------------------------------
 
 const takeWhileBootedText =
-  '"Right," he says, before your fingers are all the way round it. "That\'s fine.\nGo on."\n\nHe does not say anything else, and you stand there for a second holding a\nthing that has stopped talking, which is not the same as a thing that has\nfinished.';
+  '"Right," he says, before your fingers are all the way round it. "That\'s fine. Go on."\n\nHe does not say anything else, and you stand there for a second holding a thing that has stopped talking, which is not the same as a thing that has finished.';
 
 // ---------------------------------------------------------------------------
 // §9.4 — `PUT USB IN RIG` / `TAKE USB` from the rig.
 // ---------------------------------------------------------------------------
 
 const putInRigText =
-  'The stick goes in. The box thinks about it for a moment longer than the\nterminal does, being younger and less certain of itself.\n\n"Where are we?" says Dad, out of a loaf-sized speaker, into a car park.';
+  'The stick goes in. The box thinks about it for a moment longer than the terminal does, being younger and less certain of itself.\n\n"Where are we?" says Dad, out of a loaf-sized speaker, into a car park.';
 
 const takeFromRigText = '"Right, that\'s me," he says, and then it is just a battery and some tape.';
 

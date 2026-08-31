@@ -155,7 +155,7 @@ import { ACT3_RAM_FENCE_SCRIPT } from './ids';
 // ---------------------------------------------------------------------------
 
 const PASS_TIME_REFUSAL_TEXT =
-  'Not in here. You could sit down — the lobby has a bench and the plant has a\nwarm step — but there is no version of the next few hours that you are\nprepared to spend unconscious inside this fence.';
+  'Not in here. You could sit down — the lobby has a bench and the plant has a warm step — but there is no version of the next few hours that you are prepared to spend unconscious inside this fence.';
 
 const passTimeRefusalHandler: HandlerDef = {
   verbs: [SLEEP, V_ACT2_WAIT_UNTIL_MORNING, V_ACT2_WAIT_UNTIL_AFTERNOON, V_ACT2_WAIT_UNTIL_EVENING, V_ACT2_WAIT_UNTIL_NIGHT],

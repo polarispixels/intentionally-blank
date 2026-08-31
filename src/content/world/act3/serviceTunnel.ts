@@ -45,10 +45,10 @@ export const TUNNEL_DARK: Cond = { all: [{ not: { flag: ACT3_HEADLAMP_ON } }, { 
 // ---------------------------------------------------------------------------
 
 const belowWithLightText =
-  'The tunnel goes away from you in the one direction it has ever gone.\n\nIt is about eight feet across and a little less high, poured in bays with a\njoint every twenty feet, and the arch of it takes whatever light you have\nbrought and hands back a length of wall, a length of floor, and then the part\nthat is still dark.\n\nTwo rails run down the middle of the floor, set into the pour, with the\nconcrete brought up flush to their heads.\n\nThe air comes past you on its way out. It is warmer than the country was and\nit smells of nothing whatsoever.';
+  'The tunnel goes away from you in the one direction it has ever gone.\n\nIt is about eight feet across and a little less high, poured in bays with a joint every twenty feet, and the arch of it takes whatever light you have brought and hands back a length of wall, a length of floor, and then the part that is still dark.\n\nTwo rails run down the middle of the floor, set into the pour, with the concrete brought up flush to their heads.\n\nThe air comes past you on its way out. It is warmer than the country was and it smells of nothing whatsoever.';
 
 const belowDarkText =
-  'Dark. Not the dark of a room with the light switched off — the other kind,\nwhere your eyes go on trying for a while and then give it up.\n\nThe floor under your boots is concrete and there is a rail under one of them.\n\nBehind you and above you there is a rectangle of night with the ladder in it,\nand it is the only thing down here that has an edge.';
+  'Dark. Not the dark of a room with the light switched off — the other kind, where your eyes go on trying for a while and then give it up.\n\nThe floor under your boots is concrete and there is a rail under one of them.\n\nBehind you and above you there is a rectangle of night with the ladder in it, and it is the only thing down here that has an edge.';
 
 const description: ProseRule[] = [
   { when: TUNNEL_DARK, text: belowDarkText },
@@ -59,11 +59,11 @@ const description: ProseRule[] = [
 // §6.6 — room-level senses and responses (below).
 // ---------------------------------------------------------------------------
 
-const listenBelowText = 'Your own boots, arriving a beat late off the arch, and the very faint sound a\nlot of air makes when it is not in a hurry.';
-const smellBelowText = 'Cold concrete, and past that nothing. Not damp, not diesel, not rot. This is a\nmile of the inside of a wall and it smells of the inside of a wall.';
+const listenBelowText = 'Your own boots, arriving a beat late off the arch, and the very faint sound a lot of air makes when it is not in a hurry.';
+const smellBelowText = 'Cold concrete, and past that nothing. Not damp, not diesel, not rot. This is a mile of the inside of a wall and it smells of the inside of a wall.';
 const shoutBelowText =
-  'It goes away from you in both directions, comes back off the plug first and\noff the ladder shaft second, and the second one arrives late enough to make\nyou glad the first one was a mile short.';
-const waitSleepBelowText = 'Not down here. There is no version of the next few hours you are prepared to\nspend lying in a poured tube with a hole cut in the end of it.';
+  'It goes away from you in both directions, comes back off the plug first and off the ladder shaft second, and the second one arrives late enough to make you glad the first one was a mile short.';
+const waitSleepBelowText = 'Not down here. There is no version of the next few hours you are prepared to spend lying in a poured tube with a hole cut in the end of it.';
 
 const roomHandlers: HandlerDef[] = [
   { verbs: [LISTEN], effects: [{ say: listenBelowText }] },
@@ -92,11 +92,11 @@ const onEnter: OnEnterRule[] = [
 // ---------------------------------------------------------------------------
 
 export const CLIMB_BACK_TEXT =
-  'The mile again, the other way, with the air on your face this time instead of\nyour back.\n\nThe rectangle of night is where it was.';
+  'The mile again, the other way, with the air on your face this time instead of your back.\n\nThe rectangle of night is where it was.';
 
 /** §3.1's own EXAMINE text, duplicated verbatim — see this file's own import header note on why it isn't shared by import. */
 const BRANCH_HATCH_DOWN_BLOCKED_TEXT =
-  'Twenty feet short of the plug, low down in the left-hand wall, there is a steel\nhatch about the size of a hearth, set into the pour with a rolled lip and four\ncountersunk bolts that have never been out of it.\n\nNo handle. A squared hole in the middle of the plate, and above the hole,\nstruck into the steel one blow to a digit by somebody working at an awkward\nangle:\n\n    4471\n\nThe rails run past it. Everything down here runs past it.';
+  'Twenty feet short of the plug, low down in the left-hand wall, there is a steel hatch about the size of a hearth, set into the pour with a rolled lip and four countersunk bolts that have never been out of it.\n\nNo handle. A squared hole in the middle of the plate, and above the hole, struck into the steel one blow to a digit by somebody working at an awkward angle:\n\n    4471\n\nThe rails run past it. Everything down here runs past it.';
 
 export const serviceTunnelRoom: RoomDefSlice = {
   name: 'Service Tunnel',

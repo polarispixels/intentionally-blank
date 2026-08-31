@@ -48,7 +48,7 @@ const RETURN_VISIT =
   'The end of the pavement, the paddock rail, the sign facing away, the billboard. East, past the shed, a fence and a dark house. North, the lights. The street behind you goes back to where the buildings are.';
 
 // D2-C amendment (D2 prose doc §18.4) — retro-visibility, one clause, keyed on M15, appended to the return-visit rule.
-const RETURN_VISIT_WITH_M15 = `${RETURN_VISIT}\n\nThere is a stepladder folded flat against the back of the last building, out\nof the weather, in a place somebody chose.`;
+const RETURN_VISIT_WITH_M15 = `${RETURN_VISIT}\n\nThere is a stepladder folded flat against the back of the last building, out of the weather, in a place somebody chose.`;
 
 const description: ProseRule[] = [
   { when: { not: { flag: FLAG_VISITED_TOWN_EDGE } }, text: FIRST_SIGHT },
@@ -108,7 +108,7 @@ const NORTH_REDIRECT_WITH_TICKET_TEXT =
  * rule 5).
  */
 const NORTH_STARTED_TEXT =
-  'Thirty-two miles of county road, on foot, at whatever hour this now is.\n\nThere is a truck. Failing the truck there is a rail on Main Street with a knot\nin it that a child could get out of. Failing both of those there is standing\nhere, which you have now done.';
+  'Thirty-two miles of county road, on foot, at whatever hour this now is.\n\nThere is a truck. Failing the truck there is a rail on Main Street with a knot in it that a child could get out of. Failing both of those there is standing here, which you have now done.';
 
 /**
  * Stage D addenda §1.1 (`docs/superpowers/specs/2026-09-14-stage-d-addenda-
@@ -118,14 +118,14 @@ const NORTH_STARTED_TEXT =
  * in-world, register 92). Text transcribed verbatim (hard rule 5).
  */
 const TOWN_EDGE_BEFORE_OFFER_TEXT =
-  'You go as far as the cattle guard, put a foot on the first pipe, and look at\nwhat is on the other side of it.\n\nThirty-two of them, in the dark, on a road with no shoulder worth the name and\nnothing coming the other way to be seen by. A mile out there would be no glow\nbehind you and not appreciably more of one in front.\n\nYou take the foot off the pipe. There is a town behind you with vehicles in it,\nand every one of them belongs to somebody who is still awake.';
+  'You go as far as the cattle guard, put a foot on the first pipe, and look at what is on the other side of it.\n\nThirty-two of them, in the dark, on a road with no shoulder worth the name and nothing coming the other way to be seen by. A mile out there would be no glow behind you and not appreciably more of one in front.\n\nYou take the foot off the pipe. There is a town behind you with vehicles in it, and every one of them belongs to somebody who is still awake.';
 
 /**
  * Stage D addenda §1.2 — once Jack has offered the ride
  * (`FLAG_OFFERED_THE_RIDE`). Text transcribed verbatim (hard rule 5).
  */
 const TOWN_EDGE_OFFER_STANDS_TEXT =
-  'The offer stands. It has a truck under it, and a man who has driven that road\nenough times to have stopped noticing the signs.\n\nYou could go north on foot anyway, on the strength of being a man who does not\nwait for other people. Thirty-two of them would take that out of you before the\ncounty had finished with you, and you would arrive with nothing to show for it\nexcept having arrived.';
+  'The offer stands. It has a truck under it, and a man who has driven that road enough times to have stopped noticing the signs.\n\nYou could go north on foot anyway, on the strength of being a man who does not wait for other people. Thirty-two of them would take that out of you before the county had finished with you, and you would arrive with nothing to show for it except having arrived.';
 
 /**
  * Stage D addenda §1 — now four rules, not three. §8 ruling q2: §1.2 is
@@ -160,18 +160,18 @@ export const northBlockedText: ProseRule[] = [
 // it in act2/" instruction doesn't match where D3 actually landed this
 // string (D3 task C's own amendment inlined it here, not into an act2 file).
 export const TUNNEL_COUNTRY_PREAMBLE_TEXT =
-  'You go out over the grazing with the last of the town behind you and the line\nof cedar posts on your left, and the posts carry no wire and never have, and\nthey run north as straight as anything in this county.';
+  'You go out over the grazing with the last of the town behind you and the line of cedar posts on your left, and the posts carry no wire and never have, and they run north as straight as anything in this county.';
 
 const tunnelApproachBeat2 =
-  'An hour of it. The ground gives an inch and comes back, and the draws have to\nbe gone round, and the posts do not go round anything at all — they take the\nrises head on, one after another, at an angle that has nothing to do with the\nfences that are still up.\n\nOff to your right the county road keeps you company without ever getting\ncloser. It is doing the same thing the posts are doing, in its own way and for\nits own reasons, and neither of them will admit to the other.';
+  'An hour of it. The ground gives an inch and comes back, and the draws have to be gone round, and the posts do not go round anything at all — they take the rises head on, one after another, at an angle that has nothing to do with the fences that are still up.\n\nOff to your right the county road keeps you company without ever getting closer. It is doing the same thing the posts are doing, in its own way and for its own reasons, and neither of them will admit to the other.';
 
-const tunnelApproachBeat3 = 'Then the road makes its bend, and the posts come down off the last rise, and\nstop.';
+const tunnelApproachBeat3 = 'Then the road makes its bend, and the posts come down off the last rise, and stop.';
 
 /** §3.1 — first time out. */
 const TUNNEL_APPROACH_FIRST_TIME_TEXT = `${TUNNEL_COUNTRY_PREAMBLE_TEXT}\n\n${tunnelApproachBeat2}\n\n${tunnelApproachBeat3}`;
 
 /** §3.3 — out again, after the first time, short form. */
-const TUNNEL_APPROACH_SHORT_FORM_TEXT = 'The grazing, the posts, the bend. It is an hour whether you are looking\nforward to it or not.';
+const TUNNEL_APPROACH_SHORT_FORM_TEXT = 'The grazing, the posts, the bend. It is an hour whether you are looking forward to it or not.';
 
 const tunnelApproachTravelText: ProseRule[] = [
   // register 90: the mouth is its own room now, with real `visited` tracking
@@ -198,7 +198,7 @@ const tunnelApproachTravelText: ProseRule[] = [
  * per-turn default instead of the full two hours.
  */
 const TUNNEL_APPROACH_GATE_BLOCKED_TEXT =
-  'An hour out along the posts, and the bend, and the hardstand, and a steel plate\nlying in a concrete kerb with a keyhole in it and two lifting eyes.\n\nYou put your hands on it, which is what hands are for and is the whole of what\nthey can do here, and then you spend the second hour of the afternoon walking\nback for something that will turn or something that will lever.';
+  'An hour out along the posts, and the bend, and the hardstand, and a steel plate lying in a concrete kerb with a keyhole in it and two lifting eyes.\n\nYou put your hands on it, which is what hands are for and is the whole of what they can do here, and then you spend the second hour of the afternoon walking back for something that will turn or something that will lever.';
 
 const travelTextOut = 'You walk back in among the buildings and the wind stops being a fact about you.';
 

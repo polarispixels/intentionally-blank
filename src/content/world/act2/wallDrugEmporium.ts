@@ -28,7 +28,7 @@ const DOT_PRESENT_TEXT_NO_CUSTODIAN =
 const OTHERWISE_TEXT = 'The aisles, the hats, the counter, the claim window. The dinosaur, at the back, on its interval. The doors out to the porch and the road.';
 
 // D2-C amendment (D2 prose doc §18.4) — retro-visibility, one clause, keyed on M15, appended to the Emporium's own generic return rule.
-const OTHERWISE_TEXT_WITH_M15 = `${OTHERWISE_TEXT}\n\nThe porch rail is finished at this end and wet at the other, and it was wet at\nthis end yesterday.`;
+const OTHERWISE_TEXT_WITH_M15 = `${OTHERWISE_TEXT}\n\nThe porch rail is finished at this end and wet at the other, and it was wet at this end yesterday.`;
 
 const description: ProseRule[] = [
   { when: { not: { flag: ACT2_VISITED_EMPORIUM } }, text: FIRST_SIGHT },
@@ -86,7 +86,7 @@ const travelTextToCorridor = 'Past the end of the counter, past the hatch, and t
 // player reaches this room in daylight, days later. Text transcribed
 // verbatim (hard rule 5).
 const southBlockedText =
-  'Out through the doors, down the boards, across the lot, and then thirty-two\nmiles of county road with the signs along it counting nothing down.\n\nWhatever you came out here on is in that lot, in sight of the door, and it will\ngo back the way it came whenever you ask it to. Walking would be a way of\nproving something to a road, and this road has never once given any sign of\nkeeping score.';
+  'Out through the doors, down the boards, across the lot, and then thirty-two miles of county road with the signs along it counting nothing down.\n\nWhatever you came out here on is in that lot, in sight of the door, and it will go back the way it came whenever you ask it to. Walking would be a way of proving something to a road, and this road has never once given any sign of keeping score.';
 
 const outText = 'You go out as far as the boards. Signs, lot, road, and about a hundred miles of country arranged around a shop.\n\nWhatever you came for is not out here.';
 

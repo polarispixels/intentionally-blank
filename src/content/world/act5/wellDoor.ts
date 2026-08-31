@@ -38,14 +38,14 @@ const unboltDef = ACT3_VERBS[V_UNBOLT]!;
 if (!unboltDef.words.includes('draw bolt')) unboltDef.words.push('draw bolt');
 
 const WELL_DOOR_EXAMINE_BEFORE_TEXT =
-  'Up three tiled steps: the door.\n\nOn this side it has a handle, and a bolt, and a plate with the hinge screws\nshowing, and a strip of draught seal along the top that somebody replaced at\nsome point, because the replacement came up short and there is a little\nmade-good piece let in at the corner.\n\nThere is no reader on this side. There was never going to be one.';
+  'Up three tiled steps: the door.\n\nOn this side it has a handle, and a bolt, and a plate with the hinge screws showing, and a strip of draught seal along the top that somebody replaced at some point, because the replacement came up short and there is a little made-good piece let in at the corner.\n\nThere is no reader on this side. There was never going to be one.';
 
 const WELL_DOOR_OPEN_TEXT =
-  'The bolt draws back with one finger.\n\nThe leaf comes in towards you, heavy on four hinges, with the soft flat sound\nof a thing that is very well hung, and beyond it there are three tiled steps\ngoing up into a metal edging and the edge of a carpet, in a room you have stood\nin and knocked on this door from.\n\nIt has had a bolt on the inside of it the whole time.';
+  'The bolt draws back with one finger.\n\nThe leaf comes in towards you, heavy on four hinges, with the soft flat sound of a thing that is very well hung, and beyond it there are three tiled steps going up into a metal edging and the edge of a carpet, in a room you have stood in and knocked on this door from.\n\nIt has had a bolt on the inside of it the whole time.';
 
 /** §16.3 — after, shared verbatim with the Hub-side arm `act3_root_door` gains (§42.1). */
 export const ACT5_WELL_DOOR_OPEN_TEXT =
-  'Standing open on its four hinges at the bottom of a tiled well, with the carpet\nedging at the top of the steps on one side of it and a smooth floor with no\njoints in it on the other.\n\nNothing about it is different. It is a good door and it is doing what a good\ndoor does.';
+  'Standing open on its four hinges at the bottom of a tiled well, with the carpet edging at the top of the steps on one side of it and a smooth floor with no joints in it on the other.\n\nNothing about it is different. It is a good door and it is doing what a good door does.';
 
 const examine: ProseRule[] = [
   { when: { flag: ACT5_ROOT_DOOR_OPEN }, text: ACT5_WELL_DOOR_OPEN_TEXT },

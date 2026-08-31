@@ -340,7 +340,7 @@ describe('§27 — topic_nobody/topic_tattoo gated variants', () => {
     const { session } = enter(withState({ flags: { [ACT4_JACK_SAW_MARK]: true } }), JACKS_MOTEL);
     const { events } = say(session, 'ask jack about tattoo', store);
     const rendered = text(events);
-    expect(rendered).toMatch(/not going to improve on\s*\nit by saying it again/);
+    expect(rendered).toMatch(/not going to improve on\s* it by saying it again/);
     assertNoLeak(rendered);
   });
 

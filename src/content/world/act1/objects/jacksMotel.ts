@@ -125,7 +125,7 @@ const truckDoorLockedEffects: Effect[] = [{ say: truckDoorLockedText }];
 // ---------------------------------------------------------------------------
 
 const driveTruckEntryText =
-  'He is in it before you are. The engine comes up out of that lot like\nsomething being woken on purpose, and takes the quiet with it.';
+  'He is in it before you are. The engine comes up out of that lot like something being woken on purpose, and takes the quiet with it.';
 
 const returnTripEffects: Effect[] = [{ script: { id: ACT2_TRAVEL_SCRIPT, args: { mode: 'truck', to: 'town' } } }];
 /** D3, task A — the perimeter's own return leg (§3.2), a distinct `args` shape (`from`, not `to`) from the Wall Drug return above — see `act2/travel.ts`'s own header note on why. */
@@ -379,7 +379,7 @@ const lettersExamine =
   'On the bed that is being used as a desk, a card folder of printed sheets, done at home on a printer running low. Half are his, sent. Half are what came back.';
 
 const lettersReadText =
-  'Jack\'s are long, badly spelled, and ask the same question six different ways.\n\nThe replies are short. They are warm and fluent and they arrive at the end of themselves without having gone anywhere:\n\n    Jack - good to hear from you, brother. Things are relentless here\n    but it\'s good work and I\'m well. Give my love to everyone out\n    there. We\'ll find a weekend. L.\n\nThe greeting changes each time. The rest of it does not change much.\n\n"He signs off L," Jack says, behind you. "Forty-odd years and he has never signed off L in his life."';
+  'Jack\'s are long, badly spelled, and ask the same question six different ways.\n\nThe replies are short. They are warm and fluent and they arrive at the end of themselves without having gone anywhere:\n\n    Jack - good to hear from you, brother. Things are relentless here but it\'s good work and I\'m well. Give my love to everyone out there. We\'ll find a weekend. L.\n\nThe greeting changes each time. The rest of it does not change much.\n\n"He signs off L," Jack says, behind you. "Forty-odd years and he has never signed off L in his life."';
 
 const lettersReadEffects: Effect[] = [{ say: lettersReadText }, { grantClue: CLUE_LETTERS_ANSWERED }, { set: [FLAG_READ_JACK_LETTERS, true] }];
 
@@ -400,7 +400,7 @@ const jackLetters: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const catanExamine =
-  'A travel edition of a board game — magnetic pieces, a board that folds in four — in a box that has been carried around in a truck for a long time. One corner is taped, and the rubber band round it has gone hard and flat where it sits.\n\nInside the lid, in marker, in block capitals, in a hand that is not Jack\'s:\n\n    HOUSE RULES\n    1. THE BANK IS NOT A CHARITY\n    2. I AM THE BANK\n\nOne of the little wooden roads went missing and was replaced with one somebody whittled, which does not match and never will.';
+  'A travel edition of a board game — magnetic pieces, a board that folds in four — in a box that has been carried around in a truck for a long time. One corner is taped, and the rubber band round it has gone hard and flat where it sits.\n\nInside the lid, in marker, in block capitals, in a hand that is not Jack\'s:\n\n    HOUSE RULES 1. THE BANK IS NOT A CHARITY 2. I AM THE BANK\n\nOne of the little wooden roads went missing and was replaced with one somebody whittled, which does not match and never will.';
 
 const catanPlayText = '"Not tonight," Jack says, and moves it off the chair so you can sit down.';
 

@@ -94,7 +94,7 @@ describe('Stage E3 — root, the ending, and the hand-off, on a clean save', () 
     // followed immediately by the opening room's shipped first render —
     // byte-identical, no system line, no blank ceremony, nothing between.
     expect(stdout).toContain(
-      'The light in here is not switched off. It is withdrawn, evenly, from everywhere\nat once, the way it arrived.\nDarkness.\n\nYour head hurts.',
+      'The light in here is not switched off. It is withdrawn, evenly, from everywhere at once, the way it arrived.\nDarkness.\n\nYour head hurts.',
     );
     // and the two lines arrive exactly once more than the head's own fresh
     // start — i.e. the ending script itself never printed them (a doubled

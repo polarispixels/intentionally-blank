@@ -50,14 +50,14 @@ export type TravelDestination = 'wall_drug' | 'town' | 'perimeter';
 // ---------------------------------------------------------------------------
 
 const TRUCK_FIRST_BEATS: string[] = [
-  'The lot, the kerb, and then the cattle guard, which the truck crosses at a\nspeed nobody would recommend to it. The pipes go off underneath you like a\nstick run along a fence, and then there is no more town.\n\nIn the mirror the billboard passes from behind: grey boards, two legs in\nconcrete, never painted on that side. Going this way it advertises nothing at\nall.',
-  "The heater takes a while to come round to your position. Jack drives with both\nhands and no commentary, and the centre line arrives in dashes out of a dark\nwith nothing else in it.\n\nOff both sides the country goes on doing whatever it does out there. The\nheadlights find a fence post, and another fence post, and the eyes of\nsomething that does not stay to be identified.",
-  'The first sign comes up on the right, planted at the edge of the grass and\nleaning back from a lifetime of trucks going past it:\n\n    WALL DRUG\n    32 MILES\n\nJack does not look at it. There will, he says, be others.',
-  '"There\'s a camera at the county line," he says, some way further on, to the\nwindscreen. "Reads plates. Went in when the plant went in, and it\'s the only\none on this road."\n\nHe lets that stand for a while.\n\n"My plates are mine and my name\'s on them. You haven\'t got a name at all." The\nwheel goes a degree left and a degree back. "Between the two of us we make\nabout one legal person, and I\'d not put much on that lasting."',
-  'The signs keep arriving, one every mile or so, put in by somebody with a post\nhole digger and no reason to stop. FREE ICE WATER. HOMEMADE PIE. HAVE YOU DUG\nWALL DRUG. Then, on a post that has been repainted more recently than its\nneighbours:\n\n    WALL DRUG\n    32 MILES\n\n"They go up when they go up," Jack says. "Nobody\'s ever come back out here\nwith a brush and a smaller number."',
-  'Under the speedometer there is a little wheel with a thumb screw beside it, the\nkind you zero before a run, and it has been zeroed. He did that in the lot,\nwith the engine going, before he put it in gear, and he did it the way a man\ndoes a thing he has done every time.\n\n"Thirty-two," Jack says, without being asked. "It\'ll say thirty-two when we\nstop. Said it the first time I came out here and it\'s said it every time\nsince." He is not making a point. He is answering a question you had not got\nround to. "Signs are advertising. Truck\'s just a truck."',
-  'The lights come up on the right and stop being a glow.\n\nThey become rows. Then rows with distances between them, and a fence with\ndistances between the poles of it, and a great flat thing lit from underneath\nwith the steam going up off it and away sideways. It is a building. It has\nbeen a building for some minutes before you can say what kind.\n\nThen the road does something it has no reason to do. It goes wide and east and\nholds the bend a long way, and the building sits out in the middle of its own\nlight with its back to you the whole way round it.\n\n"They moved the road when they built," Jack says. "Paid the county and moved\nit."',
-  'After that the country is country again for a good while.\n\nAnd then it is not. Signs — not one sign, a hundred of them, in ranks on both\nsides of the road, each lit by the truck for about a second and gone: MINERS.\nCOWBOYS. TOURISTS. SORE-FOOTED PEOPLE. And behind the ranks, low and long and\nlit right through, a building that has plainly never once considered closing.\n\nJack noses in beside two other vehicles and shuts the engine off, and the\nquiet comes in and sits down.\n\n"Go on, then," he says. "I\'ll be at the counter with a coffee, being the\nperson nobody looks at."',
+  'The lot, the kerb, and then the cattle guard, which the truck crosses at a speed nobody would recommend to it. The pipes go off underneath you like a stick run along a fence, and then there is no more town.\n\nIn the mirror the billboard passes from behind: grey boards, two legs in concrete, never painted on that side. Going this way it advertises nothing at all.',
+  "The heater takes a while to come round to your position. Jack drives with both hands and no commentary, and the centre line arrives in dashes out of a dark with nothing else in it.\n\nOff both sides the country goes on doing whatever it does out there. The headlights find a fence post, and another fence post, and the eyes of something that does not stay to be identified.",
+  'The first sign comes up on the right, planted at the edge of the grass and leaning back from a lifetime of trucks going past it:\n\n    WALL DRUG 32 MILES\n\nJack does not look at it. There will, he says, be others.',
+  '"There\'s a camera at the county line," he says, some way further on, to the windscreen. "Reads plates. Went in when the plant went in, and it\'s the only one on this road."\n\nHe lets that stand for a while.\n\n"My plates are mine and my name\'s on them. You haven\'t got a name at all." The wheel goes a degree left and a degree back. "Between the two of us we make about one legal person, and I\'d not put much on that lasting."',
+  'The signs keep arriving, one every mile or so, put in by somebody with a post hole digger and no reason to stop. FREE ICE WATER. HOMEMADE PIE. HAVE YOU DUG WALL DRUG. Then, on a post that has been repainted more recently than its neighbours:\n\n    WALL DRUG 32 MILES\n\n"They go up when they go up," Jack says. "Nobody\'s ever come back out here with a brush and a smaller number."',
+  'Under the speedometer there is a little wheel with a thumb screw beside it, the kind you zero before a run, and it has been zeroed. He did that in the lot, with the engine going, before he put it in gear, and he did it the way a man does a thing he has done every time.\n\n"Thirty-two," Jack says, without being asked. "It\'ll say thirty-two when we stop. Said it the first time I came out here and it\'s said it every time since." He is not making a point. He is answering a question you had not got round to. "Signs are advertising. Truck\'s just a truck."',
+  'The lights come up on the right and stop being a glow.\n\nThey become rows. Then rows with distances between them, and a fence with distances between the poles of it, and a great flat thing lit from underneath with the steam going up off it and away sideways. It is a building. It has been a building for some minutes before you can say what kind.\n\nThen the road does something it has no reason to do. It goes wide and east and holds the bend a long way, and the building sits out in the middle of its own light with its back to you the whole way round it.\n\n"They moved the road when they built," Jack says. "Paid the county and moved it."',
+  'After that the country is country again for a good while.\n\nAnd then it is not. Signs — not one sign, a hundred of them, in ranks on both sides of the road, each lit by the truck for about a second and gone: MINERS. COWBOYS. TOURISTS. SORE-FOOTED PEOPLE. And behind the ranks, low and long and lit right through, a building that has plainly never once considered closing.\n\nJack noses in beside two other vehicles and shuts the engine off, and the quiet comes in and sits down.\n\n"Go on, then," he says. "I\'ll be at the counter with a coffee, being the person nobody looks at."',
 ];
 
 // ---------------------------------------------------------------------------
@@ -65,8 +65,8 @@ const TRUCK_FIRST_BEATS: string[] = [
 // ---------------------------------------------------------------------------
 
 const TRUCK_AGAIN_BEATS: string[] = [
-  'Out past the cattle guard, and the billboard from behind, and the dashes.\nJack drives. The signs arrive and say what they say.',
-  'The lights come up on the right, and the road goes wide and east around them,\nand after that it is signs again, and then it is Wall Drug.',
+  'Out past the cattle guard, and the billboard from behind, and the dashes. Jack drives. The signs arrive and say what they say.',
+  'The lights come up on the right, and the road goes wide and east around them, and after that it is signs again, and then it is Wall Drug.',
 ];
 
 // ---------------------------------------------------------------------------
@@ -74,8 +74,8 @@ const TRUCK_AGAIN_BEATS: string[] = [
 // ---------------------------------------------------------------------------
 
 const TRUCK_RETURN_NIGHT_BEATS: string[] = [
-  'South is the same road with the signs on the other side of you, and the ones\nfacing this way are for people going the other way and have nothing to say to\nyou at all.',
-  'The lights come round on the left, and go behind you, and stay in the mirror\nlonger than they have any business staying.\n\nThen the paler stripe, then a kerb, then a town.',
+  'South is the same road with the signs on the other side of you, and the ones facing this way are for people going the other way and have nothing to say to you at all.',
+  'The lights come round on the left, and go behind you, and stay in the mirror longer than they have any business staying.\n\nThen the paler stripe, then a kerb, then a town.',
 ];
 
 // ---------------------------------------------------------------------------
@@ -83,8 +83,8 @@ const TRUCK_RETURN_NIGHT_BEATS: string[] = [
 // ---------------------------------------------------------------------------
 
 const TRUCK_RETURN_DAY_BEATS: string[] = [
-  'In daylight the road is a grey line laid over a great deal of yellow, and the\nsigns turn out to be worse than they looked in the dark: hand-lettered, most of\nthem, and standing at slightly different angles, like a crowd that has been\nwaiting a long time.',
-  'The plant, in daylight, is white and low and entirely reasonable, and there is\nnothing coming off it but a heat shimmer, and you would drive past it without\na thought if you had not been told to have one.\n\nThe road goes wide and east around it anyway.',
+  'In daylight the road is a grey line laid over a great deal of yellow, and the signs turn out to be worse than they looked in the dark: hand-lettered, most of them, and standing at slightly different angles, like a crowd that has been waiting a long time.',
+  'The plant, in daylight, is white and low and entirely reasonable, and there is nothing coming off it but a heat shimmer, and you would drive past it without a thought if you had not been told to have one.\n\nThe road goes wide and east around it anyway.',
 ];
 
 // ---------------------------------------------------------------------------
@@ -92,12 +92,12 @@ const TRUCK_RETURN_DAY_BEATS: string[] = [
 // ---------------------------------------------------------------------------
 
 const HORSE_FIRST_BEATS: string[] = [
-  'Nobody watches you go. That is most of the argument for doing it this way.\n\nThe pavement stops being pavement, and then the grass starts, and after about\na hundred yards of that the road is a thing off to your right that you are no\nlonger using.',
-  'The country takes the horse the way it takes rain. There is no track. There is\nfrozen ground that gives an inch and comes back, and draws that have to be\ngone round, and one long shallow rise that takes the better part of an hour\nand turns out at the top of it to have another one behind it.\n\nThe cold gets in at the wrists first. Then everywhere else, at leisure.',
-  'Somewhere in the second hour the ground offers you something.\n\nA line of fence posts. Cedar, grey, split at the tops, no wire on them and\nnone for a long time by the look of the staples. They are not on the line of\nany fence anybody is keeping now — they cross the country at their own angle,\ngoing over the rise and not coming back.\n\nThey run north. So, more or less, do you.',
-  'Off to the right, a long way off, the plant stands in its light with the\ncountry black all round it, and from out here you can see what the road does\nabout it: a string of moving headlamps that goes wide, and holds wide, and\ncomes back to the line afterwards.\n\nNothing out here goes wide. The country lets you at it directly, which is the\nwhole difference between a horse and a truck and is going to cost you two more\nhours.',
-  'There is nobody to say any of it to. That is a different quiet from the\ntruck\'s, and it is not better.',
-  'Then, from a long way out and all at once, the signs — a hundred of them\nstanding in the dark with nothing lit on them but what your own eyes have\nadjusted to — and behind the signs a building with every light in it on.\n\nYou come in at the back of the lot, at a walk, off the road, off the camera,\nand off any list that anybody keeps.',
+  'Nobody watches you go. That is most of the argument for doing it this way.\n\nThe pavement stops being pavement, and then the grass starts, and after about a hundred yards of that the road is a thing off to your right that you are no longer using.',
+  'The country takes the horse the way it takes rain. There is no track. There is frozen ground that gives an inch and comes back, and draws that have to be gone round, and one long shallow rise that takes the better part of an hour and turns out at the top of it to have another one behind it.\n\nThe cold gets in at the wrists first. Then everywhere else, at leisure.',
+  'Somewhere in the second hour the ground offers you something.\n\nA line of fence posts. Cedar, grey, split at the tops, no wire on them and none for a long time by the look of the staples. They are not on the line of any fence anybody is keeping now — they cross the country at their own angle, going over the rise and not coming back.\n\nThey run north. So, more or less, do you.',
+  'Off to the right, a long way off, the plant stands in its light with the country black all round it, and from out here you can see what the road does about it: a string of moving headlamps that goes wide, and holds wide, and comes back to the line afterwards.\n\nNothing out here goes wide. The country lets you at it directly, which is the whole difference between a horse and a truck and is going to cost you two more hours.',
+  'There is nobody to say any of it to. That is a different quiet from the truck\'s, and it is not better.',
+  'Then, from a long way out and all at once, the signs — a hundred of them standing in the dark with nothing lit on them but what your own eyes have adjusted to — and behind the signs a building with every light in it on.\n\nYou come in at the back of the lot, at a walk, off the road, off the camera, and off any list that anybody keeps.',
 ];
 
 // ---------------------------------------------------------------------------
@@ -105,8 +105,8 @@ const HORSE_FIRST_BEATS: string[] = [
 // ---------------------------------------------------------------------------
 
 const HORSE_RETURN_BEATS: string[] = [
-  'The horse knows the way back the way any animal knows the way back, which is\nto say it stops asking you about it after the first mile.',
-  'Grass, and frost, and the rise, and the posts going off north on their own\nbusiness, and then a rail on a street with a knot in a rope waiting to be put\nback exactly as it was.',
+  'The horse knows the way back the way any animal knows the way back, which is to say it stops asking you about it after the first mile.',
+  'Grass, and frost, and the rise, and the posts going off north on their own business, and then a rail on a street with a knot in a rope waiting to be put back exactly as it was.',
 ];
 
 // ---------------------------------------------------------------------------
@@ -128,27 +128,27 @@ const HORSE_RETURN_BEATS: string[] = [
 // ---------------------------------------------------------------------------
 
 const PERIMETER_TRUCK_FIRST_BEATS: string[] = [
-  'Out over the cattle guard and north, and this time nobody is going to Wall\nDrug.\n\nThe fence arrives on the right a long while before anything it is fencing.\nOnce it is there it does not stop being there, and it does not go over a rise\nor round a draw the way the county\'s own fences do — it takes them.',
-  'Then the road does its wide thing, east, and holds it, and the building comes\nround on the right in its own light with the steam going up off the plant end\nand away sideways.\n\nHalfway round the bend a road comes off it to the left, made up, with a white\nline painted on it that nobody needed. Jack takes it without slowing and\nwithout being asked.',
-  'He stops well short of the gate, on the verge, and turns the truck round to\nface the way out before he touches the handbrake.\n\n"I\'ll be here." He puts the brake on with the heel of his hand. "I\'m no use to\nyou past that wire and my plates are a name on a list. Go on."',
+  'Out over the cattle guard and north, and this time nobody is going to Wall Drug.\n\nThe fence arrives on the right a long while before anything it is fencing. Once it is there it does not stop being there, and it does not go over a rise or round a draw the way the county\'s own fences do — it takes them.',
+  'Then the road does its wide thing, east, and holds it, and the building comes round on the right in its own light with the steam going up off the plant end and away sideways.\n\nHalfway round the bend a road comes off it to the left, made up, with a white line painted on it that nobody needed. Jack takes it without slowing and without being asked.',
+  'He stops well short of the gate, on the verge, and turns the truck round to face the way out before he touches the handbrake.\n\n"I\'ll be here." He puts the brake on with the heel of his hand. "I\'m no use to you past that wire and my plates are a name on a list. Go on."',
 ];
 
 const PERIMETER_TRUCK_RETURN_BEATS: string[] = [
-  'He has the engine going before you have the door shut. Nothing gets said until\nthe cattle guard, which he takes at a walking pace, the way you take a thing\nyou intend to still be there.\n\nThen: "Well?"',
+  'He has the engine going before you have the door shut. Nothing gets said until the cattle guard, which he takes at a walking pace, the way you take a thing you intend to still be there.\n\nThen: "Well?"',
 ];
 
 const PERIMETER_HORSE_FIRST_BEATS: string[] = [
-  'You go out on the horse because nobody anywhere keeps a list of horses, and\nfor the better part of an hour that is the best idea you have had all week.\n\nThe perimeter road when you meet it is a made road across grazing that never\nasked for one, and you ride the grass beside it rather than the surface, which\nis what the grass is there for.',
-  'A mile short of the gate the perimeter road crosses a cattle guard, and the\nhorse stops at it.\n\nIt is not a shy and it is not a refusal. It walks up to the pipes, puts its\nhead down, and stands. You get off and lead it, and it comes as far as the\npipes and no further, and stands again with its ears going and its weight back\noff its front feet.\n\nYou tie it at the corner post where the grass is, and it lets you, and it\nwatches you walk away with its head out over the wire.',
-  'The last mile is on your own feet, on somebody else\'s surface, with a fence on\nyour right and no verge worth the name, and it takes exactly as long as a mile\ntakes.',
+  'You go out on the horse because nobody anywhere keeps a list of horses, and for the better part of an hour that is the best idea you have had all week.\n\nThe perimeter road when you meet it is a made road across grazing that never asked for one, and you ride the grass beside it rather than the surface, which is what the grass is there for.',
+  'A mile short of the gate the perimeter road crosses a cattle guard, and the horse stops at it.\n\nIt is not a shy and it is not a refusal. It walks up to the pipes, puts its head down, and stands. You get off and lead it, and it comes as far as the pipes and no further, and stands again with its ears going and its weight back off its front feet.\n\nYou tie it at the corner post where the grass is, and it lets you, and it watches you walk away with its head out over the wire.',
+  'The last mile is on your own feet, on somebody else\'s surface, with a fence on your right and no verge worth the name, and it takes exactly as long as a mile takes.',
 ];
 
-const PERIMETER_TRUCK_AGAIN_BEATS: string[] = ['Out, round, and off on the made road. Jack stops in the same place and turns\nround in it.'];
+const PERIMETER_TRUCK_AGAIN_BEATS: string[] = ['Out, round, and off on the made road. Jack stops in the same place and turns round in it.'];
 
-const PERIMETER_HORSE_AGAIN_BEATS: string[] = ['The grass, the road, the corner post. The horse stops where it stopped before\nand you walk the last of it again.'];
+const PERIMETER_HORSE_AGAIN_BEATS: string[] = ['The grass, the road, the corner post. The horse stops where it stopped before and you walk the last of it again.'];
 
 const PERIMETER_HORSE_RETURN_BEATS: string[] = [
-  'It is where you left it and it has not settled. It does not settle when you\nuntie it and it does not settle when you are up.\n\nIt settles about a hundred yards south of the pipes, all at once, like\nsomething being put down.',
+  'It is where you left it and it has not settled. It does not settle when you untie it and it does not settle when you are up.\n\nIt settles about a hundred yards south of the pipes, all at once, like something being put down.',
 ];
 
 // ---------------------------------------------------------------------------
@@ -281,6 +281,6 @@ export const ACT2_TRAVEL_CLUES: NonNullable<WorldSlice['clues']> = {
   [ACT2_CLUE_MILES_DONT_COUNT]: {
     title: 'The signs on the county road',
     detail:
-      "Wall Drug's signs stand along the road all the way out from town, and the\nones that carry a distance carry thirty-two. So does the billboard at the town\nedge. Jack's trip wheel reads thirty-two at the far end of it. Nothing on that\nroad ever says a smaller number.",
+      "Wall Drug's signs stand along the road all the way out from town, and the ones that carry a distance carry thirty-two. So does the billboard at the town edge. Jack's trip wheel reads thirty-two at the far end of it. Nothing on that road ever says a smaller number.",
   },
 };

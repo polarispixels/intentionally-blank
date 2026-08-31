@@ -68,7 +68,7 @@ export const ACT2_D2C_QUESTIONS: NonNullable<WorldSlice['questions']> = {
     // appeared in any player's ledger; P15's ladder was hanging on it.
     openWhen: { met: ACT2_NOLAN },
     answerWhen: { any: [{ flag: ACT2_BADGE_WON }, { flag: ACT2_HEARD_GATE_TALK }] },
-    answer: 'Both, and the second is easier than it looks.\n\nOn a Friday, under the low light, with the chairs down off the tables, he stops\ndealing between two hands and talks about his week: a convoy that clears the\napron of everybody including him, and a building he has run for eleven years\nand has never once been inside during the hours that belong to maintenance.\n\nHe is not being indiscreet. He is a man off duty, telling a card table about\nhis job. And if you ask him before you stand up, he will hand his badge across\nthe felt, because he does not mind where it says he has been.',
+    answer: 'Both, and the second is easier than it looks.\n\nOn a Friday, under the low light, with the chairs down off the tables, he stops dealing between two hands and talks about his week: a convoy that clears the apron of everybody including him, and a building he has run for eleven years and has never once been inside during the hours that belong to maintenance.\n\nHe is not being indiscreet. He is a man off duty, telling a card table about his job. And if you ask him before you stand up, he will hand his badge across the felt, because he does not mind where it says he has been.',
   },
   [ACT2_Q_INSIDE_THE_PLANT]: {
     text: 'Every route into that plant runs through a badge, a truck, or a lie. Which one actually gets you inside?',
@@ -77,7 +77,7 @@ export const ACT2_D2C_QUESTIONS: NonNullable<WorldSlice['questions']> = {
     // answerQuestion effects never covered.
     openWhen: { visited: ACT3_PERIMETER_ROAD },
     answerWhen: { flag: ACT3_INSIDE },
-    answer: 'Any of them, which is not the answer I went out there expecting. The gate is\nthe only part of that plant that behaves like a gate.\n\nWhatever I came through — a badge that told the county the man who runs the\nplace had arrived for work, a turnstile that turns for anybody standing close\nenough behind a man who holds doors, a vendor number in a box on a clipboard, a\nfence, or a mile of dark under the grazing land — nothing on the far side of it\nmoved, or sounded, or asked me anything at all.\n\nIt is not built to keep a man out. It is built for people who belong there, and\nit has no way whatever of telling the difference.',
+    answer: 'Any of them, which is not the answer I went out there expecting. The gate is the only part of that plant that behaves like a gate.\n\nWhatever I came through — a badge that told the county the man who runs the place had arrived for work, a turnstile that turns for anybody standing close enough behind a man who holds doors, a vendor number in a box on a clipboard, a fence, or a mile of dark under the grazing land — nothing on the far side of it moved, or sounded, or asked me anything at all.\n\nIt is not built to keep a man out. It is built for people who belong there, and it has no way whatever of telling the difference.',
   },
 };
 
@@ -161,10 +161,10 @@ export const ACT2_D2C_MEMORIES: NonNullable<WorldSlice['memories']> = {
     title: 'The Stakeout',
     lines: [
       'You have sat on this bench before.',
-      'Not in this light. A different day, with a cup of something you had let go\ncold on the tile beside your foot, and the brass wall in front of you, and one\ndoor in it you were watching.',
-      'You were not watching for a letter. You were watching to see who came for it,\nand the whole day was worth it or it was not worth it depending on a thing you\nwould know in about a second and a half, and you sat there from the bulbs\ncoming on to the bulbs being the only light in the room.',
+      'Not in this light. A different day, with a cup of something you had let go cold on the tile beside your foot, and the brass wall in front of you, and one door in it you were watching.',
+      'You were not watching for a letter. You were watching to see who came for it, and the whole day was worth it or it was not worth it depending on a thing you would know in about a second and a half, and you sat there from the bulbs coming on to the bulbs being the only light in the room.',
       'Nobody came.',
-      'You remember the not-coming with your legs. That is where a wait like that\nlives afterwards.',
+      'You remember the not-coming with your legs. That is where a wait like that lives afterwards.',
     ],
     trigger: { when: { all: [{ flag: FLAG_SAT_IN_POST_OFFICE }, { at: POST_OFFICE }, { flag: ACT2_STARTED }] } },
   },
@@ -172,10 +172,10 @@ export const ACT2_D2C_MEMORIES: NonNullable<WorldSlice['memories']> = {
   [ACT2_MEM_M8]: {
     title: 'Said Kindly',
     lines: [
-      'An office with a window onto a plant floor, and a man behind a desk with his\nboots off under it.',
-      'He is not being difficult. That is the thing you keep, out of a room you\ncannot otherwise place: he was not being difficult in any way at all.',
-      '*There is no Sublevel 6.* Said kindly. Said the way you would tell somebody\nwhich day the bins go.',
-      'And a hand — not his, closer than his, your own end of the desk — putting a\npencil down flat on a page rather than through it.',
+      'An office with a window onto a plant floor, and a man behind a desk with his boots off under it.',
+      'He is not being difficult. That is the thing you keep, out of a room you cannot otherwise place: he was not being difficult in any way at all.',
+      '*There is no Sublevel 6.* Said kindly. Said the way you would tell somebody which day the bins go.',
+      'And a hand — not his, closer than his, your own end of the desk — putting a pencil down flat on a page rather than through it.',
     ],
     trigger: { when: { met: ACT2_NOLAN } },
   },
@@ -184,9 +184,9 @@ export const ACT2_D2C_MEMORIES: NonNullable<WorldSlice['memories']> = {
     title: 'Three Different Days',
     lines: [
       'Grey coveralls, at the edge of a day.',
-      'At the edge of a different day, on a different street, with a different thing\nin his hands.',
-      'At the edge of a third, and you had already stopped putting it in the book by\nthen, because a man doing maintenance is not an entry.',
-      'Three days you can put in order and cannot put a date on. Three streets. One\nset of coveralls, the clean kind, and no face at the top of them at all —\nbecause you never once looked at the face, and you know exactly why: there\nwas never anything about him that was going to be worth the ink.',
+      'At the edge of a different day, on a different street, with a different thing in his hands.',
+      'At the edge of a third, and you had already stopped putting it in the book by then, because a man doing maintenance is not an entry.',
+      'Three days you can put in order and cannot put a date on. Three streets. One set of coveralls, the clean kind, and no face at the top of them at all — because you never once looked at the face, and you know exactly why: there was never anything about him that was going to be worth the ink.',
     ],
     trigger: { when: { flag: ACT2_EXAMINED_CUSTODIAN } },
   },
@@ -194,11 +194,11 @@ export const ACT2_D2C_MEMORIES: NonNullable<WorldSlice['memories']> = {
   [ACT2_MEM_M19S]: {
     title: 'His Bluff Face',
     lines: [
-      'A kitchen table with the good cloth off it, and five of you round it, and a man\nat the head who has been beaten by a child and is enjoying it more than the\nchild is.',
-      'He has a face he does for it. Everybody at that table knows the face. The\nwhole trick of the man is that he knows they know, and does it anyway, and\nhalf the time he has got it, and the reason nobody can ever call him is that\nhe does not mind losing.',
-      'You are small enough that the chair is wrong. You put your hand out and say\nthe word, and he turns them over, and he has nothing at all, and he laughs\nuntil he has to put a hand on the table.',
+      'A kitchen table with the good cloth off it, and five of you round it, and a man at the head who has been beaten by a child and is enjoying it more than the child is.',
+      'He has a face he does for it. Everybody at that table knows the face. The whole trick of the man is that he knows they know, and does it anyway, and half the time he has got it, and the reason nobody can ever call him is that he does not mind losing.',
+      'You are small enough that the chair is wrong. You put your hand out and say the word, and he turns them over, and he has nothing at all, and he laughs until he has to put a hand on the table.',
       "*That's the one,* he says. *That's my boy.*",
-      'He said that to all of you. He meant it every time. That is not a flaw in the\nmemory.',
+      'He said that to all of you. He meant it every time. That is not a flaw in the memory.',
     ],
     trigger: { when: { flag: ACT2_BEAT_DADS_ADVICE } },
   },

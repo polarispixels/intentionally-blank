@@ -169,7 +169,7 @@ describe('the chiller alarm (D5 §20)', () => {
     expect(first.session.state.flags[ACT3_ALARM_PULLED]).toBe(true);
 
     const second = say(first.session, 'pull alarm', store);
-    expect(record(text(second.events))).toMatch(/a handle\nthat is already down is not a plan/);
+    expect(record(text(second.events))).toMatch(/a handle that is already down is not a plan/);
     expect(second.session.state.flags[ACT3_ALARM_PULLED]).toBe(true);
 
     const reset = say(second.session, 'reset alarm', store);

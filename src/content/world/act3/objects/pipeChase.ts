@@ -24,10 +24,10 @@ import { ACT3_CONDENSATION, ACT3_COOLING_PLANT, ACT3_CRAWL, ACT3_PIPE_CHASE, ACT
 // ---------------------------------------------------------------------------
 
 const crawlExamine =
-  'Formed, not cut: the shuttering marks run vertically the whole way and the\ncorners have proper radii on them, which means this shaft was in the drawings\nthat the concrete was poured to.\n\nThe ladder is a standard bolted string ladder in galvanised steel, and it has\nbeen maintained. The rungs are the same age as the shaft. The bolts are not.';
+  'Formed, not cut: the shuttering marks run vertically the whole way and the corners have proper radii on them, which means this shaft was in the drawings that the concrete was poured to.\n\nThe ladder is a standard bolted string ladder in galvanised steel, and it has been maintained. The rungs are the same age as the shaft. The bolts are not.';
 
 const crawlTouch =
-  'The film comes off on your fingertips and is not slime, exactly, and is not\ngoing to wash off on the way up either.';
+  'The film comes off on your fingertips and is not slime, exactly, and is not going to wash off on the way up either.';
 
 // §11.2's own "`climb` / `up` / `down` — see §11.5, §13": bare `UP`/`DOWN`
 // reach the room's own exits directly (`pipeChase.ts`, the room file) and
@@ -43,7 +43,7 @@ const crawlTouch =
 // (act1/verbs.ts), so it could never reach this object handler on its own;
 // `CLIMB` is the only verb doing any work here.
 const climbUpText =
-  'Ten minutes of ladder with a warm pipe going the other way past your right\nshoulder, and then a square of light, and then a plant room that is going to\nfeel cold.';
+  'Ten minutes of ladder with a warm pipe going the other way past your right shoulder, and then a square of light, and then a plant room that is going to feel cold.';
 
 const climbEffects: Effect[] = [{ say: climbUpText }, { goto: ACT3_COOLING_PLANT }, { advanceClock: 10 }];
 
@@ -64,16 +64,16 @@ const crawl: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const returnBLowerExamine =
-  'Twelve inches of bare steel, dry, warm to the palm.\n\nIn the plant it was warm at the top of the building. It is warm here. Between\nthose two facts there is nothing but pipe, going down, past the last floor\nthere is.';
+  'Twelve inches of bare steel, dry, warm to the palm.\n\nIn the plant it was warm at the top of the building. It is warm here. Between those two facts there is nothing but pipe, going down, past the last floor there is.';
 
 const returnBLowerTouch =
-  'Warm the way a mug is warm twenty minutes after, which is exactly how warm it\nwas four floors up, which is not how heat behaves in a pipe that is going\nanywhere sensible.';
+  'Warm the way a mug is warm twenty minutes after, which is exactly how warm it was four floors up, which is not how heat behaves in a pipe that is going anywhere sensible.';
 
 const returnBLowerFollow =
-  'Down. It has been down since the plant floor and it has not offered you a\nbranch, a valve, a tag or a tee in the whole of that distance.\n\nA pipe with no branches on it is a pipe with one customer.';
+  'Down. It has been down since the plant floor and it has not offered you a branch, a valve, a tag or a tee in the whole of that distance.\n\nA pipe with no branches on it is a pipe with one customer.';
 
 const returnBLowerListen =
-  'Water, inside it, going the way water goes when something is pushing it: a\nsteady mid-range note with no gaps in it, and it is going *up*.';
+  'Water, inside it, going the way water goes when something is pushing it: a steady mid-range note with no gaps in it, and it is going *up*.';
 
 const returnBLower: ObjectDefSlice = {
   location: ACT3_PIPE_CHASE,
@@ -107,10 +107,10 @@ const returnBLower: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const condensationExamine =
-  'Beads on the cold surfaces and none on the warm ones, which is how you know\nwhich is which without touching anything at all.\n\nThe ladder strings run wet. The wall opposite Return B runs wet. Return B\nitself is dry from top to bottom, because nothing condenses on a pipe that is\nwarmer than the air around it.\n\nEvery so often something lets go above you and goes past.';
+  'Beads on the cold surfaces and none on the warm ones, which is how you know which is which without touching anything at all.\n\nThe ladder strings run wet. The wall opposite Return B runs wet. Return B itself is dry from top to bottom, because nothing condenses on a pipe that is warmer than the air around it.\n\nEvery so often something lets go above you and goes past.';
 
 const condensationTaste =
-  'It is condensate off a concrete wall in a shaft under a building you are not\nsupposed to be in.\n\nIt tastes of concrete, which is at least honest.';
+  'It is condensate off a concrete wall in a shaft under a building you are not supposed to be in.\n\nIt tastes of concrete, which is at least honest.';
 
 const condensation: ObjectDefSlice = {
   location: ACT3_PIPE_CHASE,

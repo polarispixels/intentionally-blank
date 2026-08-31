@@ -17,7 +17,7 @@ import { ACT2_CACHE_POLAROID, ACT2_CLUE_RETURNED_LETTER, ACT2_CLUE_STRANGER_IN_H
 // ---------------------------------------------------------------------------
 
 const usbExamine =
-  'In a small plastic bag folded over twice and creased flat, the way you fold a bag when you expect somebody else to unfold it.\n\nOut of the bag it is a memory stick with a metal shell and a plastic end, and the metal is scuffed the way a thing gets in a pocket over years rather than in a box over months.\n\nOn a strip of masking tape wrapped round it, in marker, in a hand that pressed hard:\n\n    DAD\n    DO NOT FORMAT';
+  'In a small plastic bag folded over twice and creased flat, the way you fold a bag when you expect somebody else to unfold it.\n\nOut of the bag it is a memory stick with a metal shell and a plastic end, and the metal is scuffed the way a thing gets in a pocket over years rather than in a box over months.\n\nOn a strip of masking tape wrapped round it, in marker, in a hand that pressed hard:\n\n    DAD DO NOT FORMAT';
 
 const usbPutInTerminalText = 'It goes in. Nothing happens, because nothing in this corridor has anywhere to send electricity.';
 
@@ -89,7 +89,7 @@ const pencil: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const returnedLetterExamine =
-  'A plain envelope, stamped, with the address written in a hand you have seen this week on the back of a photograph and on the cover of a folder: square capitals, pressed hard, the L\'s finished with a separate stroke.\n\nIt is addressed to a man at the plant, care of the plant, which is what you do when you do not have a home address for your own brother.\n\nAcross the front, in red, at an angle, a machine has said:\n\n    RETURN TO SENDER\n    NO SUCH ADDRESSEE\n\nIt is still sealed.\n\nIt was in this box, under everything else, which means it went back to the man who sent it, and then it came here, and to do that it had to be given by one brother to the other and then hidden.';
+  'A plain envelope, stamped, with the address written in a hand you have seen this week on the back of a photograph and on the cover of a folder: square capitals, pressed hard, the L\'s finished with a separate stroke.\n\nIt is addressed to a man at the plant, care of the plant, which is what you do when you do not have a home address for your own brother.\n\nAcross the front, in red, at an angle, a machine has said:\n\n    RETURN TO SENDER NO SUCH ADDRESSEE\n\nIt is still sealed.\n\nIt was in this box, under everything else, which means it went back to the man who sent it, and then it came here, and to do that it had to be given by one brother to the other and then hidden.';
 
 const returnedLetterOpenText =
   'It is Jack\'s, and it is sealed, and he is thirty-two miles away at a counter being the person nobody looks at.\n\nYou put it in your pocket to give back to him, which is a decision you will have to make again later and will make differently.';

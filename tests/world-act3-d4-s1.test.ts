@@ -217,7 +217,7 @@ describe('S1 Mechanical Gallery — the stair down and the construction door (§
     const store = new MemoryStore();
     const session = atS1();
     const result = say(session, 'open door', store);
-    expect(text(result.events)).toMatch(/door that opens\naway from you/);
+    expect(text(result.events)).toMatch(/door that opens away from you/);
   });
 
   it('SOUTH leads to the tunnel once act3_construction_door_open is set (the room\'s own onEnter syncs the mechanism gate)', () => {

@@ -38,7 +38,7 @@ const DESK_EMPTY_AFTER =
 const MARLOW_ABSENT: Cond = { not: { npcAt: [MARLOW, FRONT_DESK] } };
 
 // D2-C amendment (D2 prose doc §18.4) — retro-visibility, one clause, keyed on M15, appended to the lobby description (the final, unconditional rule).
-const RETURN_VISIT_WITH_M15 = `${RETURN_VISIT}\n\nThe stair carpet has been brushed up the middle since you came down it, in one\ndirection, by somebody who did the whole flight.`;
+const RETURN_VISIT_WITH_M15 = `${RETURN_VISIT}\n\nThe stair carpet has been brushed up the middle since you came down it, in one direction, by somebody who did the whole flight.`;
 
 const description: ProseRule[] = [
   { when: { all: [{ flag: ACT2_STARTED }, MARLOW_ABSENT, { not: { flag: ACT2_SEEN_DESK_EMPTY } }] }, text: DESK_EMPTY_FIRST },

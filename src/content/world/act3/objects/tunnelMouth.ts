@@ -34,10 +34,10 @@ import {
 // §4 — the hatch.
 // ---------------------------------------------------------------------------
 
-const hatchExamineUnlocked = 'Over on its back in the grass, with its two eyes pointing at the sky and a\nhole under where it was.';
+const hatchExamineUnlocked = 'Over on its back in the grass, with its two eyes pointing at the sky and a hole under where it was.';
 
 const hatchExamineLocked =
-  'Four feet square, steel, set flush in a low concrete kerb, with a lifting eye\nat each of two corners and a chequered tread stamped into the face that has\nworn smooth in a strip across the middle.\n\nThere is no hasp and no padlock. There is a brass escutcheon let into the\nplate near one edge, and behind the escutcheon there is a square hole.\n\nThe strip in the tread runs from the kerb to the escutcheon and back. It is\nabout the width of a boot.';
+  'Four feet square, steel, set flush in a low concrete kerb, with a lifting eye at each of two corners and a chequered tread stamped into the face that has worn smooth in a strip across the middle.\n\nThere is no hasp and no padlock. There is a brass escutcheon let into the plate near one edge, and behind the escutcheon there is a square hole.\n\nThe strip in the tread runs from the kerb to the escutcheon and back. It is about the width of a boot.';
 
 const hatchExamine: ProseRule[] = [
   { when: { flag: ACT3_TUNNEL_UNLOCKED }, text: hatchExamineUnlocked },
@@ -45,32 +45,32 @@ const hatchExamine: ProseRule[] = [
 ];
 
 const unlockWithKeyText =
-  'The square bit goes into the square hole the way a thing goes into the thing it\nwas cut for, which is without any of the small negotiations.\n\nA quarter turn. Something in the kerb lets go with one flat knock, and the\nplate stands up half an inch on its own and stops there.\n\nThe number stamped in the bow of the key is not stamped anywhere on this\nhatch, or on the kerb, or on anything else in sight.';
+  'The square bit goes into the square hole the way a thing goes into the thing it was cut for, which is without any of the small negotiations.\n\nA quarter turn. Something in the kerb lets go with one flat knock, and the plate stands up half an inch on its own and stops there.\n\nThe number stamped in the bow of the key is not stamped anywhere on this hatch, or on the kerb, or on anything else in sight.';
 
 const pryWithLegText =
-  'You get the taper under the near eye and the kerb takes it as a fulcrum\nwithout being asked, which is the first thing today that has gone well.\n\nThe plate does not move, because the plate is not the problem. You go again\nwith your weight properly on it, and what gives is the lock: a quarter-inch\ncam in a cast body, doing the only job it has ever been given, against a yard\nof hard maple.\n\nThe plate comes up on its eyes and goes over backwards into the grass.';
+  'You get the taper under the near eye and the kerb takes it as a fulcrum without being asked, which is the first thing today that has gone well.\n\nThe plate does not move, because the plate is not the problem. You go again with your weight properly on it, and what gives is the lock: a quarter-inch cam in a cast body, doing the only job it has ever been given, against a yard of hard maple.\n\nThe plate comes up on its eyes and goes over backwards into the grass.';
 
 /** §4.4, reused as the descent gate's own "locked" `blockedText` rule below. */
 export const HATCH_OPEN_NEITHER_TEXT =
-  'It is four feet of steel in a kerb with a cam lock holding it, and the cam is\nholding it well.\n\nThere is a square hole behind the brass and there is a lifting eye at the\ncorner, and between them they describe two entirely different afternoons.';
+  'It is four feet of steel in a kerb with a cam lock holding it, and the cam is holding it well.\n\nThere is a square hole behind the brass and there is a lifting eye at the corner, and between them they describe two entirely different afternoons.';
 
 const unlockEffects: Effect[] = [{ say: unlockWithKeyText }, { set: [ACT3_TUNNEL_UNLOCKED, true] }];
 const pryEffects: Effect[] = [{ say: pryWithLegText }, { set: [ACT3_TUNNEL_UNLOCKED, true] }];
 
-const knockOnHatchText = 'It rings once, low, and then the ground under the hardstand takes the ring off\nyou and gives back rather more of it than a yard of fill ought to.';
+const knockOnHatchText = 'It rings once, low, and then the ground under the hardstand takes the ring off you and gives back rather more of it than a yard of fill ought to.';
 
-const listenAtHatchText = 'Air. Not wind — the wind out here is coming across you and this is coming up\npast you, out of the escutcheon, steadily, at about the temperature of a room.';
+const listenAtHatchText = 'Air. Not wind — the wind out here is coming across you and this is coming up past you, out of the escutcheon, steadily, at about the temperature of a room.';
 
 // §6.2 — beats 1-3, the full descent with light. Reused as the mouth's own
 // `down`/`in` exit `travelText` (`tunnelMouth.ts`, the room file) AND, here,
 // as "ENTER HATCH"'s own plain-goto nicety (message: "keep... if authored,
 // as plain gotos of the same walk text").
 export const DESCEND_WALK_TEXT =
-  'The ladder is bolted through the shaft wall in four places and goes down about\ntwenty feet onto concrete, and the rungs are dry.\n\nThen the mile.\n\nIt takes what a mile takes, and it takes it in a straight line, so that the\nonly way you know you are moving is the joints in the pour going by overhead\nat whatever interval a mile has decided to divide itself into. There is no\nturn. There is nothing on the walls. There is a rail under each foot if you\nwant one and after a while you want one.\n\nTwice the air changes temperature by about a degree and then changes back, and\nboth times you stop, and both times it is nothing.\n\nNobody has been down here for a long time and everything down here says so\nexcept the air, which is fresh, and moving, and coming from the far end.\n\nAnd then the light you have brought stops going forward and comes back at you\noff something flat.';
+  'The ladder is bolted through the shaft wall in four places and goes down about twenty feet onto concrete, and the rungs are dry.\n\nThen the mile.\n\nIt takes what a mile takes, and it takes it in a straight line, so that the only way you know you are moving is the joints in the pour going by overhead at whatever interval a mile has decided to divide itself into. There is no turn. There is nothing on the walls. There is a rail under each foot if you want one and after a while you want one.\n\nTwice the air changes temperature by about a degree and then changes back, and both times you stop, and both times it is nothing.\n\nNobody has been down here for a long time and everything down here says so except the air, which is fresh, and moving, and coming from the far end.\n\nAnd then the light you have brought stops going forward and comes back at you off something flat.';
 
 /** §6.3 — the mouth's/hatch's own "no light at all" text, reused by the descent gate's own `blockedText` below. */
 export const DESCEND_NO_LIGHT_TEXT =
-  'You go, because a tunnel is a straight line and a straight line can be walked\nby anybody with a hand on a wall.\n\nThe hand on the wall works. The rails under the boots work. What stops you,\nabout four hundred yards in, is that a mile of this at walking pace in the\ndark is a very long time to be doing arithmetic about how far back the ladder\nis, and the arithmetic wins.\n\nYou come back to the rectangle of night, which has not moved, and which is the\nonly thing here that was ever going to tell you anything.';
+  'You go, because a tunnel is a straight line and a straight line can be walked by anybody with a hand on a wall.\n\nThe hand on the wall works. The rails under the boots work. What stops you, about four hundred yards in, is that a mile of this at walking pace in the dark is a very long time to be doing arithmetic about how far back the ladder is, and the arithmetic wins.\n\nYou come back to the rectangle of night, which has not moved, and which is the only thing here that was ever going to tell you anything.';
 
 const hasLight = { any: [{ flag: ACT3_HEADLAMP_ON }, { flag: ACT3_MATCH_BURNING }] };
 

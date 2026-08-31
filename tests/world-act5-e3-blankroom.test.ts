@@ -112,7 +112,7 @@ describe('the terminal — §21', () => {
     const session = atBlankRoom();
     const store = new MemoryStore();
     const { events } = say(session, 'type', store);
-    expect(text(events)).toMatch(/already had that\s*\nconversation/);
+    expect(text(events)).toMatch(/already had that\s* conversation/);
   });
 
   it('READ TERMINAL / READ LIST shows the three headings', () => {
@@ -396,7 +396,7 @@ describe('CREATE SUBJECT — §28-§30', () => {
     });
     const rendered = text(result.events);
     expect(rendered).not.toMatch(/MYNAME|DETECTIVE|SOMEWHERE|A ROCK/);
-    expect(rendered).toMatch(/does not mind being left\s*\nalone/);
+    expect(rendered).toMatch(/does not mind being left\s* alone/);
     expect(rendered).toMatch(/PHYSICAL PARAMETERS \.+ RANDOMIZED — 1 EXCEPTION, SUPPRESSED/);
     expect(rendered).toMatch(/INITIALIZE\?/);
     const prompt = result.events.find((e): e is Extract<GameEvent, { type: 'prompt' }> => e.type === 'prompt');

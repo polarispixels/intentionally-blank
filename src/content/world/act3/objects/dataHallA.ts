@@ -28,21 +28,21 @@ import { ACT3_AISLE_SIGN, ACT3_CLUE_PULSE, ACT3_COLD_AISLE_CURTAIN, ACT3_COOLING
 // ---------------------------------------------------------------------------
 
 const racksExamine =
-  'Black steel, forty-eight units high, every one of them filled and every gap in\nevery one of them closed off with a blanking plate, because air that goes the\nwrong way round is air you have paid to move twice.\n\nBehind the perforated fronts there are the small green and amber lights of a\nvery great deal of equipment agreeing with itself. The cabling comes down out\nof the trays in bundles combed flat and dressed square and tied at intervals,\nand somebody did that by hand, and has done it by hand every time anything has\nchanged.\n\nOn the end of the row there is a laminated card with the row number on it and\na telephone extension underneath, and the extension has been crossed out and\nrewritten twice, in two hands.';
+  'Black steel, forty-eight units high, every one of them filled and every gap in every one of them closed off with a blanking plate, because air that goes the wrong way round is air you have paid to move twice.\n\nBehind the perforated fronts there are the small green and amber lights of a very great deal of equipment agreeing with itself. The cabling comes down out of the trays in bundles combed flat and dressed square and tied at intervals, and somebody did that by hand, and has done it by hand every time anything has changed.\n\nOn the end of the row there is a laminated card with the row number on it and a telephone extension underneath, and the extension has been crossed out and rewritten twice, in two hands.';
 
 const racksOpen =
-  'The doors are latched and not locked, because a lock on this door would only\nbe a thing to lose the key to.\n\nYou get one open and a wedge of hot air comes out of it into a room that has\nbeen designed at some expense against exactly that, and within about four\nseconds something in the ceiling changes note and begins to deal with you.\n\nYou shut it.';
+  'The doors are latched and not locked, because a lock on this door would only be a thing to lose the key to.\n\nYou get one open and a wedge of hot air comes out of it into a room that has been designed at some expense against exactly that, and within about four seconds something in the ceiling changes note and begins to deal with you.\n\nYou shut it.';
 
 const racksTouch =
-  'Cold at the front, where the air is going in. Warm at the back, where it has\nfinished. That is the entire business of this building written on one box in a\ntemperature you can feel with a hand, and there are several thousand boxes.';
+  'Cold at the front, where the air is going in. Warm at the back, where it has finished. That is the entire business of this building written on one box in a temperature you can feel with a hand, and there are several thousand boxes.';
 
-const racksReadCard = '    ROW A-12\n    x2240 (24hr)\n\nThe number has been crossed out and rewritten twice. The last hand is the hand\nthat writes the tags in the plant.';
+const racksReadCard = '    ROW A-12\n    x2240 (24hr)\n\nThe number has been crossed out and rewritten twice. The last hand is the hand that writes the tags in the plant.';
 
 const racksLeaveAlone =
-  'There is nothing here that you have any argument with. There is not even\nanything here you could be said to have found: it is a room of boxes doing\narithmetic for somebody, which is what these buildings are for and what this\none has always said it was.\n\nYou leave it alone, and you notice yourself deciding to.';
+  'There is nothing here that you have any argument with. There is not even anything here you could be said to have found: it is a room of boxes doing arithmetic for somebody, which is what these buildings are for and what this one has always said it was.\n\nYou leave it alone, and you notice yourself deciding to.';
 
 export const COUNT_RACKS_TEXT =
-  'You get to a number you are not confident about and then the perspective takes\nthe rest of them, and it becomes obvious that this is the sort of thing a\nbuilding tells you in a filing rather than a thing you find out by looking.';
+  'You get to a number you are not confident about and then the perspective takes the rest of them, and it becomes obvious that this is the sort of thing a building tells you in a filing rather than a thing you find out by looking.';
 
 const racks: ObjectDefSlice = {
   location: ACT3_DATA_HALL_A,
@@ -70,13 +70,13 @@ const racks: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const noiseRule1Text =
-  'You stand still and give it a minute, which is what it takes.\n\nThere is a slow variation in it. Not a beat — nothing as regular as that — but\nthe broad flat noise comes up a little and settles a little on something\nlonger than your own breathing, over and over, and once you have heard it you\nare not going to be able to stop.';
+  'You stand still and give it a minute, which is what it takes.\n\nThere is a slow variation in it. Not a beat — nothing as regular as that — but the broad flat noise comes up a little and settles a little on something longer than your own breathing, over and over, and once you have heard it you are not going to be able to stop.';
 
 const noiseRule2Text =
-  'You stand still and give it a minute, which is what it takes.\n\nThere is a slow variation in it, and it is slower than that. The broad flat\nnoise comes up, and settles, and the settling goes on long enough that you\nfind yourself waiting through it with your head turned.\n\nThen it comes up again.';
+  'You stand still and give it a minute, which is what it takes.\n\nThere is a slow variation in it, and it is slower than that. The broad flat noise comes up, and settles, and the settling goes on long enough that you find yourself waiting through it with your head turned.\n\nThen it comes up again.';
 
 const noiseRule3Text =
-  'It is not a hum and it is not a roar. It is what a very large volume of moving\nair does when it has been made to do it politely: broad, flat, everywhere, and\nwith no direction in it at all.\n\nAnd the slow thing, underneath, going up and settling.';
+  'It is not a hum and it is not a roar. It is what a very large volume of moving air does when it has been made to do it politely: broad, flat, everywhere, and with no direction in it at all.\n\nAnd the slow thing, underneath, going up and settling.';
 
 /** Shared between the object's own `LISTEN` and Data Hall A's own bare-`LISTEN` room handler — see this file's header. */
 export const noiseListenHandlers: HandlerDef[] = [
@@ -98,7 +98,7 @@ const noise: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const signExamine =
-  'A post at the aisle head with three vanes screwed to it in the order somebody\nneeded them:\n\n    ← LOBBY\n    B4 →\n    PLANT →\n\nThe LOBBY vane and the PLANT vane are the same white and the same age. The B4\nvane is a slightly different white, and its screws are a different white\nagain.';
+  'A post at the aisle head with three vanes screwed to it in the order somebody needed them:\n\n    ← LOBBY B4 → PLANT →\n\nThe LOBBY vane and the PLANT vane are the same white and the same age. The B4 vane is a slightly different white, and its screws are a different white again.';
 
 const aisleSign: ObjectDefSlice = {
   location: ACT3_DATA_HALL_A,
@@ -113,10 +113,10 @@ const aisleSign: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const plantDoorExamine =
-  'Steel, with an overhead closer, a reader beside it on the wall rather than a\npedestal, and PLANT in the same stencil as everything else.\n\nIt is the same model of reader as the one on the gate, which is the same model\nas the one at the far end of B4, which is the one the notebook has a complaint\nabout.';
+  'Steel, with an overhead closer, a reader beside it on the wall rather than a pedestal, and PLANT in the same stencil as everything else.\n\nIt is the same model of reader as the one on the gate, which is the same model as the one at the far end of B4, which is the one the notebook has a complaint about.';
 
 export const PLANT_DOOR_PASS_TEXT =
-  'Green, first ask, without the badge and without anything else, because it is\nnot that kind of reader.\n\nInside the fence this building has almost no opinions about where you go in\nit. Everything it had to say, it said at the gate.';
+  'Green, first ask, without the badge and without anything else, because it is not that kind of reader.\n\nInside the fence this building has almost no opinions about where you go in it. Everything it had to say, it said at the gate.';
 
 const plantDoor: ObjectDefSlice = {
   location: ACT3_DATA_HALL_A,
@@ -135,10 +135,10 @@ const plantDoor: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const curtainExamine =
-  'Heavy clear PVC in overlapping strips, hung from a rail across the mouth of\nthe aisle and reaching down to about shoulder height.\n\nThey keep the cold in the aisle and the hot out of it, which is the whole of\nthe idea, and they have gone slightly milky along the edges where several\nyears of shoulders have gone through them.';
+  'Heavy clear PVC in overlapping strips, hung from a rail across the mouth of the aisle and reaching down to about shoulder height.\n\nThey keep the cold in the aisle and the hot out of it, which is the whole of the idea, and they have gone slightly milky along the edges where several years of shoulders have gone through them.';
 
 const curtainThrough =
-  'Going through them is like going through the door of a butcher\'s, and on the\nother side of them the cold gets serious and the note of the room goes up.\n\nThe aisle is four feet wide and it is racks on both sides and nothing else,\nall the way down, and there is a floor grille every third rack blowing cold\nstraight up your trouser leg.';
+  'Going through them is like going through the door of a butcher\'s, and on the other side of them the cold gets serious and the note of the room goes up.\n\nThe aisle is four feet wide and it is racks on both sides and nothing else, all the way down, and there is a floor grille every third rack blowing cold straight up your trouser leg.';
 
 const curtain: ObjectDefSlice = {
   location: ACT3_DATA_HALL_A,

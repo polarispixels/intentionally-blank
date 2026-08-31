@@ -35,13 +35,13 @@ import { ACT3_READER_B4_SCRIPT } from '../scripts';
 // ---------------------------------------------------------------------------
 
 const planExamine =
-  "Behind glass in the same frame stock as the drawing in the plant: a floor plan\nof this part of the building with a red YOU ARE HERE dot, the exits picked out\nin green, the extinguishers as little numbered squares, and a scale bar along\nthe bottom.\n\nThis corridor is drawn as a long rectangle, and because a life-safety drawing\nhas to tell a fire crew how far it is to a door, the rectangle is dimensioned:\n\n    180'-0\"\n\nThe frame is screwed to the wall through four brass cups. The glass has been\ncleaned, recently, in circles.";
+  "Behind glass in the same frame stock as the drawing in the plant: a floor plan of this part of the building with a red YOU ARE HERE dot, the exits picked out in green, the extinguishers as little numbered squares, and a scale bar along the bottom.\n\nThis corridor is drawn as a long rectangle, and because a life-safety drawing has to tell a fire crew how far it is to a door, the rectangle is dimensioned:\n\n    180'-0\"\n\nThe frame is screwed to the wall through four brass cups. The glass has been cleaned, recently, in circles.";
 
 const planOpenText =
-  'Four screws, four brass cups, and a sheet of glass you would then be holding\nin a corridor. The drawing is more use to you where it is: on the wall, at one\nend of the thing it is a drawing of.';
+  'Four screws, four brass cups, and a sheet of glass you would then be holding in a corridor. The drawing is more use to you where it is: on the wall, at one end of the thing it is a drawing of.';
 
 const compareNotebookText =
-  'The notebook says what it has said since Wall Drug, in a hand going faster\nthan it can and staying legible.\n\nThe drawing says a hundred and eighty feet, in a title block, over a scale\nbar, screwed to a wall through brass cups.\n\nOne of them is wrong and neither of them is going to move.';
+  'The notebook says what it has said since Wall Drug, in a hand going faster than it can and staying legible.\n\nThe drawing says a hundred and eighty feet, in a title block, over a scale bar, screwed to a wall through brass cups.\n\nOne of them is wrong and neither of them is going to move.';
 
 const lifeSafetyPlan: ObjectDefSlice = {
   location: ACT3_CORRIDOR_B4,
@@ -60,13 +60,13 @@ const lifeSafetyPlan: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const corridorExamine =
-  'One-foot tiles in a running bond, with the joints running across your way, and\nthe seams of the sheet vinyl in the same direction, and a skirting coved up\nthe block so the floor cleaner does not have to think about corners.\n\nA corridor tiled like this is a ruler that somebody has already put down.';
+  'One-foot tiles in a running bond, with the joints running across your way, and the seams of the sheet vinyl in the same direction, and a skirting coved up the block so the floor cleaner does not have to think about corners.\n\nA corridor tiled like this is a ruler that somebody has already put down.';
 
 const paceFirstText =
-  'You start with your back against the wall the plan is on, and you walk it heel\nto toe on the joints. One tile, one step, the way you would if you had ever\nhad a reason to.\n\nTile. Tile. Tile.\n\nThe boxes go over you one after another and their note changes as you come\nunder each one and changes back. Tile. Tile. Tile. The far door does not get\nany nearer for a very long time, and then it is right in front of you.\n\nTwo hundred and twenty-one.\n\nYou stand at the far end with the number in your mouth and no confidence in it\nat all, because a man who has counted to two hundred and twenty-one on his own\nfeet has lost it somewhere.';
+  'You start with your back against the wall the plan is on, and you walk it heel to toe on the joints. One tile, one step, the way you would if you had ever had a reason to.\n\nTile. Tile. Tile.\n\nThe boxes go over you one after another and their note changes as you come under each one and changes back. Tile. Tile. Tile. The far door does not get any nearer for a very long time, and then it is right in front of you.\n\nTwo hundred and twenty-one.\n\nYou stand at the far end with the number in your mouth and no confidence in it at all, because a man who has counted to two hundred and twenty-one on his own feet has lost it somewhere.';
 
 const paceSecondText =
-  'So you do it again, the other way, from the far door back to the plan, slower,\ncounting in tens on the fingers of one hand and starting that hand again at\nevery hundred.\n\nTile. Tile. Tile.\n\nTwo hundred and twenty-one.\n\nThe drawing on the wall says a hundred and eighty feet. The drawing on the\nwall is the drawing they would send a fire crew into this corridor with. And\nyou have now walked two hundred and twenty-one one-foot tiles between its two\nends, twice, in both directions, in a building where every other thing you\nhave touched today has been exactly what it said it was.';
+  'So you do it again, the other way, from the far door back to the plan, slower, counting in tens on the fingers of one hand and starting that hand again at every hundred.\n\nTile. Tile. Tile.\n\nTwo hundred and twenty-one.\n\nThe drawing on the wall says a hundred and eighty feet. The drawing on the wall is the drawing they would send a fire crew into this corridor with. And you have now walked two hundred and twenty-one one-foot tiles between its two ends, twice, in both directions, in a building where every other thing you have touched today has been exactly what it said it was.';
 
 const paceThereafterText = 'Two hundred and twenty-one. It is going to be two hundred and twenty-one.';
 
@@ -74,10 +74,10 @@ const paceThereafterText = 'Two hundred and twenty-one. It is going to be two hu
 const measuredEffects: Effect[] = [{ set: [ACT3_B4_MEASURED, true] }, { grantClue: ACT3_CLUE_41_FEET }];
 
 const stringMeasureText =
-  "The twine off the general store's spool is longer than you thought and a good\ndeal shorter than the corridor.\n\nYou lay it out along a joint line from the wall the plan is on, put your heel\non the end of it, and lay it again from there, and again, and pinch the third\nrun where it stops short. Three runs and a bit.\n\nThen you take it up off the floor and hold it against the scale bar under the\nglass, and walk it along the bar, and count what the bar gives you for each\nrun.\n\nThree runs and a bit is not a hundred and eighty feet. It is not near a\nhundred and eighty feet.";
+  "The twine off the general store's spool is longer than you thought and a good deal shorter than the corridor.\n\nYou lay it out along a joint line from the wall the plan is on, put your heel on the end of it, and lay it again from there, and again, and pinch the third run where it stops short. Three runs and a bit.\n\nThen you take it up off the floor and hold it against the scale bar under the glass, and walk it along the bar, and count what the bar gives you for each run.\n\nThree runs and a bit is not a hundred and eighty feet. It is not near a hundred and eighty feet.";
 
 const rulerMeasureText =
-  "Eli's letter, folded the way Eli folds, opens out into a strip creased at\nintervals that are exactly each other, which is the only thing origami has\never actually been for.\n\nYou use it on the scale bar first, to find out what one crease is worth on\nthis drawing. Then you use it on the floor, where the creases and the tile\njoints agree with each other about a foot, because a foot is a foot and has\nbeen for some time.\n\nThen you do the sum a man does standing up at the end of a corridor.\n\nThe answer is not a hundred and eighty.";
+  "Eli's letter, folded the way Eli folds, opens out into a strip creased at intervals that are exactly each other, which is the only thing origami has ever actually been for.\n\nYou use it on the scale bar first, to find out what one crease is worth on this drawing. Then you use it on the floor, where the creases and the tile joints agree with each other about a foot, because a foot is a foot and has been for some time.\n\nThen you do the sum a man does standing up at the end of a corridor.\n\nThe answer is not a hundred and eighty.";
 
 const corridor: ObjectDefSlice = {
   location: ACT3_CORRIDOR_B4,
@@ -120,10 +120,10 @@ const corridor: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const readerExamine =
-  'The same pedestal, the same black pad, the same green diode, mounted beside\nthe far door at exactly the height a badge hangs on a lanyard.\n\nThere is a smear on the pad about the size of a thumb, and under the smear the\nplastic has gone matt, and it has gone matt in two separate places, because\npeople who are not let in the first time try again slightly differently.';
+  'The same pedestal, the same black pad, the same green diode, mounted beside the far door at exactly the height a badge hangs on a lanyard.\n\nThere is a smear on the pad about the size of a thumb, and under the smear the plastic has gone matt, and it has gone matt in two separate places, because people who are not let in the first time try again slightly differently.';
 
-const readerNoBadgeText = 'The pad wants a badge. You have hands, a hat, and a notebook belonging to a\nman this reader has almost certainly let through several hundred times.';
-const readerKickText = 'It is a pedestal bolted to a slab. Your foot learns this immediately and you\nlearn it about a second later, and the diode does not so much as flicker,\nwhich is somehow the insulting part.';
+const readerNoBadgeText = 'The pad wants a badge. You have hands, a hat, and a notebook belonging to a man this reader has almost certainly let through several hundred times.';
+const readerKickText = 'It is a pedestal bolted to a slab. Your foot learns this immediately and you learn it about a second later, and the diode does not so much as flicker, which is somehow the insulting part.';
 
 const readerB4: ObjectDefSlice = {
   location: ACT3_CORRIDOR_B4,
@@ -159,10 +159,10 @@ nolanBadge.handlers = [
 // ---------------------------------------------------------------------------
 
 const panelExamine =
-  'Two feet by three, in the same block wall, in the same paint, with four\ncountersunk screws in it and a hairline of shadow all round.\n\nIt is an access panel. There is a chase behind every corridor in every\nbuilding of this kind and somebody has to be able to get at it.\n\nThe paint around it has been cut through with a blade so that the panel comes\noff cleanly, which is a thing you do to a panel that comes off often.';
+  'Two feet by three, in the same block wall, in the same paint, with four countersunk screws in it and a hairline of shadow all round.\n\nIt is an access panel. There is a chase behind every corridor in every building of this kind and somebody has to be able to get at it.\n\nThe paint around it has been cut through with a blade so that the panel comes off cleanly, which is a thing you do to a panel that comes off often.';
 
 const panelRemoveText =
-  'The screws come out with the edge of a coin. The panel comes away in one\npiece.\n\nBehind it: conduit, a junction box with its lid on, a bundle of low-voltage in\na cable tie, and block wall.\n\nOn the block wall, in white stencil, six inches high, put there before\nanything was ever screwed over it:\n\n    INSPECTED\n    NOV 1983\n\nThe panel goes back on the way it came off.';
+  'The screws come out with the edge of a coin. The panel comes away in one piece.\n\nBehind it: conduit, a junction box with its lid on, a bundle of low-voltage in a cable tie, and block wall.\n\nOn the block wall, in white stencil, six inches high, put there before anything was ever screwed over it:\n\n    INSPECTED\n    NOV 1983\n\nThe panel goes back on the way it came off.';
 
 // §11.7: the stencil is "visible when act3_panel_open" — it starts hidden,
 // so the flag alone is not enough (v0.13.0 playtest: `x stencil` missed).
@@ -189,7 +189,7 @@ const panel: ObjectDefSlice = {
 };
 
 const stencilExamine =
-  'Stencilled, not printed: the letters have the little bridges in them where the\nstencil held. White on grey block, thin enough that the block\'s texture comes\nthrough the paint.\n\nBuildings of this kind are marked like this all over — in every chase, behind\nevery panel, by whoever signed the work off. It is the most ordinary mark a\nwall can carry.';
+  'Stencilled, not printed: the letters have the little bridges in them where the stencil held. White on grey block, thin enough that the block\'s texture comes through the paint.\n\nBuildings of this kind are marked like this all over — in every chase, behind every panel, by whoever signed the work off. It is the most ordinary mark a wall can carry.';
 
 const stencilTouchText = 'Under the paint the block is block. Nothing comes off on your fingers.';
 

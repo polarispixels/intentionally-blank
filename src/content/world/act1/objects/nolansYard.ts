@@ -93,7 +93,7 @@ const waitItOutRefusalText = 'Not with the yard lit and the window occupied.\n\n
 
 // §5.5 — the yield.
 const yieldText =
-  'The lid comes off and stays off.\n\nMost of a bin is a bin. You go through it the way it has to be gone through — by hand, briefly, without enthusiasm — and what you are mostly doing is throwing away everything that is only rubbish, which is nearly all of it: kitchen, packaging, a broken hanger, and one item damp enough that you decline to establish what it was and it declines to help.\n\nFour things are not rubbish.\n\n    a souvenir cup\n    a prescription bottle\n    a bundle of shredded paper\n    a slip of post-office stationery\n\nThe lid goes back on. You set it square to the kerb with the handles facing the road, because that is how it was when you got here.';
+  'The lid comes off and stays off.\n\nMost of a bin is a bin. You go through it the way it has to be gone through — by hand, briefly, without enthusiasm — and what you are mostly doing is throwing away everything that is only rubbish, which is nearly all of it: kitchen, packaging, a broken hanger, and one item damp enough that you decline to establish what it was and it declines to help.\n\nFour things are not rubbish.\n\n    a souvenir cup a prescription bottle a bundle of shredded paper a slip of post-office stationery\n\nThe lid goes back on. You set it square to the kerb with the handles facing the road, because that is how it was when you got here.';
 
 const yieldEffects: Effect[] = [
   { say: yieldText },
@@ -282,7 +282,7 @@ const nolansYardNoExitGate: ObjectDefSlice = { location: NOLANS_YARD };
 
 // §7.1 — the Wall Drug cup.
 const wallDrugCupText =
-  'A plastic cup that lost its lid some time ago, printed outside in red and yellow, the print scuffed white down one side where it has ridden in a car door.\n\n    WALL DRUG\n    FREE ICE WATER\n\nThe inside of the bottom is stained a ring\'s worth of brown, which is not what free ice water leaves.';
+  'A plastic cup that lost its lid some time ago, printed outside in red and yellow, the print scuffed white down one side where it has ridden in a car door.\n\n    WALL DRUG FREE ICE WATER\n\nThe inside of the bottom is stained a ring\'s worth of brown, which is not what free ice water leaves.';
 
 const wallDrugCup: ObjectDefSlice = {
   location: 'nowhere',
@@ -295,7 +295,7 @@ const wallDrugCup: ObjectDefSlice = {
 
 // §7.2 — the prescription bottle.
 const pillBottleExamineText =
-  'An amber plastic bottle with a white cap, the label printed by a machine that was low on one of its colours.\n\n    NOLAN, R.         SUMATRIPTAN 50MG\n    ONE AT ONSET. MAY REPEAT AFTER TWO HOURS.\n    NOT MORE THAN NINE IN ANY SEVEN DAYS.\n\nTwo left. The bottle has been opened and shut enough times to take the shine off the threads, and the pharmacy\'s own sticker on the back has been picked at by somebody with a thumbnail and time.';
+  'An amber plastic bottle with a white cap, the label printed by a machine that was low on one of its colours.\n\n    NOLAN, R.         SUMATRIPTAN 50MG\n    ONE AT ONSET. MAY REPEAT AFTER TWO HOURS. NOT MORE THAN NINE IN ANY SEVEN DAYS.\n\nTwo left. The bottle has been opened and shut enough times to take the shine off the threads, and the pharmacy\'s own sticker on the back has been picked at by somebody with a thumbnail and time.';
 const pillBottleExamineEffects: Effect[] = [{ say: pillBottleExamineText }, { grantClue: CLUE_NOLAN_HEADACHES }];
 
 const pillBottle: ObjectDefSlice = {
@@ -336,7 +336,7 @@ const shreddedStrips: ObjectDefSlice = {
 
 // §7.4 — the rent notice.
 const poBoxSlipText =
-  'A printed card, folded once, on the post office\'s own thin stock.\n\n    BOX RENT - BOX 141\n    THIS BOX IS PAID THROUGH THE END OF THE QUARTER.\n    RENEWALS AT THE COUNTER.\n\nIn a window on the front it is addressed to J., care of this house.\n\nAcross the bottom somebody has written, in a hand that is not the form\'s: returned - not known here. It has not been sent anywhere. It went in the bin.';
+  'A printed card, folded once, on the post office\'s own thin stock.\n\n    BOX RENT - BOX 141 THIS BOX IS PAID THROUGH THE END OF THE QUARTER. RENEWALS AT THE COUNTER.\n\nIn a window on the front it is addressed to J., care of this house.\n\nAcross the bottom somebody has written, in a hand that is not the form\'s: returned - not known here. It has not been sent anywhere. It went in the bin.';
 const poBoxSlipEffects: Effect[] = [{ say: poBoxSlipText }, { grantClue: CLUE_J_BOX_141 }];
 
 const poBoxSlip: ObjectDefSlice = {

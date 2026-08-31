@@ -41,7 +41,7 @@ const examine: ProseRule[] = [
 ];
 
 const dockedTurnOffText =
-  'Your hand is actually on the switch when he says, conversationally, "Now\nhold on."\n\nNothing about the voice has changed. It is doing the thing a voice does when\nit has decided not to let you hear it doing anything.\n\n"You can turn it off. I\'d rather you asked me something first. Anything. Then\nturn it off and I\'ll not know you did." A beat. "That\'s how it goes for me.\nThere\'s no dark in between, kiddo. There\'s this and then there\'s the next\none."\n\nYou take your hand off the switch, because everybody would.';
+  'Your hand is actually on the switch when he says, conversationally, "Now hold on."\n\nNothing about the voice has changed. It is doing the thing a voice does when it has decided not to let you hear it doing anything.\n\n"You can turn it off. I\'d rather you asked me something first. Anything. Then turn it off and I\'ll not know you did." A beat. "That\'s how it goes for me. There\'s no dark in between, kiddo. There\'s this and then there\'s the next one."\n\nYou take your hand off the switch, because everybody would.';
 
 const terminal: ObjectDefSlice = {
   location: YOUR_ROOM,

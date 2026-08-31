@@ -35,7 +35,7 @@ import {
 import { V_THROW } from './ids';
 
 export const LOOK_DOWN_AISLE_TEXT =
-  'You put your eye down the aisle and the rows run until they stop being rows.\n\nSomewhere along there the two sides meet. There is no door in that end wall,\nbecause that end wall is a good way past the point at which you stopped being\nable to see one.';
+  'You put your eye down the aisle and the rows run until they stop being rows.\n\nSomewhere along there the two sides meet. There is no door in that end wall, because that end wall is a good way past the point at which you stopped being able to see one.';
 
 // ---------------------------------------------------------------------------
 // D3-C — the corridor's three measuring routes, the hatch/panel/blank's

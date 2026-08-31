@@ -390,7 +390,7 @@ const topicAct4LukeLetters: TopicDef = {
   words: ['luke', 'letters', 'folder', 'president'],
   when: { clue: ACT4_CLUE_LETTERS_FROM_JACK },
   response:
-    'You tell him what is in that folder. Years of it, in his hand, on his paper,\nasking after everybody and wanting nothing.\n\nJack listens the whole way through without helping you along.\n\n"Asks after everybody," he says.\n\nThen he gets up and goes as far as the window and stands at it with his back to\nyou, and whatever is out there does not need looking at for that long.\n\nWhen he sits back down he has got hold of one end of it.\n\n"He was answering the letter he got." He turns his mug round on the table\nwithout picking it up. "Every time. Inside the week. Nice as you like."\n\n"He never had the question."\n\nHe does not ask you how you know it and he does not ask what else was in that\nroom. He sits with both hands flat on the table and does not do anything else\nwith it in front of you.',
+    'You tell him what is in that folder. Years of it, in his hand, on his paper, asking after everybody and wanting nothing.\n\nJack listens the whole way through without helping you along.\n\n"Asks after everybody," he says.\n\nThen he gets up and goes as far as the window and stands at it with his back to you, and whatever is out there does not need looking at for that long.\n\nWhen he sits back down he has got hold of one end of it.\n\n"He was answering the letter he got." He turns his mug round on the table without picking it up. "Every time. Inside the week. Nice as you like."\n\n"He never had the question."\n\nHe does not ask you how you know it and he does not ask what else was in that room. He sits with both hands flat on the table and does not do anything else with it in front of you.',
   effects: [{ set: [ACT2_LUKE_REFERENCED, true] }],
 };
 
@@ -404,7 +404,7 @@ const topicEli: TopicDef = {
   id: TOPIC_ELI,
   words: ['eli', 'three', 'energy', 'address', 'write', 'letter', 'post'],
   response:
-    '"Eli." He puts his mug down. "You want to write to him. Right."\n\nHe turns a napkin over and writes an address on it with a pen off the counter,\nand he writes it without stopping to think, which tells you how many times he\nhas written it.\n\n"He answers paper. He\'s answered every letter I\'ve ever sent him on paper,\ninside a week, in a hand you could hang on a wall." A pause. "It\'s the other\nsort he answers wrong. The quick sort. Those come back to me chatty."\n\nHe slides the napkin across. "Don\'t put my name on it."',
+    '"Eli." He puts his mug down. "You want to write to him. Right."\n\nHe turns a napkin over and writes an address on it with a pen off the counter, and he writes it without stopping to think, which tells you how many times he has written it.\n\n"He answers paper. He\'s answered every letter I\'ve ever sent him on paper, inside a week, in a hand you could hang on a wall." A pause. "It\'s the other sort he answers wrong. The quick sort. Those come back to me chatty."\n\nHe slides the napkin across. "Don\'t put my name on it."',
 };
 
 /** §9.2 — v2, gated on `act2_dad_booted`; declared ahead of the shipped `TOPIC_DAD` below so it wins while the flag holds and falls through to the shipped response otherwise. */
@@ -413,7 +413,7 @@ const topicDadV2: TopicDef = {
   words: ['dad', 'father', 'old man', 'house rules', 'catan', 'game', 'parents'],
   when: { flag: ACT2_DAD_BOOTED },
   response:
-    'You tell him.\n\nJack does not say anything for long enough that Pearl comes down the counter,\nlooks at the two of you, and goes away again without filling anything.\n\n"Right," he says.\n\nHe turns his mug round on the table without picking it up.\n\n"Give me a night."',
+    'You tell him.\n\nJack does not say anything for long enough that Pearl comes down the counter, looks at the two of you, and goes away again without filling anything.\n\n"Right," he says.\n\nHe turns his mug round on the table without picking it up.\n\n"Give me a night."',
 };
 
 /** §9.3 — after the rig exists (§9.4's own event). */
@@ -422,21 +422,21 @@ const topicRig: TopicDef = {
   words: ['rig'],
   when: { objectState: [ACT2_RIG, 'hidden', false] },
   response:
-    '"It\'s a box, a battery, and a speaker off a thing I don\'t need a speaker off\nany more." He is pleased with it and is not going to say so. "Runs a day.\nDon\'t drop it in water and don\'t ask me what the tape is holding on, because\nthe answer is the tape."',
+    '"It\'s a box, a battery, and a speaker off a thing I don\'t need a speaker off any more." He is pleased with it and is not going to say so. "Runs a day. Don\'t drop it in water and don\'t ask me what the tape is holding on, because the answer is the tape."',
 };
 
 const topicHorse: TopicDef = {
   id: TOPIC_HORSE,
   words: ['horse', 'horses'],
   response:
-    '"They\'re not anybody\'s that I know of, and they\'ve been not anybody\'s for\nabout as long as I\'ve been looking at them." He shrugs with one shoulder.\n"Somebody\'s feeding them. It isn\'t me."',
+    '"They\'re not anybody\'s that I know of, and they\'ve been not anybody\'s for about as long as I\'ve been looking at them." He shrugs with one shoulder. "Somebody\'s feeding them. It isn\'t me."',
 };
 
 const topicPlant: TopicDef = {
   id: TOPIC_PLANT,
   words: ['plant', 'facility', 'fence', 'jobs'],
   response:
-    '"Two hundred jobs and a fence." He says it like a line he has said before.\n"Nolan\'s the one you\'d ask. Nolan\'s all right — Nolan\'s better than all right,\nhe came to our mother\'s funeral and he stayed for the washing up."\n\n"He\'ll tell you anything you ask him. That\'s the trouble with asking him."',
+    '"Two hundred jobs and a fence." He says it like a line he has said before. "Nolan\'s the one you\'d ask. Nolan\'s all right — Nolan\'s better than all right, he came to our mother\'s funeral and he stayed for the washing up."\n\n"He\'ll tell you anything you ask him. That\'s the trouble with asking him."',
 };
 
 // ---------------------------------------------------------------------------
@@ -453,7 +453,7 @@ const topicFence: TopicDef = {
   words: ['fence', 'wire', 'mesh'],
   when: { all: [{ at: ACT3_PERIMETER_ROAD }, { objectAt: [MONSTER_TRUCK, ACT3_PERIMETER_ROAD] }, { not: { flag: ACT3_JACK_WILL_RAM } }] },
   response:
-    'He looks at it the way a man looks at a job.\n\n"Eight foot. Posts at eight foot, set in about two and a half by the look of\nthe spoil they never took away." He is not boasting; he is estimating. "It\'d\ngo. It\'d cost me a bumper and a headlamp and I\'d not do it for a maybe."',
+    'He looks at it the way a man looks at a job.\n\n"Eight foot. Posts at eight foot, set in about two and a half by the look of the spoil they never took away." He is not boasting; he is estimating. "It\'d go. It\'d cost me a bumper and a headlamp and I\'d not do it for a maybe."',
 };
 
 // ---------------------------------------------------------------------------
@@ -495,7 +495,7 @@ const topicJulesV2: TopicDef = {
 const TOPIC_ACT4_CHAIRS = T('act4_jack_topic_chairs');
 
 const jackChairsText =
-  'You tell him there is a room under that plant with chairs in it, in rows, and a\nrail of hooks along the wall with names under them, and that one of the names is\nNolan\'s.\n\nJack does not ask you any of the four questions you have got answers ready for.\n\n"Show me."\n\nHe is looking for his keys and they are in his hand.';
+  'You tell him there is a room under that plant with chairs in it, in rows, and a rail of hooks along the wall with names under them, and that one of the names is Nolan\'s.\n\nJack does not ask you any of the four questions you have got answers ready for.\n\n"Show me."\n\nHe is looking for his keys and they are in his hand.';
 
 const topicAct4Chairs: TopicDef = {
   id: TOPIC_ACT4_CHAIRS,
@@ -513,7 +513,7 @@ const topicAct4Chairs: TopicDef = {
 // ---------------------------------------------------------------------------
 
 const jackTunnelMouthText =
-  'He stops at the mouth of it with the lamp in his hand and looks at how the\nconcrete is finished on the inside, and at the rebate round the frame where a\ndoor used to be shut.\n\n"Somebody built this to be used," he says.\n\nThen he goes in ahead of you, which he is not supposed to do and does anyway,\nand forty feet in he stands aside and lets you past.\n\nHe does not say anything else.';
+  'He stops at the mouth of it with the lamp in his hand and looks at how the concrete is finished on the inside, and at the rebate round the frame where a door used to be shut.\n\n"Somebody built this to be used," he says.\n\nThen he goes in ahead of you, which he is not supposed to do and does anyway, and forty feet in he stands aside and lets you past.\n\nHe does not say anything else.';
 
 export const ACT4_EV_JACK_TUNNEL_EVENT: EventDef = {
   id: ACT4_EV_JACK_TUNNEL,
@@ -533,7 +533,7 @@ const topicNobodyV2: TopicDef = {
   words: ['remember', 'remembers', 'nobody', 'anybody', 'believe', 'crazy', 'delusional', 'proof', 'lying', 'alone', 'mad'],
   when: { flag: ACT4_JACK_SAW_MARK },
   response:
-    '"Nobody remembers him," he says, and then does not do the rest of it.\n\nHe has said the rest of it to everybody in this county for five weeks and he is\nnot going to say it to you.',
+    '"Nobody remembers him," he says, and then does not do the rest of it.\n\nHe has said the rest of it to everybody in this county for five weeks and he is not going to say it to you.',
 };
 
 const topicTattooV2: TopicDef = {
@@ -541,7 +541,7 @@ const topicTattooV2: TopicDef = {
   words: ['tattoo', 'tattoos', 'ink', 'arm', 'forearm', 'wrist', 'numeral', 'numerals', 'number', 'numbers', 'iv', 'four', 'roman', 'mark'],
   when: { flag: ACT4_JACK_SAW_MARK },
   response:
-    'He puts both hands round his cup and leaves them there.\n\n"I\'ve told you what I know about that," he says. "I\'m not going to improve on\nit by saying it again."',
+    'He puts both hands round his cup and leaves them there.\n\n"I\'ve told you what I know about that," he says. "I\'m not going to improve on it by saying it again."',
 };
 
 const topics: TopicDef[] = [
@@ -736,7 +736,7 @@ const tellTopics: TopicDef[] = [
 // ---------------------------------------------------------------------------
 
 const persuadeJackText =
-  'He reads it with the interior light on and the engine off, and he takes his\ntime, and he goes back up the page twice.\n\nThen he puts it on the seat between you and looks out through the windscreen\nat eight feet of somebody else\'s mesh.\n\n"Five weeks," he says. "Five weeks of being the crank. Sheriff\'s got a file\nwith my name on it and it\'s a file about *me*."\n\nHe turns the key. "Say the word and I\'ll put a hole in it. I\'d like that on\npaper somewhere, that it was me that said it."';
+  'He reads it with the interior light on and the engine off, and he takes his time, and he goes back up the page twice.\n\nThen he puts it on the seat between you and looks out through the windscreen at eight feet of somebody else\'s mesh.\n\n"Five weeks," he says. "Five weeks of being the crank. Sheriff\'s got a file with my name on it and it\'s a file about *me*."\n\nHe turns the key. "Say the word and I\'ll put a hole in it. I\'d like that on paper somewhere, that it was me that said it."';
 
 // ---------------------------------------------------------------------------
 // E1 addendum §4.1/§4.2 — `SHOW ARM TO JACK`, and the NPC-agnostic
@@ -749,10 +749,10 @@ const persuadeJackText =
 // ---------------------------------------------------------------------------
 
 export const SHOW_ARM_GENERIC_TEXT =
-  'You push the sleeve back and hold the inside of the left forearm out to be\nlooked at.\n\nThere is a patch of skin there about the size of a postage stamp, slightly\nsmoother and slightly paler than what surrounds it. In a lit room that is the\nwhole of what there is to show anybody.\n\nIt is looked at, briefly, in the manner of a thing somebody has been asked to\nlook at, and then the conversation goes back to where it was.';
+  'You push the sleeve back and hold the inside of the left forearm out to be looked at.\n\nThere is a patch of skin there about the size of a postage stamp, slightly smoother and slightly paler than what surrounds it. In a lit room that is the whole of what there is to show anybody.\n\nIt is looked at, briefly, in the manner of a thing somebody has been asked to look at, and then the conversation goes back to where it was.';
 
 const showArmToJackText =
-  'You push the sleeve back and hold the inside of the left forearm out where the\nlight can get at it.\n\nJack looks at it properly, which is more than most men would do, and takes\nabout as long over it as it deserves.\n\n"There\'s nothing there."\n\nHe is not humouring you. There is nothing there. There is a patch of skin about\nthe size of a postage stamp that is a little smoother and a little paler than\nwhat surrounds it, and in a lit room that is the entire content of what you\nhave just shown a man.\n\nThen he goes back to his mug, and about four seconds later, without looking up:\n\n"Was there meant to be?"';
+  'You push the sleeve back and hold the inside of the left forearm out where the light can get at it.\n\nJack looks at it properly, which is more than most men would do, and takes about as long over it as it deserves.\n\n"There\'s nothing there."\n\nHe is not humouring you. There is nothing there. There is a patch of skin about the size of a postage stamp that is a little smoother and a little paler than what surrounds it, and in a lit room that is the entire content of what you have just shown a man.\n\nThen he goes back to his mug, and about four seconds later, without looking up:\n\n"Was there meant to be?"';
 
 // ---------------------------------------------------------------------------
 // §6.7 — showResponses (four)
@@ -831,7 +831,7 @@ const showResponses: ShowResponseDef[] = [
 // ---------------------------------------------------------------------------
 
 const giveLetterToJackText =
-  'He takes it out of your hand, which he does with almost nothing, and turns it\nover once without opening it.\n\n"Who\'s it for?"\n\nYou tell him.\n\nJack puts it back down on the table between you and squares it up with two\nfingers until one edge of it is parallel with one edge of the table, and takes\nhis hand off it.\n\n"Not out of my hand it isn\'t." He says it flatly, the way a man reads back a\ntest result rather than a grievance. "Everything I have sent that man for five\nweeks has gone somewhere and come back polite. I\'m the wrong post box and I\'ve\nhad a long time to work that out."\n\nThen he pushes it an inch back towards you.\n\n"Find somebody nobody has ever had a reason to look twice at, and put it in\ntheir hand."';
+  'He takes it out of your hand, which he does with almost nothing, and turns it over once without opening it.\n\n"Who\'s it for?"\n\nYou tell him.\n\nJack puts it back down on the table between you and squares it up with two fingers until one edge of it is parallel with one edge of the table, and takes his hand off it.\n\n"Not out of my hand it isn\'t." He says it flatly, the way a man reads back a test result rather than a grievance. "Everything I have sent that man for five weeks has gone somewhere and come back polite. I\'m the wrong post box and I\'ve had a long time to work that out."\n\nThen he pushes it an inch back towards you.\n\n"Find somebody nobody has ever had a reason to look twice at, and put it in their hand."';
 
 const giveResponses: ShowResponseDef[] = [
   {

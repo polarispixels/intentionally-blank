@@ -28,7 +28,7 @@ import { ACT2_DRIVE_TO_PLANT_EFFECTS } from '../act2/scripts';
 // around (§3.1's own note in the source doc).
 const FIRST_SIGHT = [
   'Main Street stops being Main Street fifty yards past the library. The brick gives out and the kerb gives out, and what is left on this side is a strip of asphalt with a motel on it: eight doors under a walkway, an office with the blind down, and a sign on a post at the road, lit from inside.',
-  '    THE ARROWHEAD\n    MOTEL\n    VACANCY',
+  '    THE ARROWHEAD\n    MOTEL VACANCY',
   'The lot holds one vehicle. It is a pickup truck the way a barn is a shed, the tyres come to your chest, and it is the first vehicle you have seen anywhere in this town.',
   'Number four is open. Light behind the screen door, and a chair pulled round to face the lot, and the chair is empty, because the man who was in it is already halfway across the asphalt in his socks.',
   '"You didn\'t come." He says it well before he is near enough to say it quietly. "Nine o\'clock, twice a week, three weeks running, and last night you didn\'t come." Then he is close enough to see the side of your head, and stops walking. "Ah, hell."',

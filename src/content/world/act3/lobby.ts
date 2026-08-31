@@ -47,21 +47,21 @@ import { FOLLOW_LUKE_GONE_TEXT } from '../act4/stagingArea';
 // ---------------------------------------------------------------------------
 
 const nolanPresentText =
-  'Nolan is crossing the terrazzo with a folder under his arm and a set of keys\ngoing round one finger, at the pace of a man between two things.';
+  'Nolan is crossing the terrazzo with a folder under his arm and a set of keys going round one finger, at the pace of a man between two things.';
 
 // ---------------------------------------------------------------------------
 // §7.1 — description
 // ---------------------------------------------------------------------------
 
 const firstSightText =
-  'Somebody built a room to be walked into by people who were going to be\nimpressed, and then the people stopped coming.\n\nTwo storeys of glass on the road side. Terrazzo underfoot with brass strips in\nit. It is warm in here in a way the outside of this county has not been warm\nin weeks, and it is very clean, and the air has been standing still in it long\nenough to have gone soft.\n\nThere is a reception desk with nobody behind it and a bell on the counter.\nThere is a case in the middle of the floor with a model of the building inside\nit, lit from within. On the wall by the inner doors there is a bronze plaque,\nand beside the plaque a rack of brochures with a curl in them.\n\nThe inner doors have a turnstile and a reader. Off to the left a pair of doors\nsays CONTRACTORS — STAGING and means it.\n\nNothing anywhere in it is out of place. It is the tidiest room you have been\nin since you woke up on a floor, and there is nobody in it.';
+  'Somebody built a room to be walked into by people who were going to be impressed, and then the people stopped coming.\n\nTwo storeys of glass on the road side. Terrazzo underfoot with brass strips in it. It is warm in here in a way the outside of this county has not been warm in weeks, and it is very clean, and the air has been standing still in it long enough to have gone soft.\n\nThere is a reception desk with nobody behind it and a bell on the counter. There is a case in the middle of the floor with a model of the building inside it, lit from within. On the wall by the inner doors there is a bronze plaque, and beside the plaque a rack of brochures with a curl in them.\n\nThe inner doors have a turnstile and a reader. Off to the left a pair of doors says CONTRACTORS — STAGING and means it.\n\nNothing anywhere in it is out of place. It is the tidiest room you have been in since you woke up on a floor, and there is nobody in it.';
 
 /** §14.2's own alertness sentence, verbatim — "the second of the wave's two alertness sentences" (the first is the perimeter's own, task A). */
 const alertnessText =
-  'The desk, the bell, the case, the plaque, the rack. Over the inner doors there\nis a second camera on a bracket that is newer than the doors are.';
+  'The desk, the bell, the case, the plaque, the rack. Over the inner doors there is a second camera on a bracket that is newer than the doors are.';
 
 const otherwiseText =
-  'Glass, terrazzo, warm still air. The desk with the bell on it, the model in\nits case, the plaque, the brochures going curly in their rack.\n\nThe inner doors and their turnstile. The staging doors on the left. Behind\nyou, the way out.';
+  'Glass, terrazzo, warm still air. The desk with the bell on it, the model in its case, the plaque, the brochures going curly in their rack.\n\nThe inner doors and their turnstile. The staging doors on the left. Behind you, the way out.';
 
 const description: ProseRule[] = [
   { when: { npcAt: [ACT2_NOLAN, ACT3_LOBBY] }, text: nolanPresentText },
@@ -74,16 +74,16 @@ const description: ProseRule[] = [
 // §7.8 — room-level senses and responses
 // ---------------------------------------------------------------------------
 
-const smellText = 'Floor polish, warm carpet tile that has never had anybody walk on it, and,\nfrom somewhere a long way off through a door, coffee.';
+const smellText = 'Floor polish, warm carpet tile that has never had anybody walk on it, and, from somewhere a long way off through a door, coffee.';
 
 const listenText =
-  'Air moving in a ceiling, doing it properly.\n\nAnd that is all, until you have been standing here a while, at which point\nyou can hear the fluorescent in the model case, and after that you cannot stop\nhearing that either.';
+  'Air moving in a ceiling, doing it properly.\n\nAnd that is all, until you have been standing here a while, at which point you can hear the fluorescent in the model case, and after that you cannot stop hearing that either.';
 
 const lookUpText =
-  'Two storeys of glass on a mullion grid, and above the terrazzo a soffit with\ndownlights in it set out on a spacing that somebody argued about.';
+  'Two storeys of glass on a mullion grid, and above the terrazzo a soffit with downlights in it set out on a spacing that somebody argued about.';
 
 const sleepText =
-  'Not in here. You could sit down — the lobby has a bench and the plant has a\nwarm step — but there is no version of the next few hours that you are\nprepared to spend unconscious inside this fence.';
+  'Not in here. You could sit down — the lobby has a bench and the plant has a warm step — but there is no version of the next few hours that you are prepared to spend unconscious inside this fence.';
 
 const roomHandlers: HandlerDef[] = [
   { verbs: [SMELL], effects: [{ say: smellText }] },

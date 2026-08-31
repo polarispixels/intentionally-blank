@@ -58,7 +58,7 @@ import {
 // ---------------------------------------------------------------------------
 
 const billboardExamine =
-  'Up close it is larger than it has any need to be, and old: the boards behind the paint have shrunk apart in three places and been painted over as one surface anyway.\n\n    WALL DRUG - 32 MILES\n    FREE ICE WATER\n    PROBABLY\n\nLow down on the left leg, at about the height of a man with a nail and some time, somebody has scratched through the paint to the wood.\n\n    It was 32 miles yesterday too.\n\nThe scratches have weathered the same brown as the wood around them.';
+  'Up close it is larger than it has any need to be, and old: the boards behind the paint have shrunk apart in three places and been painted over as one surface anyway.\n\n    WALL DRUG - 32 MILES FREE ICE WATER PROBABLY\n\nLow down on the left leg, at about the height of a man with a nail and some time, somebody has scratched through the paint to the wood.\n\n    It was 32 miles yesterday too.\n\nThe scratches have weathered the same brown as the wood around them.';
 const billboardExamineEffects: Effect[] = [{ say: billboardExamine }, { grantClue: CLUE_BILLBOARD_SCRATCH }, { set: [FLAG_READ_BILLBOARD_SCRATCH, true] }];
 
 const scratchText =
@@ -144,7 +144,7 @@ const billboardBack: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const townSignText =
-  'It faces north, for people arriving, so you read the back of it first and then walk round.\n\n    TOWN LIMITS\n    POP. 412\n\nThe number is on a smaller plate bolted over the middle of the board. Above the plate, in the paint, four older bolt holes in two pairs. That is two plates ago.\n\nThe board has been repainted twice. The plate has not been repainted at all.';
+  'It faces north, for people arriving, so you read the back of it first and then walk round.\n\n    TOWN LIMITS POP. 412\n\nThe number is on a smaller plate bolted over the middle of the board. Above the plate, in the paint, four older bolt holes in two pairs. That is two plates ago.\n\nThe board has been repainted twice. The plate has not been repainted at all.';
 
 const townSign: ObjectDefSlice = {
   location: TOWN_EDGE,

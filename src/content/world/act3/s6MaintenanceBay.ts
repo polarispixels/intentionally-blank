@@ -50,16 +50,16 @@ import {
 // ---------------------------------------------------------------------------
 
 const firstSightDayText =
-  'The ladder ends on a floor, and the floor is tiled.\n\nNot plant tile. The small hard cream tile of a hospital corridor, laid true,\nwith the grout gone dark in the traffic lanes and clean everywhere else, and a\nfall on it toward a brass grating in the middle of the room.\n\nThe room is long. Down the whole of it, in rows facing the same way, there are\nchairs — reclining chairs, upholstered, on pedestals, footrests up and\nheadrests set — and the rows go back past what the lights are prepared to do\nabout them.\n\nAlong the left-hand wall, at about the height of a coat rail, a rail of hooks\nwith names underneath them.\n\nThere is a lamp on a jointed arm at the head of the nearest chair. There is a\nwhite steel cabinet on the wall by the far door. There is a set of grey\ncoveralls on a hanger at the end of the rail.\n\nEvery chair is empty, and every one of them has been set to a person.';
+  'The ladder ends on a floor, and the floor is tiled.\n\nNot plant tile. The small hard cream tile of a hospital corridor, laid true, with the grout gone dark in the traffic lanes and clean everywhere else, and a fall on it toward a brass grating in the middle of the room.\n\nThe room is long. Down the whole of it, in rows facing the same way, there are chairs — reclining chairs, upholstered, on pedestals, footrests up and headrests set — and the rows go back past what the lights are prepared to do about them.\n\nAlong the left-hand wall, at about the height of a coat rail, a rail of hooks with names underneath them.\n\nThere is a lamp on a jointed arm at the head of the nearest chair. There is a white steel cabinet on the wall by the far door. There is a set of grey coveralls on a hanger at the end of the rail.\n\nEvery chair is empty, and every one of them has been set to a person.';
 
 const firstSightNightText =
-  'The ladder ends on a floor, and the floor is tiled, and the room is full.\n\nRows of reclining chairs facing the same way, going back past what the lights\nare prepared to do about them, and in the chairs there are people.\n\nThey are asleep. They are in their own clothes. There is a strap across each\nchest and one across each pair of knees and a cuff at each wrist, and the\nstraps are lined with sheepskin, and nobody is pulling against anything.\n\nThe nearest woman has her cardigan on and her reading glasses folded into the\nbreast pocket of it. The man past her came down here in a good coat and\nsomebody hung the coat up rather than leaving it over his knees.\n\nAlong the left-hand wall, a rail of hooks with names underneath them. At the\nhead of the nearest chair, a lamp on a jointed arm. On the wall at the far end,\nbeside a door, a white steel cabinet.\n\nNobody looks up, because nobody is awake.';
+  'The ladder ends on a floor, and the floor is tiled, and the room is full.\n\nRows of reclining chairs facing the same way, going back past what the lights are prepared to do about them, and in the chairs there are people.\n\nThey are asleep. They are in their own clothes. There is a strap across each chest and one across each pair of knees and a cuff at each wrist, and the straps are lined with sheepskin, and nobody is pulling against anything.\n\nThe nearest woman has her cardigan on and her reading glasses folded into the breast pocket of it. The man past her came down here in a good coat and somebody hung the coat up rather than leaving it over his knees.\n\nAlong the left-hand wall, a rail of hooks with names underneath them. At the head of the nearest chair, a lamp on a jointed arm. On the wall at the far end, beside a door, a white steel cabinet.\n\nNobody looks up, because nobody is awake.';
 
 const returningNightText =
-  'The rows, full, facing the wall with nothing on it. The rail of hooks. The\nlamp on its arm at the head of the first chair.\n\nThe far door is the archive. The steel steps behind you go back up into the\npipe.';
+  'The rows, full, facing the wall with nothing on it. The rail of hooks. The lamp on its arm at the head of the first chair.\n\nThe far door is the archive. The steel steps behind you go back up into the pipe.';
 
 const otherwiseText =
-  'The rows, empty, facing the wall with nothing on it. The rail of hooks along\nthe left. The grating in the middle of the floor and the fall of the tile\ntoward it.\n\nThe far door is the archive. The steel steps behind you go back up into the\npipe.';
+  'The rows, empty, facing the wall with nothing on it. The rail of hooks along the left. The grating in the middle of the floor and the fall of the tile toward it.\n\nThe far door is the archive. The steel steps behind you go back up into the pipe.';
 
 const description: ProseRule[] = [
   { when: { all: [{ not: { visited: ACT3_S6_MAINTENANCE_BAY } }, { not: NIGHT }] }, text: firstSightDayText },
@@ -116,10 +116,10 @@ const inExit: ExitDefSlice = { dir: 'in', to: ACT3_S6_ARCHIVE_HUB };
 // ---------------------------------------------------------------------------
 
 const listenNightText =
-  'Breathing, at a lot of different rates, which after a minute stops sounding\nlike anything at all.\n\nAnd past the far wall, somewhere behind the archive and beyond it, machinery:\nrunning, and stopping, and a pair of doors opening and closing on a cycle that\nhas nothing to do with you.\n\nIt runs. It stops. It runs again. Whatever it is bringing, it is bringing it a\nfew at a time, and it was doing it before you got here.';
+  'Breathing, at a lot of different rates, which after a minute stops sounding like anything at all.\n\nAnd past the far wall, somewhere behind the archive and beyond it, machinery: running, and stopping, and a pair of doors opening and closing on a cycle that has nothing to do with you.\n\nIt runs. It stops. It runs again. Whatever it is bringing, it is bringing it a few at a time, and it was doing it before you got here.';
 
 const listenOtherwiseText =
-  'Air moving a long way off, on its way somewhere else, and under it the floor,\ncarrying the note you have been standing on since Sublevel 5.\n\nNothing in this room is making a sound. Rooms with people in them hum a little\neven when the people are out. This one does not.';
+  'Air moving a long way off, on its way somewhere else, and under it the floor, carrying the note you have been standing on since Sublevel 5.\n\nNothing in this room is making a sound. Rooms with people in them hum a little even when the people are out. This one does not.';
 
 const listenRules: ProseRule[] = [
   { when: NIGHT, text: listenNightText },
@@ -127,14 +127,14 @@ const listenRules: ProseRule[] = [
 ];
 
 const smellText =
-  'Clean. Laundry, floor soap, warm dust off a light fitting, and the faint flat\nsmell of the inside of a new appliance.\n\nIt is the smell of a place that is looked after by somebody who is not in it.';
+  'Clean. Laundry, floor soap, warm dust off a light fitting, and the faint flat smell of the inside of a new appliance.\n\nIt is the smell of a place that is looked after by somebody who is not in it.';
 
-const waitText = 'Nothing changes. At night, nothing changes and everybody goes on breathing; by\nday, nothing changes and the paper stays fresh.';
+const waitText = 'Nothing changes. At night, nothing changes and everybody goes on breathing; by day, nothing changes and the paper stays fresh.';
 
-const restText = 'There is a chair four feet from you with the paper fresh on it and the footrest\nup.\n\nYou stay on your feet.';
+const restText = 'There is a chair four feet from you with the paper fresh on it and the footrest up.\n\nYou stay on your feet.';
 
 const shoutText =
-  'The room takes it and gives you very little of it back, because a room with\nupholstery in it and rows of people in the upholstery is exactly the shape of a\nroom that does not echo.';
+  'The room takes it and gives you very little of it back, because a room with upholstery in it and rows of people in the upholstery is exactly the shape of a room that does not echo.';
 
 export const s6MaintenanceBayRoom: RoomDefSlice = {
   name: 'Maintenance Bay',

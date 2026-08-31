@@ -33,7 +33,7 @@ export const ACT2_D1_SCRIPTS: Record<ScriptId, ScriptFn> = {};
 // ---------------------------------------------------------------------------
 
 const truckAtTheCattleGuardText =
-  'Jack takes the cattle guard at a walking pace, the way you take a thing you\nintend to still be there on the way back.\n\nPast it the county road stops pretending. There is a fence on your right and\nit goes on being on your right, and the road holds the line of it without\noffering you anything, and up ahead the fence turns and the road turns with\nit, and neither of them has been made easy to leave.';
+  'Jack takes the cattle guard at a walking pace, the way you take a thing you intend to still be there on the way back.\n\nPast it the county road stops pretending. There is a fence on your right and it goes on being on your right, and the road holds the line of it without offering you anything, and up ahead the fence turns and the road turns with it, and neither of them has been made easy to leave.';
 
 /** Also this verb's own `default` (`act2/verbs.ts`) — the room-level handlers below are what a player actually reaches; see that file's own comment on the idiom (`V_CHECK_DATE`/`V_FIND_MY_NAME`). */
 export const ACT2_DRIVE_TO_PLANT_TEXT = truckAtTheCattleGuardText;

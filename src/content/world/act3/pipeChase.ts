@@ -36,7 +36,7 @@ import { ACT3_COOLING_PLANT, ACT3_PIPE_CHASE, ACT3_PIPE_CHASE_SEEN, ACT3_S5_REAC
 // ---------------------------------------------------------------------------
 
 const firstSight =
-  'A formed concrete shaft, about four feet by six, with a ladder bolted down one\ncorner and the two big pipes taking up most of what is left.\n\nIt is warm, and it is wet. Not running wet — the walls carry a film, and the\nfilm has been here long enough to have gone the faint grey-green of a surface\nthat gets water and no light, and the rungs are cold and greasy under the\nhand.\n\nEverything in here is a fact about Return B. Its lagging stops a yard below\nthe S5 floor and was never picked up again, so from there down it is bare\nsteel, warm, and dry in a shaft where nothing else is.\n\nAbove you the shaft goes up a long way, past a formed opening with light in\nit, to a square of light with a hatch beside it.\n\nBelow you the shaft goes down.';
+  'A formed concrete shaft, about four feet by six, with a ladder bolted down one corner and the two big pipes taking up most of what is left.\n\nIt is warm, and it is wet. Not running wet — the walls carry a film, and the film has been here long enough to have gone the faint grey-green of a surface that gets water and no light, and the rungs are cold and greasy under the hand.\n\nEverything in here is a fact about Return B. Its lagging stops a yard below the S5 floor and was never picked up again, so from there down it is bare steel, warm, and dry in a shaft where nothing else is.\n\nAbove you the shaft goes up a long way, past a formed opening with light in it, to a square of light with a hatch beside it.\n\nBelow you the shaft goes down.';
 
 const returnVisit = 'The shaft, the ladder, the two pipes, and the film on the walls.\n\nUp is the plant. Sideways is the gallery. Down is down.';
 
@@ -54,7 +54,7 @@ const onEnter: OnEnterRule[] = [{ effects: [{ set: [ACT3_PIPE_CHASE_SEEN, true] 
 // ---------------------------------------------------------------------------
 
 const upExitText =
-  'Ten minutes of ladder with a warm pipe going the other way past your right\nshoulder, and then a square of light, and then a plant room that is going to\nfeel cold.';
+  'Ten minutes of ladder with a warm pipe going the other way past your right shoulder, and then a square of light, and then a plant room that is going to feel cold.';
 
 const upExit: ExitDefSlice = { dir: 'up', to: ACT3_COOLING_PLANT, travelText: upExitText, minutes: 10 };
 
@@ -83,7 +83,7 @@ const sidewaysEffects: Effect[] = [{ goto: ACT3_S5_REACTOR_INTERFACE }, { advanc
 // ---------------------------------------------------------------------------
 
 export const CHASE_DESCENT_TEXT =
-  'The ladder goes on.\n\nThere is no landing here, no plate across it, no permit stencil and nothing\nbolted over the opening; the shaft simply continues, formed the same, with the\nsame bolts in the same string, and the air coming up it is warmer than the air\nyou are standing in and it is moving.\n\nSomewhere a long way below you, water is going through something at a steady\nrate, and it is the only thing there is to hear.';
+  'The ladder goes on.\n\nThere is no landing here, no plate across it, no permit stencil and nothing bolted over the opening; the shaft simply continues, formed the same, with the same bolts in the same string, and the air coming up it is warmer than the air you are standing in and it is moving.\n\nSomewhere a long way below you, water is going through something at a steady rate, and it is the only thing there is to hear.';
 
 // `act3_q_when_unwatched`'s own `openWhen: { visited: act3_pipe_chase }`
 // (`knowledge.ts`'s wave-D4-shared block) already opens it the moment the
@@ -97,15 +97,15 @@ const downExit: ExitDefSlice = { dir: 'down', to: ACT3_S6_MAINTENANCE_BAY, trave
 // ---------------------------------------------------------------------------
 
 const listenText =
-  'Water in a pipe, drips arriving at different intervals from different heights,\nand above all of it the plant, a long way up, being the loudest thing in the\ncounty to anybody standing in a concrete tube.';
+  'Water in a pipe, drips arriving at different intervals from different heights, and above all of it the plant, a long way up, being the loudest thing in the county to anybody standing in a concrete tube.';
 
 const smellText =
-  'Wet concrete, warm steel, and the flat mineral smell of treated water, which\nyou last met upstairs coming off a gland that was weeping a drop an hour.';
+  'Wet concrete, warm steel, and the flat mineral smell of treated water, which you last met upstairs coming off a gland that was weeping a drop an hour.';
 
 const shoutText =
-  'A shaft this shape does something specific with a shout, which is to send most\nof it straight up and give you back the rest a half-second later sounding\nlike somebody else.';
+  'A shaft this shape does something specific with a shout, which is to send most of it straight up and give you back the rest a half-second later sounding like somebody else.';
 
-const waitText = 'Warm, wet, and going nowhere. The drips carry on arriving at their own\nintervals.';
+const waitText = 'Warm, wet, and going nowhere. The drips carry on arriving at their own intervals.';
 
 const restText = 'On a ladder, in a shaft, with a hand on a warm pipe. No.';
 

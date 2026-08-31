@@ -42,17 +42,17 @@ import {
  * is transcribed directly from the same spec section rather than imported.
  */
 const WELL_DOOR_EXAMINE_BEFORE_TEXT_DUP =
-  'Up three tiled steps: the door.\n\nOn this side it has a handle, and a bolt, and a plate with the hinge screws\nshowing, and a strip of draught seal along the top that somebody replaced at\nsome point, because the replacement came up short and there is a little\nmade-good piece let in at the corner.\n\nThere is no reader on this side. There was never going to be one.';
+  'Up three tiled steps: the door.\n\nOn this side it has a handle, and a bolt, and a plate with the hinge screws showing, and a strip of draught seal along the top that somebody replaced at some point, because the replacement came up short and there is a little made-good piece let in at the corner.\n\nThere is no reader on this side. There was never going to be one.';
 
 // ---------------------------------------------------------------------------
 // §10 — the room.
 // ---------------------------------------------------------------------------
 
 const firstSightText =
-  'The ladder stops in the floor of a room the size of a landing.\n\nWalls, floor and ceiling are the smooth thing the bottom of the shaft was, and\nthey run into one another without a line, so that the room is a shape and not\nan assembly. It is not white and it is not grey. It is lit, evenly, and you\ncannot find what is lighting it.\n\nThere is a door in the wall on your left with three tiled steps going up to\nit, which is the wrong way round for a door at the bottom of anything.\n\nThere is a door in the wall in front of you with nothing round it at all.\n\nAnd between them, on a stand that comes out of the floor, there is a console\nwith a screen on it, and the screen says\n\n    USER:\n\nand there is a cursor, blinking at about the rate of a resting heart.';
+  'The ladder stops in the floor of a room the size of a landing.\n\nWalls, floor and ceiling are the smooth thing the bottom of the shaft was, and they run into one another without a line, so that the room is a shape and not an assembly. It is not white and it is not grey. It is lit, evenly, and you cannot find what is lighting it.\n\nThere is a door in the wall on your left with three tiled steps going up to it, which is the wrong way round for a door at the bottom of anything.\n\nThere is a door in the wall in front of you with nothing round it at all.\n\nAnd between them, on a stand that comes out of the floor, there is a console with a screen on it, and the screen says\n\n    USER:\n\nand there is a cursor, blinking at about the rate of a resting heart.';
 
 const unconditionalText =
-  'The landing at the bottom of the ladder. A door up three tiled steps, a door\nwith nothing round it, and a console on a stand asking for a user.';
+  'The landing at the bottom of the ladder. A door up three tiled steps, a door with nothing round it, and a console on a stand asking for a user.';
 
 const description: ProseRule[] = [
   { when: { not: { visited: ACT5_ROOT_ANTECHAMBER } }, text: firstSightText },
@@ -66,18 +66,18 @@ const onEnter: OnEnterRule[] = [{ effects: [{ checkpoint: ACT5_CHECKPOINT_ANTECH
 // ---------------------------------------------------------------------------
 
 const listenText =
-  'The water, much closer now and still not varying, and the sound of a room being\nlarge, which down here is not coming from anywhere in particular because down\nhere it does not have to.';
+  'The water, much closer now and still not varying, and the sound of a room being large, which down here is not coming from anywhere in particular because down here it does not have to.';
 
 const smellText =
-  'Nothing. Not the nothing of clean air — the nothing the smooth part of the\nshaft had, which is a surface with no history on it.';
+  'Nothing. Not the nothing of clean air — the nothing the smooth part of the shaft had, which is a surface with no history on it.';
 
 const touchWallFloorText =
-  'Warm, and hard, and slightly giving, in the way a very good floor in a very old\nbuilding is slightly giving, and there is no grain in it and no cold in it and\nnothing anywhere that your fingers can find an edge on.';
+  'Warm, and hard, and slightly giving, in the way a very good floor in a very old building is slightly giving, and there is no grain in it and no cold in it and nothing anywhere that your fingers can find an edge on.';
 
 const searchRoomText =
-  'There is no behind. The stand comes out of the floor the way the bench in the\nnext room comes out of the wall, and the cable that ought to be under it is\nnot, and there is nowhere for it to have gone.';
+  'There is no behind. The stand comes out of the floor the way the bench in the next room comes out of the wall, and the cable that ought to be under it is not, and there is nowhere for it to have gone.';
 
-const yellText = 'It does not come back. Not swallowed — simply not returned, the way a shout is\nnot returned in a field.';
+const yellText = 'It does not come back. Not swallowed — simply not returned, the way a shout is not returned in a field.';
 
 const roomHandlers: HandlerDef[] = [
   { verbs: [LISTEN], effects: [{ say: listenText }] },
@@ -102,7 +102,7 @@ const roomHandlers: HandlerDef[] = [
 // ---------------------------------------------------------------------------
 
 const consoleExamineText =
-  'A screen on a stand, with a keyboard shelf under it and nothing else: no case,\nno vents, no maker\'s plate, no switch, and no way of telling whether it is on\nbecause it has never been off.\n\n    USER:\n\nThe cursor is doing the only thing in this room that is happening.\n\nIt is the same prompt, in the same lettering, at the same size, as the one on\nthe machine standing in a rented room over a hardware store with a stain on\nthe boards beside it. It has been asking a long time.';
+  'A screen on a stand, with a keyboard shelf under it and nothing else: no case, no vents, no maker\'s plate, no switch, and no way of telling whether it is on because it has never been off.\n\n    USER:\n\nThe cursor is doing the only thing in this room that is happening.\n\nIt is the same prompt, in the same lettering, at the same size, as the one on the machine standing in a rented room over a hardware store with a stain on the boards beside it. It has been asking a long time.';
 
 /**
  * §11.2 — "TYPE"/"USE CONSOLE" without invoking the structured login
@@ -114,13 +114,13 @@ const consoleExamineText =
  * either — see this task's report.
  */
 const consoleUseWithoutLoggingInText =
-  'The cursor takes everything you give it without comment and does not move off\nthe line it is on, because it is not a line you write on. It is a label.\n\nUnderneath it, when you stop, there is a second label, and it says PASSWORD:,\nand it has been there the whole time.';
+  'The cursor takes everything you give it without comment and does not move off the line it is on, because it is not a line you write on. It is a label.\n\nUnderneath it, when you stop, there is a second label, and it says PASSWORD:, and it has been there the whole time.';
 
 const consoleTakeBreakPryText =
-  'The leg goes in over the top of the screen bezel and finds a screen bezel\nunderneath it, and behind the stand there is more floor.\n\nYou stop, on the grounds that you have come a long way to be at this machine\nand it would be a poor sort of afternoon to spend the last of it taking it\napart.';
+  'The leg goes in over the top of the screen bezel and finds a screen bezel underneath it, and behind the stand there is more floor.\n\nYou stop, on the grounds that you have come a long way to be at this machine and it would be a poor sort of afternoon to spend the last of it taking it apart.';
 
 const consoleLookBehindSearchText =
-  'Nothing on it, under it or behind it. No paper taped anywhere, no card in a\nholder, no biro line on the bezel, nothing at all written down within reach of\nthis machine.\n\nWhich is unusual, in a building where everything else is.';
+  'Nothing on it, under it or behind it. No paper taped anywhere, no card in a holder, no biro line on the bezel, nothing at all written down within reach of this machine.\n\nWhich is unusual, in a building where everything else is.';
 
 const anteConsole: ObjectDefSlice = {
   location: ACT5_ROOT_ANTECHAMBER,
@@ -142,11 +142,11 @@ const anteConsole: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const innerDoorExamineAfterText =
-  'A leaf of the same material as the wall it is in, standing a finger\'s width off\nits seal, with the room\'s even light going through the gap and not lighting\nanything on the other side of it.\n\nThere is no handle. There is no frame. There is the line where it stops being\nwall, and there was not one of those an hour ago.';
+  'A leaf of the same material as the wall it is in, standing a finger\'s width off its seal, with the room\'s even light going through the gap and not lighting anything on the other side of it.\n\nThere is no handle. There is no frame. There is the line where it stops being wall, and there was not one of those an hour ago.';
 
 /** §15.2 — also this room's own `n` exit's `blockedText`, below. */
 export const INNER_DOOR_EXAMINE_BEFORE_TEXT =
-  'There is a door in the wall in front of you in the sense that there is a\nrectangle of the wall which is a door.\n\nNo handle, no keyway, no reader, no gap, no seam you can get a nail into. It\nis not shut against you. It has not been asked yet.';
+  'There is a door in the wall in front of you in the sense that there is a rectangle of the wall which is a door.\n\nNo handle, no keyway, no reader, no gap, no seam you can get a nail into. It is not shut against you. It has not been asked yet.';
 
 const innerDoorExamine: ProseRule[] = [
   { when: { flag: ACT5_ROOT_ACCEPTED }, text: innerDoorExamineAfterText },
@@ -154,11 +154,11 @@ const innerDoorExamine: ProseRule[] = [
 ];
 
 const innerDoorOpenPushText =
-  'It does not move, and it does not resist either. Pushing it is like pushing the\nwall on either side of it, which is exactly what you are doing.';
+  'It does not move, and it does not resist either. Pushing it is like pushing the wall on either side of it, which is exactly what you are doing.';
 
 /** §15.3 — the root door's own shipped knock line, verbatim, on a different door — the one sentence in the game used twice on purpose (not counted per that section's own note). */
 const innerDoorKnockText =
-  'Your knuckles do not make a noise on it. They make a smaller noise than they\nmake on your own hand.';
+  'Your knuckles do not make a noise on it. They make a smaller noise than they make on your own hand.';
 
 const innerDoor: ObjectDefSlice = {
   location: ACT5_ROOT_ANTECHAMBER,

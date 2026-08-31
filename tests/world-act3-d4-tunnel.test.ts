@@ -86,9 +86,9 @@ describe('The county-road walk (§3)', () => {
     const store = new MemoryStore();
     const result = say(atTownEdge(), 'nw', store);
     expect(text(result.events)).toContain(
-      'You go out over the grazing with the last of the town behind you and the line\nof cedar posts on your left, and the posts carry no wire and never have, and\nthey run north as straight as anything in this county.',
+      'You go out over the grazing with the last of the town behind you and the line of cedar posts on your left, and the posts carry no wire and never have, and they run north as straight as anything in this county.',
     );
-    expect(text(result.events)).toContain('Then the road makes its bend, and the posts come down off the last rise, and\nstop.');
+    expect(text(result.events)).toContain('Then the road makes its bend, and the posts come down off the last rise, and stop.');
     expect(result.session.state.location).toBe(ACT3_TUNNEL_MOUTH);
   });
 
@@ -98,7 +98,7 @@ describe('The county-road walk (§3)', () => {
     session = say(session, 'nw', store).session;
     session = say(session, 'se', store).session; // back to Town Edge
     const result = say(session, 'nw', store);
-    expect(text(result.events)).toContain('The grazing, the posts, the bend. It is an hour whether you are looking\nforward to it or not.');
+    expect(text(result.events)).toContain('The grazing, the posts, the bend. It is an hour whether you are looking forward to it or not.');
   });
 
   it('going out with nothing that will open it blocks the exit and the player stays at Town Edge (§3.4)', () => {
@@ -111,7 +111,7 @@ describe('The county-road walk (§3)', () => {
     // one neutral turn lets the event correct it to closed for this state.
     session = say(session, 'wait', store).session;
     const result = say(session, 'nw', store);
-    expect(text(result.events)).toContain('and then you spend the second hour of the afternoon walking\nback for something that will turn or something that will lever.');
+    expect(text(result.events)).toContain('and then you spend the second hour of the afternoon walking back for something that will turn or something that will lever.');
     expect(result.session.state.location).toBe(TOWN_EDGE);
   });
 });
@@ -121,17 +121,17 @@ describe('The hatch (§4)', () => {
     const store = new MemoryStore();
     const session = say(atTownEdge(), 'nw', store).session;
     const result = say(session, 'examine hatch', store);
-    expect(text(result.events)).toContain('There is no hasp and no padlock. There is a brass escutcheon let into the\nplate near one edge, and behind the escutcheon there is a square hole.');
+    expect(text(result.events)).toContain('There is no hasp and no padlock. There is a brass escutcheon let into the plate near one edge, and behind the escutcheon there is a square hole.');
   });
 
   it('UNLOCK HATCH with the keyring sets act3_tunnel_unlocked', () => {
     const store = new MemoryStore();
     const session = say(atTownEdge(), 'nw', store).session;
     const result = say(session, 'unlock hatch', store);
-    expect(text(result.events)).toContain('A quarter turn. Something in the kerb lets go with one flat knock, and the\nplate stands up half an inch on its own and stops there.');
+    expect(text(result.events)).toContain('A quarter turn. Something in the kerb lets go with one flat knock, and the plate stands up half an inch on its own and stops there.');
     expect(result.session.state.flags[ACT3_TUNNEL_UNLOCKED]).toBe(true);
     const examined = say(result.session, 'examine hatch', store);
-    expect(text(examined.events)).toBe('Over on its back in the grass, with its two eyes pointing at the sky and a\nhole under where it was.');
+    expect(text(examined.events)).toBe('Over on its back in the grass, with its two eyes pointing at the sky and a hole under where it was.');
   });
 
   it('PRY HATCH with the chair leg, on a fresh state with no keyring, also sets act3_tunnel_unlocked', () => {
@@ -148,7 +148,7 @@ describe('The hatch (§4)', () => {
     // Simulate having neither by dropping both, then trying OPEN.
     const dropped: GameState = { ...session.state, objects: { ...session.state.objects, [KEYRING]: { location: TOWN_EDGE }, [CHAIR_LEG]: { location: TOWN_EDGE } } };
     const result = say({ ...session, state: dropped }, 'open hatch', store);
-    expect(text(result.events)).toContain('There is a square hole behind the brass and there is a lifting eye at the\ncorner, and between them they describe two entirely different afternoons.');
+    expect(text(result.events)).toContain('There is a square hole behind the brass and there is a lifting eye at the corner, and between them they describe two entirely different afternoons.');
     expect(result.session.state.flags[ACT3_TUNNEL_UNLOCKED]).not.toBe(true);
   });
 });
@@ -163,7 +163,7 @@ describe('Descending — a real bare DOWN at the mouth (§5, §6.2, §6.3, regis
     const store = new MemoryStore();
     const session = atUnlockedMouth(store);
     const result = say(session, 'down', store);
-    expect(text(result.events)).toContain('You come back to the rectangle of night, which has not moved, and which is the\nonly thing here that was ever going to tell you anything.');
+    expect(text(result.events)).toContain('You come back to the rectangle of night, which has not moved, and which is the only thing here that was ever going to tell you anything.');
     expect(result.session.state.location).toBe(ACT3_TUNNEL_MOUTH);
     expect(result.session.state.flags[ACT3_TUNNEL_BELOW]).not.toBe(true);
     expect(result.session.state.flags[ACT3_WALKED_TUNNEL]).not.toBe(true);
@@ -173,7 +173,7 @@ describe('Descending — a real bare DOWN at the mouth (§5, §6.2, §6.3, regis
     const store = new MemoryStore();
     const session = say(atTownEdge(), 'nw', store).session; // never unlocked
     const result = say(session, 'down', store);
-    expect(text(result.events)).toContain('There is a square hole behind the brass and there is a lifting eye at the\ncorner, and between them they describe two entirely different afternoons.');
+    expect(text(result.events)).toContain('There is a square hole behind the brass and there is a lifting eye at the corner, and between them they describe two entirely different afternoons.');
     expect(result.session.state.location).toBe(ACT3_TUNNEL_MOUTH);
   });
 
@@ -185,9 +185,9 @@ describe('Descending — a real bare DOWN at the mouth (§5, §6.2, §6.3, regis
     expect(lit.session.state.flags[ACT3_HEADLAMP_ON]).toBe(true);
 
     const result = say(lit.session, 'down', store);
-    expect(text(result.events)).toContain('The ladder is bolted through the shaft wall in four places and goes down about\ntwenty feet onto concrete, and the rungs are dry.');
-    expect(text(result.events)).toContain('Nobody has been down here for a long time and everything down here says so\nexcept the air, which is fresh, and moving, and coming from the far end.');
-    expect(text(result.events)).toContain('And then the light you have brought stops going forward and comes back at you\noff something flat.');
+    expect(text(result.events)).toContain('The ladder is bolted through the shaft wall in four places and goes down about twenty feet onto concrete, and the rungs are dry.');
+    expect(text(result.events)).toContain('Nobody has been down here for a long time and everything down here says so except the air, which is fresh, and moving, and coming from the far end.');
+    expect(text(result.events)).toContain('And then the light you have brought stops going forward and comes back at you off something flat.');
     expect(result.session.state.location).toBe(ACT3_SERVICE_TUNNEL);
     expect(result.session.state.flags[ACT3_TUNNEL_BELOW]).toBe(true);
     expect(result.session.state.flags[ACT3_WALKED_TUNNEL]).toBe(true);
@@ -201,7 +201,7 @@ describe('Descending — a real bare DOWN at the mouth (§5, §6.2, §6.3, regis
     expect(below.state.location).toBe(ACT3_SERVICE_TUNNEL);
 
     const result = say(below, 'up', store);
-    expect(text(result.events)).toContain('The mile again, the other way, with the air on your face this time instead of\nyour back.');
+    expect(text(result.events)).toContain('The mile again, the other way, with the air on your face this time instead of your back.');
     expect(text(result.events)).toContain('The rectangle of night is where it was.');
     expect(result.session.state.location).toBe(ACT3_TUNNEL_MOUTH);
   });
@@ -231,19 +231,19 @@ describe('Below: the rails and the seal (§6.4, §6.5)', () => {
     const store = new MemoryStore();
     const below = belowWithLight(store);
     const examined = say(below, 'examine rails', store);
-    expect(text(examined.events)).toContain('Narrow gauge, laid straight and set directly into the pour so that the heads\nstand a half inch proud and everything below them is buried.');
+    expect(text(examined.events)).toContain('Narrow gauge, laid straight and set directly into the pour so that the heads stand a half inch proud and everything below them is buried.');
 
     // Turn off the lamp: the room goes dark, but the rails are still touchable.
     const dark: GameState = { ...below.state, flags: { ...below.state.flags, [ACT3_HEADLAMP_ON]: false } };
     const touched = say({ ...below, state: dark }, 'touch rails', store);
-    expect(text(touched.events)).toContain('Cold, flat on top, and greasy in the way old steel is greasy without anybody\nhaving greased it.');
+    expect(text(touched.events)).toContain('Cold, flat on top, and greasy in the way old steel is greasy without anybody having greased it.');
   });
 
   it('examining the seal grants the clue and sets act3_saw_seal', () => {
     const store = new MemoryStore();
     const below = belowWithLight(store);
     const result = say(below, 'examine seal', store);
-    expect(text(result.events)).toContain('Through the middle of the plug there is a hole. It is not a crack and it is\nnot a failure.');
+    expect(text(result.events)).toContain('Through the middle of the plug there is a hole. It is not a crack and it is not a failure.');
     expect(result.session.state.flags[ACT3_SAW_SEAL]).toBe(true);
     expect(result.session.state.clues).toContain(ACT3_CLUE_SEAL_FROM_INSIDE);
   });
@@ -262,14 +262,14 @@ describe('The construction door, tunnel side, and the exit to S1 (§7.1, §7.2, 
     const store = new MemoryStore();
     const below = belowWithLight(store);
     const result = say(below, 'examine door', store);
-    expect(text(result.events)).toContain('It is not locked. There is no keyhole in it and no reader beside it and no\ncard of instructions screwed anywhere near it.');
+    expect(text(result.events)).toContain('It is not locked. There is no keyhole in it and no reader beside it and no card of instructions screwed anywhere near it.');
   });
 
   it('OPEN DOOR sets act3_construction_door_open, and NORTH into S1 becomes real', () => {
     const store = new MemoryStore();
     const below = belowWithLight(store);
     const opened = say(below, 'open door', store);
-    expect(text(opened.events)).toContain('Behind it: light. Painted block, a run of conduit along the top of the wall,\nand the back of a rank of pumps.');
+    expect(text(opened.events)).toContain('Behind it: light. Painted block, a run of conduit along the top of the wall, and the back of a rank of pumps.');
     expect(opened.session.state.flags[ACT3_CONSTRUCTION_DOOR_OPEN]).toBe(true);
 
     const north = say(opened.session, 'north', store);
@@ -300,7 +300,7 @@ describe('The match — a two-turn light (§5.2)', () => {
     expect(below.state.location).toBe(ACT3_SERVICE_TUNNEL);
 
     const struck = say(below, 'light match', store);
-    expect(text(struck.events)).toContain('The striker takes it on the second go. The tunnel comes as far forward as a\nmatch will bring it');
+    expect(text(struck.events)).toContain('The striker takes it on the second go. The tunnel comes as far forward as a match will bring it');
     expect(struck.session.state.flags[ACT3_MATCH_BURNING]).toBe(true);
     // Set to 3, but `tick()` runs once per turn inside the SAME `step()`
     // that ran this very LIGHT MATCH command (`turn.ts`: `respond()` then
@@ -316,7 +316,7 @@ describe('The match — a two-turn light (§5.2)', () => {
 
     // The turn after that: out (1 -> 0), burning cleared.
     const t2 = say(t1.session, 'wait', store);
-    expect(text(t2.events)).toContain('Out. The dark comes back in the way it does, all at once and from every\ndirection at the same speed.');
+    expect(text(t2.events)).toContain('Out. The dark comes back in the way it does, all at once and from every direction at the same speed.');
     expect(t2.session.state.flags[ACT3_MATCH_BURNING]).toBe(false);
   });
 

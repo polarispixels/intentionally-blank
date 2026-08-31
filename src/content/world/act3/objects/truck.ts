@@ -37,10 +37,10 @@ import { ACT3_HEADLAMP, ACT3_HEADLAMP_ON, ACT3_HEADLAMP_TAKEN, ACT3_TRUCK_TOOLBO
 // takes the gate (the doc's own note). Text transcribed verbatim (hard
 // rule 5).
 const toolboxWithHeadlampText =
-  'A steel box across the bed behind the cab, lid up, at shoulder height, because\neverything on this truck is at shoulder height.\n\nA coil of jump lead with the clamps taped apart so they cannot find each other.\nA wrench with the shine worn off its jaws. A tray of the fine grey silt that\nevery toolbox in this county has a layer of.\n\nUnder the coil, where you would only find it by moving the coil, there is a\nheadlamp.';
+  'A steel box across the bed behind the cab, lid up, at shoulder height, because everything on this truck is at shoulder height.\n\nA coil of jump lead with the clamps taped apart so they cannot find each other. A wrench with the shine worn off its jaws. A tray of the fine grey silt that every toolbox in this county has a layer of.\n\nUnder the coil, where you would only find it by moving the coil, there is a headlamp.';
 
 const toolboxAfterHeadlampText =
-  'A steel box across the bed behind the cab, lid up, at shoulder height, because\neverything on this truck is at shoulder height.\n\nA coil of jump lead with the clamps taped apart so they cannot find each other.\nA wrench with the shine worn off its jaws. A tray of the fine grey silt that\nevery toolbox in this county has a layer of.\n\nThe coil is lying where you left it after taking what was under it.';
+  'A steel box across the bed behind the cab, lid up, at shoulder height, because everything on this truck is at shoulder height.\n\nA coil of jump lead with the clamps taped apart so they cannot find each other. A wrench with the shine worn off its jaws. A tray of the fine grey silt that every toolbox in this county has a layer of.\n\nThe coil is lying where you left it after taking what was under it.';
 
 const toolboxExamineProse: ProseRule[] = [
   { when: { flag: ACT3_HEADLAMP_TAKEN }, text: toolboxAfterHeadlampText },
@@ -74,17 +74,17 @@ const wrench: ObjectDefSlice = {
 // custom handler in this game already relies on).
 // ---------------------------------------------------------------------------
 
-const headlampExamineLit = 'Lit, and pointed wherever your face is, which takes about four minutes to stop\nbeing funny.\n\nThe band is damp on the inside and the shell is warm over the reflector.';
+const headlampExamineLit = 'Lit, and pointed wherever your face is, which takes about four minutes to stop being funny.\n\nThe band is damp on the inside and the shell is warm over the reflector.';
 const headlampExamineUnlit =
-  'A headlamp on a perished elastic band, out of the bottom of Jack\'s toolbox\nunder a coil of jump lead: a plastic shell, a reflector with a scuff across\nit, a rocker switch, and a battery door held on by a screw somebody has\nreplaced with a different screw.\n\nIt is the kind of object that is either completely dead or completely fine and\ngives no indication which until you ask it.';
+  'A headlamp on a perished elastic band, out of the bottom of Jack\'s toolbox under a coil of jump lead: a plastic shell, a reflector with a scuff across it, a rocker switch, and a battery door held on by a screw somebody has replaced with a different screw.\n\nIt is the kind of object that is either completely dead or completely fine and gives no indication which until you ask it.';
 const headlampExamine: ProseRule[] = [
   { when: { flag: ACT3_HEADLAMP_ON }, text: headlampExamineLit },
   { text: headlampExamineUnlit },
 ];
 
 const headlampTurnOnText = 'Completely fine.';
-const headlampTurnOffText = 'Off, and the afterimage of the reflector sits in front of you for a while\ndoing nothing useful.';
-const headlampFirstTakeText = 'It is under a coil of jump lead in a toolbox belonging to a man who has never\nonce in his life been asked whether he has a torch and had to say no.';
+const headlampTurnOffText = 'Off, and the afterimage of the reflector sits in front of you for a while doing nothing useful.';
+const headlampFirstTakeText = 'It is under a coil of jump lead in a toolbox belonging to a man who has never once in his life been asked whether he has a torch and had to say no.';
 
 const headlamp: ObjectDefSlice = {
   location: { in: ACT3_TRUCK_TOOLBOX },

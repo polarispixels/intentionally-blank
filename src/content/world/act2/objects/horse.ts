@@ -41,17 +41,17 @@ import { ACT2_HORSE, ACT2_HORSE_BORROWED, ACT2_TRAVEL_SCRIPT, ACT2_WALL_DRUG_EMP
 import { ACT3_PERIMETER_ROAD } from '../../act3/ids';
 
 const horseExamine =
-  'The near one. Sixteen hands of entirely uninterested brown, standing hipshot\nwith one ear back on the conversation and the rest of it asleep.\n\nSomebody has tied it to the rail with a knot that exists to keep an animal\nstanding where it was put, and not for one moment to stop anybody taking it.';
+  'The near one. Sixteen hands of entirely uninterested brown, standing hipshot with one ear back on the conversation and the rest of it asleep.\n\nSomebody has tied it to the rail with a knot that exists to keep an animal standing where it was put, and not for one moment to stop anybody taking it.';
 
 /** §16.2 — `UNTIE HORSE`/`TAKE HORSE`/`MOUNT HORSE` (all reach the built-in `TAKE`; "untie"/"mount" are already `TAKE`'s own synonyms, `act1/verbs.ts`). Sets `act2_horse_borrowed`; does not depart. */
 const untieHorseText =
-  'The knot comes undone in one pull, the way it was tied to. The horse steps\nback off the rail and stands in the road with you, waiting to be told what the\ntwo of you are doing.\n\nNo door opens. No blind moves. The sheriff\'s one lit window goes on being lit.\nThe street goes on being a street with a man standing in it holding a horse,\nand it is prepared to go on being that for as long as you need.';
+  'The knot comes undone in one pull, the way it was tied to. The horse steps back off the rail and stands in the road with you, waiting to be told what the two of you are doing.\n\nNo door opens. No blind moves. The sheriff\'s one lit window goes on being lit. The street goes on being a street with a man standing in it holding a horse, and it is prepared to go on being that for as long as you need.';
 
 const untieHorseEffects: Effect[] = [{ say: untieHorseText }, { set: [ACT2_HORSE_BORROWED, true] }];
 
 /** §3's own entry line for "RIDE HORSE" at Main Street or Town Edge, before the outbound ride. */
 const rideHorseEntryText =
-  'Getting up is the whole difficulty and it is over quickly. After that you are\nhigher than you have been all night, and moving, and nobody in the county\nknows about any of it.';
+  'Getting up is the whole difficulty and it is over quickly. After that you are higher than you have been all night, and moving, and nobody in the county knows about any of it.';
 
 const horse: ObjectDefSlice = {
   location: MAIN_STREET,

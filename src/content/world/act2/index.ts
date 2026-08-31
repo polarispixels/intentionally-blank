@@ -224,7 +224,7 @@ const ACT2_CENSOR_QUESTIONS: NonNullable<WorldSlice['questions']> = {
     // arrive already closed, and that is accepted ("a question the player
     // answers in the act of asking it is the library").
     answerWhen: { clue: ACT2_CLUE_SERVICE_TUNNEL },
-    answer: 'The film, and it is not close.\n\nThe terminal has nothing before 2036 and no account of why. The drawer marked\n2028-2031 has a first sod turned in a cold wind, eleven people in coats, a\nsenator standing slightly apart with his hands behind his back, and a\nphotograph of the dedication plaque shot square on before it went up, every\nletter legible: THE BADLANDS FACILITY, COMMISSIONED 2030. And in the following\nwinter, a column about the works closing down mentions in passing that the\nconstruction adit is to be sealed rather than demolished.\n\nOne of those records can be reached from somewhere else. The other one is a tin\nof acetate in an unlocked drawer, in a room with nobody in it.',
+    answer: 'The film, and it is not close.\n\nThe terminal has nothing before 2036 and no account of why. The drawer marked 2028-2031 has a first sod turned in a cold wind, eleven people in coats, a senator standing slightly apart with his hands behind his back, and a photograph of the dedication plaque shot square on before it went up, every letter legible: THE BADLANDS FACILITY, COMMISSIONED 2030. And in the following winter, a column about the works closing down mentions in passing that the construction adit is to be sealed rather than demolished.\n\nOne of those records can be reached from somewhere else. The other one is a tin of acetate in an unlocked drawer, in a room with nobody in it.',
   },
 };
 

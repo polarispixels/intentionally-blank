@@ -25,7 +25,7 @@ export const ACT5_REPLAY_MEMORIES: NonNullable<WorldSlice['memories']> = {
   [ACT5_MEM_M21]: {
     title: 'The Corner',
     lines: [
-      "I got it up the stairs on my own with the flex round my wrist, which is how\nyou carry a thing you would rather nobody offered to help with.\n\nIt went in the corner because the corner is where the outlet was. Then I\nsquared it up to the wall. Then I stood back and squared it up again, with a\nwhole room still to do and no reason on earth to be spending the afternoon on\nthe angle of a desk.\n\nThere was nothing on it anybody would ever want. I did it properly anyway, and\nthen I turned the light off from the doorway and stood there a minute longer\nthan the job needed.",
+      "I got it up the stairs on my own with the flex round my wrist, which is how you carry a thing you would rather nobody offered to help with.\n\nIt went in the corner because the corner is where the outlet was. Then I squared it up to the wall. Then I stood back and squared it up again, with a whole room still to do and no reason on earth to be spending the afternoon on the angle of a desk.\n\nThere was nothing on it anybody would ever want. I did it properly anyway, and then I turned the light off from the doorway and stood there a minute longer than the job needed.",
     ],
     trigger: { when: { all: [{ flag: ACT5_OPENING_LOGIN_SEEN }, { not: { flag: ACT2_STARTED } }] } },
   },
@@ -34,7 +34,7 @@ export const ACT5_REPLAY_MEMORIES: NonNullable<WorldSlice['memories']> = {
   [ACT5_MEM_M22]: {
     title: 'Across A Desk',
     lines: [
-      'He read them out to me across a desk without looking up from what he was\ndoing, the way you give a man the combination for a gate he is going to use\ntwice and then never again.\n\nI wrote them down afterwards, out in the corridor, standing up, because I did\nnot want him watching me decide they were worth writing down.\n\nNobody has changed them since. I used to put that down to somebody being lazy\nabout it.\n\nA lock only gets changed when somebody tries it.',
+      'He read them out to me across a desk without looking up from what he was doing, the way you give a man the combination for a gate he is going to use twice and then never again.\n\nI wrote them down afterwards, out in the corridor, standing up, because I did not want him watching me decide they were worth writing down.\n\nNobody has changed them since. I used to put that down to somebody being lazy about it.\n\nA lock only gets changed when somebody tries it.',
     ],
     trigger: {
       when: {
@@ -47,7 +47,7 @@ export const ACT5_REPLAY_MEMORIES: NonNullable<WorldSlice['memories']> = {
   [ACT5_MEM_M23]: {
     title: 'Looking For A Rat',
     lines: [
-      'You walk a tunnel like that with your light on the rails, because the rails\nare what you are down there for. I did it for years and the light never came\noff them once.\n\nThe day it did, I was looking for a rat.\n\nLow in the wall on the left, with a lip of concrete over it, and not on any\ndrawing that has ever come through my hands. I stood in front of it long\nenough that my light started going orange.\n\nThen I climbed back out and I did not put it in the book. That was the first\nthing I ever left out of it.',
+      'You walk a tunnel like that with your light on the rails, because the rails are what you are down there for. I did it for years and the light never came off them once.\n\nThe day it did, I was looking for a rat.\n\nLow in the wall on the left, with a lip of concrete over it, and not on any drawing that has ever come through my hands. I stood in front of it long enough that my light started going orange.\n\nThen I climbed back out and I did not put it in the book. That was the first thing I ever left out of it.',
     ],
     trigger: { when: { all: [{ flag: ACT5_BRANCH_UNLOCKED }, { not: { flag: ACT4_STARTED } }] } },
   },
@@ -56,7 +56,7 @@ export const ACT5_REPLAY_MEMORIES: NonNullable<WorldSlice['memories']> = {
   [ACT5_MEM_M24]: {
     title: 'An Evening I Did Not Need',
     lines: [
-      'I had a second thing to try, and a third after that, and I had put most of an\nevening aside for being turned down politely by a machine.\n\nIt took about as long as signing for a parcel.\n\nAnd then the door was open, and I did not go through it. I stood there with my\nhand flat on the machine for a while, which is not a thing I do, and I could\nnot have told you what I was waiting for.\n\nI have been frightened of a good many things in this building. Being let in\nwas never one of them, and it should have been.',
+      'I had a second thing to try, and a third after that, and I had put most of an evening aside for being turned down politely by a machine.\n\nIt took about as long as signing for a parcel.\n\nAnd then the door was open, and I did not go through it. I stood there with my hand flat on the machine for a while, which is not a thing I do, and I could not have told you what I was waiting for.\n\nI have been frightened of a good many things in this building. Being let in was never one of them, and it should have been.',
     ],
     trigger: { when: { all: [{ flag: ACT5_ROOT_ACCEPTED }, { not: { clue: ACT3_CLUE_JULES_DEPRECATED } }] } },
   },

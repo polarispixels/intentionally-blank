@@ -65,22 +65,22 @@ import { SNAPSHOT_FIELD_LINE, WAKE_SECOND } from '../formScripts';
 // ---------------------------------------------------------------------------
 
 export const BLANK_ROOM_FIRST_SIGHT =
-  'The door opens into a room with nothing in it.\n\nThat is not a way of putting it and it is not the dark doing it. The light is\neven and comes from no fitting you can find. The floor is the material the\nbottom of the shaft was, and so are the walls, and so is the ceiling, and there\nis no line anywhere that any two of them meet on, so that standing in the\ndoorway you have to look at your own boots to find out where the floor is.\n\nAgainst the far wall, on a bench that comes out of the wall the way a branch\ncomes out of a tree, there is a terminal.\n\nUnder the bench there is a grey steel cabinet, waist high, with its door\nstanding open.\n\nThat is the room.\n\nEvery room you have been in since you woke up had been gone through by\nsomebody, and you find that you are standing in this doorway waiting for\nsomebody to have gone through this one, and nobody has, and nobody is going to,\nbecause there has never been a single thing in here to take.';
+  'The door opens into a room with nothing in it.\n\nThat is not a way of putting it and it is not the dark doing it. The light is even and comes from no fitting you can find. The floor is the material the bottom of the shaft was, and so are the walls, and so is the ceiling, and there is no line anywhere that any two of them meet on, so that standing in the doorway you have to look at your own boots to find out where the floor is.\n\nAgainst the far wall, on a bench that comes out of the wall the way a branch comes out of a tree, there is a terminal.\n\nUnder the bench there is a grey steel cabinet, waist high, with its door standing open.\n\nThat is the room.\n\nEvery room you have been in since you woke up had been gone through by somebody, and you find that you are standing in this doorway waiting for somebody to have gone through this one, and nobody has, and nobody is going to, because there has never been a single thing in here to take.';
 
 export const BLANK_ROOM_UNCONDITIONAL =
-  'Nothing in here but a bench with a terminal on it and a steel cabinet under the\nbench, in a room with no corners and no shadows and no way of telling which\nwall you came in by until you turn round.';
+  'Nothing in here but a bench with a terminal on it and a steel cabinet under the bench, in a room with no corners and no shadows and no way of telling which wall you came in by until you turn round.';
 
 export const BLANK_ROOM_LISTEN =
-  'The water. Directly underneath now, at the same steady rate it has kept since\nthe top of the ladder, and it is the only thing in the world that is doing\nanything.';
+  'The water. Directly underneath now, at the same steady rate it has kept since the top of the ladder, and it is the only thing in the world that is doing anything.';
 
 export const BLANK_ROOM_SMELL =
-  'Nothing at all, again, and by now you have stopped finding it strange, which is\nits own piece of information about how long you have been down here.';
+  'Nothing at all, again, and by now you have stopped finding it strange, which is its own piece of information about how long you have been down here.';
 
 const BLANK_ROOM_TOUCH_WALL =
-  'Warm, and hard, and very faintly giving. Your palm leaves no mark on it and\ntakes nothing off it.';
+  'Warm, and hard, and very faintly giving. Your palm leaves no mark on it and takes nothing off it.';
 
 export const BLANK_ROOM_SEARCH =
-  'The cabinet is under the bench and it is empty. The bench is part of the wall.\nThe terminal is on the bench, and there is no cable coming out of the back of\nit and nowhere for one to go.\n\nThere is nothing else. You go round the walls once with a hand out, because\nthat is what you do, and the walls go round with you.';
+  'The cabinet is under the bench and it is empty. The bench is part of the wall. The terminal is on the bench, and there is no cable coming out of the back of it and nowhere for one to go.\n\nThere is nothing else. You go round the walls once with a hand out, because that is what you do, and the walls go round with you.';
 
 export const BLANK_ROOM_SLEEP_WAIT =
   'You could. The floor is warm and the light is even and nobody is coming.\n\nYou do not.';
@@ -88,7 +88,7 @@ export const BLANK_ROOM_SLEEP_WAIT =
 export const BLANK_ROOM_YELL = 'Not returned. Not even slightly.';
 
 export const BLANK_ROOM_PRY_WALL =
-  'There is no join to get it into, no skirting, no cover strip and no edge, and\nafter a while you are standing in the middle of a warm room hitting it with a\npiece of a chair, which is not a thing you are prepared to have been doing for\nlong.';
+  'There is no join to get it into, no skirting, no cover strip and no edge, and after a while you are standing in the middle of a warm room hitting it with a piece of a chair, which is not a thing you are prepared to have been doing for long.';
 
 const BLANK_ROOM_SURFACE = O('act5_blank_room_surface');
 
@@ -110,20 +110,20 @@ const blankRoomSurface: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const TERMINAL_EXAMINE =
-  'It is the same machine.\n\nBeige gone the colour of weak tea. A screen with actual depth to it. A keyboard\nwhose keys have been worn blank in exactly the places a person\'s fingers live.\n\nIt is the same machine as the one on a stand in a rented room with a stain on\nthe boards beside it, and the one in the back of a shop full of plaster\njackalopes, and the one on the bench on the floor above this one, and the one\nbolted to a bulkhead a very long way from here. It is standing on a shelf that\ngrew out of a wall, in a room with no corners, under a county, and it is the\nsame machine.\n\nThere is no USER: on it. There is no cursor.\n\nIt is not asking anything.';
+  'It is the same machine.\n\nBeige gone the colour of weak tea. A screen with actual depth to it. A keyboard whose keys have been worn blank in exactly the places a person\'s fingers live.\n\nIt is the same machine as the one on a stand in a rented room with a stain on the boards beside it, and the one in the back of a shop full of plaster jackalopes, and the one on the bench on the floor above this one, and the one bolted to a bulkhead a very long way from here. It is standing on a shelf that grew out of a wall, in a room with no corners, under a county, and it is the same machine.\n\nThere is no USER: on it. There is no cursor.\n\nIt is not asking anything.';
 
 export const TERMINAL_TYPE =
-  'The keys go down with the deep unembarrassed travel of a machine built when\npeople were expected to sit at them all day.\n\nNothing appears. Nothing is refused either. It has already had that\nconversation, in the other room, with you.\n\nDown the left-hand side of the screen there is a short list of the things it\ndoes hold, in the lettering the ledger used, and the list is not long.';
+  'The keys go down with the deep unembarrassed travel of a machine built when people were expected to sit at them all day.\n\nNothing appears. Nothing is refused either. It has already had that conversation, in the other room, with you.\n\nDown the left-hand side of the screen there is a short list of the things it does hold, in the lettering the ledger used, and the list is not long.';
 
-const TERMINAL_LIST_HEADING = '    RECORDS\n    INDEX\n    CREATE SUBJECT';
+const TERMINAL_LIST_HEADING = '    RECORDS\n    INDEX CREATE SUBJECT';
 
 const TERMINAL_LIST_NARRATION =
-  'Three headings and no menu numbers and no instructions, the way a thing is\nlabelled when the only people who were ever going to read it already knew.';
+  'Three headings and no menu numbers and no instructions, the way a thing is labelled when the only people who were ever going to read it already knew.';
 
 const TERMINAL_LIST_COMBINED = `${TERMINAL_LIST_HEADING}\n\n${TERMINAL_LIST_NARRATION}`;
 
 export const CREATE_SUBJECT_APPROACH =
-  'The third heading takes one keystroke, the way the other two did.\n\nThe screen clears itself and puts up a form, and the form is the record with\nthe answers taken out of it.';
+  'The third heading takes one keystroke, the way the other two did.\n\nThe screen clears itself and puts up a form, and the form is the record with the answers taken out of it.';
 
 const terminal: ObjectDefSlice = {
   location: ACT5_BLANK_ROOM,
@@ -151,15 +151,15 @@ const terminal: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const RECORD_BLOCK =
-  '    CREATE SUBJECT — RECORD\n\n    AUTHOR ............................ JULES I\n    SUBJECT DESIGNATION ............... —\n    OCCUPATION ........................ INVESTIGATOR\n    INITIAL MEMORY STATE .............. INTENTIONALLY BLANK\n    STARTING ENVIRONMENT .............. MAIN ST / TOP FLOOR REAR\n    INITIAL PHYSICAL CONDITION ........ HEADACHE\n    PHYSICAL PARAMETERS ............... RANDOMIZED — 1 EXCEPTION, SUPPRESSED\n    INITIAL OBJECTS ................... FEDORA (WORN)\n                                        LAMP\n                                        TERMINAL\n                                        PAGE 7/8 (HATBAND)\n                                        CHAIR — ONE LEG LOOSE';
+  '    CREATE SUBJECT — RECORD\n\n    AUTHOR ............................ JULES I SUBJECT DESIGNATION ............... — OCCUPATION ........................ INVESTIGATOR INITIAL MEMORY STATE .............. INTENTIONALLY BLANK STARTING ENVIRONMENT .............. MAIN ST / TOP FLOOR REAR INITIAL PHYSICAL CONDITION ........ HEADACHE PHYSICAL PARAMETERS ............... RANDOMIZED — 1 EXCEPTION, SUPPRESSED INITIAL OBJECTS ................... FEDORA (WORN) LAMP TERMINAL PAGE 7/8 (HATBAND) CHAIR — ONE LEG LOOSE';
 
 const RECORD_FIRST_READ =
-  `There is one record under that heading that is more recent than the others, and\nit is more recent because nothing has been done at this level since it was\nwritten.\n\n${RECORD_BLOCK}`;
+  `There is one record under that heading that is more recent than the others, and it is more recent because nothing has been done at this level since it was written.\n\n${RECORD_BLOCK}`;
 
 const RECORD_EVERY_READ = RECORD_BLOCK;
 
 export const RECORD_PRINT =
-  'There is a tray on the side of the machine that a printer prints into, and\nwhatever else this terminal is for, it is not for that.\n\nYou write it down instead, on paper, in your own hand, which is the only\ntechnology in this county that has been reliable all week.';
+  'There is a tray on the side of the machine that a printer prints into, and whatever else this terminal is for, it is not for that.\n\nYou write it down instead, on paper, in your own hand, which is the only technology in this county that has been reliable all week.';
 
 const recordFirstReadEffects: Effect[] = [
   { say: RECORD_FIRST_READ },
@@ -189,19 +189,19 @@ const record: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const INDEX_EXAMINE =
-  '    INDEX\n\nUnder it, the index: not names this time but fields of them, arranged the way\nthe ledger upstairs was arranged, with a status word after each, and for line\nafter line after line the status word is the same one.\n\nYou hold the key down and they go up the screen and it does not stop, and you\ntake your finger off it, because you have done this once already this week five\nfloors up and it ended somewhere.';
+  '    INDEX\n\nUnder it, the index: not names this time but fields of them, arranged the way the ledger upstairs was arranged, with a status word after each, and for line after line after line the status word is the same one.\n\nYou hold the key down and they go up the screen and it does not stop, and you take your finger off it, because you have done this once already this week five floors up and it ended somewhere.';
 
 export const INDEX_SEARCH_JULES_PLAIN =
-  '    SEARCH: JULES\n\n    1 RESULT\n\n    JULES I\n    SNAPSHOT ......................... ARCHIVED / ROOT\n\nUpstairs that line was the end of a file that said NO FURTHER ACTION under it.\n\nDown here it is not the end of anything. It is an address, and you are standing\nat it.';
+  '    SEARCH: JULES\n\n    1 RESULT\n\n    JULES I SNAPSHOT ......................... ARCHIVED / ROOT\n\nUpstairs that line was the end of a file that said NO FURTHER ACTION under it.\n\nDown here it is not the end of anything. It is an address, and you are standing at it.';
 
 export const INDEX_SEARCH_JULES_DEEP =
-  '    SEARCH: JULES\n\n    1 RESULT\n\n    JULES I\n    SNAPSHOT ......................... ARCHIVED / ROOT\n    INDEX ............................ COMPLETE — 1 SESSION\n\n    OPEN?\n\nThe second line was not there a moment ago, and it was not written by this\nmachine. It was written by a kitchen, at about the time a kitchen finished\nbeing a kitchen, by a room that had been waiting for somebody to sit in the\nfirst chair.';
+  '    SEARCH: JULES\n\n    1 RESULT\n\n    JULES I SNAPSHOT ......................... ARCHIVED / ROOT INDEX ............................ COMPLETE — 1 SESSION\n\n    OPEN?\n\nThe second line was not there a moment ago, and it was not written by this machine. It was written by a kitchen, at about the time a kitchen finished being a kitchen, by a room that had been waiting for somebody to sit in the first chair.';
 
 export const INDEX_SEARCH_OTHER =
-  '    1 RESULT\n\nand after it, in the field where a word goes, the word that is in that field on\nevery line but one.';
+  '    1 RESULT\n\nand after it, in the field where a word goes, the word that is in that field on every line but one.';
 
 export const INDEX_SEARCH_SELF =
-  '    SEARCH:\n\nThe cursor waits. You get as far as the first letter of a word that is not a\nname, and stop, and the cursor goes on waiting, because that is the one thing\nthese machines have always been good at.';
+  '    SEARCH:\n\nThe cursor waits. You get as far as the first letter of a word that is not a name, and stop, and the cursor goes on waiting, because that is the one thing these machines have always been good at.';
 
 const indexSearchJulesEffects: Effect[] = [
   { if: { when: { flag: ACT4_DEEP_INDEX }, then: [{ say: INDEX_SEARCH_JULES_DEEP }], else: [{ say: INDEX_SEARCH_JULES_PLAIN }] } },
@@ -263,7 +263,7 @@ const julesSnapshot: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const TRAY_EXAMINE_BEFORE =
-  'A printer tray on the side of the machine, of the kind that folds out and has\none wire lip to stop paper going over the front of it.\n\nThere is nothing in it. There has been nothing in it for a long time; the two\nrubber feet the paper would sit on have not been sat on.';
+  'A printer tray on the side of the machine, of the kind that folds out and has one wire lip to stop paper going over the front of it.\n\nThere is nothing in it. There has been nothing in it for a long time; the two rubber feet the paper would sit on have not been sat on.';
 
 const TRAY_EXAMINE_AFTER = 'One sheet, face up, still warm at the top edge where it came out.';
 
@@ -282,7 +282,7 @@ const tray: ObjectDefSlice = {
 };
 
 const letterExamineText =
-  'Half a page, in the machine\'s lettering, which is nobody\'s hand at all.\n\nIt is not addressed and it is not signed, and it does not need either of those\nthings, because there is exactly one man alive it could be for and he will know\nby the second line.\n\nYou read the first two lines of it and then you stop, and fold it in half, and\nput it in the inside pocket, which has a hole in it and has had all week, and\nyou feel it go down and settle at the bottom of the lining where nothing else\nis.';
+  'Half a page, in the machine\'s lettering, which is nobody\'s hand at all.\n\nIt is not addressed and it is not signed, and it does not need either of those things, because there is exactly one man alive it could be for and he will know by the second line.\n\nYou read the first two lines of it and then you stop, and fold it in half, and put it in the inside pocket, which has a hole in it and has had all week, and you feel it go down and settle at the bottom of the lining where nothing else is.';
 
 // §25.4 — "TAKE LETTER before §24.3, or READ LETTER with nothing in the
 // tray." Transcribed, but NOT wired to a handler: the letter object stays
@@ -322,28 +322,28 @@ const letterToJack: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const LOCKER_EXAMINE =
-  'A grey steel cabinet, waist high, standing under the bench with its door open\nagainst the wall on a stay.\n\nOrdinary. Rolled edges, a shelf halfway up, four rubber feet, a hasp on the\ndoor with no padlock through it. It is the only thing in this room you have\nseen the like of anywhere else, and where you have seen the like of it is\nevery plant room and tool crib and back corridor in the county.\n\nThere is nothing in it and nothing written on it, inside or out, and no card in\nthe holder on the front, and no holder on the front.\n\nIt is below the level at which anything in this building is written down.';
+  'A grey steel cabinet, waist high, standing under the bench with its door open against the wall on a stay.\n\nOrdinary. Rolled edges, a shelf halfway up, four rubber feet, a hasp on the door with no padlock through it. It is the only thing in this room you have seen the like of anywhere else, and where you have seen the like of it is every plant room and tool crib and back corridor in the county.\n\nThere is nothing in it and nothing written on it, inside or out, and no card in the holder on the front, and no holder on the front.\n\nIt is below the level at which anything in this building is written down.';
 
 export const LOCKER_PUT_GENERAL =
-  'It goes on the shelf. The steel takes the weight the way steel does and the\ncabinet goes on being a cabinet.\n\nNothing acknowledges it. No line appears anywhere on any screen in this room.\nThat is the whole of what you came down here to do with it.';
+  'It goes on the shelf. The steel takes the weight the way steel does and the cabinet goes on being a cabinet.\n\nNothing acknowledges it. No line appears anywhere on any screen in this room. That is the whole of what you came down here to do with it.';
 
 const LOCKER_PUT_NOTEBOOK =
-  'You go through it once more first, which is not necessary and takes a while.\n\nFacilities shorthand in one hand for two hundred pages, and then, down the\nmargins and across the backs of the diagrams, the same shorthand in the same\nhand written by somebody else, three weeks ago, working out what the first lot\nmeant.\n\nThe page fits the gap. The login is in the back. It goes on the shelf.';
+  'You go through it once more first, which is not necessary and takes a while.\n\nFacilities shorthand in one hand for two hundred pages, and then, down the margins and across the backs of the diagrams, the same shorthand in the same hand written by somebody else, three weeks ago, working out what the first lot meant.\n\nThe page fits the gap. The login is in the back. It goes on the shelf.';
 
 const LOCKER_PUT_FILM =
-  'On the shelf, squared up with the notebook, because a photograph left loose in\na steel box is a photograph with a bend in it by the time anybody comes back.';
+  'On the shelf, squared up with the notebook, because a photograph left loose in a steel box is a photograph with a bend in it by the time anybody comes back.';
 
 const LOCKER_PUT_USB_WITH_DAD =
-  'You have to take it off the rig first.\n\n"Right," Dad says, before you have got it half out. "Well."\n\nThen nothing, because there is nothing to make the nothing with.\n\nIt goes on the shelf, a piece of plastic the size of a thumb joint with a man\nin it who is not going to experience being on that shelf, and you put it at the\nback, out of the light, which does not matter to it either.';
+  'You have to take it off the rig first.\n\n"Right," Dad says, before you have got it half out. "Well."\n\nThen nothing, because there is nothing to make the nothing with.\n\nIt goes on the shelf, a piece of plastic the size of a thumb joint with a man in it who is not going to experience being on that shelf, and you put it at the back, out of the light, which does not matter to it either.';
 
 const LOCKER_PUT_LETTER =
-  'You get it out of the lining, which takes some doing, and hold it for a moment\nwith the idea of taking it up the ladder and putting it under a door at the\nArrowhead.\n\nThere is a man standing at the top of a well between here and there.\n\nIt goes on the shelf, on top of the notebook, where the first thing anybody\nopening this cabinet will find is a half page addressed to nobody that only one\nman could be meant to read.';
+  'You get it out of the lining, which takes some doing, and hold it for a moment with the idea of taking it up the ladder and putting it under a door at the Arrowhead.\n\nThere is a man standing at the top of a well between here and there.\n\nIt goes on the shelf, on top of the notebook, where the first thing anybody opening this cabinet will find is a half page addressed to nobody that only one man could be meant to read.';
 
 export const LOCKER_TAKE_FROM =
-  'Out again, and the cabinet goes back to being empty, which it is extremely\ngood at.';
+  'Out again, and the cabinet goes back to being empty, which it is extremely good at.';
 
 const LOCKER_CLOSE_LOCK =
-  'The door swings to on its stay and does not catch, because the hasp has no\npadlock through it and never had.\n\nYou leave it standing open. A shut cupboard in an empty room is a thing\nsomebody looks in.';
+  'The door swings to on its stay and does not catch, because the hasp has no padlock through it and never had.\n\nYou leave it standing open. A shut cupboard in an empty room is a thing somebody looks in.';
 
 const locker: ObjectDefSlice = {
   location: ACT5_BLANK_ROOM,
@@ -452,12 +452,12 @@ export const ACT5_EV_LOCKER_EVENT: EventDef = {
 // ---------------------------------------------------------------------------
 
 const DOOR_EXAMINE =
-  'On this side it is a rectangle of wall standing a finger\'s width off its seal,\nwith the antechamber\'s light coming through the gap looking exactly like this\nroom\'s.';
+  'On this side it is a rectangle of wall standing a finger\'s width off its seal, with the antechamber\'s light coming through the gap looking exactly like this room\'s.';
 
 const DOOR_LISTEN_BEFORE = 'The water, and the room being large, and nothing else whatever.';
 
 const DOOR_LISTEN_AFTER =
-  'Through this door: the landing. Through the door up the three tiled steps at\nthe far side of the landing: a room with a carpet in it and a machine on a\nbench.\n\nAnd through both of them, a long way off and quite clear, somebody standing\nstill on a carpet.\n\nYou listen to it for a while. It does not become anything else.';
+  'Through this door: the landing. Through the door up the three tiled steps at the far side of the landing: a room with a carpet in it and a machine on a bench.\n\nAnd through both of them, a long way off and quite clear, somebody standing still on a carpet.\n\nYou listen to it for a while. It does not become anything else.';
 
 const door: ObjectDefSlice = {
   location: ACT5_BLANK_ROOM,

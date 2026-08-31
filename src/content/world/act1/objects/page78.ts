@@ -86,7 +86,7 @@ const page78: ObjectDefSlice = {
       effects: [
         {
           say:
-            'You put the sheet flat on the edge of the shelf, which is the flattest thing in this corridor, and take the pencil out from under the band, and lay the lead over on its side, and go at the page the way a child goes at a coin.\n\nThe valleys come up white out of the grey. Not all of it. Enough of it:\n\n    admin\n    admin-password\n\n    W.D. — hold — 4417\n\nBelow that, three more lines that the graphite finds and cannot make into words, and one that is not words at all: a short row of small marks, evenly spaced, that were made by a person doing something deliberate.',
+            'You put the sheet flat on the edge of the shelf, which is the flattest thing in this corridor, and take the pencil out from under the band, and lay the lead over on its side, and go at the page the way a child goes at a coin.\n\nThe valleys come up white out of the grey. Not all of it. Enough of it:\n\n    admin admin-password\n\n    W.D. — hold — 4417\n\nBelow that, three more lines that the graphite finds and cannot make into words, and one that is not words at all: a short row of small marks, evenly spaced, that were made by a person doing something deliberate.',
         },
         { set: [ACT2_PAGE_RUBBED, true] },
         { grantClue: ACT2_CLUE_INDENTED_CREDENTIALS },

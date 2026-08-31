@@ -99,7 +99,7 @@ describe('Wall Drug SOUTH (§2)', () => {
     const store = new MemoryStore();
     const session = enter(withState({ location: ACT2_WALL_DRUG_EMPORIUM, flags: { [ACT2_STARTED]: true } }), ACT2_WALL_DRUG_EMPORIUM).session;
     const t = text(say(session, 'south', store).events);
-    expect(t).toContain('thirty-two\nmiles of county road with the signs along it counting nothing down.');
+    expect(t).toContain('thirty-two miles of county road with the signs along it counting nothing down.');
     expect(t).toContain('this road has never once given any sign of');
     expect(t).not.toContain('a head that has already been hit once tonight');
     expect(t).not.toContain('END OF BUILD');
@@ -192,7 +192,7 @@ describe('COMPARE LOGBOOK WITH NOTEBOOK (§5)', () => {
     const store = new MemoryStore();
     const session = atS5({ objects: { [ACT2_NOTEBOOK]: { location: 'inventory' } } });
     const t = text(say(session, 'compare logbook with notebook', store).events);
-    expect(t).toContain('which is the\ncorrect instinct and the wrong book');
+    expect(t).toContain('which is the correct instinct and the wrong book');
     expect(t).toContain('a hand is made of words');
   });
 });
@@ -211,7 +211,7 @@ describe('X TOOLBOX / SEARCH TOOLBOX (§6)', () => {
     const store = new MemoryStore();
     const t = text(say(atPerimeterWithTruck(), 'x toolbox', store).events);
     expect(t).toContain('lid up, at shoulder height');
-    expect(t).toContain('there is a\nheadlamp');
+    expect(t).toContain('there is a headlamp');
   });
 
   it('after the headlamp is taken — §6.2', () => {

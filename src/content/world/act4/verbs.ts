@@ -55,10 +55,10 @@ import { V_ACT4_SEND_MESSAGE } from './ids';
 import { RIG_SEND_MESSAGE_TEXT } from './objects/hab';
 
 const WRITE_ON_BOARD_TEXT =
-  'There is a man at each end of this room being paid to notice exactly this, and\nyou are going to be in here for a while yet.\n\nYou put your hands where they were.';
+  'There is a man at each end of this room being paid to notice exactly this, and you are going to be in here for a while yet.\n\nYou put your hands where they were.';
 
 export const PUSH_PAST_DETAIL_TEXT =
-  'No.\n\nYou have been hit on the head once this month by somebody better at it than you\nare, and these two do it professionally, in pairs, and would be extremely sorry\nabout it afterwards, in writing.';
+  'No.\n\nYou have been hit on the head once this month by somebody better at it than you are, and these two do it professionally, in pairs, and would be extremely sorry about it afterwards, in writing.';
 
 export const ACT4_L_VERBS: Record<string, VerbDef> = {
   [V_ACT4_WRITE_ON]: {

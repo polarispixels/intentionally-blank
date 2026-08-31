@@ -70,32 +70,32 @@ export const ACT5_E3_TASK_W_CLUES: NonNullable<WorldSlice['clues']> = {
   [ACT5_CLUE_KEY_NUMBER]: {
     title: '4471',
     detail:
-      'There is a number stamped into the plate of a hatch in the wall of the service\ntunnel, twenty feet short of the plug.\n\n    4471\n\nThat is all this note is for.',
+      'There is a number stamped into the plate of a hatch in the wall of the service tunnel, twenty feet short of the plug.\n\n    4471\n\nThat is all this note is for.',
   },
   [ACT5_CLUE_REVISION]: {
     title: 'SYSTEM REVISION 2089.4',
     detail:
-      'Sprayed through a stencil on the wall of the shaft, at head height, below the\nline where the poured concrete stops:\n\n    SYSTEM REVISION\n    2089.4\n\nThe paint has not aged and neither has the wall it is on.',
+      'Sprayed through a stencil on the wall of the shaft, at head height, below the line where the poured concrete stops:\n\n    SYSTEM REVISION 2089.4\n\nThe paint has not aged and neither has the wall it is on.',
   },
   [ACT5_CLUE_ACCEPTED]: {
     title: 'ACCESS LEVEL: ROOT',
     detail:
-      'admin / admin-password, typed into the console at the bottom of the shaft.\n\nRECOGNIZED. ACCESS LEVEL: ROOT. RECONCILIATION — RUNNING.\n\nThe machine in the rented room has been putting one extra word in front of the\nfirst of those since the morning I woke up, for a name, for a word, for\nnothing at all.',
+      'admin / admin-password, typed into the console at the bottom of the shaft.\n\nRECOGNIZED. ACCESS LEVEL: ROOT. RECONCILIATION — RUNNING.\n\nThe machine in the rented room has been putting one extra word in front of the first of those since the morning I woke up, for a name, for a word, for nothing at all.',
   },
   [ACT5_CLUE_MADE_BY_JULES]: {
     title: 'AUTHOR: JULES I.',
     detail:
-      'A creation record at root, and there is no date on it anywhere.\n\nAUTHOR: JULES I. OCCUPATION: INVESTIGATOR. INITIAL MEMORY STATE: INTENTIONALLY\nBLANK. STARTING ENVIRONMENT: MAIN ST / TOP FLOOR REAR. INITIAL PHYSICAL\nCONDITION: HEADACHE. PHYSICAL PARAMETERS: RANDOMIZED — 1 EXCEPTION,\nSUPPRESSED.\n\nThen a list of things placed in the room. A hat, worn. A lamp. A terminal. Page\n7/8, in the hatband. A chair with one leg loose.\n\nWhere the designation goes there is a dash.',
+      'A creation record at root, and there is no date on it anywhere.\n\nAUTHOR: JULES I. OCCUPATION: INVESTIGATOR. INITIAL MEMORY STATE: INTENTIONALLY BLANK. STARTING ENVIRONMENT: MAIN ST / TOP FLOOR REAR. INITIAL PHYSICAL CONDITION: HEADACHE. PHYSICAL PARAMETERS: RANDOMIZED — 1 EXCEPTION, SUPPRESSED.\n\nThen a list of things placed in the room. A hat, worn. A lamp. A terminal. Page 7/8, in the hatband. A chair with one leg loose.\n\nWhere the designation goes there is a dash.',
   },
   [ACT5_CLUE_JULES_SPOKE]: {
     title: 'He left the name field empty on purpose',
     detail:
-      'He is in the archive at root and he can be opened, once, and he answers in\ntext.\n\nHe asked after Jack before he asked anything else. He said he lied to him at\nthe door and would do it again for the same reason and is not asking to be\ntold that was all right. He said he got as far as this room and worked out that\nthere was no way to go through it and still be in the records on the other\nside. He said he left the name field empty on purpose and that it was not a\nkindness.\n\nHe dictated a letter and the printer ran.\n\nThen the field said ARCHIVED / ROOT again, and it will go on saying it.',
+      'He is in the archive at root and he can be opened, once, and he answers in text.\n\nHe asked after Jack before he asked anything else. He said he lied to him at the door and would do it again for the same reason and is not asking to be told that was all right. He said he got as far as this room and worked out that there was no way to go through it and still be in the records on the other side. He said he left the name field empty on purpose and that it was not a kindness.\n\nHe dictated a letter and the printer ran.\n\nThen the field said ARCHIVED / ROOT again, and it will go on saying it.',
   },
   [ACT5_CLUE_LOCKER]: {
     title: 'Nothing in it and nothing written on it',
     detail:
-      "A grey steel cabinet under the terminal's bench in the Blank Room, waist high,\ndoor standing open, nothing in it and nothing written on it.\n\nIt is below the level at which anything in this building is written down.",
+      "A grey steel cabinet under the terminal's bench in the Blank Room, waist high, door standing open, nothing in it and nothing written on it.\n\nIt is below the level at which anything in this building is written down.",
   },
 };
 
@@ -105,21 +105,21 @@ export const ACT5_E3_TASK_W_QUESTIONS: NonNullable<WorldSlice['questions']> = {
     openWhen: { flag: ACT5_STARTED },
     answerWhen: { flag: ACT5_ROOT_ACCEPTED },
     answer:
-      'One room, one console, and a login prompt of the kind that has been refusing\nyou since the first morning. It does not refuse. It says RECOGNIZED, and then\nit says ROOT, and then it says that the job that was pending upstairs is no\nlonger pending.',
+      'One room, one console, and a login prompt of the kind that has been refusing you since the first morning. It does not refuse. It says RECOGNIZED, and then it says ROOT, and then it says that the job that was pending upstairs is no longer pending.',
   },
   [ACT5_Q_WHO_IS_FILED_AT_ROOT]: {
     text: 'SNAPSHOT: ARCHIVED / ROOT. Archived where, and can it be opened?',
     openWhen: { all: [{ clue: ACT3_CLUE_JULES_DEPRECATED }, { at: ACT5_BLANK_ROOM }] },
     answerWhen: { flag: ACT5_JULES_WOKEN },
     answer:
-      'Here, on this machine, under his own numeral, in an index nobody has had a\nreason to open since the job was closed. It opens once. He is not rescued and\ndoes not ask to be. He asks after his brother, tells you what he did and why,\nand dictates a letter he cannot post.',
+      'Here, on this machine, under his own numeral, in an index nobody has had a reason to open since the job was closed. It opens once. He is not rescued and does not ask to be. He asks after his brother, tells you what he did and why, and dictates a letter he cannot post.',
   },
   [ACT5_Q_WHAT_DO_YOU_OWE]: {
     text: 'What do you owe the next one?',
     openWhen: { flag: ACT5_RECONCILIATION_RUNNING },
     answerWhen: { flag: ACT5_INITIALIZED },
     answer:
-      'Whatever is in the cabinet, which is the only thing at this level that is not\naddressable, plus a room with the same five things in it and a form filled in\nby somebody who had read it before.\n\nThe last one left a page in a hatband and a login in a back cover and could\nnot get any further than the door. You got through the door.',
+      'Whatever is in the cabinet, which is the only thing at this level that is not addressable, plus a room with the same five things in it and a form filled in by somebody who had read it before.\n\nThe last one left a page in a hatband and a login in a back cover and could not get any further than the door. You got through the door.',
   },
 };
 
@@ -134,26 +134,26 @@ export const ACT5_E3_TASK_W_PUZZLES: NonNullable<WorldSlice['puzzles']> = {
         id: 'key',
         class: 'analytical',
         route: { flag: ACT5_BRANCH_UNLOCKED },
-        note: 'UNLOCK HATCH WITH KEYRING, in the service tunnel, twenty feet short of the\nplug. The flat brass one with the squared bit — the one that opened the plate\nin the kerb on the county road.',
+        note: 'UNLOCK HATCH WITH KEYRING, in the service tunnel, twenty feet short of the plug. The flat brass one with the squared bit — the one that opened the plate in the kerb on the county road.',
       },
       {
         id: 'pry',
         class: 'direct',
         route: { flag: ACT5_BRANCH_UNLOCKED },
-        note: 'PRY HATCH WITH CHAIR LEG. There is a lip on the low side of the plate. The\nbolts are not what is holding it.',
+        note: 'PRY HATCH WITH CHAIR LEG. There is a lip on the low side of the plate. The bolts are not what is holding it.',
       },
       {
         id: 'stair',
         class: 'social',
         route: { flag: ACT4_S6_DOOR_OPEN },
-        note: 'GO DOWN the stair behind the door on Sublevel 5 — the one that wanted two\nthings and got both of them off a man with a paper badge. It has been standing\nopen since he went back up in the lift.',
+        note: 'GO DOWN the stair behind the door on Sublevel 5 — the one that wanted two things and got both of them off a man with a paper badge. It has been standing open since he went back up in the lift.',
       },
     ],
     hints: [
-      'Every credential in this game has now been offered to that door and the best\none in the country was offered to it last. The door is not the way.',
-      'There are two ways down that are not a door and neither of them is clever. One\nof them is a stair that got opened for you and left open. The other is in a\nwall you have walked past in the dark with a light on your head.',
-      'The tunnel: about twenty feet short of the plug, low down on the left, there is\na steel hatch with a squared hole in the middle of it. You are carrying\nsomething with a squared bit on it and have been since the second week, and if\nyou are not, you have been prying things open all week with something else.',
-      'UNLOCK HATCH WITH KEYRING, or PRY HATCH WITH CHAIR LEG. Then DOWN, and go on\ngoing down. If you took the visit as far as Sublevel 5, GO DOWN the stair\nbehind the two-thing door instead; it comes out in the same shaft.',
+      'Every credential in this game has now been offered to that door and the best one in the country was offered to it last. The door is not the way.',
+      'There are two ways down that are not a door and neither of them is clever. One of them is a stair that got opened for you and left open. The other is in a wall you have walked past in the dark with a light on your head.',
+      'The tunnel: about twenty feet short of the plug, low down on the left, there is a steel hatch with a squared hole in the middle of it. You are carrying something with a squared bit on it and have been since the second week, and if you are not, you have been prying things open all week with something else.',
+      'UNLOCK HATCH WITH KEYRING, or PRY HATCH WITH CHAIR LEG. Then DOWN, and go on going down. If you took the visit as far as Sublevel 5, GO DOWN the stair behind the two-thing door instead; it comes out in the same shaft.',
     ],
   },
   [ACT5_P26_CONSOLE]: {
@@ -166,14 +166,14 @@ export const ACT5_E3_TASK_W_PUZZLES: NonNullable<WorldSlice['puzzles']> = {
       {
         id: 'login',
         class: 'analytical',
-        note: "LOG IN at the console in the antechamber, and give it what is written in pencil\ninside the back cover of Jules's notebook. It is the same pair that has been\nrefused upstairs all week. It is not refused here.",
+        note: "LOG IN at the console in the antechamber, and give it what is written in pencil inside the back cover of Jules's notebook. It is the same pair that has been refused upstairs all week. It is not refused here.",
       },
     ],
     hints: [
-      'There is one machine at the bottom and it is asking the same question the\nmachine in your room asks.',
-      'You have answered that question wrongly at every machine in this county and\ncorrectly at one of them. Whatever you gave the one on Sublevel 6 is what this\none wants.',
-      'It is written down. It is written down in pencil, by somebody who did not\nintend to be told it twice, in the only book you own that has a gap in the\npagination.',
-      'READ NOTEBOOK, or read the back cover of it directly, and then LOG IN at the\nconsole. Two fields. It is the same pair. It has been the same pair since Act\nII and it has never once been the right depth.',
+      'There is one machine at the bottom and it is asking the same question the machine in your room asks.',
+      'You have answered that question wrongly at every machine in this county and correctly at one of them. Whatever you gave the one on Sublevel 6 is what this one wants.',
+      'It is written down. It is written down in pencil, by somebody who did not intend to be told it twice, in the only book you own that has a gap in the pagination.',
+      'READ NOTEBOOK, or read the back cover of it directly, and then LOG IN at the console. Two fields. It is the same pair. It has been the same pair since Act II and it has never once been the right depth.',
       'LOG IN. User: admin. Password: admin-password.',
     ],
   },
@@ -193,14 +193,14 @@ export const ACT5_E3_TASK_W_PUZZLES: NonNullable<WorldSlice['puzzles']> = {
         id: 'search_index',
         class: 'analytical',
         route: { all: [{ flag: ACT4_DEEP_INDEX }, { has: ACT2_NOTEBOOK }] },
-        note: 'SEARCH INDEX FOR JULES at the root terminal, then OPEN SNAPSHOT or WAKE JULES.\nIt will not run unless the room the family remembered has been finished — that\nis where the index came from — and unless his notebook is physically in your\nhand when you ask.',
+        note: 'SEARCH INDEX FOR JULES at the root terminal, then OPEN SNAPSHOT or WAKE JULES. It will not run unless the room the family remembered has been finished — that is where the index came from — and unless his notebook is physically in your hand when you ask.',
       },
     ],
     hints: [
-      'Nothing in this room is required. The index is a list of what is filed at this\nlevel and one of the things filed at this level is a man.',
-      'The ledger on Sublevel 6 told you where he was three weeks ago and you wrote it\ndown: SNAPSHOT — ARCHIVED / ROOT. You are standing in root. SEARCH INDEX FOR\nJULES.',
-      'It will want two things, and it says which two, in two words each. One of them\nwas made by finishing the room the family remembered. The other is in your\ncoat, unless you have put it down somewhere, in which case it is wherever you\nput it down.',
-      'SEARCH INDEX FOR JULES, then WAKE JULES, with his notebook in your hand and the\nescape-room reconstruction completed. It opens once. There is no way to open it\ntwice and nothing anywhere depends on your having opened it at all.',
+      'Nothing in this room is required. The index is a list of what is filed at this level and one of the things filed at this level is a man.',
+      'The ledger on Sublevel 6 told you where he was three weeks ago and you wrote it down: SNAPSHOT — ARCHIVED / ROOT. You are standing in root. SEARCH INDEX FOR JULES.',
+      'It will want two things, and it says which two, in two words each. One of them was made by finishing the room the family remembered. The other is in your coat, unless you have put it down somewhere, in which case it is wherever you put it down.',
+      'SEARCH INDEX FOR JULES, then WAKE JULES, with his notebook in your hand and the escape-room reconstruction completed. It opens once. There is no way to open it twice and nothing anywhere depends on your having opened it at all.',
     ],
   },
   [ACT5_P28_CREATE]: {
@@ -213,13 +213,13 @@ export const ACT5_E3_TASK_W_PUZZLES: NonNullable<WorldSlice['puzzles']> = {
       {
         id: 'create',
         class: 'analytical',
-        note: 'CREATE SUBJECT at the root terminal. Six fields; every one of them is on a\nrecord you have already read. Answer them however you like — it takes what you\ngive it — and then answer INITIALIZE?',
+        note: 'CREATE SUBJECT at the root terminal. Six fields; every one of them is on a record you have already read. Answer them however you like — it takes what you give it — and then answer INITIALIZE?',
       },
     ],
     hints: [
       'There are three headings on that terminal and you have read two of them.',
-      'The third one is a form. It is the same form as the record, with the answers\ntaken out. It takes whatever you put in it, including the things that are\nalready in it.',
-      'CREATE SUBJECT. Fill in the fields — any way you like; it accepts all of them —\nand then answer INITIALIZE with YES. If you have anything you would rather was\nstill here afterwards, put it in the cabinet under the bench first.',
+      'The third one is a form. It is the same form as the record, with the answers taken out. It takes whatever you put in it, including the things that are already in it.',
+      'CREATE SUBJECT. Fill in the fields — any way you like; it accepts all of them — and then answer INITIALIZE with YES. If you have anything you would rather was still here afterwards, put it in the cabinet under the bench first.',
     ],
   },
 };

@@ -222,7 +222,7 @@ const windowExamine =
 // once the visit is announced; rule 2 is the shipped text, unedited. No
 // response anywhere in the game remarks on it (§8's own note — do not add
 // a reaction).
-const windowExamineAnnounced = `${windowExamine}\n\nThere is a signwriter on a stepladder outside with a mahl stick and a pot of\ngold, going over the arc letter by letter, and the letters he is going over are\nTHE SUNDOWNER.`;
+const windowExamineAnnounced = `${windowExamine}\n\nThere is a signwriter on a stepladder outside with a mahl stick and a pot of gold, going over the arc letter by letter, and the letters he is going over are THE SUNDOWNER.`;
 
 const windowExamineRule: ProseRule[] = [
   { when: { flag: ACT4_VISIT_ANNOUNCED }, text: windowExamineAnnounced },

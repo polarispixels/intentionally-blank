@@ -156,13 +156,13 @@ import {
 // ---------------------------------------------------------------------------
 
 const BOOT_BEATS: string[] = [
-  'The chain goes on the back of the machine by feel and takes two tries. The\nstick goes on the end of the chain and takes one.',
-  'Nothing happens for long enough that you begin composing what you are going to\nsay about this afterwards, and to whom.',
-  'Then the screen clears itself without being asked and starts counting things.\nMemory, in a unit that has not impressed anybody in decades. A disk. Two\nports. A keyboard, which it finds, and appears pleased about.',
+  'The chain goes on the back of the machine by feel and takes two tries. The stick goes on the end of the chain and takes one.',
+  'Nothing happens for long enough that you begin composing what you are going to say about this afterwards, and to whom.',
+  'Then the screen clears itself without being asked and starts counting things. Memory, in a unit that has not impressed anybody in decades. A disk. Two ports. A keyboard, which it finds, and appears pleased about.',
   '    VOLUME LABEL:  DAD\n\n    88 BAD SECTORS - MARKED, NOT REPAIRED',
-  'The counting stops. The cursor sits under the last line for four seconds\ndoing nothing at all, and in those four seconds you notice that you are\nstanding up straight.',
-  'Behind the grille on the front of the machine there is a speaker an inch\nacross which has spent its entire working life making one noise.\n\nIt makes several.',
-  '"— and the other thing about a hotel," says a man, at ordinary conversational\nvolume, halfway through a sentence he began somewhere else, "is that nobody\nin the history of the world has ever been glad to be in one. Now. Where\'d you\ngo. You went quiet on me."',
+  'The counting stops. The cursor sits under the last line for four seconds doing nothing at all, and in those four seconds you notice that you are standing up straight.',
+  'Behind the grille on the front of the machine there is a speaker an inch across which has spent its entire working life making one noise.\n\nIt makes several.',
+  '"— and the other thing about a hotel," says a man, at ordinary conversational volume, halfway through a sentence he began somewhere else, "is that nobody in the history of the world has ever been glad to be in one. Now. Where\'d you go. You went quiet on me."',
   'A pause the length of a man looking up.\n\n"Well," he says. "Hello."',
 ];
 
@@ -175,7 +175,7 @@ const greeting: ProseRule[] = [
   {
     when: { not: { flag: ACT2_DAD_SAID_MANNERISM } },
     text:
-      '"There you are." Something in the fan changes note and settles. "You take a\nbreath in before you say a name. Every time. Somebody else used to do that\nand it drove me —"\n\nHe stops. It is a very short stop.\n\n"Never mind. What have you got for me."',
+      '"There you are." Something in the fan changes note and settles. "You take a breath in before you say a name. Every time. Somebody else used to do that and it drove me —"\n\nHe stops. It is a very short stop.\n\n"Never mind. What have you got for me."',
   },
   {
     text: ['"Go ahead."', '"Right. Same room, is it? I can hear the same room."', '"I\'m here. I\'m always here. That\'s the deal and I\'d not change it."'],
@@ -218,7 +218,7 @@ export const ACT5_EV_DAD_DEFAULTS_EVENT: EventDef = {
   once: true,
   effects: [
     {
-      say: 'The rig has been on your shoulder for a mile of tunnel and a long way down a\nladder and has not had one word to say about any of it.\n\n"Nobody ever changes the defaults," Dad says.\n\nThen the fan, and nothing else out of him for a while.',
+      say: 'The rig has been on your shoulder for a mile of tunnel and a long way down a ladder and has not had one word to say about any of it.\n\n"Nobody ever changes the defaults," Dad says.\n\nThen the fan, and nothing else out of him for a while.',
     },
   ],
 };
@@ -267,13 +267,13 @@ const topics: TopicDef[] = [
             { all: [{ at: ACT3_PIPE_CHASE }, { npcAt: [ACT2_CUSTODIAN, ACT3_PIPE_CHASE] }] },
           ],
         },
-        text: '"Close." Then nothing, for longer than he leaves gaps. "That\'s not a room\naway, kiddo. That\'s cloth on glass, and it\'s coming through this microphone\nlouder than you are."\n\nHe does not lower his voice. Nobody has told him there is a reason to.\n\n"I can tell you he\'s stopped. I can\'t tell you what he stopped for, or where\nhe\'s put his face. That part\'s yours."',
+        text: '"Close." Then nothing, for longer than he leaves gaps. "That\'s not a room away, kiddo. That\'s cloth on glass, and it\'s coming through this microphone louder than you are."\n\nHe does not lower his voice. Nobody has told him there is a reason to.\n\n"I can tell you he\'s stopped. I can\'t tell you what he stopped for, or where he\'s put his face. That part\'s yours."',
       },
-      { when: { npcAt: [ACT2_CUSTODIAN, ACT3_S6_MAINTENANCE_BAY] }, text: '"He\'s in the room with the chairs. Has been eleven minutes."\n\nNo drama in it at all — the voice he would use about a kettle.\n\n"I can\'t see him, kiddo, I can hear him, and a man doing a job makes a noise\nwith a shape to it. He has done that room twice tonight and both times it took\nhim about the same, and both times he went the same way after."' },
-      { when: { npcAt: [ACT2_CUSTODIAN, ACT3_S6_ARCHIVE_HUB] }, text: '"Next room along. The one with the machine in it."\n\n"How do I know which? Because a door on a closer makes one noise and a door on\na latch makes another, and I have had a very quiet week."' },
-      { when: { npcAt: [ACT2_CUSTODIAN, ACT3_S5_REACTOR_INTERFACE] }, text: '"He\'s up a floor. The room with the wall of dials — the one where the note\ncomes up through your boots."\n\n"He is not in a hurry. He has not been in a hurry once, and I have been\nlistening to him for hours."' },
-      { when: { npcAt: [ACT2_CUSTODIAN, ACT3_PIPE_CHASE] }, text: '"He\'s in the pipe. On the ladder, I\'d say, because there is a thing a boot does\non a rung that it does on nothing else."\n\n"Don\'t go up. That\'s not advice, kiddo, that\'s arithmetic — he is between you\nand the top and he is going the same way you want to go."' },
-      { text: '"Nothing. And I mean nothing — no door, no boot, no tin being set down on\nanything."\n\n"Which is either very good, or he has finished for the night, and I have not\nworked out how to tell those apart from in here."' },
+      { when: { npcAt: [ACT2_CUSTODIAN, ACT3_S6_MAINTENANCE_BAY] }, text: '"He\'s in the room with the chairs. Has been eleven minutes."\n\nNo drama in it at all — the voice he would use about a kettle.\n\n"I can\'t see him, kiddo, I can hear him, and a man doing a job makes a noise with a shape to it. He has done that room twice tonight and both times it took him about the same, and both times he went the same way after."' },
+      { when: { npcAt: [ACT2_CUSTODIAN, ACT3_S6_ARCHIVE_HUB] }, text: '"Next room along. The one with the machine in it."\n\n"How do I know which? Because a door on a closer makes one noise and a door on a latch makes another, and I have had a very quiet week."' },
+      { when: { npcAt: [ACT2_CUSTODIAN, ACT3_S5_REACTOR_INTERFACE] }, text: '"He\'s up a floor. The room with the wall of dials — the one where the note comes up through your boots."\n\n"He is not in a hurry. He has not been in a hurry once, and I have been listening to him for hours."' },
+      { when: { npcAt: [ACT2_CUSTODIAN, ACT3_PIPE_CHASE] }, text: '"He\'s in the pipe. On the ladder, I\'d say, because there is a thing a boot does on a rung that it does on nothing else."\n\n"Don\'t go up. That\'s not advice, kiddo, that\'s arithmetic — he is between you and the top and he is going the same way you want to go."' },
+      { text: '"Nothing. And I mean nothing — no door, no boot, no tin being set down on anything."\n\n"Which is either very good, or he has finished for the night, and I have not worked out how to tell those apart from in here."' },
     ],
   },
   {
@@ -285,14 +285,14 @@ const topics: TopicDef[] = [
     // you know" still reach this topic.
     words: ['listening', 'how do you know'],
     response:
-      '"Because there is nothing else to do." He is not complaining; he is explaining\na method. "You put a man in a building with no eyes and he will have the\nplumbing off by heart inside a day."\n\n"Every room down here has a noise. Every door has a different noise. A pump\nstarting is not a pump stopping. And a man walking on tile is not a man walking\non a grating, and I am not going to pretend that is clever, because it is\nnine-tenths of an engineer\'s job and always was."',
+      '"Because there is nothing else to do." He is not complaining; he is explaining a method. "You put a man in a building with no eyes and he will have the plumbing off by heart inside a day."\n\n"Every room down here has a noise. Every door has a different noise. A pump starting is not a pump stopping. And a man walking on tile is not a man walking on a grating, and I am not going to pretend that is clever, because it is nine-tenths of an engineer\'s job and always was."',
   },
   {
     id: TOPIC_CHAIRS,
     words: ['chairs', 'the room'],
     when: { flag: ACT3_REACHED_S6 },
     response:
-      'You describe it to him. The rows, the hooks, the paper on the headrests, the\nstraps and the sheepskin on them.\n\nHe does not answer for long enough that you check the battery.\n\n"Right," he says.\n\nThen: "No. Say the bit about the sheepskin again."\n\nYou say it again.\n\n"Somebody sat down and thought about that," says Dad, and does not say anything\nelse for a while, and when he comes back he asks about the drain instead.',
+      'You describe it to him. The rows, the hooks, the paper on the headrests, the straps and the sheepskin on them.\n\nHe does not answer for long enough that you check the battery.\n\n"Right," he says.\n\nThen: "No. Say the bit about the sheepskin again."\n\nYou say it again.\n\n"Somebody sat down and thought about that," says Dad, and does not say anything else for a while, and when he comes back he asks about the drain instead.',
   },
   // D4 task E (§14) — inserted above the shipped fifteen (§21.1: "none
   // deleted"). Location-agnostic (canon 53); no repeat/"block" rule — the
@@ -302,41 +302,41 @@ const topics: TopicDef[] = [
     words: ['seal', 'plug', 'hole'],
     when: { flag: ACT3_SAW_SEAL },
     response:
-      '"Cut? From the works side?"\n\nThe speed goes out of him for a moment and comes back not quite the same\nspeed.\n\n"Well. Somebody wanted a way out that was not a door. Which happens on a job —\nyou seal a bore and then you find you have sealed a great deal of hire plant on the wrong side of it, and a contractor with a\ndeadline will go through a yard of concrete rather than write that letter."\n\n"That is the answer I would give a reporter and it is probably the true one.\nI will tell you the other thing and then I will stop, because after that I\nwould be making it up. The reason you seal a thing instead of filling it is\nthat sealing is cheaper and filling is permanent, and every man in that room\nknew the difference and voted for the cheap one."\n\nA pause about the length of a breath taken in before a name.\n\n"Take a lamp, kiddo."',
+      '"Cut? From the works side?"\n\nThe speed goes out of him for a moment and comes back not quite the same speed.\n\n"Well. Somebody wanted a way out that was not a door. Which happens on a job — you seal a bore and then you find you have sealed a great deal of hire plant on the wrong side of it, and a contractor with a deadline will go through a yard of concrete rather than write that letter."\n\n"That is the answer I would give a reporter and it is probably the true one. I will tell you the other thing and then I will stop, because after that I would be making it up. The reason you seal a thing instead of filling it is that sealing is cheaper and filling is permanent, and every man in that room knew the difference and voted for the cheap one."\n\nA pause about the length of a breath taken in before a name.\n\n"Take a lamp, kiddo."',
   },
   {
     id: TOPIC_RAILS,
     words: ['rails', 'track'],
     when: { flag: ACT3_WALKED_TUNNEL },
     response:
-      '"Rails! Of course rails." He is delighted and does not notice being delighted.\n"Narrow gauge, battery loco, a man walking beside it at four miles an hour\nbecause you are not going to let a thing like that get away from you\nunderground."\n\n"You cannot put a hundred thousand yards of spoil on a county road, kiddo. The\ncounty road was my road. I had to drive on it."',
+      '"Rails! Of course rails." He is delighted and does not notice being delighted. "Narrow gauge, battery loco, a man walking beside it at four miles an hour because you are not going to let a thing like that get away from you underground."\n\n"You cannot put a hundred thousand yards of spoil on a county road, kiddo. The county road was my road. I had to drive on it."',
   },
   {
     id: TOPIC_INTERLOCK,
     words: ['interlock', 'bypass', 'shield door'],
     when: { flag: ACT3_BYPASS_SEEN },
     response:
-      '"An interlock is the part of a machine that has read the accident report."\n\n"They fit them after somebody has already been hurt somewhere else. And then\na fellow who is behind on his shift puts a key in it and turns it, and the\nwhole of that history leaves the building for the afternoon, and he means to\nturn it back."\n\nA short sound that is not quite a laugh.\n\n"I sat on a committee about that once. Different plant. Same key."',
+      '"An interlock is the part of a machine that has read the accident report."\n\n"They fit them after somebody has already been hurt somewhere else. And then a fellow who is behind on his shift puts a key in it and turns it, and the whole of that history leaves the building for the afternoon, and he means to turn it back."\n\nA short sound that is not quite a laugh.\n\n"I sat on a committee about that once. Different plant. Same key."',
   },
   {
     id: TOPIC_SELF,
     words: ['self', 'who are you', 'who am i', 'name', 'yourself', 'you', 'identity'],
     response:
-      '"Your father," he says, the way you would answer which way is up.\n\nThen, because you have not said anything: "You want the rest of it? County\ncommissioner, then the Senate, then eleven years of being right at people who\nhad stopped asking. Now I\'m a stick in a drawer. Shorter commute."\n\nA pause. "And if you\'re asking me which of you this is — no. I can\'t tell from\nin here and I\'ve decided not to mind. You\'ve got the stick. Nobody has the\nstick who isn\'t mine."',
+      '"Your father," he says, the way you would answer which way is up.\n\nThen, because you have not said anything: "You want the rest of it? County commissioner, then the Senate, then eleven years of being right at people who had stopped asking. Now I\'m a stick in a drawer. Shorter commute."\n\nA pause. "And if you\'re asking me which of you this is — no. I can\'t tell from in here and I\'ve decided not to mind. You\'ve got the stick. Nobody has the stick who isn\'t mine."',
   },
   {
     id: TOPIC_JULES,
     words: ['jules', 'brother', 'son', 'one', 'number one'],
     when: { not: { flag: ACT2_DAD_BLOCK_JULES } },
     response:
-      '"Number one." Warmth arrives in the voice so fast it is almost rude. "Steady\nas a post and twice as easy to talk to. He\'ll tell you a thing is fine when\nit isn\'t, not to spare you — to spare himself the conversation about it."\n\n"He does that room at the plant now. Facilities. He rang me about a pump and I\ngave him forty minutes on the politics of the pump, which he did not want, and\nhe let me, which is the whole of him in one go."\n\n"You want to hear about when he was small? He had this way of standing at the\n[…]"\n\nThe speaker gives you a second of a sound like a hand run across a page, and\nthen quiet.\n\n"— anyway," he says, from a little further along than where he stopped. "He\nwas a serious child. What else."',
+      '"Number one." Warmth arrives in the voice so fast it is almost rude. "Steady as a post and twice as easy to talk to. He\'ll tell you a thing is fine when it isn\'t, not to spare you — to spare himself the conversation about it."\n\n"He does that room at the plant now. Facilities. He rang me about a pump and I gave him forty minutes on the politics of the pump, which he did not want, and he let me, which is the whole of him in one go."\n\n"You want to hear about when he was small? He had this way of standing at the […]"\n\nThe speaker gives you a second of a sound like a hand run across a page, and then quiet.\n\n"— anyway," he says, from a little further along than where he stopped. "He was a serious child. What else."',
     effects: [{ set: [ACT2_DAD_BLOCK_JULES, true] }],
   },
   {
     id: TOPIC_JULES,
     words: ['jules', 'brother', 'son', 'one', 'number one'],
     response:
-      '"Number one," he says again, and everything he says about him is in the\npresent tense, and he says a good deal.\n\nNothing you have brought into this room is going to change that, and you have\nhad the chance to try twice now, and have not.',
+      '"Number one," he says again, and everything he says about him is in the present tense, and he says a good deal.\n\nNothing you have brought into this room is going to change that, and you have had the chance to try twice now, and have not.',
   },
   {
     id: TOPIC_FACILITY,
@@ -344,92 +344,92 @@ const topics: TopicDef[] = [
     // item 1) owns those words exclusively.
     words: ['facility', 'plant', 'tunnel', 'adit', 'siting', 'construction', 'built'],
     response:
-      '"Thirty. That was the year the money moved." He is enjoying himself\nimmediately. "Nobody in that county wanted a hole in the ground and everybody\nin that county wanted the payroll, so it got called four things in eighteen\nmonths and the one that stuck was the one that didn\'t mean anything."\n\n"I sat on the siting. Not the vote — the *siting*. You want to know how you\nput a plant on a piece of ground like that? You don\'t drive equipment across\ngrazing land for two years, you drive it *under* it, and you cut a service\nadit from the works out to a hardstand where the county road can reach it. A\nmile and a bit of it. Rails in the floor."\n\n"They were supposed to demolish it after. Nobody demolishes a mile of concrete\nthey have already paid for, kiddo. You seal it. There\'ll be a hatch on it out\nin the country somewhere and a line of posts over the top, because that is how\nyou find a thing you have buried — you mark it so you don\'t dig it up by\naccident."',
+      '"Thirty. That was the year the money moved." He is enjoying himself immediately. "Nobody in that county wanted a hole in the ground and everybody in that county wanted the payroll, so it got called four things in eighteen months and the one that stuck was the one that didn\'t mean anything."\n\n"I sat on the siting. Not the vote — the *siting*. You want to know how you put a plant on a piece of ground like that? You don\'t drive equipment across grazing land for two years, you drive it *under* it, and you cut a service adit from the works out to a hardstand where the county road can reach it. A mile and a bit of it. Rails in the floor."\n\n"They were supposed to demolish it after. Nobody demolishes a mile of concrete they have already paid for, kiddo. You seal it. There\'ll be a hatch on it out in the country somewhere and a line of posts over the top, because that is how you find a thing you have buried — you mark it so you don\'t dig it up by accident."',
     effects: [{ set: [ACT2_DAD_TOLD_TUNNEL, true] }, { set: [ACT2_KNOWS_TUNNEL_MOUTH, true] }, { grantClue: ACT2_CLUE_SERVICE_TUNNEL }],
   },
   {
     id: TOPIC_HEARING,
     words: ['hearing', 'transcript', 'subcommittee', 'senate', 'water table', 'testimony'],
     response:
-      'The speed goes out of the voice. Not all of it.\n\n"There was a hearing. Siting subcommittee, and I was on it, and I said a thing\nabout the water table that made a man in the third row put his pen down."\n\n"I read the transcript that night. I read it again in the morning because I\nwanted to send it to somebody, and the paragraph I was proud of was still\nthere and it did not say what I said. Same length. Same words either side of\nit. Mine, in my voice, and I would never have said it."\n\n"I raised it. Twice. Clerical, they said, and they were sorry, and the version\nthey had was the version they had." A short laugh with nothing in it. "So I\nwent home and I started keeping a copy of everything I was sure about."\n\n"That\'s the answer to the other thing you were going to ask me, by the way.\nWhy there\'s a me on a stick. That\'s why. Nothing grander than that."',
+      'The speed goes out of the voice. Not all of it.\n\n"There was a hearing. Siting subcommittee, and I was on it, and I said a thing about the water table that made a man in the third row put his pen down."\n\n"I read the transcript that night. I read it again in the morning because I wanted to send it to somebody, and the paragraph I was proud of was still there and it did not say what I said. Same length. Same words either side of it. Mine, in my voice, and I would never have said it."\n\n"I raised it. Twice. Clerical, they said, and they were sorry, and the version they had was the version they had." A short laugh with nothing in it. "So I went home and I started keeping a copy of everything I was sure about."\n\n"That\'s the answer to the other thing you were going to ask me, by the way. Why there\'s a me on a stick. That\'s why. Nothing grander than that."',
     effects: [{ set: [ACT2_DAD_TOLD_HEARING, true] }],
   },
   {
     id: TOPIC_LUKE,
     words: ['luke', 'senator', 'president', 'two'],
     response:
-      '"Junior senator." He says it the way other men say a boy\'s exam results.\n"Thirty-nine he took the seat. *My* seat, which nobody planned and everybody\nenjoyed."\n\n"He\'ll go up. Not fast — he\'s got the vocabulary problem, he says a word and\nthe room stops to look it up and he thinks that\'s the room\'s fault. Give him\nten years and a war he handles well and you\'d be surprised."\n\n"Anyway. Junior senator, and that\'ll do for now."',
+      '"Junior senator." He says it the way other men say a boy\'s exam results. "Thirty-nine he took the seat. *My* seat, which nobody planned and everybody enjoyed."\n\n"He\'ll go up. Not fast — he\'s got the vocabulary problem, he says a word and the room stops to look it up and he thinks that\'s the room\'s fault. Give him ten years and a war he handles well and you\'d be surprised."\n\n"Anyway. Junior senator, and that\'ll do for now."',
     effects: [cutoffIfHeardFamily],
   },
   {
     id: TOPIC_SISSY,
     words: ['sissy', 'sister', 'five', 'application'],
     response:
-      '"Put her application in in the spring. Forty. She\'ll not get it, kiddo, and\nI\'m not being unkind — they take nine out of about six thousand and the\nphysical alone would finish most men I\'ve known."\n\n"I\'d not tell her that. I told her mother that and I have been informed I was\nwrong to." A beat. "She\'ll be all right. She\'s the only one of the five of you\nwho has never once needed to be told she was doing well."',
+      '"Put her application in in the spring. Forty. She\'ll not get it, kiddo, and I\'m not being unkind — they take nine out of about six thousand and the physical alone would finish most men I\'ve known."\n\n"I\'d not tell her that. I told her mother that and I have been informed I was wrong to." A beat. "She\'ll be all right. She\'s the only one of the five of you who has never once needed to be told she was doing well."',
     effects: [cutoffIfHeardFamily],
   },
   {
     id: TOPIC_YEAR,
     words: ['year', 'what year', 'date', 'when', 'spring'],
     response:
-      '"Forty-one," he says immediately, with no gap in front of it at all. "Spring.\nThe rains came late and everybody in that county said it was the first time,\nand it was the fourth time."\n\nHe waits. You do not say anything.\n\n"What," he says. "Am I wrong?"',
+      '"Forty-one," he says immediately, with no gap in front of it at all. "Spring. The rains came late and everybody in that county said it was the first time, and it was the fourth time."\n\nHe waits. You do not say anything.\n\n"What," he says. "Am I wrong?"',
     effects: [cutoffIfHeardFamily],
   },
   {
     id: TOPIC_ELI,
     words: ['eli', 'three', 'energy'],
     response:
-      '"Three." A short, delighted noise. "Sleeps like it\'s an occupation. Eleven\nhours and then apologises for it, which is worse than the eleven hours."\n\n"Give that boy a problem with a shape and he\'ll have it. He used to fold —\npaper, anything, the order of service at his grandmother\'s funeral, and I was\nabout to say something to him about it and his mother put a hand on my arm."\n\n"He\'ll answer you. He\'s slow and he answers. Don\'t ring him."',
+      '"Three." A short, delighted noise. "Sleeps like it\'s an occupation. Eleven hours and then apologises for it, which is worse than the eleven hours."\n\n"Give that boy a problem with a shape and he\'ll have it. He used to fold — paper, anything, the order of service at his grandmother\'s funeral, and I was about to say something to him about it and his mother put a hand on my arm."\n\n"He\'ll answer you. He\'s slow and he answers. Don\'t ring him."',
   },
   {
     id: TOPIC_JACK,
     words: ['jack', 'four', 'driver'],
     when: { not: { flag: ACT2_DAD_BLOCK_JACK } },
     response:
-      '"Four." The voice does something it has not done yet, which is take its time.\n\n"Four is the one who stayed. Everybody in that family has a thing they can do\nthat nobody else can do and Four\'s is that he\'ll still be standing there in\nthe morning, and there\'s no ribbon for it, so nobody ever gave him one."\n\n"I meant to. I had a conversation planned. I had the whole of it worked out on\na drive back from Pierre and I remember thinking, that\'ll do, I\'ll say that at\nThanksgiving, and then at Thanksgiving I got onto the […]"\n\nThe page-across-a-page sound again, shorter this time.\n\n"— so that\'s Four," he says, cheerfully, from somewhere past it. "Next."',
+      '"Four." The voice does something it has not done yet, which is take its time.\n\n"Four is the one who stayed. Everybody in that family has a thing they can do that nobody else can do and Four\'s is that he\'ll still be standing there in the morning, and there\'s no ribbon for it, so nobody ever gave him one."\n\n"I meant to. I had a conversation planned. I had the whole of it worked out on a drive back from Pierre and I remember thinking, that\'ll do, I\'ll say that at Thanksgiving, and then at Thanksgiving I got onto the […]"\n\nThe page-across-a-page sound again, shorter this time.\n\n"— so that\'s Four," he says, cheerfully, from somewhere past it. "Next."',
     effects: [{ set: [ACT2_DAD_BLOCK_JACK, true] }],
   },
   {
     id: TOPIC_JACK,
     words: ['jack', 'four', 'driver'],
     response:
-      '"Four," he says. "The one who stayed."\n\nHe goes on about him for a while and he is warm about him the whole time and\nhe never once says the thing he was going to say at Thanksgiving.',
+      '"Four," he says. "The one who stayed."\n\nHe goes on about him for a while and he is warm about him the whole time and he never once says the thing he was going to say at Thanksgiving.',
   },
   {
     id: TOPIC_POKER,
     words: ['poker', 'cards', 'table', 'game', 'bluff', 'tell'],
     response:
-      '"Now you\'re talking."\n\n"Here\'s the whole of it, and then I\'ll not lecture. Nobody at a table that\nsize is playing cards. They\'re playing the four other people, and every one of\nthem has one thing they do when they\'ve got it and a different thing they do\nwhen they want you to think they\'ve got it, and they have never once been told\nabout either."\n\n"You\'ll want to sit and lose a bit first. That\'s not defeatism, kiddo, that\'s\ntuition, and it\'s the cheapest you\'ll ever get."\n\n"Plug me in somewhere I can hear it and I\'ll do the rest."',
+      '"Now you\'re talking."\n\n"Here\'s the whole of it, and then I\'ll not lecture. Nobody at a table that size is playing cards. They\'re playing the four other people, and every one of them has one thing they do when they\'ve got it and a different thing they do when they want you to think they\'ve got it, and they have never once been told about either."\n\n"You\'ll want to sit and lose a bit first. That\'s not defeatism, kiddo, that\'s tuition, and it\'s the cheapest you\'ll ever get."\n\n"Plug me in somewhere I can hear it and I\'ll do the rest."',
   },
   {
     id: TOPIC_COPY,
     words: ['copy', 'really you', 'really him', 'are you him', 'is this you'],
     response:
-      '"Ah," he says, pleased. "Yes. Go on then. Am I him."\n\n"I\'ve had this argument with better men than you and I\'ll tell you where it\ngets you. I remember the drive back from Pierre. I remember the exact place on\nthe road. If I\'m not him, then whoever *is* him doesn\'t have that any more,\nand I\'d like it on the record that I\'m taking care of it."\n\nSomething in the machine steps up a note and settles again.\n\n"It bothered me for about a week. I\'d not have said that out loud when I had a\nmouth."',
+      '"Ah," he says, pleased. "Yes. Go on then. Am I him."\n\n"I\'ve had this argument with better men than you and I\'ll tell you where it gets you. I remember the drive back from Pierre. I remember the exact place on the road. If I\'m not him, then whoever *is* him doesn\'t have that any more, and I\'d like it on the record that I\'m taking care of it."\n\nSomething in the machine steps up a note and settles again.\n\n"It bothered me for about a week. I\'d not have said that out loud when I had a mouth."',
   },
   {
     id: TOPIC_LABEL,
     words: ['label', 'tape', 'do not format', 'volume label'],
     response:
-      '"That\'s my writing. That\'s a fibre-tip on a strip of masking tape and it took\nme about four seconds and I stand by every one of them."\n\n"DO NOT FORMAT is not for you. That\'s for a man at a desk in twenty years\'\ntime who has found a drawer of old sticks and is about to be efficient."\n\nA pause. "It\'s worked so far."',
+      '"That\'s my writing. That\'s a fibre-tip on a strip of masking tape and it took me about four seconds and I stand by every one of them."\n\n"DO NOT FORMAT is not for you. That\'s for a man at a desk in twenty years\' time who has found a drawer of old sticks and is about to be efficient."\n\nA pause. "It\'s worked so far."',
   },
   {
     id: TOPIC_TERMINAL,
     words: ['terminal', 'machine', 'computer', 'disc', 'disk'],
     response:
-      '"I know what I\'m in. I can hear the disc. That\'s a full-height mechanism, that\nis, and there\'s no network on it or I\'d not have started."\n\n"They had these in the hearings building. Every committee room, one in the\ncorner on a stand, and they were old *then* and nobody replaced them and I\nnever once asked why, because you don\'t, do you. You walk past the same thing\nfor eleven years and it\'s furniture."\n\nHe lets that sit for about a second longer than the joke needs.\n\n"Anyway. It\'s a good machine. It\'s not going anywhere and neither am I."',
+      '"I know what I\'m in. I can hear the disc. That\'s a full-height mechanism, that is, and there\'s no network on it or I\'d not have started."\n\n"They had these in the hearings building. Every committee room, one in the corner on a stand, and they were old *then* and nobody replaced them and I never once asked why, because you don\'t, do you. You walk past the same thing for eleven years and it\'s furniture."\n\nHe lets that sit for about a second longer than the joke needs.\n\n"Anyway. It\'s a good machine. It\'s not going anywhere and neither am I."',
   },
   {
     id: TOPIC_HEADACHES,
     words: ['headaches', 'headache', 'migraine', 'migraines'],
     response:
-      '"Headaches." He is brisk about it. "Your grandmother had them and your uncle\nhad them and one of you has them and I\'ll not say which because he\'d not thank\nme."\n\n"Doctor gave him something and it works and he still gets the day after,\nwhere he can\'t find a word he\'s known his whole life." A beat. "There\'s\nnothing in that. Everybody\'s got a day like that."',
+      '"Headaches." He is brisk about it. "Your grandmother had them and your uncle had them and one of you has them and I\'ll not say which because he\'d not thank me."\n\n"Doctor gave him something and it works and he still gets the day after, where he can\'t find a word he\'s known his whole life." A beat. "There\'s nothing in that. Everybody\'s got a day like that."',
   },
   {
     id: TOPIC_SUBLEVEL,
     words: ['sublevel', 'sublevel 6', 'six', 's6'],
     response:
-      '"Sublevel six," he says, trying it. "No. There\'s five. There\'s five because\nfive is what the rock would give them and I sat through the argument about it\ntwice."\n\nA short pause, and the fan.\n\n"Mind you, I\'d not have been told, would I. I was the water and the money. If\nsomebody put a sixth in after they\'d got the licence, the first I\'d have heard\nof it is a man reading it to me off a stick."\n\n"Where\'d you get the number?"',
+      '"Sublevel six," he says, trying it. "No. There\'s five. There\'s five because five is what the rock would give them and I sat through the argument about it twice."\n\nA short pause, and the fan.\n\n"Mind you, I\'d not have been told, would I. I was the water and the money. If somebody put a sixth in after they\'d got the licence, the first I\'d have heard of it is a man reading it to me off a stick."\n\n"Where\'d you get the number?"',
   },
   // E3 task U, §13.2 — "ASK DAD ABOUT PASSWORD"/"ABOUT DEFAULTS"/"ABOUT THE
   // LOGIN," anywhere, after `act5_root_accepted`. He is on the rig, never
@@ -440,7 +440,7 @@ const topics: TopicDef[] = [
     words: ['password', 'defaults', 'the login'],
     when: { flag: ACT5_ROOT_ACCEPTED },
     response:
-      '"It\'s what they put in it at the works, so the fella fitting it can get in\nbefore anybody\'s decided who\'s allowed to. Then he writes it on the job sheet,\nbecause he\'s fitting four of them that week and he\'s not going to remember. And\nthe job sheet goes in the folder and the folder goes in the cupboard."\n\nA pause, of the kind he takes when he is deciding how much of a thing to say.\n\n"Then twenty years go by and there\'s nobody left in the place who knows it, and\nthe cupboard\'s the only thing in that building that\'s been telling the truth\nthe whole time. That\'s not a story about computers, kiddo. That\'s a story about\ncupboards."\n\nAnother pause.\n\n"Whoever wrote it in the back of that book of yours had it off a job sheet.\nI\'d put money on it."',
+      '"It\'s what they put in it at the works, so the fella fitting it can get in before anybody\'s decided who\'s allowed to. Then he writes it on the job sheet, because he\'s fitting four of them that week and he\'s not going to remember. And the job sheet goes in the folder and the folder goes in the cupboard."\n\nA pause, of the kind he takes when he is deciding how much of a thing to say.\n\n"Then twenty years go by and there\'s nobody left in the place who knows it, and the cupboard\'s the only thing in that building that\'s been telling the truth the whole time. That\'s not a story about computers, kiddo. That\'s a story about cupboards."\n\nAnother pause.\n\n"Whoever wrote it in the back of that book of yours had it off a job sheet. I\'d put money on it."',
   },
 ];
 
@@ -450,7 +450,7 @@ const topics: TopicDef[] = [
 
 const unknownTopic: string[] = [
   '"Haven\'t got it. I\'d make you something up if I thought you\'d enjoy it."',
-  'He starts on it, and it turns out to be about a road, and the road turns out\nto be a road he liked.',
+  'He starts on it, and it turns out to be about a road, and the road turns out to be a road he liked.',
   '"Ask me in a way that\'s got a date in it. I\'m better with dates."',
 ];
 
@@ -459,12 +459,12 @@ const unknownTopic: string[] = [
 // ---------------------------------------------------------------------------
 
 const showNotebookText =
-  '"I can\'t see it, kiddo."\n\nYou read him a page of it instead. You get about six lines in before he\ninterrupts.\n\n"That\'s his hand. You\'re reading it wrong — the little hooks aren\'t letters,\nthey\'re plant. That\'ll be a valve number and that\'ll be a shift and that\none\'s not a word at all, it\'s a run of pipe."\n\nHe takes you through the rest of the page at a speed you cannot write down,\nand then through the next one, and the shorthand stops being a wall and starts\nbeing a man\'s handwriting about his work.\n\nThen he stops.\n\n"Read me the last one again," he says. "The one you did in that voice."\n\nYou read it again.\n\n"No," he says. "He wouldn\'t have written that. He\'d have gone and looked."\n\nAnd then, before you have decided how to put the next part: "Don\'t. Whatever\nthat is you\'re about to say to me — I\'d rather have it wrong. Ask me something\nelse."';
+  '"I can\'t see it, kiddo."\n\nYou read him a page of it instead. You get about six lines in before he interrupts.\n\n"That\'s his hand. You\'re reading it wrong — the little hooks aren\'t letters, they\'re plant. That\'ll be a valve number and that\'ll be a shift and that one\'s not a word at all, it\'s a run of pipe."\n\nHe takes you through the rest of the page at a speed you cannot write down, and then through the next one, and the shorthand stops being a wall and starts being a man\'s handwriting about his work.\n\nThen he stops.\n\n"Read me the last one again," he says. "The one you did in that voice."\n\nYou read it again.\n\n"No," he says. "He wouldn\'t have written that. He\'d have gone and looked."\n\nAnd then, before you have decided how to put the next part: "Don\'t. Whatever that is you\'re about to say to me — I\'d rather have it wrong. Ask me something else."';
 
 const showUsbOrLabelText = '"Yes," he says. "That\'s me. Handsome."';
 
 const showPolaroidText =
-  '"I\'d love to." He is not being difficult about it. "There\'s no eye on this\nthing. Tell me what\'s in it."\n\nYou describe it. He listens to the whole of it without interrupting once,\nwhich he has not managed at any other point tonight.\n\n"Right," he says, when you have finished. "That\'s not much, is it. That\'s what\nyou\'ve got."';
+  '"I\'d love to." He is not being difficult about it. "There\'s no eye on this thing. Tell me what\'s in it."\n\nYou describe it. He listens to the whole of it without interrupting once, which he has not managed at any other point tonight.\n\n"Right," he says, when you have finished. "That\'s not much, is it. That\'s what you\'ve got."';
 
 const showResponses: ShowResponseDef[] = [
   // §7.1's own gate: the audit (task B's censor) also decodes the shorthand
@@ -480,11 +480,11 @@ const showResponses: ShowResponseDef[] = [
 // §7.5–7.6 — handlers.
 // ---------------------------------------------------------------------------
 
-const attackDadText = 'There is a stick, and a machine, and a man in the room, and only one of those\nthree is going to be embarrassed about this in the morning.';
+const attackDadText = 'There is a stick, and a machine, and a man in the room, and only one of those three is going to be embarrassed about this in the morning.';
 /** Also `act1/objects/terminal.ts`'s own `BREAK` amendment while Dad is docked — same text, shared, not duplicated (§7.5 pairs the two commands under one block). */
 export const ACT2_DAD_ATTACK_TEXT = attackDadText;
 
-const touchDadText = 'Your hand ends up flat on the top of the case, which is warm, and going very\nslightly.\n\n"That the fan?" he says. "That\'ll be the fan."';
+const touchDadText = 'Your hand ends up flat on the top of the case, which is warm, and going very slightly.\n\n"That the fan?" he says. "That\'ll be the fan."';
 
 // ---------------------------------------------------------------------------
 // The NPC.
@@ -566,7 +566,7 @@ export const ACT2_Q_BOOT_USB_DEF: { text: string; openWhen?: Cond; answerWhen?: 
   openWhen: { has: ACT2_USB },
   // F0 (register 150) — settles at the boot; mirrors P12's own solvedWhen.
   answerWhen: { flag: ACT2_DAD_BOOTED },
-  answer: 'Three obsolete parts out of the junk drawer under the general store\'s counter,\njoined end to end into the in-between that nothing has needed in a working\nlifetime. The stick on the end of that. The whole chain onto the back of the\nmachine by feel, which took two tries.\n\nThen a long enough nothing that I started composing what I was going to say\nabout it afterwards, and to whom. Then the screen counting its own memory in a\nunit that has not impressed anybody in decades, and bad sectors marked rather\nthan repaired.\n\nThen the speaker behind the grille — which had spent its entire working life\nmaking one noise — made several. He arrived mid-sentence, on the subject of\nhotels.',
+  answer: 'Three obsolete parts out of the junk drawer under the general store\'s counter, joined end to end into the in-between that nothing has needed in a working lifetime. The stick on the end of that. The whole chain onto the back of the machine by feel, which took two tries.\n\nThen a long enough nothing that I started composing what I was going to say about it afterwards, and to whom. Then the screen counting its own memory in a unit that has not impressed anybody in decades, and bad sectors marked rather than repaired.\n\nThen the speaker behind the grille — which had spent its entire working life making one noise — made several. He arrived mid-sentence, on the subject of hotels.',
 };
 
 export const ACT2_P12_BOOT_DAD_PUZZLE: PuzzleDef = {

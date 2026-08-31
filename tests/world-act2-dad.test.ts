@@ -90,7 +90,7 @@ describe('Dad — derived position', () => {
     const { session } = enter(base, YOUR_ROOM);
     const { session: after, events } = say(session, 'take usb', store);
 
-    expect(text(events)).toMatch(/That's fine\.\s*\nGo on/);
+    expect(text(events)).toMatch(/That's fine\.\s* Go on/);
     expect(after.state.objects[ACT2_USB]?.location).toBe('inventory');
     expect(npcRoom(TEST_WORLD, after.state, ACT2_DAD)).toBe('offstage');
   });

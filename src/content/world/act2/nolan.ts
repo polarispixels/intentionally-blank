@@ -115,14 +115,14 @@ export const NOLAN_SUBLEVEL_LINE = 'There is no Sublevel 6.';
 // ---------------------------------------------------------------------------
 
 export const NOLAN_YARD_WITH_HIM_TEXT =
-  'The porch light is on and the gate is open, hooked back against the fence with\na bent nail that was put there for the purpose.\n\nNolan is on the step with a mug, in a cardigan, doing nothing at all. The dog\nis lying across his feet with the whole of its weight, the way a dog lies on\nsomebody it has decided about.\n\nThe bin is in against the house with the lid on, squared to the wall.';
+  'The porch light is on and the gate is open, hooked back against the fence with a bent nail that was put there for the purpose.\n\nNolan is on the step with a mug, in a cardigan, doing nothing at all. The dog is lying across his feet with the whole of its weight, the way a dog lies on somebody it has decided about.\n\nThe bin is in against the house with the lid on, squared to the wall.';
 
 // ---------------------------------------------------------------------------
 // §17.2 — EXAMINE
 // ---------------------------------------------------------------------------
 
 const examineText =
-  'Sixty, and tidy about it: shaved this morning, shirt buttoned to the collar\nunder the cardigan, boots off at the step and set side by side facing the\ndoor.\n\nThere is a plant badge on a clip on his shirt pocket that he has not taken off\nand does not appear to know is there.\n\nHe looks like a man having a good evening, and he looks tired in the way that\ndoes not come off with a night\'s sleep.';
+  'Sixty, and tidy about it: shaved this morning, shirt buttoned to the collar under the cardigan, boots off at the step and set side by side facing the door.\n\nThere is a plant badge on a clip on his shirt pocket that he has not taken off and does not appear to know is there.\n\nHe looks like a man having a good evening, and he looks tired in the way that does not come off with a night\'s sleep.';
 
 // ---------------------------------------------------------------------------
 // §17.3 — greeting
@@ -132,7 +132,7 @@ const greeting: ProseRule[] = [
   {
     when: { not: { met: ACT2_NOLAN } },
     text:
-      'He is up off the step before you have got the gate all the way open, and the\ndog is up with him, and neither of them treats you as a question.\n\n"Come in the yard, come in the yard. Mind him, he leans." He puts a hand out\nand shakes yours with both of his. "You\'ll be the one that\'s been round the\ntown asking. Somebody said. It\'s a small enough place."\n\nHe looks at the side of your head, and something in his face closes and opens\nagain.\n\n"That\'s healing all right," he says. "Sit down. I\'ll not keep you standing in\nyour own business."',
+      'He is up off the step before you have got the gate all the way open, and the dog is up with him, and neither of them treats you as a question.\n\n"Come in the yard, come in the yard. Mind him, he leans." He puts a hand out and shakes yours with both of his. "You\'ll be the one that\'s been round the town asking. Somebody said. It\'s a small enough place."\n\nHe looks at the side of your head, and something in his face closes and opens again.\n\n"That\'s healing all right," he says. "Sit down. I\'ll not keep you standing in your own business."',
   },
   {
     text: [
@@ -147,7 +147,7 @@ const greeting: ProseRule[] = [
 // §17.4 — topic_sublevel
 // ---------------------------------------------------------------------------
 
-const sublevelRule1Text = `"${NOLAN_SUBLEVEL_LINE}"\n\nHe says it kindly. He says it the way you would tell somebody which day the\nbins go — no edge on it, no impatience, and entirely ready to say it again if\nyou need it again.\n\n"Five, and the plant floor above them. I've walked every foot of all of it and\nI could draw you the building on this step with a finger and not have to stop\nand think. There's no six. There's nothing under five but the rock they had to\ntake out to get five."`;
+const sublevelRule1Text = `"${NOLAN_SUBLEVEL_LINE}"\n\nHe says it kindly. He says it the way you would tell somebody which day the bins go — no edge on it, no impatience, and entirely ready to say it again if you need it again.\n\n"Five, and the plant floor above them. I've walked every foot of all of it and I could draw you the building on this step with a finger and not have to stop and think. There's no six. There's nothing under five but the rock they had to take out to get five."`;
 
 const topicSublevel: TopicDef = {
   id: ACT2_NOLAN_TOPIC_SUBLEVEL,
@@ -175,7 +175,7 @@ const topicJules: TopicDef = {
   // "nine years" (not "four") — canon decision 72 (`docs/spec/09-canon-
   // decisions.md`): "Nolan's two lines and Jules's M7 corrected to nine."
   response:
-    '"Him." He puts the mug down on the step. "Julian — Jules. Jules, sorry. I did\nthat to his face for nine years and he was decent about it every time."\n\n"Best supervisor I ever had and I\'ve had six. He\'d walk a job before he wrote\nit up, which nobody does." The mug gets turned round once. "Then it went bad.\nTheft, of all the things in the world, and I sat in that room while they put it\nto him, and he said he hadn\'t, and I believed him, and I signed the paper\nanyway, because the paper was what I had in front of me."\n\nHe is quiet for a moment.\n\n"I couldn\'t tell you what he looked like. Isn\'t that a thing." He picks the mug\nback up. "Nine years across a desk. Julian. Jules."',
+    '"Him." He puts the mug down on the step. "Julian — Jules. Jules, sorry. I did that to his face for nine years and he was decent about it every time."\n\n"Best supervisor I ever had and I\'ve had six. He\'d walk a job before he wrote it up, which nobody does." The mug gets turned round once. "Then it went bad. Theft, of all the things in the world, and I sat in that room while they put it to him, and he said he hadn\'t, and I believed him, and I signed the paper anyway, because the paper was what I had in front of me."\n\nHe is quiet for a moment.\n\n"I couldn\'t tell you what he looked like. Isn\'t that a thing." He picks the mug back up. "Nine years across a desk. Julian. Jules."',
 };
 
 // ---------------------------------------------------------------------------
@@ -186,7 +186,7 @@ const topicBadge: TopicDef = {
   id: ACT2_NOLAN_TOPIC_BADGE,
   words: ['badge', 'clip', 'lanyard', 'id', 'credential', 'card'],
   response:
-    'He looks down at his own shirt to check what you mean, and laughs at himself.\n\n"I\'ve worn that to bed. My wife used to take it off me." A beat that goes past\nbefore he does. "It opens the gate, the lobby, the halls and the lift. Not the\nplant floor — that\'s two of us and a key. And it says where I\'ve been all day,\nwhich I\'ve never minded, because where I\'ve been all day is the plant."',
+    'He looks down at his own shirt to check what you mean, and laughs at himself.\n\n"I\'ve worn that to bed. My wife used to take it off me." A beat that goes past before he does. "It opens the gate, the lobby, the halls and the lift. Not the plant floor — that\'s two of us and a key. And it says where I\'ve been all day, which I\'ve never minded, because where I\'ve been all day is the plant."',
 };
 
 // ---------------------------------------------------------------------------
@@ -200,7 +200,7 @@ const topicBadge: TopicDef = {
 // here — see `poker.ts`'s own header on the cycle that would create.
 // ---------------------------------------------------------------------------
 
-const badgeLoanText = `He unclips it before you have finished the question, and holds it out across\nthe felt with the lanyard hanging.\n\n"Go see for yourself. ${NOLAN_SUBLEVEL_LINE} Bring it back Monday."\n\nWhitlock watches him do it and does not say anything, and Jack watches\nWhitlock not say anything.`;
+const badgeLoanText = `He unclips it before you have finished the question, and holds it out across the felt with the lanyard hanging.\n\n"Go see for yourself. ${NOLAN_SUBLEVEL_LINE} Bring it back Monday."\n\nWhitlock watches him do it and does not say anything, and Jack watches Whitlock not say anything.`;
 
 const topicBadgeLoan: TopicDef = {
   id: ACT2_NOLAN_TOPIC_BADGE_LOAN,
@@ -218,7 +218,7 @@ const topicHeadaches: TopicDef = {
   id: ACT2_NOLAN_TOPIC_HEADACHES,
   words: ['headache', 'headaches', 'pills', 'tablets', 'prescription', 'bottle', 'migraine'],
   response:
-    '"Ah, you\'ve been in my bin." He is not angry. He is faintly delighted. "Whole\ncounty knows. Pearl asks after them like they\'re a relative."\n\n"They come on of a morning, mostly. Not pain, exactly — a sort of a\n*thickness*, and a day where I can\'t find a word I\'ve had my whole life."\n\nHe drinks. "The tablets work. The doctor says stress and I say I have the least\nstressful job in the state, and we leave it there."',
+    '"Ah, you\'ve been in my bin." He is not angry. He is faintly delighted. "Whole county knows. Pearl asks after them like they\'re a relative."\n\n"They come on of a morning, mostly. Not pain, exactly — a sort of a *thickness*, and a day where I can\'t find a word I\'ve had my whole life."\n\nHe drinks. "The tablets work. The doctor says stress and I say I have the least stressful job in the state, and we leave it there."',
 };
 
 // ---------------------------------------------------------------------------
@@ -229,7 +229,7 @@ const topicHeadaches: TopicDef = {
 // ---------------------------------------------------------------------------
 
 const trashResponse =
-  'He takes it and holds it out at the distance men his age hold things.\n\n"That\'s ours. That\'s the right form and that\'s the right hand on it, that\'s the\ngate office." He reads it twice. "It\'d have come to me. Everything like that\ncomes to me."\n\nHe hands it back.\n\n"I don\'t remember it," he says, and there is nothing in his voice but a man\nbeing accurate. "I\'ll not pretend I do. I\'d have signed it and it\'d have gone\nin the bin with the rest of the week."';
+  'He takes it and holds it out at the distance men his age hold things.\n\n"That\'s ours. That\'s the right form and that\'s the right hand on it, that\'s the gate office." He reads it twice. "It\'d have come to me. Everything like that comes to me."\n\nHe hands it back.\n\n"I don\'t remember it," he says, and there is nothing in his voice but a man being accurate. "I\'ll not pretend I do. I\'d have signed it and it\'d have gone in the bin with the rest of the week."';
 
 const trashEffects: Effect[] = [{ say: trashResponse }, { grantClue: ACT2_CLUE_NOLAN_FORGOT_ORDER }];
 
@@ -245,7 +245,7 @@ const topicTrash: TopicDef = {
 // ---------------------------------------------------------------------------
 
 const rentNoticeResponse =
-  '"That\'s my hand," he says at once, and turns it over, and turns it back.\n\n"*Returned — not known here.*" He reads his own writing out loud the way you\nread somebody else\'s. "Well, it\'s right. There\'s nobody of that name at this\nhouse and there never has been, and I\'d have put it out for the postman and\nthen I\'d have thought better of it, because you don\'t send a thing back with\nsomebody\'s money in it."\n\nHe gives it to you. "Where did you get this?"';
+  '"That\'s my hand," he says at once, and turns it over, and turns it back.\n\n"*Returned — not known here.*" He reads his own writing out loud the way you read somebody else\'s. "Well, it\'s right. There\'s nobody of that name at this house and there never has been, and I\'d have put it out for the postman and then I\'d have thought better of it, because you don\'t send a thing back with somebody\'s money in it."\n\nHe gives it to you. "Where did you get this?"';
 
 // ---------------------------------------------------------------------------
 // §17.10 — topic_poker
@@ -255,7 +255,7 @@ const topicPoker: TopicDef = {
   id: ACT2_NOLAN_TOPIC_POKER,
   words: ['poker', 'cards', 'friday', 'game', 'table', 'deal'],
   response:
-    '"Fridays." He brightens like a lamp. "Pearl puts the chairs down about the\ntime the counter goes quiet and we\'re four, and we\'ve been four for years, and\nif you make it five nobody will say a word about it."\n\n"Bring money you\'re not fond of."',
+    '"Fridays." He brightens like a lamp. "Pearl puts the chairs down about the time the counter goes quiet and we\'re four, and we\'ve been four for years, and if you make it five nobody will say a word about it."\n\n"Bring money you\'re not fond of."',
 };
 
 // ---------------------------------------------------------------------------
@@ -266,7 +266,7 @@ const topicNights: TopicDef = {
   id: ACT2_NOLAN_TOPIC_NIGHTS,
   words: ['nights', 'sleep', 'dreams', 'dream', 'wife'],
   response:
-    '"I sleep like a stone." He says it with real satisfaction. "Always have. Down\nat the same time, up at the same time, and nothing in between."\n\n"My wife used to say I was the only man she\'d met who didn\'t dream. I said\neverybody dreams and they forget them, and she said, no, Nolan, you\'re\ndifferent, you go somewhere and you come back tidy."',
+    '"I sleep like a stone." He says it with real satisfaction. "Always have. Down at the same time, up at the same time, and nothing in between."\n\n"My wife used to say I was the only man she\'d met who didn\'t dream. I said everybody dreams and they forget them, and she said, no, Nolan, you\'re different, you go somewhere and you come back tidy."',
 };
 
 // ---------------------------------------------------------------------------
@@ -275,8 +275,8 @@ const topicNights: TopicDef = {
 
 const unknownTopic: string[] = [
   '"Now, I\'d be guessing at that." He does not guess.',
-  '"Ask me a plant question. I\'m good on the plant and I\'m no use on anything\nelse, and I\'ve made my peace with it."',
-  'He thinks about it properly, which takes a while, and comes back with nothing,\nand is sorry about it in a way that makes you sorry you asked.',
+  '"Ask me a plant question. I\'m good on the plant and I\'m no use on anything else, and I\'ve made my peace with it."',
+  'He thinks about it properly, which takes a while, and comes back with nothing, and is sorry about it in a way that makes you sorry you asked.',
 ];
 
 // ---------------------------------------------------------------------------
@@ -307,7 +307,7 @@ const topicUnreachable: TopicDef = {
 // ---------------------------------------------------------------------------
 
 const watchNolanText =
-  'He does it again on the next street. Badge, quarter turn, let go, and the\nwhole time his face is doing the thing his face does, which is nothing.\n\nHe is not hiding it. Nobody has ever told him about it, so there has never\nbeen anything to hide.';
+  'He does it again on the next street. Badge, quarter turn, let go, and the whole time his face is doing the thing his face does, which is nothing.\n\nHe is not hiding it. Nobody has ever told him about it, so there has never been anything to hide.';
 
 // =============================================================================
 // D3, task B — Nolan at work, an `{ at: act3_lobby }` layer over the D2
@@ -321,21 +321,21 @@ const watchNolanText =
 // ---------------------------------------------------------------------------
 
 const examineAtWorkText =
-  'The same man, shaved and buttoned, in the same clothes with a lanyard over\nthem and a pair of safety glasses hooked in the pocket that has the pens in\nit.\n\nHe does not look tired in here.';
+  'The same man, shaved and buttoned, in the same clothes with a lanyard over them and a pair of safety glasses hooked in the pocket that has the pens in it.\n\nHe does not look tired in here.';
 
 // ---------------------------------------------------------------------------
 // §8.3 — greeting at work, and §8.7's fence variant (above everything).
 // ---------------------------------------------------------------------------
 
 const greetingFenceVariantText =
-  'He comes over the terrazzo at a pace he does not use for anything else, and\nstops a yard short, and looks at you, and past you, and at you again.\n\n"There\'s a fence down," he says. "There\'s a fence down and here you are."\n\nHe waits. You can watch him decide, and what he decides is the thing he has\ndecided about everybody for eleven years.\n\n"Right. Well." The folder goes under the other arm. "Stay off the plant floor,\nbe out before the last office light, and I\'ll have to write it up." A beat.\n"I\'ll write it up Monday."';
+  'He comes over the terrazzo at a pace he does not use for anything else, and stops a yard short, and looks at you, and past you, and at you again.\n\n"There\'s a fence down," he says. "There\'s a fence down and here you are."\n\nHe waits. You can watch him decide, and what he decides is the thing he has decided about everybody for eleven years.\n\n"Right. Well." The folder goes under the other arm. "Stay off the plant floor, be out before the last office light, and I\'ll have to write it up." A beat. "I\'ll write it up Monday."';
 
 const greetingWorkFirstText =
-  'He sees you and stops, and there is about half a second in which he is\ndeciding something, and then he is pleased, because that is what he does with\nhalf-seconds.\n\n"Now then." He does not put the folder down. "You\'ll want signing in."';
+  'He sees you and stops, and there is about half a second in which he is deciding something, and then he is pleased, because that is what he does with half-seconds.\n\n"Now then." He does not put the folder down. "You\'ll want signing in."';
 
 const greetingWorkRotationText: string[] = [
   '"Two minutes," he says, and gives you them, standing.',
-  '"You\'re still here." It is not a complaint. He checks the clock over the desk\nwhile he says it.',
+  '"You\'re still here." It is not a complaint. He checks the clock over the desk while he says it.',
 ];
 
 // ---------------------------------------------------------------------------
@@ -346,7 +346,7 @@ const greetingWorkRotationText: string[] = [
 // ≥2-hearings silent clue grant.
 // ---------------------------------------------------------------------------
 
-const sublevelAtWorkText = `He looks at the inner doors behind you before he answers, which he did not do\nin his own yard.\n\n"${NOLAN_SUBLEVEL_LINE}"\n\n"Come out to the house and I'll draw it for you on the step. Not in here."`;
+const sublevelAtWorkText = `He looks at the inner doors behind you before he answers, which he did not do in his own yard.\n\n"${NOLAN_SUBLEVEL_LINE}"\n\n"Come out to the house and I'll draw it for you on the step. Not in here."`;
 
 const topicSublevelAtWork: TopicDef = {
   id: ACT3_NOLAN_TOPIC_SUBLEVEL_WORK,
@@ -368,8 +368,8 @@ const topicBadgeAtWork: TopicDef = {
   words: topicBadge.words,
   when: { at: ACT3_LOBBY },
   response: [
-    { when: { has: ACT2_NOLAN_BADGE }, text: '"You\'ve got mine," he says, with no change in his face at all, and does not\nask when he is getting it back.' },
-    { text: '"It opens what it opens." He taps the folder against his leg. "Gate, lobby,\nhalls, lift. Not the plant floor. You want the plant floor, you want me and a\nkey."' },
+    { when: { has: ACT2_NOLAN_BADGE }, text: '"You\'ve got mine," he says, with no change in his face at all, and does not ask when he is getting it back.' },
+    { text: '"It opens what it opens." He taps the folder against his leg. "Gate, lobby, halls, lift. Not the plant floor. You want the plant floor, you want me and a key."' },
   ] satisfies ProseRule[],
 };
 
@@ -377,7 +377,7 @@ const topicJulesAtWork: TopicDef = {
   id: ACT3_NOLAN_TOPIC_JULES_WORK,
   words: topicJules.words,
   when: { at: ACT3_LOBBY },
-  response: '"Not in here." He says it gently and it is still no. "That\'s a thing with a\nfile on it and I\'m on the floor. Come out to the house."',
+  response: '"Not in here." He says it gently and it is still no. "That\'s a thing with a file on it and I\'m on the floor. Come out to the house."',
 };
 
 const topicHeadachesAtWork: TopicDef = {
@@ -385,7 +385,7 @@ const topicHeadachesAtWork: TopicDef = {
   words: topicHeadaches.words,
   when: { at: ACT3_LOBBY },
   response:
-    '"Better in the building, if you\'ll credit it." He is faintly delighted by\nthis, the way he was in his own yard. "It\'s the mornings at home that get me.\nIn here I\'ve things to be doing."',
+    '"Better in the building, if you\'ll credit it." He is faintly delighted by this, the way he was in his own yard. "It\'s the mornings at home that get me. In here I\'ve things to be doing."',
 };
 
 const topicNightsAtWork: TopicDef = {
@@ -393,7 +393,7 @@ const topicNightsAtWork: TopicDef = {
   words: topicNights.words,
   when: { at: ACT3_LOBBY },
   response:
-    '"Maintenance has it." He is already half turned. "Last office light to first\nshift. I\'ve never been in it while they\'ve got it and I\'ve never wanted to\nbe — ask me something about the plant, go on, I\'m good on the plant."',
+    '"Maintenance has it." He is already half turned. "Last office light to first shift. I\'ve never been in it while they\'ve got it and I\'ve never wanted to be — ask me something about the plant, go on, I\'m good on the plant."',
 };
 
 // ---------------------------------------------------------------------------
@@ -412,7 +412,7 @@ const unknownTopicAtWork: string[] = ['"On the floor I\'m no use for anything bu
 // ---------------------------------------------------------------------------
 
 const followInsideText =
-  '"You\'ll want to stay this side of the turnstile, or with me, and I\'m going to\nthe plant floor." He is already going. "There\'s a kettle behind the desk and\nnobody minds."';
+  '"You\'ll want to stay this side of the turnstile, or with me, and I\'m going to the plant floor." He is already going. "There\'s a kettle behind the desk and nobody minds."';
 
 // =============================================================================
 // D5, task F — Nolan asleep in the Bay at night (§6.3, §6.4, §6.1). He has
@@ -450,11 +450,11 @@ const followInsideText =
 // =============================================================================
 
 const nolanBayWakeFirstText =
-  'You say his name. Not loudly.\n\nHe does not do any of the things a sleeping man does when somebody says his\nname in a room. He does not shift, or half-surface, or make the noise, or turn\nhis head a quarter of an inch toward it and go back down.\n\nHis breathing goes on at the rate it was going at.\n\nThe strap across his chest is not tight, and it was never going to be the strap\nthat kept him here.';
+  'You say his name. Not loudly.\n\nHe does not do any of the things a sleeping man does when somebody says his name in a room. He does not shift, or half-surface, or make the noise, or turn his head a quarter of an inch toward it and go back down.\n\nHis breathing goes on at the rate it was going at.\n\nThe strap across his chest is not tight, and it was never going to be the strap that kept him here.';
 
 const nolanBayWakeAgainText = 'You say it again, at the volume you would use to a man across a yard.\n\nThe clock over the door goes on doing the only work being done in this room.';
 
-const nolanBayWakeHandText = "His hand is warm. It is the ordinary warmth of a hand. You put it back where it\nwas on the arm of the chair, with the palm up, the way it was.";
+const nolanBayWakeHandText = "His hand is warm. It is the ordinary warmth of a hand. You put it back where it was on the arm of the chair, with the palm up, the way it was.";
 
 const nolanBayWakeRotation: string[] = [nolanBayWakeFirstText, nolanBayWakeAgainText, nolanBayWakeHandText];
 
@@ -581,7 +581,7 @@ export const nolanBadge: ObjectDefSlice = {
       when: { all: [{ clockPhase: 'night' }, { not: { has: ACT2_NOLAN_BADGE } }] },
       effects: [
         {
-          say: 'You unwind the lanyard from the hook, twice, the way it went on.\n\nThe photograph is a man who has just been told to look at the camera and has\ndone it exactly. The badge weighs nothing at all and it opens the gate, the\nlobby, the halls and the lift, and he told you that himself, on a step, in a\ncardigan, with a dog across his feet.\n\nHe does not move.',
+          say: 'You unwind the lanyard from the hook, twice, the way it went on.\n\nThe photograph is a man who has just been told to look at the camera and has done it exactly. The badge weighs nothing at all and it opens the gate, the lobby, the halls and the lift, and he told you that himself, on a step, in a cardigan, with a dog across his feet.\n\nHe does not move.',
         },
         { move: [ACT2_NOLAN_BADGE, 'inventory'] },
         { set: [ACT3_TOOK_NOLAN_BADGE, true] },

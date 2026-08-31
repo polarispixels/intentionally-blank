@@ -75,23 +75,23 @@ import {
 // ---------------------------------------------------------------------------
 
 const doorExamine =
-  'A freight lift: two leaves, centre-opening, in a frame with a scarred steel\nthreshold that has had pallets over it for a lot of years.\n\nA call button on a plate beside it, a black disc that has been pressed by\ngloves. Above the door, a position indicator with a short row of little\nwindows in it, and the lit one is L.';
+  'A freight lift: two leaves, centre-opening, in a frame with a scarred steel threshold that has had pallets over it for a lot of years.\n\nA call button on a plate beside it, a black disc that has been pressed by gloves. Above the door, a position indicator with a short row of little windows in it, and the lit one is L.';
 
 // §13.2
 const callText =
-  'The button lights. Something a long way below starts, and takes its time about\nit, and arrives, and the leaves go back on a car big enough to put a pallet\nin and turn round.';
+  'The button lights. Something a long way below starts, and takes its time about it, and arrives, and the leaves go back on a car big enough to put a pallet in and turn round.';
 
 // §13.3
 const enterText =
-  'Steel walls with quilted pads hung on hooks over them, one of the pads folded\nback and left that way. A bulb behind a wire cage in the ceiling. A floor of\nchequer plate with the pattern worn smooth down the middle and still sharp at\nthe edges.\n\nAn inspection certificate in a small brass frame with a hinged glass front.\n\nThe panel is on the right, beside the door.';
+  'Steel walls with quilted pads hung on hooks over them, one of the pads folded back and left that way. A bulb behind a wire cage in the ceiling. A floor of chequer plate with the pattern worn smooth down the middle and still sharp at the edges.\n\nAn inspection certificate in a small brass frame with a hinged glass front.\n\nThe panel is on the right, beside the door.';
 
 // §13.9 — "OPEN DOORS between floors / STOP LIFT."
 const interlockText =
-  'There is no stop switch on this panel — a stop switch on a freight car is a\nthing that gets leaned on — and the leaves are interlocked with the car, and\nthe interlock is the reason that people who ride lifts arrive at floors.';
+  'There is no stop switch on this panel — a stop switch on a freight car is a thing that gets leaned on — and the leaves are interlocked with the car, and the interlock is the reason that people who ride lifts arrive at floors.';
 
 // §13.9 — "PULL PADS / LOOK BEHIND PADS."
 const padsText =
-  'Quilted movers’ blankets on hooks, hung to keep freight off the walls. Behind\nthem: steel, and the marks of about twenty years of freight that arrived\nbefore somebody bought the blankets.';
+  'Quilted movers’ blankets on hooks, hung to keep freight off the walls. Behind them: steel, and the marks of about twenty years of freight that arrived before somebody bought the blankets.';
 
 const callEffects: Effect[] = [{ say: callText }, { set: [ACT3_ELEVATOR_CALLED, true] }];
 
@@ -108,13 +108,13 @@ const doorHandlers: HandlerDef[] = [
 // ---------------------------------------------------------------------------
 
 const panelExamine =
-  'A brushed plate with the buttons in a column and a printed legend strip beside\nthem:\n\n    L\n    S1\n    S5\n\nThere is no S2, S3 or S4, because a freight lift stops where there is\nsomething to unload.\n\nUnder S5 there is a fourth position in the column, and in that position there\nis a blank: a plain disc of the same brushed steel, flush with the plate, with\na screw hole on either side of it.\n\nThe legend strip beside the blank has nothing printed on it. It is not\nscratched out and it is not covered over. It was printed that way, and cut\nthat way, and fitted.';
+  'A brushed plate with the buttons in a column and a printed legend strip beside them:\n\n    L S1 S5\n\nThere is no S2, S3 or S4, because a freight lift stops where there is something to unload.\n\nUnder S5 there is a fourth position in the column, and in that position there is a blank: a plain disc of the same brushed steel, flush with the plate, with a screw hole on either side of it.\n\nThe legend strip beside the blank has nothing printed on it. It is not scratched out and it is not covered over. It was printed that way, and cut that way, and fitted.';
 
 const panelHandlers: HandlerDef[] = [{ verbs: [EXAMINE], effects: [{ say: panelExamine }] }];
 
 // §13.5 — "PRESS BLANK."
 const pressBlankText =
-  'It is not a button. There is nothing behind it to move and nothing under it to\nbe pressed.\n\nYour fingertip comes away with a very small amount of the polish that has\nbuilt up on it over the years, from exactly this.';
+  'It is not a button. There is nothing behind it to move and nothing under it to be pressed.\n\nYour fingertip comes away with a very small amount of the polish that has built up on it over the years, from exactly this.';
 
 // D4 §12.2 — appended once S5 has been visited, read against
 // `act3_pressed_blank` exactly as the doc's own `when` states (§21.1: "read
@@ -125,7 +125,7 @@ const pressBlankText =
 // Grants `act3_clue_no_lower`, which nothing in D3 already granted (grepped
 // clean, per this task's brief).
 const pressBlankAddedLine =
-  'The polish on it is deeper than the polish on S5, and S5 is the button that\ntakes a man to the bottom of his own building.';
+  'The polish on it is deeper than the polish on S5, and S5 is the button that takes a man to the bottom of his own building.';
 
 const pressBlankEffects: Effect[] = [
   { say: pressBlankText },
@@ -143,10 +143,10 @@ const pressBlankEffects: Effect[] = [
 
 // §13.6 — "UNSCREW BLANK / PRY BLANK / REMOVE BLANK."
 const unscrewBlankText =
-  'The two screw holes have no screws in them, and they are the wrong size and\nthe wrong spacing for anything on this plate, which means that whatever those\ntwo screws once held was held on some other plate, in some other version of\nthis car.\n\nThe blank itself is not held on by anything. It is a plug. It is a tight one,\nand it is not coming out for a coin, a chair leg, or a man in a hat.';
+  'The two screw holes have no screws in them, and they are the wrong size and the wrong spacing for anything on this plate, which means that whatever those two screws once held was held on some other plate, in some other version of this car.\n\nThe blank itself is not held on by anything. It is a plug. It is a tight one, and it is not coming out for a coin, a chair leg, or a man in a hat.';
 
 const blankExamine =
-  'A plain disc of brushed steel, flush with the plate, with a screw hole on\neither side of it. The legend strip beside it has nothing printed on it.';
+  'A plain disc of brushed steel, flush with the plate, with a screw hole on either side of it. The legend strip beside it has nothing printed on it.';
 
 const blankHandlers: HandlerDef[] = [
   { verbs: [EXAMINE], effects: [{ say: blankExamine }] },
@@ -188,12 +188,12 @@ const FLOOR_EXAMINE: Record<Floor, string> = {
 
 // §13.9 — "PRESS L while already at L" (D3, unchanged).
 const pressLText =
-  'The L lights, the car does not move, and the leaves open again on the room you\nare standing in, which is the lift being polite about it.';
+  'The L lights, the car does not move, and the leaves open again on the room you are standing in, which is the lift being polite about it.';
 
 // §12.1 — "PRESS S1 / PRESS S5 while already at that floor": the same joke,
 // its own second telling, in its own words.
 const alreadyAtFloorText =
-  'The button lights, the car does not move, and the leaves open again on the\nfloor you are standing on, which is the lift being polite about it a second\ntime.';
+  'The button lights, the car does not move, and the leaves open again on the floor you are standing on, which is the lift being polite about it a second time.';
 
 function floorButtonHandlers(button: Floor, instanceFloor: Floor): HandlerDef[] {
   const ringEffects: Effect[] =
@@ -211,7 +211,7 @@ function floorButtonHandlers(button: Floor, instanceFloor: Floor): HandlerDef[] 
 // ---------------------------------------------------------------------------
 
 const certificateText =
-  'A card in a hinged brass frame, ruled into boxes, filled in by hand.\n\nRated load in pounds. Number of persons. Date of last examination, which was\nthis year. Date of the next, which is not far off. A signature in the last box\nthat is nobody you have heard of, in a hand you have not seen before.';
+  'A card in a hinged brass frame, ruled into boxes, filled in by hand.\n\nRated load in pounds. Number of persons. Date of last examination, which was this year. Date of the next, which is not far off. A signature in the last box that is nobody you have heard of, in a hand you have not seen before.';
 
 const certificateHandlers: HandlerDef[] = [{ verbs: [EXAMINE, READ], effects: [{ say: certificateText }] }];
 

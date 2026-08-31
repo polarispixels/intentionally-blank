@@ -145,10 +145,10 @@ export const ACT5_TASK_V_VERBS: Record<string, VerbDef> = {
 // ---------------------------------------------------------------------------
 
 const WAKE_REFUSED_NO_DEEP_INDEX =
-  '    OPEN?\n\n    INDEX INCOMPLETE\n\nThe cursor sits under it. Whatever a snapshot is, it is not a thing this\nmachine will put back together out of what it has got, and what it has got is\na name and a place and no session at all.';
+  '    OPEN?\n\n    INDEX INCOMPLETE\n\nThe cursor sits under it. Whatever a snapshot is, it is not a thing this machine will put back together out of what it has got, and what it has got is a name and a place and no session at all.';
 
 const WAKE_REFUSED_NO_NOTEBOOK =
-  '    OPEN?\n\n    ANCHOR NOT PRESENT\n\nYou go through your pockets, which is not something a screen has ever made you\ndo before, and find a pencil, and a returned envelope, and a claim ticket, and\na great deal of paper that is not the paper.\n\nIt is upstairs, or it is in a truck, or it is on a counter where you put it\ndown. It is not here, and this machine has just told you, in its own two words,\nthat here is where it has to be.';
+  '    OPEN?\n\n    ANCHOR NOT PRESENT\n\nYou go through your pockets, which is not something a screen has ever made you do before, and find a pencil, and a returned envelope, and a claim ticket, and a great deal of paper that is not the paper.\n\nIt is upstairs, or it is in a truck, or it is on a counter where you put it down. It is not here, and this machine has just told you, in its own two words, that here is where it has to be.';
 
 /**
  * The ledger field line, verbatim, printed twice in this scene: once as
@@ -161,17 +161,17 @@ export const SNAPSHOT_FIELD_LINE = '    SNAPSHOT ......................... ARCHI
 
 const WAKE_SCENE: string[] = [
   '    OPEN?\n\nYou put a hand flat on the bench, which does nothing for anybody, and type it.\n\n    OPENING\n\n    ...\n\n    OPEN',
-  'Nothing happens for long enough that you have started to work out what you are\ngoing to do next.\n\nThen, at the bottom of the screen, a cursor.',
+  'Nothing happens for long enough that you have started to work out what you are going to do next.\n\nThen, at the bottom of the screen, a cursor.',
   '    is jack all right',
-  'No capital, no question mark, and it arrives all at once rather than a letter\nat a time, the way a thing arrives that was already finished before it was\nsent.',
-  'You tell him.\n\nIt takes a while, and it is not a good account, because it is being typed with\ntwo fingers by a man who has been awake for a long time onto a keyboard in a\nroom with no corners in it, and because the parts of it that matter are the\nparts he has no way of putting in order.\n\nThe cursor waits for all of it.',
-  '    thank you\n\n    i am going to assume you have my book because it will not open this\n    without it. there is a page in the front i tore out and put in a hat.\n    did you find that\n\n    good\n\n    right',
+  'No capital, no question mark, and it arrives all at once rather than a letter\nat a time, the way a thing arrives that was already finished before it was sent.',
+  'You tell him.\n\nIt takes a while, and it is not a good account, because it is being typed with two fingers by a man who has been awake for a long time onto a keyboard in a room with no corners in it, and because the parts of it that matter are the parts he has no way of putting in order.\n\nThe cursor waits for all of it.',
+  '    thank you\n\n    i am going to assume you have my book because it will not open this without it. there is a page in the front i tore out and put in a hat. did you find that\n\n    good\n\n    right',
   'And then, without being asked anything:',
-  '    i lied to him at his own door with my hand on the frame. he had worked it\n    out on his own and he came round to be told he was right and i told him he\n    was tired. i would do it again tomorrow for the same reason and i am not\n    asking anybody to say that was all right\n\n    i got as far as this room. i sat where you are standing and i went through\n    what it would take and there is no version of it where a man goes through\n    that door and is still in the records on the other side of it. i tried\n    for nine days to find one\n\n    so i did the other thing',
-  '    i left the name field empty. it was not a kindness. a thing with a name in\n    that field is a thing this place can find, and i wanted you difficult\n\n    i left you the book and the login and the page and the hat and i left you\n    my brother, who is the best of us and does not know it, and i left you\n    nothing else at all because everything else i owned had already been\n    gone through twice',
-  'There is a pause here that is longer than the others and there is no way of\nknowing what is in it.',
+  '    i lied to him at his own door with my hand on the frame. he had worked it\n    out on his own and he came round to be told he was right and i told him he was tired. i would do it again tomorrow for the same reason and i am not asking anybody to say that was all right\n\n    i got as far as this room. i sat where you are standing and i went through what it would take and there is no version of it where a man goes through that door and is still in the records on the other side of it. i tried for nine days to find one\n\n    so i did the other thing',
+  '    i left the name field empty. it was not a kindness. a thing with a name in\n    that field is a thing this place can find, and i wanted you difficult\n\n    i left you the book and the login and the page and the hat and i left you my brother, who is the best of us and does not know it, and i left you nothing else at all because everything else i owned had already been gone through twice',
+  'There is a pause here that is longer than the others and there is no way of knowing what is in it.',
   '    i would like to send him something. i cannot post it from in here. if you\n    are going up would you take it\n\n    tell him i said the truck was a stupid truck. he will know why',
-  'Underneath the bench, on the side of the machine, a tray you had not looked at\ntwice takes a sheet of paper out of a slot, one line at a time, at the speed a\nthing is written rather than the speed a thing is copied.',
+  'Underneath the bench, on the side of the machine, a tray you had not looked at twice takes a sheet of paper out of a slot, one line at a time, at the speed a thing is written rather than the speed a thing is copied.',
   '    that is everything i have got\n\n    i do not know how long it has been. do not tell me',
   SNAPSHOT_FIELD_LINE,
   'The cursor goes back to where it started.',
@@ -182,7 +182,7 @@ const WAKE_SCENE: string[] = [
  * after `act5_jules_woken` (Stage F1 sweep).
  */
 export const WAKE_SECOND =
-  '    SNAPSHOT ......................... ARCHIVED / ROOT\n\nThat is the field. It was the field before you opened it and it is the field\nnow, and there is nothing about it anywhere that says it has been opened.';
+  '    SNAPSHOT ......................... ARCHIVED / ROOT\n\nThat is the field. It was the field before you opened it and it is the field now, and there is nothing about it anywhere that says it has been opened.';
 
 export const act5WakeJules: ScriptFn = (world, state) => {
   const deepIndex = flag(world, state, ACT4_DEEP_INDEX) === true;
@@ -246,55 +246,55 @@ export const act5CreateSubjectOpen: ScriptFn = (_world, state) => ({ state, even
 // ---------------------------------------------------------------------------
 
 const FIELD1_CLUE =
-  'The first field is where the dash was. It takes what you put in it at exactly\nthe speed it took a dash.';
+  'The first field is where the dash was. It takes what you put in it at exactly the speed it took a dash.';
 const FIELD1_UNCOND =
-  'The first field is the only one on the form that does not mind being left\nalone. It takes what you give it, including nothing, and goes down to the next.';
+  'The first field is the only one on the form that does not mind being left alone. It takes what you give it, including nothing, and goes down to the next.';
 
 const FIELD2_FLAG =
-  'The second is a word for what a man does all day.\n\nSomewhere else in this machine there is a page that has been keeping score of\nhow he goes about it, and has been since the first morning, and nothing on this\nform asks about that or offers to.';
+  'The second is a word for what a man does all day.\n\nSomewhere else in this machine there is a page that has been keeping score of how he goes about it, and has been since the first morning, and nothing on this form asks about that or offers to.';
 const FIELD2_UNCOND =
-  'The second is a word for what a man does all day, and there is a list behind\nit — you can feel the list, because the field settles onto something the\nmoment you stop typing.';
+  'The second is a word for what a man does all day, and there is a list behind it — you can feel the list, because the field settles onto something the moment you stop typing.';
 
 const FIELD3_MEMORY =
-  'The third field is not typed so much as read out.\n\nNot aloud. But in that order, at that pace, with a small pause after it, and\nyou have had the pause for longer than you have had anything else.';
+  'The third field is not typed so much as read out.\n\nNot aloud. But in that order, at that pace, with a small pause after it, and you have had the pause for longer than you have had anything else.';
 const FIELD3_CLUE =
-  'The third field wants a state and not a contents. There is a phrase for the\nstate, two words long, and it is on a record on this machine already, and it is\nalso the reason this form has a form to be filled in.';
+  'The third field wants a state and not a contents. There is a phrase for the state, two words long, and it is on a record on this machine already, and it is also the reason this form has a form to be filled in.';
 const FIELD3_UNCOND =
-  'The third field wants a state and not a contents, which is a distinction you\nwould not have thought a machine would bother making.';
+  'The third field wants a state and not a contents, which is a distinction you would not have thought a machine would bother making.';
 
 const FIELD4_CLUE =
-  'The fourth is an address, in the form an address goes in.\n\nYou have written this one down in your own hand off a screen in this building,\nat the bottom of a list of jobs somebody was going to do. The field does not\ncare where you got it.';
+  'The fourth is an address, in the form an address goes in.\n\nYou have written this one down in your own hand off a screen in this building, at the bottom of a list of jobs somebody was going to do. The field does not care where you got it.';
 const FIELD4_UNCOND =
-  'The fourth is an address, in the form an address goes in. Somewhere with a door\nthat shuts and a window that does not.';
+  'The fourth is an address, in the form an address goes in. Somewhere with a door that shuts and a window that does not.';
 
 const FIELD5_MEMORY =
-  'The fifth field is medical and is one word long.\n\nYour hand goes up to the back of your head while you are typing it, and finds\nthe place where the hair is stiff, and comes down again.';
+  'The fifth field is medical and is one word long.\n\nYour hand goes up to the back of your head while you are typing it, and finds the place where the hair is stiff, and comes down again.';
 const FIELD5_UNCOND =
-  'The fifth field is medical and is one word long, and there is not much to be\nsaid for the word except that it is accurate.';
+  'The fifth field is medical and is one word long, and there is not much to be said for the word except that it is accurate.';
 
 const FIELD6_ALL =
-  'The last field is a list and takes as many lines as you want to give it.\n\nYou put a hat on it. Then a lamp, then a machine, then a sheet of paper with a\nnumber on both sides of it and an impression in the top of it that nobody will\nfind for weeks.\n\nAnd then, because it is true, a chair with one leg loose.';
+  'The last field is a list and takes as many lines as you want to give it.\n\nYou put a hat on it. Then a lamp, then a machine, then a sheet of paper with a number on both sides of it and an impression in the top of it that nobody will find for weeks.\n\nAnd then, because it is true, a chair with one leg loose.';
 const FIELD6_CLUE =
-  'The last field is a list and takes as many lines as you want to give it.\n\nThere is a version of this list on this machine already, and the last line of\nit is a joke that turned out not to be one.';
+  'The last field is a list and takes as many lines as you want to give it.\n\nThere is a version of this list on this machine already, and the last line of it is a joke that turned out not to be one.';
 const FIELD6_UNCOND =
-  'The last field is a list and takes as many lines as you want to give it. What\ngoes in a room is not a thing this machine has an opinion about.';
+  'The last field is a list and takes as many lines as you want to give it. What goes in a room is not a thing this machine has an opinion about.';
 
 const SUPPRESSED_LINE =
-  'Between the fifth field and the sixth, on its own, in the same lettering as\neverything else, the form prints a line it does not offer you:\n\n    PHYSICAL PARAMETERS ............... RANDOMIZED — 1 EXCEPTION, SUPPRESSED\n\nThe cursor goes round it. There is no way of putting the cursor on it, and no\nkey that will, and nothing anywhere on this form that says what the exception\nwas.';
+  'Between the fifth field and the sixth, on its own, in the same lettering as everything else, the form prints a line it does not offer you:\n\n    PHYSICAL PARAMETERS ............... RANDOMIZED — 1 EXCEPTION, SUPPRESSED\n\nThe cursor goes round it. There is no way of putting the cursor on it, and no key that will, and nothing anywhere on this form that says what the exception was.';
 
 const CACHE_NOTEBOOK =
-  'In the cabinet under the bench, a notebook with two hands in it and a page that\nfits.';
+  'In the cabinet under the bench, a notebook with two hands in it and a page that fits.';
 const CACHE_FILM = 'And a photograph.';
 const CACHE_USB =
-  'And an old man in a thumb-sized piece of plastic, at the back of the shelf,\nswitched off, who will not experience being there.';
+  'And an old man in a thumb-sized piece of plastic, at the back of the shelf, switched off, who will not experience being there.';
 const CACHE_LETTER =
-  'And half a page in nobody\'s handwriting for a man who is going to be told\nnothing about any of this by anybody else.';
+  'And half a page in nobody\'s handwriting for a man who is going to be told nothing about any of this by anybody else.';
 const CACHE_CLOSE = 'There is no field on this form for a cabinet.';
 
 const KNOWLEDGE_SKY =
-  'There is no field for where the room goes either, and it would not need one.\nThere is only the one place anything is.';
+  'There is no field for where the room goes either, and it would not need one. There is only the one place anything is.';
 const KNOWLEDGE_JULES =
-  'The form was filled in once before by a man sitting where you are sitting, who\nhad spent nine days looking for a way of doing something else, and who did not\nfind one, and who has told you so himself within the hour.';
+  'The form was filled in once before by a man sitting where you are sitting, who had spent nine days looking for a way of doing something else, and who did not find one, and who has told you so himself within the hour.';
 
 const FORM_CLOSE = 'The form sits there, complete, with one line in it you did not write.\n\n    INITIALIZE?';
 
@@ -356,17 +356,17 @@ export const act5CreateSubjectRespond: ScriptFn = (world, state) => {
 // in it" was a promise the game never kept). Only that clause changed;
 // "Nothing down here is going anywhere" ships verbatim, as commissioned.
 const INITIALIZE_NO =
-  'The form stays where it is, and nothing about it presses you, which is more\ncourtesy than any machine in this county has shown anybody all week.\n\nIt will be there. Nothing down here is going anywhere.';
+  'The form stays where it is, and nothing about it presses you, which is more courtesy than any machine in this county has shown anybody all week.\n\nIt will be there. Nothing down here is going anywhere.';
 
 const INIT_BEAT_1 = '    > YES';
 const INIT_BEAT_2 =
   'The cursor goes down one line and stops there, and for a moment nothing else in\nthe room does anything at all.';
 const INIT_BEAT_3 =
-  'Then the fields go, from the bottom of the form upwards, one at a time, at\nabout the rate a man reads.\n\nThe chair. The paper. The machine. The lamp. The hat.';
+  'Then the fields go, from the bottom of the form upwards, one at a time, at about the rate a man reads.\n\nThe chair. The paper. The machine. The lamp. The hat.';
 const INIT_BEAT_4 =
-  'The bench takes the terminal back into itself without a sound, because there\nwas never a join in it to make one with.';
+  'The bench takes the terminal back into itself without a sound, because there was never a join in it to make one with.';
 const INIT_BEAT_5 =
-  'The light in here is not switched off. It is withdrawn, evenly, from everywhere\nat once, the way it arrived.';
+  'The light in here is not switched off. It is withdrawn, evenly, from everywhere at once, the way it arrived.';
 
 /** §31.2's ending script. Five separate `say` effects, then `{ end }` — nothing else, ever (register 137). */
 export const act5Recursion: ScriptFn = (world, state) => {

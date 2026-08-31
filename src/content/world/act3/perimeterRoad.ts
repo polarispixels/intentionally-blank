@@ -34,18 +34,18 @@ import { MANIFEST_ABSENT_TEXT, MANIFEST_SIGN_NO_ORDER_TEXT, PHOTOGRAPH_TEXT, ROU
 // ---------------------------------------------------------------------------
 
 const FIRST_SIGHT =
-  'The made road runs out at a gate, square on, with a hut beside it and a light\non a pole above the hut.\n\nThe fence goes off from the gate both ways and keeps going. New mesh on new\nposts, tensioned properly, three strands above it, and it stands out of the\ngrazing like a ruled line drawn across a photograph of somewhere else. There\nis one camera on the near gatepost and it is a fixed one.\n\nInside the wire is an apron of concrete the size of a field, swept, painted\ninto bays, and empty. Past the apron, the building: flat, long, lit from\nunderneath, with the steam going up off the plant end.\n\nThe hut has a window with a shutter, a turnstile beside it, and a reader on a\npedestal beside the turnstile. Over the door of the hut, in aluminium letters\nthat have been up long enough to have shadows:\n\n    MERIDIAN\n\nNothing is moving in any of it. The light on the pole goes round.';
+  'The made road runs out at a gate, square on, with a hut beside it and a light on a pole above the hut.\n\nThe fence goes off from the gate both ways and keeps going. New mesh on new posts, tensioned properly, three strands above it, and it stands out of the grazing like a ruled line drawn across a photograph of somewhere else. There is one camera on the near gatepost and it is a fixed one.\n\nInside the wire is an apron of concrete the size of a field, swept, painted into bays, and empty. Past the apron, the building: flat, long, lit from underneath, with the steam going up off the plant end.\n\nThe hut has a window with a shutter, a turnstile beside it, and a reader on a pedestal beside the turnstile. Over the door of the hut, in aluminium letters that have been up long enough to have shadows:\n\n    MERIDIAN\n\nNothing is moving in any of it. The light on the pole goes round.';
 
 const DELIVERY_TEXT =
-  'The gate is standing open and the apron is not empty.\n\nSix vehicles, nose to tail, on the near bays with their engines off and their\ndrivers not out of them. The painted line at the apron\'s edge has a man\nstanding on the far side of it doing nothing, which is what the line is for.\n\nAt the hut window a clipboard is hanging on a nail.';
+  'The gate is standing open and the apron is not empty.\n\nSix vehicles, nose to tail, on the near bays with their engines off and their drivers not out of them. The painted line at the apron\'s edge has a man standing on the far side of it doing nothing, which is what the line is for.\n\nAt the hut window a clipboard is hanging on a nail.';
 
 const NOLAN_PRESENT_TEXT =
-  'There is one car on the far side of the fence, parked nose-in at the end\nbay, and a man walking away from it towards the lobby doors with a bag on his\nshoulder and a mug in the same hand as his badge.\n\nHe is not hurrying and he is not late. He has done this walk about three\nthousand times.';
+  'There is one car on the far side of the fence, parked nose-in at the end bay, and a man walking away from it towards the lobby doors with a bag on his shoulder and a mug in the same hand as his badge.\n\nHe is not hurrying and he is not late. He has done this walk about three thousand times.';
 
-const ALERTNESS_TEXT = 'The road, the gate, the hut, the wire. The light on the pole goes round faster\nthan it did.';
+const ALERTNESS_TEXT = 'The road, the gate, the hut, the wire. The light on the pole goes round faster than it did.';
 
 const OTHERWISE_TEXT =
-  'The gate, the hut, the turnstile and the reader. The apron beyond, swept and\nempty, and the building beyond that with the steam coming off it.\n\nBehind you the road goes back to the bend. Off to the west there is nothing\nbut grazing.';
+  'The gate, the hut, the turnstile and the reader. The apron beyond, swept and empty, and the building beyond that with the steam coming off it.\n\nBehind you the road goes back to the bend. Off to the west there is nothing but grazing.';
 
 const description: ProseRule[] = [
   { when: { not: { visited: ACT3_PERIMETER_ROAD } }, text: FIRST_SIGHT },
@@ -63,23 +63,23 @@ const description: ProseRule[] = [
 // ---------------------------------------------------------------------------
 
 const listen =
-  'Wind in mesh, which is a note and not a noise, and a transformer somewhere\ninside the wire holding one flat chord and never letting it go.\n\nUnder both of them, from the plant end, the sound a very large amount of\nmoving air makes at half a mile.';
+  'Wind in mesh, which is a note and not a noise, and a transformer somewhere inside the wire holding one flat chord and never letting it go.\n\nUnder both of them, from the plant end, the sound a very large amount of moving air makes at half a mile.';
 
 const smell =
-  'Cold grass, hot metal, and the smell steam has when it has come off clean\nwater and nothing else, which is no smell at all and is somehow noticeable\nanyway.';
+  'Cold grass, hot metal, and the smell steam has when it has come off clean water and nothing else, which is no smell at all and is somehow noticeable anyway.';
 
-const lookWest = 'Grazing, going away, doing what it does out there. Somewhere out in it a line\nof cedar posts carries no wire and goes north.';
+const lookWest = 'Grazing, going away, doing what it does out there. Somewhere out in it a line of cedar posts carries no wire and goes north.';
 
 // ---------------------------------------------------------------------------
 // §4.10 — room-specific responses.
 // ---------------------------------------------------------------------------
 
-const shoutText = 'The wire takes it and gives nothing back, and the grazing does not even do\nthat. Somewhere in the middle distance the transformer holds its chord.';
+const shoutText = 'The wire takes it and gives nothing back, and the grazing does not even do that. Somewhere in the middle distance the transformer holds its chord.';
 
 const waitText = 'The light goes round. Nothing else does.';
 
 const sleepRefusalText =
-  'Not here, sixty yards from a gate, with a light going round. There is a town\nan hour behind you with a bed in it and a truck facing the right way.';
+  'Not here, sixty yards from a gate, with a light going round. There is a town an hour behind you with a bed in it and a truck facing the right way.';
 
 const roomHandlers: HandlerDef[] = [
   { verbs: [LISTEN], effects: [{ say: listen }] },
@@ -104,7 +104,7 @@ const roomHandlers: HandlerDef[] = [
 // ---------------------------------------------------------------------------
 
 const gateRefusalText =
-  'The turnstile does not move, and neither does anything else, and there is\nnobody to appeal to about it.\n\nThere is a pad on a pedestal, a clipboard that is only here on Tuesdays, a man\nwho comes to work in the first half hour of the morning, and a truck.';
+  'The turnstile does not move, and neither does anything else, and there is nobody to appeal to about it.\n\nThere is a pad on a pedestal, a clipboard that is only here on Tuesdays, a man who comes to work in the first half hour of the morning, and a truck.';
 
 const exits: ExitDefSlice[] = [
   { dir: 'n', to: ACT3_LOBBY, door: ACT3_GATE_DOOR, blockedText: gateRefusalText },

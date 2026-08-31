@@ -109,31 +109,31 @@ import { ACT4_CLUE_TWO_THING_DOOR } from '../../act4/ids';
 // ---------------------------------------------------------------------------
 
 const gaugesExamine =
-  'Round faces, white on black, in two ranks the length of the wall, each with a\nbrass tag wired to its bezel and a red hairline painted on the inside of the\nglass where somebody once decided the needle should not go past.\n\nThey are grouped, and the grouping is the argument. Left-hand rank:\ngeneration — what comes off the machine. Right-hand rank: distribution —\nwhere it goes, one gauge to a feeder, with the pressures and the temperatures\nfilling in below.\n\nThe needles do not hunt. They sit.';
+  'Round faces, white on black, in two ranks the length of the wall, each with a brass tag wired to its bezel and a red hairline painted on the inside of the glass where somebody once decided the needle should not go past.\n\nThey are grouped, and the grouping is the argument. Left-hand rank: generation — what comes off the machine. Right-hand rank: distribution — where it goes, one gauge to a feeder, with the pressures and the temperatures filling in below.\n\nThe needles do not hunt. They sit.';
 
 const gaugesTouch =
-  'The glass is cold and the needle behind it does not care what you do to the\nglass, which is the entire reason anybody still fits these.';
+  'The glass is cold and the needle behind it does not care what you do to the glass, which is the entire reason anybody still fits these.';
 
 // Stage D addenda §3 (`docs/superpowers/specs/2026-09-14-stage-d-addenda-
 // prose.md`) — `COUNT GAUGES`. Refuses the total by name (canon 70; addenda
 // §8 ruling 5 — declining a count is not counting), no digit anywhere.
 const gaugesCountText =
-  'You get partway along the top rank before the exercise turns on you. There are\nas many of them as the wall was built to hold, which is a fact about a wall,\nand you did not come down here for a fact about a wall.\n\nWhat is on the faces is one question and what is on the tags underneath them is\nanother, and neither of them is answered by arriving at a total.';
+  'You get partway along the top rank before the exercise turns on you. There are as many of them as the wall was built to hold, which is a fact about a wall, and you did not come down here for a fact about a wall.\n\nWhat is on the faces is one question and what is on the tags underneath them is another, and neither of them is answered by arriving at a total.';
 
 // §9.3, rule 1 — the night window (grants the clue, sets the flag).
 const gaugesReadNight =
-  '    HALL A     460\n    FDR 3      408\n\nand then back to the big face on the generation side, the one with the\nwidest bezel in the room:\n\n    GEN        868\n\nHALL A has not moved. HALL A does not move; a hall of machines does the same\nthing at three in the morning that it does at three in the afternoon, and\nthat is the entire reason people put them out here where nothing else is.\n\nFDR 3 has moved. It is down, and it has been down long enough that the\nneedle is sitting rather than settling.\n\nLow on the glass of FDR 3\'s bezel, inside it, where you would have to have\ntaken the bezel off to do it, there is a pencil line. It is at the needle. It\nis not dated and it is not initialled and it is not on any other gauge in\nthe room.';
+  '    HALL A     460\n    FDR 3      408\n\nand then back to the big face on the generation side, the one with the widest bezel in the room:\n\n    GEN        868\n\nHALL A has not moved. HALL A does not move; a hall of machines does the same thing at three in the morning that it does at three in the afternoon, and that is the entire reason people put them out here where nothing else is.\n\nFDR 3 has moved. It is down, and it has been down long enough that the needle is sitting rather than settling.\n\nLow on the glass of FDR 3\'s bezel, inside it, where you would have to have taken the bezel off to do it, there is a pencil line. It is at the needle. It is not dated and it is not initialled and it is not on any other gauge in the room.';
 
 const GAUGES_READ_NIGHT_TEXT = `You go along the distribution rank with a finger under the tags.\n\n${gaugesReadNight}`;
 
 // §9.3, rule 2 — the baseline, any other hour.
 const gaugesReadBaseline =
-  '    HALL A     460\n    FDR 3      445\n\nand then back to the big face on the generation side, the one with the\nwidest bezel in the room:\n\n    GEN        905\n\nEvery other tag on this wall says what its gauge is for. HALL A goes to the\nhall. PLANT goes to the plant. LIGHTING AND SMALL POWER goes, at some\nlength, to lighting and small power.\n\nFDR 3 says FDR 3.\n\nThe needle on it has worn a shine into the paint of the dial where it has\nbeen sitting.';
+  '    HALL A     460\n    FDR 3      445\n\nand then back to the big face on the generation side, the one with the widest bezel in the room:\n\n    GEN        905\n\nEvery other tag on this wall says what its gauge is for. HALL A goes to the hall. PLANT goes to the plant. LIGHTING AND SMALL POWER goes, at some length, to lighting and small power.\n\nFDR 3 says FDR 3.\n\nThe needle on it has worn a shine into the paint of the dial where it has been sitting.';
 
 const GAUGES_READ_BASELINE_TEXT = `You go along the distribution rank with a finger under the tags.\n\n${gaugesReadBaseline}`;
 
 // §9.3, rule 3 — a second reading in the window, after the first.
-const GAUGES_READ_SECOND_TEXT = 'Down again, and by the same amount, and at the same needle-width above the\npencil line.';
+const GAUGES_READ_SECOND_TEXT = 'Down again, and by the same amount, and at the same needle-width above the pencil line.';
 
 const gaugesReadProse: ProseRule[] = [
   // Checked before rule 1's own window cond so a SECOND read within the
@@ -156,7 +156,7 @@ const gaugesReadEffects: Effect[] = [
 // §9.4 — COMPARE AUDIT WITH GAUGES / COMPARE LETTER WITH GAUGES / CHECK
 // AUDIT AGAINST WALL (the latter two: see this file's own header gaps).
 const compareAuditGaugesText =
-  'You hold Eli\'s second sheet up beside the wall, which is a thing you have been\ncarrying it around for four days to be able to do and have not, until now,\nhad a wall for.\n\nHis FILED column and the tag that says HALL A are the same number.\n\nHis TAKEN column and the big face on the generation side are the same\nnumber, give or take whichever month you put your thumb on.\n\nAnd the third column — the one he ruled himself, and headed DIFFERENCE, and\nsat with for four days before he would put it in an envelope — that one is\nnot a subtraction down here.\n\nIt is a gauge. It has a bezel and a brass tag and a red line painted on the\nglass, and somebody comes along this wall every morning to make sure it is\nwhere it was.';
+  'You hold Eli\'s second sheet up beside the wall, which is a thing you have been carrying it around for four days to be able to do and have not, until now, had a wall for.\n\nHis FILED column and the tag that says HALL A are the same number.\n\nHis TAKEN column and the big face on the generation side are the same number, give or take whichever month you put your thumb on.\n\nAnd the third column — the one he ruled himself, and headed DIFFERENCE, and sat with for four days before he would put it in an envelope — that one is not a subtraction down here.\n\nIt is a gauge. It has a bezel and a brass tag and a red line painted on the glass, and somebody comes along this wall every morning to make sure it is where it was.';
 
 const compareAuditGaugesEffects: Effect[] = [
   { say: compareAuditGaugesText },
@@ -192,13 +192,13 @@ const gauges: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const demandDialExamine =
-  'Under a hinged perspex cover with a hasp on it and nothing through the hasp: a\nsingle dial about the size of a saucer, brass-rimmed, graduated the whole way\nround, with a small chrome handwheel on the end of its spindle.\n\nThe card screwed under it says DEMAND, and under that, smaller:\n\n    NOT TO BE ALTERED WITHOUT AUTHORITY\n\nThe dial is not on a graduation. It is between two of them, and it has been\nbetween them long enough for the polish on the handwheel to have gone flat on\none side.';
+  'Under a hinged perspex cover with a hasp on it and nothing through the hasp: a single dial about the size of a saucer, brass-rimmed, graduated the whole way round, with a small chrome handwheel on the end of its spindle.\n\nThe card screwed under it says DEMAND, and under that, smaller:\n\n    NOT TO BE ALTERED WITHOUT AUTHORITY\n\nThe dial is not on a graduation. It is between two of them, and it has been between them long enough for the polish on the handwheel to have gone flat on one side.';
 
 const demandDialFirstTurnText =
-  'The cover comes up, because a hasp with nothing through it is a hinge with\nambitions, and the handwheel turns about a degree, and the entire wall of\ngauges to your right notices.\n\nYou put it back before the needles have finished moving, which is the correct\ninstinct arrived at slightly late.';
+  'The cover comes up, because a hasp with nothing through it is a hinge with ambitions, and the handwheel turns about a degree, and the entire wall of gauges to your right notices.\n\nYou put it back before the needles have finished moving, which is the correct instinct arrived at slightly late.';
 
 const demandDialSecondTurnText =
-  'Once was experiment. Twice is a decision about somebody else\'s building, made\nin the dark, by a man who does not know what is on the other side of that\nwall.';
+  'Once was experiment. Twice is a decision about somebody else\'s building, made in the dark, by a man who does not know what is on the other side of that wall.';
 
 const demandDialTurnEffects: Effect[] = [
   {
@@ -230,15 +230,15 @@ const demandDial: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const chaseBottomExamine =
-  'The two big returns come through the end wall at waist height, turn down\nthrough ninety degrees on long-radius bends, and go into the floor.\n\nBeside them, in the same opening, there is a steel ladder. The opening is not\na hole knocked in anything: it is formed, with a rolled edge and a handhold,\nand the ladder is bolted through it in four places.\n\nReturn A stops at this floor. You can watch it do it — through the wall, round\nthe bend, down about a yard, and then a valve and a blank flange, because five\nfloors down is where the building stops and a return has to stop somewhere.\n\nReturn B goes past the flange and keeps going.\n\nSo does the ladder.';
+  'The two big returns come through the end wall at waist height, turn down through ninety degrees on long-radius bends, and go into the floor.\n\nBeside them, in the same opening, there is a steel ladder. The opening is not a hole knocked in anything: it is formed, with a rolled edge and a handhold, and the ladder is bolted through it in four places.\n\nReturn A stops at this floor. You can watch it do it — through the wall, round the bend, down about a yard, and then a valve and a blank flange, because five floors down is where the building stops and a return has to stop somewhere.\n\nReturn B goes past the flange and keeps going.\n\nSo does the ladder.';
 
-const chaseBottomTouchReturnB = 'Warm. The same warm. Four floors below the room where you first put a hand on\nit, and it has not given any of it up on the way.';
+const chaseBottomTouchReturnB = 'Warm. The same warm. Four floors below the room where you first put a hand on it, and it has not given any of it up on the way.';
 
 // Exported: the room shell wires this onto its own room-level handler for
 // `V_ACT3_LOOK_DOWN_SHAFT` (bare — "look down" has no dedicated verb in
 // this game to hang a dobj off, same reasoning as `V_LOOK_DOWN_AISLE`).
 export const chaseBottomLookDownText =
-  'Ladder, pipe, ladder, pipe, and then the point at which what you are looking at\nstops being a thing you can see and starts being a direction.';
+  'Ladder, pipe, ladder, pipe, and then the point at which what you are looking at stops being a thing you can see and starts being a direction.';
 
 // Stage D addenda §4.2 — `LISTEN DOWN` / `LISTEN AT THE OPENING`. v0.17.0:
 // carried as a bare verb (room-level), NOT a bare "down" noun — the noun made
@@ -248,7 +248,7 @@ export const chaseBottomLookDownText =
 // `EXAMINE DOWN`) resolve at all — D4 §9.6 listed it, and shipping dropped
 // it. Text transcribed verbatim (hard rule 5).
 export const chaseBottomListenText =
-  'You put your head into the opening and hold still.\n\nWarm air coming up. Water in Return B going the other way. Under both of them,\nfrom somewhere with no edges in it, a sound like a room being large.\n\nIt does not arrive from a distance. It is already there, the way the note in\nthis room is already there, and it stops the moment you notice you are\nlistening for the end of it.';
+  'You put your head into the opening and hold still.\n\nWarm air coming up. Water in Return B going the other way. Under both of them, from somewhere with no edges in it, a sound like a room being large.\n\nIt does not arrive from a distance. It is already there, the way the note in this room is already there, and it stops the moment you notice you are listening for the end of it.';
 
 // Stage D addenda §4.1 — `DROP <thing> DOWN THE SHAFT` / `THROW <thing>
 // DOWN` / `PUT <thing> IN OPENING`. Exported: this can never be a handler on
@@ -259,7 +259,7 @@ export const chaseBottomListenText =
 // object is never put beyond reach — no `move` effect here, ever (register
 // 91). Text transcribed verbatim (hard rule 5).
 export const chaseBottomDropDownText =
-  'You hold it out over the opening and hold it there.\n\nWhat you want is a number: let go, listen, multiply, know. What you have in\nyour hand is something you were given, argued for, or levered out of something\nelse, and the shaft is not in the business of giving things back.\n\nYour hand comes in. The question stands, and so does the object, in your\npocket, where it is useful.';
+  'You hold it out over the opening and hold it there.\n\nWhat you want is a number: let go, listen, multiply, know. What you have in your hand is something you were given, argued for, or levered out of something else, and the shaft is not in the business of giving things back.\n\nYour hand comes in. The question stands, and so does the object, in your pocket, where it is useful.';
 
 const chaseBottomDownEffects: Effect[] = [{ goto: ACT3_PIPE_CHASE }, { advanceClock: 1 }];
 
@@ -283,7 +283,7 @@ const chaseBottom: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const s6DoorExamineShippedText =
-  'Steel, flush in the end wall, no window, no vision panel, no closer on it and\nno handle on this side.\n\nThe only legend is a strip of engraved plastic screwed on at eye height:\n\n    MECHANICAL — NO ADMITTANCE\n\nBeside it, on one plate: a reader of exactly the family fitted upstairs, and\nbelow the reader a rubber keypad with letters on it as well as numbers, and a\ntwo-line display above the keypad.\n\nA pad with letters on it is fitted when somebody expects a name to be typed\nand not just a number.\n\nEvery other door in this building has a reader. This one has a reader and a\npad.';
+  'Steel, flush in the end wall, no window, no vision panel, no closer on it and no handle on this side.\n\nThe only legend is a strip of engraved plastic screwed on at eye height:\n\n    MECHANICAL — NO ADMITTANCE\n\nBeside it, on one plate: a reader of exactly the family fitted upstairs, and below the reader a rubber keypad with letters on it as well as numbers, and a two-line display above the keypad.\n\nA pad with letters on it is fitted when somebody expects a name to be typed and not just a number.\n\nEvery other door in this building has a reader. This one has a reader and a pad.';
 
 // E1 addendum §6 — the S6 door, standing open. `EXAMINE` becomes a two-rule
 // `ProseRule[]`: this block once `act4_s6_door_open` holds, then the
@@ -291,7 +291,7 @@ const s6DoorExamineShippedText =
 // shipped block is untouched and not re-counted per the addendum's own
 // word count).
 const s6DoorExamineOpenText =
-  'The leaf stands in about a foot off its seal and stops there, and from this\nside you can see the whole depth of it and the rebate all round, machined\nrather than pressed, which is not how anybody builds a cupboard.\n\nThe strip of engraved plastic still says\n\n    MECHANICAL — NO ADMITTANCE\n\nto a corridor it is no longer keeping anybody out of.\n\nThe reader is dark. The pad has cleared its display and gone back to being a\nrubber pad with letters on it, waiting for the next name, of which there is not\na queue.\n\nCold comes round the edge of the leaf, steadily, off the poured steps behind\nit.';
+  'The leaf stands in about a foot off its seal and stops there, and from this side you can see the whole depth of it and the rebate all round, machined rather than pressed, which is not how anybody builds a cupboard.\n\nThe strip of engraved plastic still says\n\n    MECHANICAL — NO ADMITTANCE\n\nto a corridor it is no longer keeping anybody out of.\n\nThe reader is dark. The pad has cleared its display and gone back to being a rubber pad with letters on it, waiting for the next name, of which there is not a queue.\n\nCold comes round the edge of the leaf, steadily, off the poured steps behind it.';
 
 const s6DoorExamine: ProseRule[] = [
   { when: { flag: ACT4_S6_DOOR_OPEN }, text: s6DoorExamineOpenText },
@@ -299,27 +299,27 @@ const s6DoorExamine: ProseRule[] = [
 ];
 
 const s6DoorPushText =
-  'It does not move, and there is nothing on it to move it by, and it is hung so\nclose in its frame that you cannot get a fingernail into the gap, let alone\nanything with a handle on it.';
+  'It does not move, and there is nothing on it to move it by, and it is hung so close in its frame that you cannot get a fingernail into the gap, let alone anything with a handle on it.';
 
 const s6DoorPryText =
-  'The frame is grouted into poured concrete and the leaf is hung on hinges you\ncannot see from this side.\n\nThe chair leg has had a good run — a drawer, a plate, and a cam lock in a\nkerb — and this is the first thing all week that it is simply the wrong shape\nfor.';
+  'The frame is grouted into poured concrete and the leaf is hung on hinges you cannot see from this side.\n\nThe chair leg has had a good run — a drawer, a plate, and a cam lock in a kerb — and this is the first thing all week that it is simply the wrong shape for.';
 
-const s6DoorKnockText = 'Twice, like a man at a door, which after a few seconds begins to feel like\nsomething you have chosen to do rather than something you are still doing.\n\nNothing.';
+const s6DoorKnockText = 'Twice, like a man at a door, which after a few seconds begins to feel like something you have chosen to do rather than something you are still doing.\n\nNothing.';
 
-const s6DoorListenText = 'Nothing. Not silence — nothing. Four inches of steel in a wall of concrete is\nnot in the business of passing anything on, and it does not make an exception\nfor you.';
+const s6DoorListenText = 'Nothing. Not silence — nothing. Four inches of steel in a wall of concrete is not in the business of passing anything on, and it does not make an exception for you.';
 
 // §9.8 — the badge, at this door: refuses, grants the clue.
 const s6BadgeText =
-  'The reader takes it the way every reader in this building has taken it.\n\nIt goes green. Then it goes out. The door does not move.\n\nSomewhere a log now has a line in it saying NOLAN, at a door NOLAN does not\nopen.';
+  'The reader takes it the way every reader in this building has taken it.\n\nIt goes green. Then it goes out. The door does not move.\n\nSomewhere a log now has a line in it saying NOLAN, at a door NOLAN does not open.';
 
 const s6BadgeEffects: Effect[] = [{ say: s6BadgeText }, { grantClue: ACT3_CLUE_S6_DOOR_REFUSES }];
 
 // §9.8 — the pad: TYPE CREDENTIALS / ENTER CREDENTIALS / TYPE ADMIN / TYPE
 // PASSWORD / USE NOTEBOOK ON PAD, gated on knowing the words at all.
 const s6PadCredentialsText =
-  'You type the two words out of the inside of a dead man\'s back cover, slowly,\nbecause the keys are stiff and because it had not occurred to you until just\nnow that you might only get to do this once.\n\nThe display holds still for about as long as it takes to be sure it is\nthinking. Then:\n\n    ACCESS LEVEL: MAINTENANCE\n    DENIED\n\nThe pad did not refuse the words. It read them, agreed with them, and\ndeclined to open.\n\nWhich means the words are not wrong. They are only shallow.';
+  'You type the two words out of the inside of a dead man\'s back cover, slowly, because the keys are stiff and because it had not occurred to you until just now that you might only get to do this once.\n\nThe display holds still for about as long as it takes to be sure it is thinking. Then:\n\n    ACCESS LEVEL: MAINTENANCE DENIED\n\nThe pad did not refuse the words. It read them, agreed with them, and declined to open.\n\nWhich means the words are not wrong. They are only shallow.';
 
-const s6PadRepeatText = '    ACCESS LEVEL: MAINTENANCE\n    DENIED\n\nExactly the same, and at exactly the same speed, which is a machine\'s way of\ntelling you that it is not going to develop an opinion about you.';
+const s6PadRepeatText = '    ACCESS LEVEL: MAINTENANCE\n    DENIED\n\nExactly the same, and at exactly the same speed, which is a machine\'s way of telling you that it is not going to develop an opinion about you.';
 
 const s6PadNoneText = '    ACCESS LEVEL: NONE\n\nFaster. It did not have to look that one up.';
 
@@ -355,7 +355,7 @@ export const s6PadEffects: Effect[] = [
 // ---------------------------------------------------------------------------
 
 export const s6DoorLukeText =
-  'The door at the end wall wants two things and has never had more than one of\nthem off you.\n\nHe takes the visitor\'s badge off his lapel — the paper one, printed for him\nthis morning by the plant, in a plastic sleeve, with his name spelled correctly\non it — and puts it on the reader.\n\nThe reader goes green. That is not the surprise. The surprise is the pad.\n\nHe types on it without looking at it. It is short, and whatever it is, it is\nsomething he has known long enough that he does not have to go and find it.\n\nThe two-line display clears itself, and the leaf comes off its seal with the\nsoft heavy sound of a thing that is very well hung, and swings in about a foot\nand stops.\n\nBehind it there is a stair.';
+  'The door at the end wall wants two things and has never had more than one of them off you.\n\nHe takes the visitor\'s badge off his lapel — the paper one, printed for him this morning by the plant, in a plastic sleeve, with his name spelled correctly on it — and puts it on the reader.\n\nThe reader goes green. That is not the surprise. The surprise is the pad.\n\nHe types on it without looking at it. It is short, and whatever it is, it is something he has known long enough that he does not have to go and find it.\n\nThe two-line display clears itself, and the leaf comes off its seal with the soft heavy sound of a thing that is very well hung, and swings in about a foot and stops.\n\nBehind it there is a stair.';
 
 const s6DoorLukeEffects: Effect[] = [
   { say: s6DoorLukeText },
@@ -376,7 +376,7 @@ const s6DoorLukeEffects: Effect[] = [
 // reusing this exact string (hard rule 5 — one text, owned once). Exported
 // for the room shell's own `downExit`.
 const s6StairShippedText =
-  'Poured steps going down out of the light, no handrail, and a cold coming up\nthem that the rest of this floor has not got.\n\nYou have been in this building at night and underneath it in a pipe, and you\nknow by now the difference between a place you are not ready for and a place you\nhave not got a reason for yet.\n\nThis is the second one.';
+  'Poured steps going down out of the light, no handrail, and a cold coming up them that the rest of this floor has not got.\n\nYou have been in this building at night and underneath it in a pipe, and you know by now the difference between a place you are not ready for and a place you have not got a reason for yet.\n\nThis is the second one.';
 
 // E1 addendum §7 — `GO DOWN` at S5, second and later. `firstOnce` (the
 // `ProseRule.text` mechanism, `luke.ts`'s own `unknownTopic` idiom): the
@@ -469,7 +469,7 @@ ACT2_CENSOR_OBJECTS[ACT2_REPLY_AUDIT]!.handlers = [
 // ---------------------------------------------------------------------------
 
 const wallClockExamine =
-  'Eight inches across, high on the wall over the gauges, in a plain steel bezel:\na white face, black hands, a sweep second hand, and no maker\'s name on it\nanywhere at all.\n\nIt is the only instrument in this room that is not measuring the building.';
+  'Eight inches across, high on the wall over the gauges, in a plain steel bezel: a white face, black hands, a sweep second hand, and no maker\'s name on it anywhere at all.\n\nIt is the only instrument in this room that is not measuring the building.';
 
 const wallClock: ObjectDefSlice = {
   location: ACT3_S5_REACTOR_INTERFACE,
@@ -488,7 +488,7 @@ const wallClock: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const searchBenchText =
-  'A logbook clipped to the underside of the bench in a wire holder, ruled for\nreadings, with the last several pages ruled and not filled.\n\nThe pages before those are filled, in one hand, every morning, without a gap.';
+  'A logbook clipped to the underside of the bench in a wire holder, ruled for readings, with the last several pages ruled and not filled.\n\nThe pages before those are filled, in one hand, every morning, without a gap.';
 
 const bench: ObjectDefSlice = {
   location: ACT3_S5_REACTOR_INTERFACE,
@@ -501,13 +501,13 @@ const bench: ObjectDefSlice = {
 };
 
 const readLogbookText =
-  'Columns of the same three numbers, in pencil, morning after morning, going\nback further than the book has pages for.\n\nThey are the numbers on the wall. Every one of them. Down the whole page and\ndown the page before it, without a variation big enough to be worth the ink.\n\nThen the entries stop, and the ruling goes on.';
+  'Columns of the same three numbers, in pencil, morning after morning, going back further than the book has pages for.\n\nThey are the numbers on the wall. Every one of them. Down the whole page and down the page before it, without a variation big enough to be worth the ink.\n\nThen the entries stop, and the ruling goes on.';
 
 // Stage D addenda §5 — `COMPARE LOGBOOK WITH NOTEBOOK`. Same idiom as
 // `corridorB4.ts`'s own `lifeSafetyPlan` handler for `V_FIT`/`ACT2_NOTEBOOK`.
 // Grants nothing, sets nothing. Text transcribed verbatim (hard rule 5).
 const compareLogbookNotebookText =
-  'You get the notebook out and hold it open beside the wire holder, which is the\ncorrect instinct and the wrong book.\n\nFigures. Columns of them, in pencil, ruled and dated and signed by nobody.\nThere is not a word on the page — not a note, not a margin, not so much as a\ncrossed-out one — and a hand is made of words.\n\nTwo men can write the same three numbers the same way, and all that proves is\nthat the numbers were the same.';
+  'You get the notebook out and hold it open beside the wire holder, which is the correct instinct and the wrong book.\n\nFigures. Columns of them, in pencil, ruled and dated and signed by nobody. There is not a word on the page — not a note, not a margin, not so much as a crossed-out one — and a hand is made of words.\n\nTwo men can write the same three numbers the same way, and all that proves is that the numbers were the same.';
 
 const logbook: ObjectDefSlice = {
   location: ACT3_S5_REACTOR_INTERFACE,
@@ -521,7 +521,7 @@ const logbook: ObjectDefSlice = {
 };
 
 const touchWallText =
-  'Cool, painted, and entirely ordinary, and it stays entirely ordinary for as\nlong as you leave your hand on it, which is not very long.';
+  'Cool, painted, and entirely ordinary, and it stays entirely ordinary for as long as you leave your hand on it, which is not very long.';
 
 const touchWall: ObjectDefSlice = {
   location: ACT3_S5_REACTOR_INTERFACE,
@@ -542,7 +542,7 @@ const touchWall: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const interlockExamine =
-  'The shield door is a slab in a rebate, with a wheel in the middle of it and a\nlamp above the wheel, and the lamp is not lit.\n\nUnder the lamp, engraved into the steel and filled white:\n\n    DOOR MAY BE OPENED WHEN LAMP IS LIT\n\nBeside the lamp there is a small steel panel with three things on it: a\nkeyswitch, a green button and a red one. The keyswitch has two positions,\nmarked NORMAL and BYPASS, and a card tag on a wire hanging off it.\n\nThe key is in the switch. It is turned to BYPASS.';
+  'The shield door is a slab in a rebate, with a wheel in the middle of it and a lamp above the wheel, and the lamp is not lit.\n\nUnder the lamp, engraved into the steel and filled white:\n\n    DOOR MAY BE OPENED WHEN LAMP IS LIT\n\nBeside the lamp there is a small steel panel with three things on it: a keyswitch, a green button and a red one. The keyswitch has two positions, marked NORMAL and BYPASS, and a card tag on a wire hanging off it.\n\nThe key is in the switch. It is turned to BYPASS.';
 
 const interlockExamineEffects: Effect[] = [{ say: interlockExamine }, { set: [ACT3_BYPASS_SEEN, true] }];
 
@@ -551,22 +551,22 @@ const interlockExamineEffects: Effect[] = [{ say: interlockExamine }, { set: [AC
 // heading render that way — the death paragraph itself is not under one,
 // so it renders as an ordinary `say`).
 const BEAT_1 =
-  'The wheel turns. It turns easily, and it goes on turning for longer than you\nexpect, the way a thing turns when it is undoing eight bolts at once instead\nof one.\n\nThe lamp above it does not light. Nothing on the panel objects.';
+  'The wheel turns. It turns easily, and it goes on turning for longer than you expect, the way a thing turns when it is undoing eight bolts at once instead of one.\n\nThe lamp above it does not light. Nothing on the panel objects.';
 
 const BEAT_2 =
-  'The door comes off its seal with a sound like a jar being opened, and swings,\nand behind it there is a short gallery with a handrail down one side and a\nwall of the same concrete at the end of it.\n\nThere is warm dry air, and light, and nothing else. No machinery. No noise. No\nglow, and no sign, and nothing anywhere that a reasonable person would step\nback from.\n\nIt is the least alarming room you have been in since the diner.';
+  'The door comes off its seal with a sound like a jar being opened, and swings, and behind it there is a short gallery with a handrail down one side and a wall of the same concrete at the end of it.\n\nThere is warm dry air, and light, and nothing else. No machinery. No noise. No glow, and no sign, and nothing anywhere that a reasonable person would step back from.\n\nIt is the least alarming room you have been in since the diner.';
 
 const BEAT_3 =
-  'Your mouth fills with the taste of metal. It is not a strong taste and it is\nnot unpleasant and it is gone before you have finished deciding what it was.\n\nYou pull the door to behind you, because there is nothing in there to look at.';
+  'Your mouth fills with the taste of metal. It is not a strong taste and it is not unpleasant and it is gone before you have finished deciding what it was.\n\nYou pull the door to behind you, because there is nothing in there to look at.';
 
 export const INTERLOCK_DEATH_TEXT =
-  'An interlock is not a lock. It is a machine\'s flat refusal to allow two things\nto be true at the same time — this door open, and that side running — and it\nis fitted because the thing it prevents does not hurt at the time.\n\nSomebody turned this one off, and hung a tag on it, and did not come back.\n\nYou feel entirely well. You are going to go on feeling entirely well for\nseveral hours yet. The case ends here anyway, and it ends because a card tag\nwith nothing written on it was allowed to stand in for a machine.';
+  'An interlock is not a lock. It is a machine\'s flat refusal to allow two things to be true at the same time — this door open, and that side running — and it is fitted because the thing it prevents does not hurt at the time.\n\nSomebody turned this one off, and hung a tag on it, and did not come back.\n\nYou feel entirely well. You are going to go on feeling entirely well for several hours yet. The case ends here anyway, and it ends because a card tag with nothing written on it was allowed to stand in for a machine.';
 
 export const INTERLOCK_BEATS = [BEAT_1, BEAT_2, BEAT_3];
 
 // §10.5 — the shield door with the keyswitch at NORMAL.
 const interlockNormalText =
-  'The wheel turns a quarter of a turn and stops against something that is not\ngoing to be argued with, and the lamp above it stays out.\n\nSomewhere inside the door a bolt is across, and it is across because a machine\non the other side of that wall is running and has been told that this matters\nmore than your afternoon does.';
+  'The wheel turns a quarter of a turn and stops against something that is not going to be argued with, and the lamp above it stays out.\n\nSomewhere inside the door a bolt is across, and it is across because a machine on the other side of that wall is running and has been told that this matters more than your afternoon does.';
 
 const interlockDoorEffects: Effect[] = [
   {
@@ -597,7 +597,7 @@ const interlock: ObjectDefSlice = {
 
 // §10.1 sub-parts: the tag, the lamp, the keyswitch, the buttons.
 const interlockTagText =
-  'A card tag on a wire, ruled for a name, a date and a reason, and rubbed\nfeatureless by however many sleeves have gone past it since.\n\nTags like this are how everybody knows a bypass is temporary.\n\nThis one has been temporary for a while.';
+  'A card tag on a wire, ruled for a name, a date and a reason, and rubbed featureless by however many sleeves have gone past it since.\n\nTags like this are how everybody knows a bypass is temporary.\n\nThis one has been temporary for a while.';
 
 const interlockTag: ObjectDefSlice = {
   location: ACT3_S5_REACTOR_INTERFACE,
@@ -608,7 +608,7 @@ const interlockTag: ObjectDefSlice = {
 };
 
 const interlockLampText =
-  'A red lens in a chrome ring, cold, with the filament visible behind it and\nunlit, which is the lamp doing its job: the lamp is not decoration, it is the\nsentence.';
+  'A red lens in a chrome ring, cold, with the filament visible behind it and unlit, which is the lamp doing its job: the lamp is not decoration, it is the sentence.';
 
 const interlockLamp: ObjectDefSlice = {
   location: ACT3_S5_REACTOR_INTERFACE,
@@ -626,10 +626,10 @@ const interlockLamp: ObjectDefSlice = {
 };
 
 const interlockKeyswitchText =
-  'A flat barrel key with a rubber fob, in a switch, turned as far as it goes and\nleft there.\n\nThe polish on the fob says it has been turned back and forth a great many\ntimes by somebody who did not have to think about it.';
+  'A flat barrel key with a rubber fob, in a switch, turned as far as it goes and left there.\n\nThe polish on the fob says it has been turned back and forth a great many times by somebody who did not have to think about it.';
 
 const turnToNormalText =
-  'It comes round to NORMAL with a click you feel more than hear, and the lamp\nabove the wheel stays exactly as unlit as it was.\n\nWhich is the whole of what the lamp had to tell you: with the bypass out, this\ndoor is not going to open at all, and with the bypass in, it is.';
+  'It comes round to NORMAL with a click you feel more than hear, and the lamp above the wheel stays exactly as unlit as it was.\n\nWhich is the whole of what the lamp had to tell you: with the bypass out, this door is not going to open at all, and with the bypass in, it is.';
 
 // Exported: the room shell wires this onto its own room-level handler for
 // `V_ACT3_TURN_TO_NORMAL` ("TURN KEYSWITCH TO NORMAL", bare — see that
@@ -651,7 +651,7 @@ const interlockKeyswitch: ObjectDefSlice = {
 };
 
 const interlockButtonsText =
-  'The green lights while your thumb is on it and goes out when your thumb comes\noff. The red does not light at all.\n\nNeither of them does anything you can hear, which on a panel of this kind\nmeans one of them is doing something you cannot.';
+  'The green lights while your thumb is on it and goes out when your thumb comes off. The red does not light at all.\n\nNeither of them does anything you can hear, which on a panel of this kind means one of them is doing something you cannot.';
 
 const interlockButtons: ObjectDefSlice = {
   location: ACT3_S5_REACTOR_INTERFACE,

@@ -77,7 +77,7 @@ import { ACT4_STAGING_AREA } from './ids';
 // ---------------------------------------------------------------------------
 
 const description =
-  'Wide face, heavy jaw, grey coming in at one temple, and about twenty years of\nphotographs between you and any of it.\n\nGrey suit, no tie, one button of the collar open, and the coat over the back of\nthe chair rather than on him, because he has been in this room a while and\nexpects to be a while longer.\n\nHe sits square to the table with a cup in front of him he has not drunk out of\nand both hands where they can be seen, which is habit rather than courtesy.';
+  'Wide face, heavy jaw, grey coming in at one temple, and about twenty years of photographs between you and any of it.\n\nGrey suit, no tie, one button of the collar open, and the coat over the back of the chair rather than on him, because he has been in this room a while and expects to be a while longer.\n\nHe sits square to the table with a cup in front of him he has not drunk out of and both hands where they can be seen, which is habit rather than courtesy.';
 
 // ---------------------------------------------------------------------------
 // §11.0b — greeting, two rules.
@@ -86,10 +86,10 @@ const description =
 const greeting: ProseRule[] = [
   {
     when: { not: { met: ACT4_LUKE } },
-    text: 'He is on his feet before you are through the door, which is either manners or\ntwenty years of being got at, and he puts his hand out.\n\n"You\'ll be the one who folds paper," he says.',
+    text: 'He is on his feet before you are through the door, which is either manners or twenty years of being got at, and he puts his hand out.\n\n"You\'ll be the one who folds paper," he says.',
   },
   {
-    text: 'He is where he was, coat still over the chair, cup still not drunk out of, and\nhe stops what he is doing entirely, which nobody else in this county does.',
+    text: 'He is where he was, coat still over the chair, cup still not drunk out of, and he stops what he is doing entirely, which nobody else in this county does.',
   },
 ];
 
@@ -100,9 +100,9 @@ const greeting: ProseRule[] = [
 // ---------------------------------------------------------------------------
 
 const unknownTopicRotation: string[] = [
-  '"I don\'t know." He says it flatly and without decorating it, which is\napparently what a man can do in a room with no press in it.',
-  'He answers a question standing next to the one you asked. It is a good answer\nand it is not to your question, and he knows both of those things.',
-  '"That is outside my competence." Then, because that was not quite honest:\n"Outside my knowledge. Competence would be a claim."',
+  '"I don\'t know." He says it flatly and without decorating it, which is apparently what a man can do in a room with no press in it.',
+  'He answers a question standing next to the one you asked. It is a good answer and it is not to your question, and he knows both of those things.',
+  '"That is outside my competence." Then, because that was not quite honest: "Outside my knowledge. Competence would be a claim."',
 ];
 
 // `firstOnce` only exists on `ProseRule.text` — a bare `string[]` (unwrapped)
@@ -122,7 +122,7 @@ const topicLetters: TopicDef = {
   id: TOPIC_LETTERS,
   words: ['letters', "jack's letters", 'writing', 'post'],
   response:
-    '"I kept them." He does not touch the folder. "I have kept everything my family\nhas sent me for twenty years. You start because you are sentimental and you go\non because somebody in an office tells you that you have to."\n\n"I answered every one. Inside the week, in my own hand, because he would have\nknown." A pause he does not fill. "And I could not tell you tonight what I said\nback to him. Not one line of it."\n\nHe puts one finger on the folder and does not open it.\n\n"He is the only one of us who was ever any good at complaining. There is not a\ncomplaint in there, and I have not had anybody to say that to who would not\nhave written it down."',
+    '"I kept them." He does not touch the folder. "I have kept everything my family has sent me for twenty years. You start because you are sentimental and you go on because somebody in an office tells you that you have to."\n\n"I answered every one. Inside the week, in my own hand, because he would have known." A pause he does not fill. "And I could not tell you tonight what I said back to him. Not one line of it."\n\nHe puts one finger on the folder and does not open it.\n\n"He is the only one of us who was ever any good at complaining. There is not a complaint in there, and I have not had anybody to say that to who would not have written it down."',
 };
 
 // ---------------------------------------------------------------------------
@@ -136,7 +136,7 @@ const topicNoumena: TopicDef = {
   id: TOPIC_NOUMENA,
   words: ['noumena', 'the word', 'words', 'the letter'],
   response:
-    '"My father used to say it back to me with the vowels in the wrong places." He\nsays this without any particular fondness and without any particular anything\nelse. "Four of them at that table and not one ever asked me what it meant. They\nwaited for Sunday, to see whether I would do it again."\n\n"The thing as it is." He stops there, which is where he has always stopped.\n"Ask Eli. Eli will give you forty minutes and a diagram."\n\nThen he looks at you a second longer than the question needed.\n\n"You spelled it right," he says.',
+    '"My father used to say it back to me with the vowels in the wrong places." He says this without any particular fondness and without any particular anything else. "Four of them at that table and not one ever asked me what it meant. They waited for Sunday, to see whether I would do it again."\n\n"The thing as it is." He stops there, which is where he has always stopped. "Ask Eli. Eli will give you forty minutes and a diagram."\n\nThen he looks at you a second longer than the question needed.\n\n"You spelled it right," he says.',
   effects: [{ grantClue: ACT4_CLUE_LUKES_WORD }],
 };
 
@@ -147,7 +147,7 @@ const topicNoumena: TopicDef = {
 const TOPIC_JACK = T('act4_luke_topic_jack');
 
 const topicJackText =
-  '"Jack." Something happens to his face that is not a smile and is next door to\none. "The only one of us who stayed where he was put, and the only one of us\nanybody here would recognise, and he has never once been in a photograph with\nme."\n\n"He fixes things. He has been fixing things since he was eleven. He did my\nfirst car twice and charged me for the second one, and he was right to."\n\nThe finger goes back on the folder.\n\n"Is he well?"';
+  '"Jack." Something happens to his face that is not a smile and is next door to one. "The only one of us who stayed where he was put, and the only one of us anybody here would recognise, and he has never once been in a photograph with me."\n\n"He fixes things. He has been fixing things since he was eleven. He did my first car twice and charged me for the second one, and he was right to."\n\nThe finger goes back on the folder.\n\n"Is he well?"';
 
 // Addendum §1 — answering "Is he well?" (`TELL LUKE ABOUT JACK`, ASK routed
 // the same, E1 §37.3). Status line ruling q2: §1.1 ships WITHOUT its final
@@ -155,7 +155,7 @@ const topicJackText =
 // (the same `unknownTopic` idiom above): the shipped block plays once, then
 // the answer and its short form rotate.
 const topicJackAnswerText =
-  'You tell him about the stool at the end of Pearl\'s counter at six in the\nmorning, and the mug turned round and round and never picked up, and three days\nunshaved with no decision made about it.\n\nYou do not tell him the rest of it. He does not ask you for the rest of it.\n\n"No," he says — answering himself, not doubting you.\n\nHe looks at the folder without putting a finger on it this time.\n\n"He would not have put that in a letter."';
+  'You tell him about the stool at the end of Pearl\'s counter at six in the morning, and the mug turned round and round and never picked up, and three days unshaved with no decision made about it.\n\nYou do not tell him the rest of it. He does not ask you for the rest of it.\n\n"No," he says — answering himself, not doubting you.\n\nHe looks at the folder without putting a finger on it this time.\n\n"He would not have put that in a letter."';
 
 const topicJackShortText = '"You have told me," he says. "I am not going to make you tell me twice."';
 
@@ -172,13 +172,13 @@ const topicJack: TopicDef = {
 const TOPIC_JULES = T('act4_luke_topic_jules');
 
 const topicJulesText =
-  '"I don\'t know that name." He says it without hedging, which is the thing about\nhim: he will tell you he does not know something and not put anything on the\nfront of it.\n\nThen, because you have not moved:\n\n"There is a lacuna where you are pointing and I am not going to pretend there\nis not. I have been at it since a folded piece of paper was put in front of me\nthis morning, and I have a very good memory."\n\nHe turns the cup a quarter turn.\n\n"If you are asking about the numbers: there is no I and there was never an I.\nOur father was I. He paid for them, he sat in the chair first, and he put\nhimself at the head of the row because he was the head of the row." A short\nbreath through the nose that is nearly amusement. "Eli tells it differently. Eli\nis wrong, and will be wrong about it at my funeral."';
+  '"I don\'t know that name." He says it without hedging, which is the thing about him: he will tell you he does not know something and not put anything on the front of it.\n\nThen, because you have not moved:\n\n"There is a lacuna where you are pointing and I am not going to pretend there is not. I have been at it since a folded piece of paper was put in front of me this morning, and I have a very good memory."\n\nHe turns the cup a quarter turn.\n\n"If you are asking about the numbers: there is no I and there was never an I. Our father was I. He paid for them, he sat in the chair first, and he put himself at the head of the row because he was the head of the row." A short breath through the nose that is nearly amusement. "Eli tells it differently. Eli is wrong, and will be wrong about it at my funeral."';
 
 // Addendum §2 — `TELL LUKE ABOUT JULES`, after §11.4. No gate, no flag: the
 // rotation itself is "after §11.4" (this file's own `firstOnce` idiom,
 // above).
 const topicJulesAfterText =
-  '"I have been going back over a table with four children at it since you put\nthat name in front of me," he says. "I can put every one of them in their\nchair. I can tell you what my father was drinking."\n\nHe turns the cup a quarter turn and puts it back exactly where it was.\n\n"There is nothing else in it. Looking is most of what I am for, and there is\nnothing else in it."\n\nThen, without any apology on the front of it: "Ask me tomorrow. I will have the\nsame nothing, and I will have checked it."';
+  '"I have been going back over a table with four children at it since you put that name in front of me," he says. "I can put every one of them in their chair. I can tell you what my father was drinking."\n\nHe turns the cup a quarter turn and puts it back exactly where it was.\n\n"There is nothing else in it. Looking is most of what I am for, and there is nothing else in it."\n\nThen, without any apology on the front of it: "Ask me tomorrow. I will have the same nothing, and I will have checked it."';
 
 const topicJules: TopicDef = {
   id: TOPIC_JULES,
@@ -197,7 +197,7 @@ const topicFacility: TopicDef = {
   id: TOPIC_FACILITY,
   words: ['plant', 'facility', 'building', 'dad', 'hearings'],
   response:
-    '"I know the provenance of this building considerably better than I know the\nbuilding." He turns the cup back. "Commissioned the year I finished law school,\nout of a bill my father spent two winters on, and there is a plaque in that\nlobby with his name on it and a title in front of it that he enjoyed more than\nhe ever admitted."\n\n"I have been in that lobby three times in twenty years. Ribbon, ribbon, and a\nphotograph with a man from the county."\n\nHe goes and finds the end of the sentence, which he has not had to do yet.\n\n"I have never been anywhere else in it, and nobody has ever offered."',
+    '"I know the provenance of this building considerably better than I know the building." He turns the cup back. "Commissioned the year I finished law school, out of a bill my father spent two winters on, and there is a plaque in that lobby with his name on it and a title in front of it that he enjoyed more than he ever admitted."\n\n"I have been in that lobby three times in twenty years. Ribbon, ribbon, and a photograph with a man from the county."\n\nHe goes and finds the end of the sentence, which he has not had to do yet.\n\n"I have never been anywhere else in it, and nobody has ever offered."',
 };
 
 // ---------------------------------------------------------------------------
@@ -214,13 +214,13 @@ const TOPIC_DOOR = T('act4_luke_topic_door');
 // actual wired strings for canon 104 ("no Luke line below S5") rather than
 // re-deriving them.
 export const doorEscortText =
-  'The one who does the talking says a sentence with the word advance in it and\nthen a sentence with the word protocol in it, and neither is addressed to you.\n\nHe is answered in four words and a look at a watch. The two of them come as far\nas the lift and no further, because there is only so much of this that a man can\nbe told.\n\nThe leaves come together.\n\nNobody says anything on the way down. He stands the way a man stands in a\nfreight lift, hands at his sides, and on the way past it he reads the legend\nstrip beside the buttons, the way you read anything in a lift.\n\nThere is nothing on it to read.\n\nThe little windows over the door go L, and then a long nothing, and then S5.';
+  'The one who does the talking says a sentence with the word advance in it and then a sentence with the word protocol in it, and neither is addressed to you.\n\nHe is answered in four words and a look at a watch. The two of them come as far as the lift and no further, because there is only so much of this that a man can be told.\n\nThe leaves come together.\n\nNobody says anything on the way down. He stands the way a man stands in a freight lift, hands at his sides, and on the way past it he reads the legend strip beside the buttons, the way you read anything in a lift.\n\nThere is nothing on it to read.\n\nThe little windows over the door go L, and then a long nothing, and then S5.';
 
 const doorRule1Text =
-  'You tell him there is a door in this building that has refused everything you\nhave been able to put in front of it, and that it is five floors under the lobby he\nhas been photographed in three times.\n\nHe listens the whole way through without helping you along, which is what twenty\nyears of it does to a man.\n\nThen the cup goes down and he reaches back for the coat.\n\n"Take me to it," he says, and is on his feet before he has finished saying it,\nwhich is the fastest anybody in this county has agreed to anything all week.';
+  'You tell him there is a door in this building that has refused everything you have been able to put in front of it, and that it is five floors under the lobby he has been photographed in three times.\n\nHe listens the whole way through without helping you along, which is what twenty years of it does to a man.\n\nThen the cup goes down and he reaches back for the coat.\n\n"Take me to it," he says, and is on his feet before he has finished saying it, which is the fastest anybody in this county has agreed to anything all week.';
 
 const doorRule2Text =
-  '"There is a door." He is not humouring you; he is waiting for the rest of it,\nand there is not any rest of it yet.\n\n"Bring me a door," he says.';
+  '"There is a door." He is not humouring you; he is waiting for the rest of it, and there is not any rest of it yet.\n\n"Bring me a door," he says.';
 
 const topicDoor: TopicDef = {
   id: TOPIC_DOOR,
@@ -258,7 +258,7 @@ const topicSissy: TopicDef = {
   id: TOPIC_SISSY,
   words: ['sissy', 'mars', 'the station'],
   response:
-    '"Sissy writes to everybody. It is the one thing the distance has not touched."\nA pause that is not for effect. "She has been filing something for about a\nyear that I get told has been handled. I asked once what it was. It had been\nhandled."\n\n"I have signed for that programme four times and I could not tell you tonight\nwhat my sister is looking at."',
+    '"Sissy writes to everybody. It is the one thing the distance has not touched." A pause that is not for effect. "She has been filing something for about a year that I get told has been handled. I asked once what it was. It had been handled."\n\n"I have signed for that programme four times and I could not tell you tonight what my sister is looking at."',
 };
 
 // ---------------------------------------------------------------------------
@@ -271,7 +271,7 @@ const topicDetail: TopicDef = {
   id: TOPIC_DETAIL,
   words: ['detail', 'security', 'schedule', 'the visit'],
   response:
-    '"They are very good," he says, and means it, "and they are not mine."\n\n"There was a stop on my sheet this morning. A counter on a main street, four\nminutes, a photograph of me holding a cup and saying something about pie." He\nputs a hand flat on the paper tablecloth. "It came off between the airport\nand here. Nobody has told me why, and I have stopped asking, because the answer\nis always that it was for my safety and it is always said kindly."\n\nHe looks at the urn on the card table and then does not look at it again.',
+    '"They are very good," he says, and means it, "and they are not mine."\n\n"There was a stop on my sheet this morning. A counter on a main street, four minutes, a photograph of me holding a cup and saying something about pie." He puts a hand flat on the paper tablecloth. "It came off between the airport and here. Nobody has told me why, and I have stopped asking, because the answer is always that it was for my safety and it is always said kindly."\n\nHe looks at the urn on the card table and then does not look at it again.',
 };
 
 // ---------------------------------------------------------------------------
@@ -282,17 +282,17 @@ const showResponses: ShowResponseDef[] = [
   {
     objects: [ACT2_NOTEBOOK],
     response:
-      'He takes it and does what a lawyer does with a document nobody has given him\ntime to read: he opens it at the back first.\n\nHe looks at the inside of the back cover for a while.\n\n"Whose is this?"\n\nYou tell him. He gives it back, and then asks you a question about the paper.',
+      'He takes it and does what a lawyer does with a document nobody has given him time to read: he opens it at the back first.\n\nHe looks at the inside of the back cover for a while.\n\n"Whose is this?"\n\nYou tell him. He gives it back, and then asks you a question about the paper.',
   },
   {
     objects: [ACT2_RETURNED_LETTER],
     response:
-      'He takes it and turns it over and reads the front, and does not put it down.\n\n"That is his hand. That is his stamp, and that is how he does an L."\n\nThen nothing for a while. He is reading the red printing, and specifically the\nsecond line of it, which says there is no such addressee.\n\n"It\'s sealed," he says.\n\nHe puts it down on the white paper between you, squared, and does not ask you\nfor it and does not ask you to open it.',
+      'He takes it and turns it over and reads the front, and does not put it down.\n\n"That is his hand. That is his stamp, and that is how he does an L."\n\nThen nothing for a while. He is reading the red printing, and specifically the second line of it, which says there is no such addressee.\n\n"It\'s sealed," he says.\n\nHe puts it down on the white paper between you, squared, and does not ask you for it and does not ask you to open it.',
   },
   {
     objects: [INTACT_POLAROIDS],
     response:
-      '"That\'s the porch." He holds it at the distance a man his age holds a\nphotograph. "The old place. That is my father\'s chair and my father in it, and\nI could tell you what the argument was about and I am not going to."\n\nHe gives it back without turning to the other one.',
+      '"That\'s the porch." He holds it at the distance a man his age holds a photograph. "The old place. That is my father\'s chair and my father in it, and I could tell you what the argument was about and I am not going to."\n\nHe gives it back without turning to the other one.',
   },
   {
     // Register: neither D1 §23 (only the player and Dot ever recognise the
@@ -309,11 +309,11 @@ const showResponses: ShowResponseDef[] = [
 // the shipped unconditional refusal.
 // ---------------------------------------------------------------------------
 
-const attackText = 'There are two men in this room whose entire working life is arranged around the\nten seconds after you finish having that idea.';
+const attackText = 'There are two men in this room whose entire working life is arranged around the ten seconds after you finish having that idea.';
 
-const followText = '"I\'m not going anywhere," he says, "which is the first true thing I have said\nin this building."';
+const followText = '"I\'m not going anywhere," he says, "which is the first true thing I have said in this building."';
 
-const hugKissText = 'He converts it into a handshake without any suggestion that anything needed\nconverting.';
+const hugKissText = 'He converts it into a handshake without any suggestion that anything needed converting.';
 
 // ---------------------------------------------------------------------------
 // §20 — the escort. Fired from §11.6 rule 1's own follow-up: a second ask
@@ -395,7 +395,7 @@ export const ACT4_EV_LUKE_ESCORT_LEAVES_EVENT: EventDef = {
 // ---------------------------------------------------------------------------
 
 export const ACT4_LUKE_AT_ROOT_TEXT =
-  'He follows you the length of Sublevel 6 without asking where you are going.\nPast the rail of hooks. Past the rows of chairs, at which he looks the way\nanybody looks the first time, and does not stop.\n\nIn the archive room he stands for a moment in front of a door frame with no\ndoor in it, and then goes on to the far end, where the carpet stops at three\nsteps down into a well.\n\nHe goes down them.\n\nHe puts his hand flat on the reader beside the door. Then the badge. Then the\nhand again.\n\nNothing. No diode. No beat while something somewhere agrees with something\nelse.\n\nHe does it once more, the way a man checks he did it right the first time, and\nthen stops, at the bottom of a tiled well under a building with his father\'s\nname on a plaque in its lobby, in front of a small grey box that has never once\nbeen switched on.\n\nHe is down there a while.\n\nThen he comes back up the three steps and goes past you, and does not look at\nyou as he passes, and it is not rudeness. There is nothing on his face to give\nanybody.\n\nHe is already in the lift with his hand flat on the leaf, holding it, which is a\ncourtesy from a man who has not needed to open a door for himself in years.\n\nNobody says anything on the way up either.\n\nIn the lobby two men are waiting at the turnstile who have plainly had the worst\nafternoon of their professional lives, and one of them takes his elbow, and he\nlets him.\n\nAt the doors he looks back into the building, once, at the whole of it, the way\nyou look at a room you have decided you will not be in again.';
+  'He follows you the length of Sublevel 6 without asking where you are going. Past the rail of hooks. Past the rows of chairs, at which he looks the way anybody looks the first time, and does not stop.\n\nIn the archive room he stands for a moment in front of a door frame with no door in it, and then goes on to the far end, where the carpet stops at three steps down into a well.\n\nHe goes down them.\n\nHe puts his hand flat on the reader beside the door. Then the badge. Then the hand again.\n\nNothing. No diode. No beat while something somewhere agrees with something else.\n\nHe does it once more, the way a man checks he did it right the first time, and then stops, at the bottom of a tiled well under a building with his father\'s name on a plaque in its lobby, in front of a small grey box that has never once been switched on.\n\nHe is down there a while.\n\nThen he comes back up the three steps and goes past you, and does not look at you as he passes, and it is not rudeness. There is nothing on his face to give anybody.\n\nHe is already in the lift with his hand flat on the leaf, holding it, which is a courtesy from a man who has not needed to open a door for himself in years.\n\nNobody says anything on the way up either.\n\nIn the lobby two men are waiting at the turnstile who have plainly had the worst afternoon of their professional lives, and one of them takes his elbow, and he lets him.\n\nAt the doors he looks back into the building, once, at the whole of it, the way you look at a room you have decided you will not be in again.';
 
 export const ACT4_LUKE_AT_ROOT_EFFECTS: Effect[] = [
   { say: ACT4_LUKE_AT_ROOT_TEXT },

@@ -38,16 +38,16 @@ import {
 // ---------------------------------------------------------------------------
 
 export const S1_DOOR_OPEN_BEFORE_TEXT =
-  'There is nothing to pull. The handle turned into wall a long time ago and the\njoint is full of paint.\n\nYou could put the chair leg into it and make a mess and a noise and a\nrectangle of bare steel, and you would still be pulling on a door that opens\naway from you, with nothing on this side to pull it by.';
+  'There is nothing to pull. The handle turned into wall a long time ago and the joint is full of paint.\n\nYou could put the chair leg into it and make a mess and a noise and a rectangle of bare steel, and you would still be pulling on a door that opens away from you, with nothing on this side to pull it by.';
 
 // §7.1 rules 2 and 3 — the S1 side of the door, before and after (wired by
 // the main session at integration; task A parked the text, task B's object
 // had only §7.3).
 const S1_DOOR_EXAMINE_BEFORE_TEXT =
-  'From this side it is not a door.\n\nIt is a rectangle in the block wall, filled with steel, painted the wall\'s\ncolour so many times that the paint has closed the joint all the way round and\nturned the whole thing into a shape you would walk past. People have. There is\na scuff line across the bottom of it at about the height of a trolley.\n\nThere is a handle. The handle is painted too, into the wall, in one piece with\nit.';
+  'From this side it is not a door.\n\nIt is a rectangle in the block wall, filled with steel, painted the wall\'s colour so many times that the paint has closed the joint all the way round and turned the whole thing into a shape you would walk past. People have. There is a scuff line across the bottom of it at about the height of a trolley.\n\nThere is a handle. The handle is painted too, into the wall, in one piece with it.';
 
 const S1_DOOR_EXAMINE_AFTER_TEXT =
-  'Standing open against the block, with a lip of paint hanging off the frame in\none piece where the joint gave, and a mile of tunnel behind it going away\nunder the grazing.';
+  'Standing open against the block, with a lip of paint hanging off the frame in one piece where the joint gave, and a mile of tunnel behind it going away under the grazing.';
 
 const constructionDoorS1: ObjectDefSlice = {
   location: ACT3_S1_MECHANICAL_GALLERY,
@@ -79,21 +79,21 @@ const constructionDoorGate: ObjectDefSlice = { location: ACT3_S1_MECHANICAL_GALL
 // ---------------------------------------------------------------------------
 
 const pumpsExamine =
-  'Four of them in a row, each one a motor and a volute bolted to a common frame,\nand each frame standing on rubber pads the size of hockey pucks so that what\nthe pumps do stays in the pumps and out of the building.\n\nThree are running. The fourth is dry and cold and is the standby, and its\nbrass tag hangs off its isolating valve on the same gauge of wire as every\nother tag in this building, stamped by the same hand.\n\nPut a palm on a running one and the water inside it arrives and leaves,\narrives and leaves.';
+  'Four of them in a row, each one a motor and a volute bolted to a common frame, and each frame standing on rubber pads the size of hockey pucks so that what the pumps do stays in the pumps and out of the building.\n\nThree are running. The fourth is dry and cold and is the standby, and its brass tag hangs off its isolating valve on the same gauge of wire as every other tag in this building, stamped by the same hand.\n\nPut a palm on a running one and the water inside it arrives and leaves, arrives and leaves.';
 
 const readTagsText =
-  '    CWR-1\n    CWR-2\n    CWR-3\n    CWR-4 (S)\n\nChilled water return, and the S is the standby, and nothing on any of them\nsays where the water is coming back from.';
+  '    CWR-1\n    CWR-2 CWR-3 CWR-4 (S)\n\nChilled water return, and the S is the standby, and nothing on any of them says where the water is coming back from.';
 
 const listenPumpsText =
-  'A hum with a shove in it, four times a second, and under that the sound of the\npipework accepting the shove and passing it on.\n\nYou feel it in the floor before you hear it, which by now is how you expect\nwater to introduce itself.';
+  'A hum with a shove in it, four times a second, and under that the sound of the pipework accepting the shove and passing it on.\n\nYou feel it in the floor before you hear it, which by now is how you expect water to introduce itself.';
 
 const stopPumpText =
-  'There is a hasp on the isolating valve, an interlock behind the hasp, and a\nlaminated card in a bracket beside both of them explaining, in the tone of a\nman who has had to explain it before, what happens to a building when its\nreturns stop.\n\nAlso, three floors up there is a wall of gauges that would know inside a\nminute.';
+  'There is a hasp on the isolating valve, an interlock behind the hasp, and a laminated card in a bracket beside both of them explaining, in the tone of a man who has had to explain it before, what happens to a building when its returns stop.\n\nAlso, three floors up there is a wall of gauges that would know inside a minute.';
 
 // Exported: §8.8's "SEARCH ROOM" is bare (no dobj, the room's own handler,
 // `s1MechanicalGallery.ts`) and needs this same string, not a duplicate.
 export const S1_SEARCH_BEHIND_PUMPS_TEXT =
-  'Behind the pumps: the wall the construction door is in, a floor drain with a\ngrating over it, and about forty years less dust than you were expecting in a\nbuilding that has not had forty years.';
+  'Behind the pumps: the wall the construction door is in, a floor drain with a grating over it, and about forty years less dust than you were expecting in a building that has not had forty years.';
 
 const pumps: ObjectDefSlice = {
   location: ACT3_S1_MECHANICAL_GALLERY,
@@ -113,10 +113,10 @@ const pumps: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const cribExamine =
-  'A mesh cage about the size of a bedroom, with the door standing open and the\npadlock hanging on the hasp through its own shackle, unlocked, the way a\npadlock hangs when nobody has ever needed it shut.\n\nA bench along one side with a vice on it. Over the bench, a board with an\noutline painted for every tool, and every tool in its outline, and nothing on\nthe board that is not in an outline.\n\nOn the bench: a coffee tin of split pins, a rag folded in four, and a paper\ncup with about a half inch of something in the bottom of it that has gone to\nskin.';
+  'A mesh cage about the size of a bedroom, with the door standing open and the padlock hanging on the hasp through its own shackle, unlocked, the way a padlock hangs when nobody has ever needed it shut.\n\nA bench along one side with a vice on it. Over the bench, a board with an outline painted for every tool, and every tool in its outline, and nothing on the board that is not in an outline.\n\nOn the bench: a coffee tin of split pins, a rag folded in four, and a paper cup with about a half inch of something in the bottom of it that has gone to skin.';
 
 const cribTakeText =
-  'Spanners, a mallet, three sizes of grip, a pot of the same grey paint as the\nwalls with the lid on properly.\n\nYou take nothing, because there is nothing here you do not already have a\nworse version of in your coat, and because a board like this notices.';
+  'Spanners, a mallet, three sizes of grip, a pot of the same grey paint as the walls with the lid on properly.\n\nYou take nothing, because there is nothing here you do not already have a worse version of in your coat, and because a board like this notices.';
 
 const crib: ObjectDefSlice = {
   location: ACT3_S1_MECHANICAL_GALLERY,
@@ -129,7 +129,7 @@ const crib: ObjectDefSlice = {
 };
 
 const cribCupExamine =
-  'Paper, waxed, with a bead of dried coffee down one side and a skin across the\ntop gone the colour and thickness of a thing that has been left considerably\nlonger than the length of a break.\n\nWhoever set it down was coming back.';
+  'Paper, waxed, with a bead of dried coffee down one side and a skin across the top gone the colour and thickness of a thing that has been left considerably longer than the length of a break.\n\nWhoever set it down was coming back.';
 
 const cribCup: ObjectDefSlice = {
   location: { on: ACT3_TOOL_CRIB },
@@ -139,7 +139,7 @@ const cribCup: ObjectDefSlice = {
 };
 
 const cribBoardExamine =
-  'Painted outlines, done freehand and done well, one to a tool, with the tool\nin it.\n\nThere is not a gap on this board anywhere.';
+  'Painted outlines, done freehand and done well, one to a tool, with the tool in it.\n\nThere is not a gap on this board anywhere.';
 
 const cribBoard: ObjectDefSlice = {
   location: { on: ACT3_TOOL_CRIB },
@@ -153,13 +153,13 @@ const cribBoard: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const rackExamine =
-  'Against the back wall of the crib, a rack of tape cartridges standing on edge\nin plastic shells, five shelves of them, each shell with a printed spine label\nand each spine label with a card in a slot on the shelf edge in front of it.\n\nThe cards are the old kind: three ruled columns, headed OUT, BY and BACK,\nfilled in by hand, the way a library did it before libraries stopped.\n\nMost of the cards have nothing on them. A few have one line, written and then\nstruck through.\n\nOn the third shelf there is a slot with a card in it and no tape behind it.';
+  'Against the back wall of the crib, a rack of tape cartridges standing on edge in plastic shells, five shelves of them, each shell with a printed spine label and each spine label with a card in a slot on the shelf edge in front of it.\n\nThe cards are the old kind: three ruled columns, headed OUT, BY and BACK, filled in by hand, the way a library did it before libraries stopped.\n\nMost of the cards have nothing on them. A few have one line, written and then struck through.\n\nOn the third shelf there is a slot with a card in it and no tape behind it.';
 
 const readSpineLabelsText =
-  'A run of letters and a run of numbers, printed, sequential, going along the\nshelf and down to the next one without a break in them anywhere.\n\nThey are not titles. Nobody labelled these expecting to want one back for a\nreason he could describe.';
+  'A run of letters and a run of numbers, printed, sequential, going along the shelf and down to the next one without a break in them anywhere.\n\nThey are not titles. Nobody labelled these expecting to want one back for a reason he could describe.';
 
 const takeTapeText =
-  'They come off the shelf and go back on it and there is nothing in this\nbuilding to put one into; a machine that reads these would be the size of the\ncrib and there is no crib-sized hole in this room.\n\nWhatever these are for, they are for somewhere else, and they have been\nwaiting there a while.';
+  'They come off the shelf and go back on it and there is nothing in this building to put one into; a machine that reads these would be the size of the crib and there is no crib-sized hole in this room.\n\nWhatever these are for, they are for somewhere else, and they have been waiting there a while.';
 
 // §21.2's own collision note: "the checkout card is the only portable one;
 // once taken it wins everywhere." The rack's own noun list keeps to the
@@ -178,14 +178,14 @@ const tapeRack: ObjectDefSlice = {
 };
 
 const checkoutCardExamine =
-  'Ruled in three columns — OUT, BY, BACK — and filled in once, in pencil, small\nand fast.\n\nUnder OUT, a day and a month and no year.\n\nUnder BY, one letter and a full stop:\n\n    J.\n\nUnder BACK, nothing, and the line has not been struck through, which on a card\nlike this is the whole of the filing system saying that the tape is still out.';
+  'Ruled in three columns — OUT, BY, BACK — and filled in once, in pencil, small and fast.\n\nUnder OUT, a day and a month and no year.\n\nUnder BY, one letter and a full stop:\n\n    J.\n\nUnder BACK, nothing, and the line has not been struck through, which on a card like this is the whole of the filing system saying that the tape is still out.';
 
 // §8.6 — COMPARE CARD WITH NOTEBOOK / COMPARE HANDWRITING / COMPARE CARD
 // WITH BACK COVER (`V_FIT`, act2/ids.ts — words compare/match/fit, same
 // idiom as `objects/corridorB4.ts`'s own life-safety-plan/notebook compare
 // and `objects/coolingPlant.ts`'s own drawing/returns compare).
 const compareCardText =
-  "You hold the card against the inside of the notebook's back cover, where the\npencil is heaviest.\n\nThe same pressure. The same small fast letters leaning the same way. The full\nstop after the J is put down hard enough to be a decision, and there is one\nexactly like it after every abbreviation in the book.\n\nHe took a tape out of this rack and did not bring it back.";
+  "You hold the card against the inside of the notebook's back cover, where the pencil is heaviest.\n\nThe same pressure. The same small fast letters leaning the same way. The full stop after the J is put down hard enough to be a decision, and there is one exactly like it after every abbreviation in the book.\n\nHe took a tape out of this rack and did not bring it back.";
 
 const compareCardEffects: Effect[] = [{ say: compareCardText }, { grantClue: ACT3_CLUE_J_HAND }];
 
@@ -215,7 +215,7 @@ const checkoutCard: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const stairsExamine =
-  'A steel stair in a half-turn, galvanised, with a scaffold handrail and a\nkick-plate, going down out of the light into more of the same light.\n\nScrewed to the wall at the head of it, a small sign with an arrow and one line\non it:\n\n    S5\n\nThere is nothing between here and there, and the sign does not pretend\notherwise.';
+  'A steel stair in a half-turn, galvanised, with a scaffold handrail and a kick-plate, going down out of the light into more of the same light.\n\nScrewed to the wall at the head of it, a small sign with an arrow and one line on it:\n\n    S5\n\nThere is nothing between here and there, and the sign does not pretend otherwise.';
 
 const stairsDown: ObjectDefSlice = {
   location: ACT3_S1_MECHANICAL_GALLERY,
@@ -229,7 +229,7 @@ const stairsDown: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const floorTouchText =
-  'Sealed screed, swept, with the pumps\' pulse in it and a mop line round the\nbase of the crib where somebody goes to the wall and stops.';
+  'Sealed screed, swept, with the pumps\' pulse in it and a mop line round the base of the crib where somebody goes to the wall and stops.';
 
 const s1Floor: ObjectDefSlice = {
   location: ACT3_S1_MECHANICAL_GALLERY,

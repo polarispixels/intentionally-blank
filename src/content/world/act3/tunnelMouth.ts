@@ -17,10 +17,10 @@ import { ACT3_AT_TUNNEL_MOUTH, ACT3_SERVICE_TUNNEL, ACT3_TUNNEL_DESCENT_GATE, AC
 // ---------------------------------------------------------------------------
 
 const mouthFirstArrivalText =
-  'The posts stop at a patch of ground that is not grazing.\n\nIt is a hardstand: an apron of concrete under gravel under years, square, big\nenough to turn a lorry on, with the county road along one side of it and the\nroad\'s one bend taking the corner off. Grass has come in from all four edges\nand met in the middle along the lines of the panels.\n\nSet in a low kerb in the middle of it there is a steel plate about four feet\nsquare, with two lifting eyes and a brass escutcheon.\n\nThere is no sign, no fence and no post with a number on it. There is nothing\nout here at all to say that the ground under this is not simply ground.';
+  'The posts stop at a patch of ground that is not grazing.\n\nIt is a hardstand: an apron of concrete under gravel under years, square, big enough to turn a lorry on, with the county road along one side of it and the road\'s one bend taking the corner off. Grass has come in from all four edges and met in the middle along the lines of the panels.\n\nSet in a low kerb in the middle of it there is a steel plate about four feet square, with two lifting eyes and a brass escutcheon.\n\nThere is no sign, no fence and no post with a number on it. There is nothing out here at all to say that the ground under this is not simply ground.';
 
 const mouthHatchOpenText =
-  'The hardstand, the kerb, and the plate over on its back in the grass.\n\nWhere the plate was there is a shaft with a ladder down one side of it, and\nthe air coming up out of the shaft is warmer than the county and it is going\nsomewhere.';
+  'The hardstand, the kerb, and the plate over on its back in the grass.\n\nWhere the plate was there is a shaft with a ladder down one side of it, and the air coming up out of the shaft is warmer than the county and it is going somewhere.';
 
 const description: ProseRule[] = [
   { when: { not: { flag: ACT3_TUNNEL_UNLOCKED } }, text: mouthFirstArrivalText },
@@ -31,7 +31,7 @@ const description: ProseRule[] = [
 // §6.6 — room-level senses (the mouth's own variant).
 // ---------------------------------------------------------------------------
 
-const listenMouthText = 'Wind on grass, a long way of it. Nothing on the road; the road has not had\nanything on it since the bend.';
+const listenMouthText = 'Wind on grass, a long way of it. Nothing on the road; the road has not had anything on it since the bend.';
 
 const roomHandlers: HandlerDef[] = [{ verbs: [LISTEN], effects: [{ say: listenMouthText }] }];
 
@@ -52,7 +52,7 @@ const onEnter: OnEnterRule[] = [
 // ---------------------------------------------------------------------------
 
 const walkBackToTownText =
-  'An hour back the way you came, downhill more than up, with the posts on your\nright this time and the town coming up out of the ground in the order it went\ndown: the water tower, then the grain bins, then the roofs.';
+  'An hour back the way you came, downhill more than up, with the posts on your right this time and the town coming up out of the ground in the order it went down: the water tower, then the grain bins, then the roofs.';
 
 export const tunnelMouthRoom: RoomDefSlice = {
   name: 'Tunnel Mouth',

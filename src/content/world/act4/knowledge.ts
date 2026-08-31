@@ -47,7 +47,7 @@ export const ACT4_E0_QUESTIONS: NonNullable<WorldSlice['questions']> = {
     // alongside `act3/scripts.ts`'s own explicit `answerQuestion` effect).
     answerWhen: { all: [{ clue: ACT4_CLUE_SAME_HAND }, { flag: ACT4_NUMERAL_SEARCHED }, { flag: ACT4_PROFILE_SEEN }] },
     answer:
-      'Three pieces, and none of them is a sentence. Your hand is his hand. The\nledger files you under his numeral with no name in the row. And the machine has\nbeen keeping a fourth page on you since the first morning, and it is up to\ndate.',
+      'Three pieces, and none of them is a sentence. Your hand is his hand. The ledger files you under his numeral with no name in the row. And the machine has been keeping a fourth page on you since the first morning, and it is up to date.',
   },
   [ACT4_Q_WHO_OUTRANKS_IT]: {
     text: 'Who outranks this building?',
@@ -58,7 +58,7 @@ export const ACT4_E0_QUESTIONS: NonNullable<WorldSlice['questions']> = {
     // explicit `{ answerQuestion }` effect rather than an ambient `Cond`
     // (`act4LukeAtRoot`'s own effects, `./luke.ts`).
     answer:
-      'Nobody who is alive. The building took his badge upstairs and opened a door for\nhim on Sublevel 5, and then it did nothing whatever at the bottom of the well,\nbecause the thing at the bottom of the well is not a door that refuses people.\nIt is a door nobody has ever switched the reader on for.',
+      'Nobody who is alive. The building took his badge upstairs and opened a door for him on Sublevel 5, and then it did nothing whatever at the bottom of the well, because the thing at the bottom of the well is not a door that refuses people. It is a door nobody has ever switched the reader on for.',
   },
 };
 
@@ -74,7 +74,7 @@ export const ACT4_E0_TASK_I_CLUES: NonNullable<WorldSlice['clues']> = {
   [ACT4_CLUE_VISIT_COMING]: {
     title: 'Two governors and a senator',
     detail:
-      'The county is milling and resurfacing the full length of Main Street, the\nsheriff has been handed a protection schedule with her own county in it, and\nPearl has been told there will be four minutes at her counter. The President\nis coming to the plant, the day after tomorrow.',
+      'The county is milling and resurfacing the full length of Main Street, the sheriff has been handed a protection schedule with her own county in it, and Pearl has been told there will be four minutes at her counter. The President is coming to the plant, the day after tomorrow.',
   },
 };
 
@@ -91,12 +91,12 @@ export const ACT4_E0_TASK_K_CLUES: NonNullable<WorldSlice['clues']> = {
   [ACT4_CLUE_FILED_UNDER_ONE]: {
     title: 'SUBJECT [UNRESOLVED] — MAINTENANCE',
     detail:
-      'The archive ledger takes a numeral. Under I there are two results: SUBJECT\nJULES I, DEPRECATED, and SUBJECT [UNRESOLVED], MAINTENANCE. The second row has\nno name in it.',
+      'The archive ledger takes a numeral. Under I there are two results: SUBJECT JULES I, DEPRECATED, and SUBJECT [UNRESOLVED], MAINTENANCE. The second row has no name in it.',
   },
   [ACT4_CLUE_PROFILED]: {
     title: 'SUBJECT BEHAVIORAL PROFILE',
     detail:
-      'The archive terminal has a fourth heading under ARCHIVE, LOAD and QUEUE. It\nprints SUBJECT BEHAVIORAL PROFILE, three percentages — observation, social\ninference, direct action — and a line that says which one of them is the\nprimary strategy. It came up as fast as the other three.',
+      'The archive terminal has a fourth heading under ARCHIVE, LOAD and QUEUE. It prints SUBJECT BEHAVIORAL PROFILE, three percentages — observation, social inference, direct action — and a line that says which one of them is the primary strategy. It came up as fast as the other three.',
   },
 };
 
@@ -121,12 +121,12 @@ export const ACT4_J_CLUES: NonNullable<WorldSlice['clues']> = {
   [ACT4_CLUE_SAME_HAND]: {
     title: "Everybody's cursive looks alike",
     detail:
-      "Three weeks of my own case notes, bagged off the floor of my room by the\ncounty, are written in the same shorthand as Jules's work book: the same\npressure, the same small fast letters leaning the same way, the same full stop\nput down hard after every abbreviation. The hook that means a valve. The\ndoubled stroke that means a shift.",
+      "Three weeks of my own case notes, bagged off the floor of my room by the county, are written in the same shorthand as Jules's work book: the same pressure, the same small fast letters leaning the same way, the same full stop put down hard after every abbreviation. The hook that means a valve. The doubled stroke that means a shift.",
   },
   [ACT4_CLUE_ELIS_REASON]: {
     title: "I could not tell you that man's face",
     detail:
-      'Eli says there was never an I. He says the man in Rapid City would not put a\nsingle upright on skin, because a line becomes a scar or a smudge, and that the\nsheet therefore started at two. He was six. He remembers the card on the wall\nand he does not remember the man\'s face.',
+      'Eli says there was never an I. He says the man in Rapid City would not put a single upright on skin, because a line becomes a scar or a smudge, and that the sheet therefore started at two. He was six. He remembers the card on the wall and he does not remember the man\'s face.',
   },
 };
 
@@ -141,17 +141,17 @@ export const ACT4_J_PUZZLES: NonNullable<WorldSlice['puzzles']> = {
       {
         id: 'compare',
         class: 'analytical',
-        note: 'COMPARE NOTES WITH NOTEBOOK, once the evidence bag is open — the county bagged\nthree weeks of your own work off the floor of your room.',
+        note: 'COMPARE NOTES WITH NOTEBOOK, once the evidence bag is open — the county bagged three weeks of your own work off the floor of your room.',
       },
       {
         id: 'ledger',
         class: 'analytical',
-        note: 'SEARCH LEDGER FOR I at the archive terminal. The prompt has said SURNAME OR\nNUMERAL since the first time you read it.',
+        note: 'SEARCH LEDGER FOR I at the archive terminal. The prompt has said SURNAME OR NUMERAL since the first time you read it.',
       },
       {
         id: 'profile',
         class: 'analytical',
-        note: 'READ PROFILE at the archive terminal, once Act IV has opened the fourth\nheading.',
+        note: 'READ PROFILE at the archive terminal, once Act IV has opened the fourth heading.',
       },
     ],
     hints: [
@@ -213,22 +213,22 @@ export const ACT4_O_CLUES: NonNullable<WorldSlice['clues']> = {
   [ACT4_CLUE_FRAME_WANTS_MORE]: {
     title: 'There is no reader on this thing',
     detail:
-      'The first frame is not locked and there is nothing on it to unlock. I walked\ninto it and came out of it eighteen inches further into the same room. It is\nchecking something, and there is no reader, no pad and no slot anywhere near\nit, so whatever it wants is not a thing I can be carrying.',
+      'The first frame is not locked and there is nothing on it to unlock. I walked into it and came out of it eighteen inches further into the same room. It is checking something, and there is no reader, no pad and no slot anywhere near it, so whatever it wants is not a thing I can be carrying.',
   },
   [ACT4_CLUE_ADMITTED]: {
     title: 'The floor on the far side of it was linoleum',
     detail:
-      'It let me in. The second time I put a foot over that sill the floor on the far\nside of it was linoleum. Nothing about me changed between the two attempts\nexcept what I had remembered in between.',
+      'It let me in. The second time I put a foot over that sill the floor on the far side of it was linoleum. Nothing about me changed between the two attempts except what I had remembered in between.',
   },
   [ACT4_CLUE_ROOM_COMPLETED]: {
     title: 'It completed',
     detail:
-      'The kitchen is built out of what four people remember of one afternoon. The\nparts all four of them looked at are exact. The parts nobody looked at are\nblank. There is a place in the middle of it, standing height, that the light\ntreats as occupied and that has nothing in it, and the room will not finish\nuntil somebody does that person\'s small ordinary business: takes his chair,\nlooks where he kept the spare, says the thing he said on the way out.\n\nIt only completes for the one who knew the part.\n\nIt completed.',
+      'The kitchen is built out of what four people remember of one afternoon. The parts all four of them looked at are exact. The parts nobody looked at are blank. There is a place in the middle of it, standing height, that the light treats as occupied and that has nothing in it, and the room will not finish until somebody does that person\'s small ordinary business: takes his chair, looks where he kept the spare, says the thing he said on the way out.\n\nIt only completes for the one who knew the part.\n\nIt completed.',
   },
   [ACT4_CLUE_HARVEST_WRONG]: {
     title: 'The good cloth is on the table',
     detail:
-      'On the film the good cloth is on the table. In the room the good cloth is off\nit and folded on the dresser. Four people built that kitchen out of what they\nhad and got that one wrong, and there is no way to be wrong about a thing like\nthat unless it was never looked at by anybody who was in the room.',
+      'On the film the good cloth is on the table. In the room the good cloth is off it and folded on the dresser. Four people built that kitchen out of what they had and got that one wrong, and there is no way to be wrong about a thing like that unless it was never looked at by anybody who was in the room.',
   },
 };
 
@@ -238,7 +238,7 @@ export const ACT4_O_QUESTIONS: NonNullable<WorldSlice['questions']> = {
     openWhen: { flag: ACT4_CHAMBER_ADMITTED },
     answerWhen: { flag: ACT4_CHAMBER_COMPLETE },
     answer:
-      'Because it was built out of four people and there were five, and the shape of\nwhat is missing from it is the shape of a man who took the first chair, kept\nthe spare key in the coffee jar, and said the same thing on his way out of a\ndoor for as long as anybody could remember. It stopped where you stood because\nyou were standing in the hole. It started again when you did his afternoon.',
+      'Because it was built out of four people and there were five, and the shape of what is missing from it is the shape of a man who took the first chair, kept the spare key in the coffee jar, and said the same thing on his way out of a door for as long as anybody could remember. It stopped where you stood because you were standing in the hole. It started again when you did his afternoon.',
   },
 };
 
@@ -258,25 +258,25 @@ export const ACT4_O_PUZZLES: NonNullable<WorldSlice['puzzles']> = {
       {
         id: 'chair',
         class: 'analytical',
-        note: 'SIT IN THE FIRST CHAIR when the voices call the game. Not the chair nearest the\ndoor and not the chair you would have chosen. The first one — the one at the\nend with its back to the window, which is empty and stays empty.',
+        note: 'SIT IN THE FIRST CHAIR when the voices call the game. Not the chair nearest the door and not the chair you would have chosen. The first one — the one at the end with its back to the window, which is empty and stays empty.',
       },
       {
         id: 'jar',
         class: 'analytical',
-        note: 'LOOK IN THE COFFEE JAR on the shelf over the stove. The drawer in the table is\nlocked and there is no key in this room, which is only true of rooms where\nnobody kept a spare. Somebody in this family always kept a spare, and always\nkept it in the same place, and said so often enough that it stuck.',
+        note: 'LOOK IN THE COFFEE JAR on the shelf over the stove. The drawer in the table is locked and there is no key in this room, which is only true of rooms where nobody kept a spare. Somebody in this family always kept a spare, and always kept it in the same place, and said so often enough that it stuck.',
       },
       {
         id: 'phrase',
         class: 'analytical',
-        note: 'SAY THE HOUSE RULE at the panel by the back door when the timer runs out. It\nwants a line, not a code. It is the thing the last one out of that kitchen said\nevery time, and you have heard it twice this week from two different people who\nhave never met.',
+        note: 'SAY THE HOUSE RULE at the panel by the back door when the timer runs out. It wants a line, not a code. It is the thing the last one out of that kitchen said every time, and you have heard it twice this week from two different people who have never met.',
       },
     ],
     hints: [
-      'There are two openings in that wall with light behind them, and one of them let\nyou in.',
-      'Nothing in this kitchen is locked except a drawer, and nothing in this kitchen is\nasking you a question except a panel by the back door, and neither of those is\nthe first thing that has to happen. Something is being waited for.',
-      'Listen to the speaker properly. They call the game, and then somebody says the\nrule, and then they leave a gap the length of a short answer, and nothing goes in\nit. There is a chair at that table nobody is in.',
-      'Three small ordinary things, in any order, and none of them is clever: take the\nchair the room is holding for you; find the spare key where that family always\nkept the spare of everything; and when the timer runs out, put in the thing the\nlast one out of that kitchen said, which you have heard this week from two people\nwho have never met.',
-      'SIT IN THE FIRST CHAIR — the end one, back to the window. LOOK IN THE JAR on the\nshelf over the stove, and use what is down the side of the glass on the drawer.\nWhen the panel comes up, type YOUNGEST GOES LAST, or HOUSE RULES; it takes\neither, because they are the same sentence in that house. If the room gets away\nfrom you, keep going: it resets, it never locks, and after two bad turns the\nvoices start helping.',
+      'There are two openings in that wall with light behind them, and one of them let you in.',
+      'Nothing in this kitchen is locked except a drawer, and nothing in this kitchen is asking you a question except a panel by the back door, and neither of those is the first thing that has to happen. Something is being waited for.',
+      'Listen to the speaker properly. They call the game, and then somebody says the rule, and then they leave a gap the length of a short answer, and nothing goes in it. There is a chair at that table nobody is in.',
+      'Three small ordinary things, in any order, and none of them is clever: take the chair the room is holding for you; find the spare key where that family always kept the spare of everything; and when the timer runs out, put in the thing the last one out of that kitchen said, which you have heard this week from two people who have never met.',
+      'SIT IN THE FIRST CHAIR — the end one, back to the window. LOOK IN THE JAR on the shelf over the stove, and use what is down the side of the glass on the drawer. When the panel comes up, type YOUNGEST GOES LAST, or HOUSE RULES; it takes either, because they are the same sentence in that house. If the room gets away from you, keep going: it resets, it never locks, and after two bad turns the voices start helping.',
     ],
   },
 };
@@ -291,8 +291,8 @@ export const ACT4_O_MEMORIES: NonNullable<WorldSlice['memories']> = {
   [ACT4_MEM_M10_ANALYTICAL]: {
     title: 'The Kitchen',
     lines: [
-      'The kitchen timer lived on the sill over the sink and it ran a minute and a half\nslow across its whole travel, which I had established over a summer and which\nnobody had asked me to establish.',
-      'Dad set it for the potatoes and went out to the yard. I put it back a turn.\nWhen it went off, the potatoes were done at the time he thought he had set it\nfor, and he said what he always said, which was that there was nothing wrong\nwith that timer.',
+      'The kitchen timer lived on the sill over the sink and it ran a minute and a half slow across its whole travel, which I had established over a summer and which nobody had asked me to establish.',
+      'Dad set it for the potatoes and went out to the yard. I put it back a turn. When it went off, the potatoes were done at the time he thought he had set it for, and he said what he always said, which was that there was nothing wrong with that timer.',
       'There is nothing wrong with that timer. That was never the claim.',
     ],
     trigger: {
@@ -308,9 +308,9 @@ export const ACT4_O_MEMORIES: NonNullable<WorldSlice['memories']> = {
   [ACT4_MEM_M10_SOCIAL]: {
     title: 'The Kitchen',
     lines: [
-      'The joke was that the youngest still could not say a particular long word, and\nthe joke was old by then, and she had started getting it wrong on purpose\nbecause a joke you do on purpose is one you own.',
+      'The joke was that the youngest still could not say a particular long word, and the joke was old by then, and she had started getting it wrong on purpose because a joke you do on purpose is one you own.',
       'All of us at that table going. Dad not going. Dad going.',
-      'I had the end seat with my back to the window, which is the seat you end up in\nif you are the one who gets up to take the picture.',
+      'I had the end seat with my back to the window, which is the seat you end up in if you are the one who gets up to take the picture.',
     ],
     trigger: {
       when: {
@@ -325,9 +325,9 @@ export const ACT4_O_MEMORIES: NonNullable<WorldSlice['memories']> = {
   [ACT4_MEM_M10_DIRECT]: {
     title: 'The Kitchen',
     lines: [
-      'The chair went under me on the back left leg, all at once, the way they do —\nthe dowel coming out of the socket dry and clean with no splinter on it\nanywhere.',
-      'I went down with the plate still level in my hand. I have never managed that\nsince and I did not manage it on purpose then.',
-      'The leg lay under the table for the rest of the afternoon and nobody picked it\nup, and I have thought about that leg more than the day deserves.',
+      'The chair went under me on the back left leg, all at once, the way they do — the dowel coming out of the socket dry and clean with no splinter on it anywhere.',
+      'I went down with the plate still level in my hand. I have never managed that since and I did not manage it on purpose then.',
+      'The leg lay under the table for the rest of the afternoon and nobody picked it up, and I have thought about that leg more than the day deserves.',
     ],
     trigger: {
       when: {
@@ -380,17 +380,17 @@ export const ACT4_L_CLUES: NonNullable<WorldSlice['clues']> = {
   [ACT4_CLUE_DETAIL_REFUSES]: {
     title: 'Nothing I am carrying was issued to me',
     detail:
-      'Two men stand on the doors of the staging area. They took the borrowed badge\nand read both sides of it and handed it back and did not move. Nothing I am\ncarrying was issued to me, because there is nobody for anything to be issued\nto.',
+      'Two men stand on the doors of the staging area. They took the borrowed badge and read both sides of it and handed it back and did not move. Nothing I am carrying was issued to me, because there is nobody for anything to be issued to.',
   },
   [ACT4_CLUE_MESSAGE_THROUGH]: {
     title: 'The post office is where the censor lives',
     detail:
-      "The letter went in folded the way Eli folds, with one of the family's own words\nin it and a numeral at the end of it where a signature goes, and it was handed\nacross a counter rather than posted. The post office is where the censor lives.",
+      "The letter went in folded the way Eli folds, with one of the family's own words in it and a numeral at the end of it where a signature goes, and it was handed across a counter rather than posted. The post office is where the censor lives.",
   },
   [ACT4_CLUE_LETTERS_FROM_JACK]: {
     title: 'Jack wrote none of them',
     detail:
-      "There is a folder in that room with years of letters from Jack in it. Cheerful.\nAsking after everybody. Not one of them asking for anything, not one of them\ncrossed out, and every one of them the same length. Jack's hand and Jack's\nsignature. Jack wrote none of them.",
+      "There is a folder in that room with years of letters from Jack in it. Cheerful. Asking after everybody. Not one of them asking for anything, not one of them crossed out, and every one of them the same length. Jack's hand and Jack's signature. Jack wrote none of them.",
   },
 };
 
@@ -400,7 +400,7 @@ export const ACT4_L_QUESTIONS: NonNullable<WorldSlice['questions']> = {
     openWhen: { clue: ACT4_CLUE_DETAIL_REFUSES },
     answerWhen: { flag: ACT4_LUKE_MET },
     answer:
-      'Not with anything you own. With a sheet of post-office paper, folded the way a\nsix-year-old folded them at the back of a hearing, with a word in it that only\nfive people ever used and a numeral at the bottom where a name goes — handed\nover a counter to somebody nobody has ever thought to search.',
+      'Not with anything you own. With a sheet of post-office paper, folded the way a six-year-old folded them at the back of a hearing, with a word in it that only five people ever used and a numeral at the bottom where a name goes — handed over a counter to somebody nobody has ever thought to search.',
   },
 };
 
@@ -415,25 +415,25 @@ export const ACT4_L_PUZZLES: NonNullable<WorldSlice['puzzles']> = {
       {
         id: 'pearl',
         class: 'social',
-        note: 'GIVE LETTER TO PEARL, at her counter, once the visit is announced. Write it at\nthe post office and fold it before you go — but do not post it. Two of three:\nthe fold, one of the family\'s own words, and a numeral last on the page.',
+        note: 'GIVE LETTER TO PEARL, at her counter, once the visit is announced. Write it at the post office and fold it before you go — but do not post it. Two of three: the fold, one of the family\'s own words, and a numeral last on the page.',
         route: { onOrAfterDay: ACT4_VISIT_DAY },
       },
       {
         id: 'whitlock',
         class: 'social',
-        note: 'GIVE LETTER TO WHITLOCK, once she has been shown paper she can hold. She goes\nin and out of that lobby with a folder and nobody in this county has ever asked\nher what is in it. Two of three: the fold, the word, the numeral.',
+        note: 'GIVE LETTER TO WHITLOCK, once she has been shown paper she can hold. She goes in and out of that lobby with a folder and nobody in this county has ever asked her what is in it. Two of three: the fold, the word, the numeral.',
         route: { all: [{ flag: ACT4_WHITLOCK_CONVINCED }, { onOrAfterDay: ACT4_VISIT_DAY }] },
       },
     ],
     hints: [
-      'There is one man alive who outranks the last door in that building, and the\ncounty has milled a road for him.',
-      'Two men stand between you and the room they are keeping him in, and they are\nthe only people in this county who have ever looked properly at what you are\ncarrying.',
-      'You cannot go through them and you cannot go round them. Something can, though.\nPaper has been reaching this family all week, and you know which kind reaches\nthem and which kind reaches somebody else first.',
-      'A letter that reads like everybody else\'s gets answered like everybody else\'s.\nThink about what is in a letter from his family that is not in a letter from a\nstranger: the way it is folded, a word only the five of them ever used,\nand what goes at the bottom where a name would.',
-      'Fold it the way you learned at the reader. Put one of the family\'s words in it.\nSign it with a numeral, last thing on the page. Then give it — do not post it,\nthe post office is where the other thing lives — to somebody nobody has ever\nthought to search: the woman at the counter, or the sheriff, if you have given\nher a reason.',
+      'There is one man alive who outranks the last door in that building, and the county has milled a road for him.',
+      'Two men stand between you and the room they are keeping him in, and they are the only people in this county who have ever looked properly at what you are carrying.',
+      'You cannot go through them and you cannot go round them. Something can, though. Paper has been reaching this family all week, and you know which kind reaches them and which kind reaches somebody else first.',
+      'A letter that reads like everybody else\'s gets answered like everybody else\'s. Think about what is in a letter from his family that is not in a letter from a stranger: the way it is folded, a word only the five of them ever used, and what goes at the bottom where a name would.',
+      'Fold it the way you learned at the reader. Put one of the family\'s words in it. Sign it with a numeral, last thing on the page. Then give it — do not post it, the post office is where the other thing lives — to somebody nobody has ever thought to search: the woman at the counter, or the sheriff, if you have given her a reason.',
     ],
     missedRecovery:
-      'The visit, once announced, does not leave. He stays in that room until the\nmessage reaches him, and the room is still there the day after.',
+      'The visit, once announced, does not leave. He stays in that room until the message reaches him, and the room is still there the day after.',
   },
 };
 
@@ -458,22 +458,22 @@ export const ACT4_E1_TASK_M_CLUES: NonNullable<WorldSlice['clues']> = {
   [ACT4_CLUE_LUKES_WORD]: {
     title: 'You spelled it right',
     detail:
-      'Noumena. He used it at a dinner table until it was the family\'s joke, and it is\nin the margin of the work book, and it is one of the three things that got a\nfolded piece of paper read by the President of the United States.',
+      'Noumena. He used it at a dinner table until it was the family\'s joke, and it is in the margin of the work book, and it is one of the three things that got a folded piece of paper read by the President of the United States.',
   },
   [ACT4_CLUE_LUKES_REASON]: {
     title: 'There was never an I',
     detail:
-      'He says there was never an I. He says their father was I: he paid for the\ntattoos, he sat in the chair first, and he put himself at the head of the row\nbecause he was the head of the row. He says Eli tells it differently, and that\nEli is wrong.',
+      'He says there was never an I. He says their father was I: he paid for the tattoos, he sat in the chair first, and he put himself at the head of the row because he was the head of the row. He says Eli tells it differently, and that Eli is wrong.',
   },
   [ACT4_CLUE_TWO_THING_DOOR]: {
     title: 'Behind it there is a stair',
     detail:
-      'The door at the end of the Sublevel 5 gallery takes a badge on the reader and\nthen a name on the pad. It took his. Behind it there is a stair, and the stair\ngoes down.',
+      'The door at the end of the Sublevel 5 gallery takes a badge on the reader and then a name on the pad. It took his. Behind it there is a stair, and the stair goes down.',
   },
   [ACT4_CLUE_NOT_THE_USER]: {
     title: 'There is nothing in it to refuse anybody with',
     detail:
-      'The reader beside the door at the bottom of the well did nothing at all for the\nPresident of the United States. It did not refuse him. There is nothing in it\nto refuse anybody with.',
+      'The reader beside the door at the bottom of the well did nothing at all for the President of the United States. It did not refuse him. There is nothing in it to refuse anybody with.',
   },
 };
 
@@ -497,7 +497,7 @@ export const ACT4_E1_TASK_N_CLUES: NonNullable<WorldSlice['clues']> = {
   [ACT4_CLUE_JACK_SAW]: {
     title: 'It has been a numeral since the first morning',
     detail:
-      'Jack took my wrist under the inspection lamp in the maintenance bay and turned\nthe arm over and looked at what is under the skin there. He did not say\nanything. He has not said anything about it since.',
+      'Jack took my wrist under the inspection lamp in the maintenance bay and turned the arm over and looked at what is under the skin there. He did not say anything. He has not said anything about it since.',
   },
 };
 
@@ -539,7 +539,7 @@ export const ACT4_E2_TASK_Q_CLUES: NonNullable<WorldSlice['clues']> = {
   [ACT4_CLUE_SKY_IS_CEILING]: {
     title: 'Same arrangement, confirmed',
     detail:
-      'Her film and the Polaroid, side by side under the safelight. Same arrangement,\nconfirmed — the film is sharp and the discs on the Polaroid are the same discs.\n\nAnd on the film only, because it was open on a tripod for a long time and the\nnegative was pushed: straight lines behind the stars. Faint, but straight, and\nthey meet, and they do not meet at any angle that anything in a sky meets at.\nWhere two of them cross the black is a different black and it has an edge, and\nbehind the edge there is structure — the kind a thing has when it was made\nrather than when it grew.\n\nTwo skies. Eighty million miles. One arrangement, and the seams are in both of\nthem; you can only see them on the one that was photographed properly.',
+      'Her film and the Polaroid, side by side under the safelight. Same arrangement, confirmed — the film is sharp and the discs on the Polaroid are the same discs.\n\nAnd on the film only, because it was open on a tripod for a long time and the negative was pushed: straight lines behind the stars. Faint, but straight, and they meet, and they do not meet at any angle that anything in a sky meets at. Where two of them cross the black is a different black and it has an edge, and behind the edge there is structure — the kind a thing has when it was made rather than when it grew.\n\nTwo skies. Eighty million miles. One arrangement, and the seams are in both of them; you can only see them on the one that was photographed properly.',
   },
 };
 
@@ -561,25 +561,25 @@ export const ACT4_E2_TASK_Q_PUZZLES: NonNullable<WorldSlice['puzzles']> = {
       {
         id: 'ask_sissy',
         class: 'social',
-        note: 'ASK SISSY ABOUT THE FILM once she has told you about the launch. She will hand\nit over. She has been waiting a year for somebody to want it.',
+        note: 'ASK SISSY ABOUT THE FILM once she has told you about the launch. She will hand it over. She has been waiting a year for somebody to want it.',
       },
       {
         id: 'show_polaroid',
         class: 'analytical',
-        note: 'SHOW HER THE NIGHT-SKY POLAROID. She will look at it for a long time and then\ngo and get the canister without being asked.',
+        note: 'SHOW HER THE NIGHT-SKY POLAROID. She will look at it for a long time and then go and get the canister without being asked.',
       },
       {
         id: 'take_film',
         class: 'direct',
-        note: 'TAKE THE FILM out of the camera on the tripod in the dome while she is down in\nthe galley. It is not locked and it is not hidden and she never asks for it\nback, which is its own answer about her.',
+        note: 'TAKE THE FILM out of the camera on the tripod in the dome while she is down in the galley. It is not locked and it is not hidden and she never asks for it back, which is its own answer about her.',
       },
     ],
     hints: [
-      'Everything anybody has told you comes down a wire, and the wire is the one place\nthis world has ever been caught changing its mind. Her sky does not have to.',
-      'She was told to stop shooting film and she did not stop. Ask her about it, or\nshow her the one photograph of a sky you already own, or go up the ladder and\nlook at what is on the tripod.',
-      'A roll of exposed film is worth nothing at all until somebody puts it through\nchemistry, and there is exactly one room in this county with the chemistry in it.\nYou have walked past its door and read the plate on it.',
-      'The library annex, past the drawer bank. It is locked and it has been locked\nsince before you got here. There is more than one way into a door like that: the\nthing you have been prying with all week, or the key that whoever used that room\nlast did not take home with them.',
-      'Open the darkroom — PRY DOOR WITH CHAIR LEG, or SEARCH THE SHELF the sign-in book\nstands on and use the key. DEVELOP FILM; develop both canisters while you are in\nthere, they take the same hour. Then put her print and the night-sky Polaroid\nside by side: COMPARE PRINT WITH POLAROID.',
+      'Everything anybody has told you comes down a wire, and the wire is the one place this world has ever been caught changing its mind. Her sky does not have to.',
+      'She was told to stop shooting film and she did not stop. Ask her about it, or show her the one photograph of a sky you already own, or go up the ladder and look at what is on the tripod.',
+      'A roll of exposed film is worth nothing at all until somebody puts it through chemistry, and there is exactly one room in this county with the chemistry in it. You have walked past its door and read the plate on it.',
+      'The library annex, past the drawer bank. It is locked and it has been locked since before you got here. There is more than one way into a door like that: the thing you have been prying with all week, or the key that whoever used that room last did not take home with them.',
+      'Open the darkroom — PRY DOOR WITH CHAIR LEG, or SEARCH THE SHELF the sign-in book stands on and use the key. DEVELOP FILM; develop both canisters while you are in there, they take the same hour. Then put her print and the night-sky Polaroid side by side: COMPARE PRINT WITH POLAROID.',
     ],
   },
 };
@@ -606,17 +606,17 @@ export const ACT4_P_CLUES: NonNullable<WorldSlice['clues']> = {
   [ACT4_CLUE_SISSY_COUNTS_THREE]: {
     title: 'She has three brothers',
     detail:
-      'She has three brothers. She said it the way you say a thing that has never had\na reason to be said carefully — counting off what each of them was doing on the\nday she went up, and stopping when she ran out of them.',
+      'She has three brothers. She said it the way you say a thing that has never had a reason to be said carefully — counting off what each of them was doing on the day she went up, and stopping when she ran out of them.',
   },
   [ACT4_CLUE_SISSYS_REASON]: {
     title: 'Her account of why the sheet starts at two',
     detail:
-      'Her account of why the sheet starts at two: the first one did not take. The man\nput it on somebody, it healed out to a smear inside a year, and rather than sit\nthat one down again they moved the whole row up. She cannot tell me which of\nthem it was on. Eli says the parlour refused to do a single upright at all.\nThe President says their father was I and there never was another. All three of them are\ncertain and no two of them agree, and not one of them has mentioned birth\norder, which is the only version I was given by anybody who lives here.',
+      'Her account of why the sheet starts at two: the first one did not take. The man put it on somebody, it healed out to a smear inside a year, and rather than sit that one down again they moved the whole row up. She cannot tell me which of them it was on. Eli says the parlour refused to do a single upright at all. The President says their father was I and there never was another. All three of them are certain and no two of them agree, and not one of them has mentioned birth order, which is the only version I was given by anybody who lives here.',
   },
   [ACT4_CLUE_SAME_ARRANGEMENT]: {
     title: 'The same arrangement, held against the dome',
     detail:
-      'Held up against the dome: the bright one, and the long shallow triangle of\nsmaller ones under it, and the close pair below and left of that, all in the\nsame positions and the same proportions as they are on a Polaroid of a porch roof in\nSouth Dakota. The Polaroid is out of focus and cannot prove anything on its\nown. The arrangement is the arrangement.',
+      'Held up against the dome: the bright one, and the long shallow triangle of smaller ones under it, and the close pair below and left of that, all in the same positions and the same proportions as they are on a Polaroid of a porch roof in South Dakota. The Polaroid is out of focus and cannot prove anything on its own. The arrangement is the arrangement.',
   },
 };
 
@@ -643,17 +643,17 @@ export const ACT4_P_QUESTIONS: NonNullable<WorldSlice['questions']> = {
 Object.assign(ACT4_P_QUESTIONS[ACT4_Q_THE_SKY]!, {
   answerWhen: { clue: ACT4_CLUE_SKY_IS_CEILING },
   answer:
-    'It is the same one. Her camera and a Polaroid of a porch roof in South Dakota\ntook the same arrangement of stars, and the film is good enough to show what\nthe Polaroid never could: the lines behind them, and where the lines cross.\nNobody up there is looking at anything the people down here are not looking at.',
+    'It is the same one. Her camera and a Polaroid of a porch roof in South Dakota took the same arrangement of stars, and the film is good enough to show what the Polaroid never could: the lines behind them, and where the lines cross. Nobody up there is looking at anything the people down here are not looking at.',
 });
 
 export const ACT4_P_MEMORIES: NonNullable<WorldSlice['memories']> = {
   [ACT4_MEM_M11]: {
     title: 'One Sky',
     lines: [
-      'A field with the truck backed into it and the tailgate down and four of us up on\nthe bed of it with our necks back, and the cold coming up out of the ground into\nthe metal into us.',
-      'The one who does energy had worked out to the minute when it would clear the\nhorizon and had told everybody twice. The youngest of the boys had driven all day\nand would not say so. I had the blanket, because I was the oldest, which is not a\nprivilege, it is a duty about blankets.',
-      'And the sky over that field was the sky over that field: the whole enormous\nordinary lot of it, going all the way down to the fence line, with nothing of hers\nin it yet.',
-      'We watched a nothing for a long time and then there was a thing in it going up,\nand one of them said her name, and none of us said anything else at all.',
+      'A field with the truck backed into it and the tailgate down and four of us up on the bed of it with our necks back, and the cold coming up out of the ground into the metal into us.',
+      'The one who does energy had worked out to the minute when it would clear the horizon and had told everybody twice. The youngest of the boys had driven all day and would not say so. I had the blanket, because I was the oldest, which is not a privilege, it is a duty about blankets.',
+      'And the sky over that field was the sky over that field: the whole enormous ordinary lot of it, going all the way down to the fence line, with nothing of hers in it yet.',
+      'We watched a nothing for a long time and then there was a thing in it going up, and one of them said her name, and none of us said anything else at all.',
     ],
     trigger: { when: { all: [{ met: ACT4_SISSY }, { flag: ACT4_SISSY_TOPIC_LAUNCH }] } },
   },

@@ -101,7 +101,7 @@ describe('the ledger under a numeral — canon 105 (fixed-phrase form)', () => {
     expect(rendered).toMatch(/SUBJECT JULES I .+ DEPRECATED/);
     expect(rendered).toMatch(/SUBJECT \[UNRESOLVED\] .+ MAINTENANCE/);
     expect(rendered).toMatch(/read before and it has not improved/);
-    expect(rendered).toMatch(/what it puts when there\nis not one/);
+    expect(rendered).toMatch(/what it puts when there is not one/);
     expect(after.state.flags[ACT4_NUMERAL_SEARCHED]).toBe(true);
     expect(after.state.clues).toContain(ACT4_CLUE_FILED_UNDER_ONE);
     expect(after.state.clues).not.toContain(ACT4_CLUE_PROFILED);

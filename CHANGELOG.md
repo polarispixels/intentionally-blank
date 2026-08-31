@@ -12,6 +12,21 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [1.0.1] - 2026-08-31
+
+### Fixed
+
+- **Choppy mid-sentence line breaks across nearly the entire prose corpus**
+  (~96 content files, ~3,400 instances). Authored prose had been hard-wrapped
+  at ~80 columns in the source `.ts` files, with the literal `\n` landing
+  mid-word or mid-clause; combined with the transcript's `white-space:
+  pre-wrap`, this produced the choppy, inconsistent line breaks players saw
+  in nearly every paragraph (found by Ryan, playing from the landing).
+  Collapsed stray mid-clause `\n` runs to a single space; left genuine
+  paragraph breaks (`\n\n`) and column-aligned/tabular content (gauge
+  readouts, terminal panels, the `HELP` verb lists) untouched. Test fixtures
+  with hardcoded prose excerpts updated to match.
+
 ## [1.0.0] - 2026-08-31
 
 **Stage F — polish. The game is done.** Plan:

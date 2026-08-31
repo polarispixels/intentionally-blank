@@ -359,7 +359,7 @@ const followText = '"I\'m not going anywhere." She turns a page. "That\'s the jo
 // ---------------------------------------------------------------------------
 
 const GIVE_LETTER_TEXT =
-  'She reads the outside of it, and then she reads you, which takes longer.\n\n"I\'m liaison," she says. "That means I stand in a lobby tomorrow next to a man\nwho won\'t give me his first name. It also means I walk in and out of that lobby\nwith a folder under my arm, and nobody has ever asked me what\'s in it."\n\nThe folder comes off the desk and the letter goes into it.\n\n"I\'m not carrying anything I\'d have to lie about. Is there anything in there\nI\'d have to lie about?"\n\nYou tell her no.\n\n"Right," she says, because she has never yet asked a man twice.';
+  'She reads the outside of it, and then she reads you, which takes longer.\n\n"I\'m liaison," she says. "That means I stand in a lobby tomorrow next to a man who won\'t give me his first name. It also means I walk in and out of that lobby with a folder under my arm, and nobody has ever asked me what\'s in it."\n\nThe folder comes off the desk and the letter goes into it.\n\n"I\'m not carrying anything I\'d have to lie about. Is there anything in there I\'d have to lie about?"\n\nYou tell her no.\n\n"Right," she says, because she has never yet asked a man twice.';
 
 const giveResponses: ShowResponseDef[] = [
   {

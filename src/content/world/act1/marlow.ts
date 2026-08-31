@@ -206,7 +206,7 @@ const topics: TopicDef[] = [
     response: [
       {
         when: { flag: ACT4_VISIT_ANNOUNCED },
-        text: '"Three names went in Tuesday." He has both hands on the book and does not open\nit. "Three rooms, a week in advance, paid."\n\nHe turns the register a quarter turn towards you, which from him is a speech,\nand then turns it back.\n\n"One hand wrote all three."',
+        text: '"Three names went in Tuesday." He has both hands on the book and does not open it. "Three rooms, a week in advance, paid."\n\nHe turns the register a quarter turn towards you, which from him is a speech, and then turns it back.\n\n"One hand wrote all three."',
       },
       {
         when: { flag: FLAG_REGISTER_IMPRESSION_FOUND },
@@ -271,7 +271,7 @@ const topics: TopicDef[] = [
   {
     id: TOPIC_HORSES,
     words: ['horse', 'horses', 'rail', 'hitching rail', 'whose horses', 'owner'],
-    response: 'Marlow looks at the ceiling for a moment. "They were there when I came."\n\nThen, because you are still standing there: "Nobody\'s ever said whose. And\nnobody\'s ever asked me before tonight."',
+    response: 'Marlow looks at the ceiling for a moment. "They were there when I came."\n\nThen, because you are still standing there: "Nobody\'s ever said whose. And nobody\'s ever asked me before tonight."',
     effects: [{ set: [ACT2_HORSE_BORROWED, true] }],
   },
 ];

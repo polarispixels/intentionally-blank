@@ -54,18 +54,18 @@ import {
 // ---------------------------------------------------------------------------
 
 const manifoldsExamine =
-  'Headers of about ten inches running the length of the wall on saddles, with\nthe branches coming off them in pairs, and every pair tagged: a brass disc on\na wire, stamped, hanging from the valve handle.\n\nFlow is red at the collars and return is blue, and none of it has been allowed\nto go grey anywhere. Somebody with a paint pot and a slow afternoon has kept\nthis room exactly as legible as it was on the day it was commissioned, and has\ndone it more than once.\n\nTwo of the returns are bigger than the rest and come up out of the floor at\nthe back, side by side, into the same rank of saddles.';
+  'Headers of about ten inches running the length of the wall on saddles, with the branches coming off them in pairs, and every pair tagged: a brass disc on a wire, stamped, hanging from the valve handle.\n\nFlow is red at the collars and return is blue, and none of it has been allowed to go grey anywhere. Somebody with a paint pot and a slow afternoon has kept this room exactly as legible as it was on the day it was commissioned, and has done it more than once.\n\nTwo of the returns are bigger than the rest and come up out of the floor at the back, side by side, into the same rank of saddles.';
 
 const readTagsText =
-  'Stamped brass, one blow to a letter, in a hand that leaned on the R.\n\n    CH-1 FLOW\n    CH-1 RTN\n    CH-2 FLOW\n    CH-2 RTN\n    HALL A FLOW\n    RETURN A\n    RETURN B\n\nSeven of them, hanging on seven wires, all going the same way round.';
+  'Stamped brass, one blow to a letter, in a hand that leaned on the R.\n\n    CH-1 FLOW CH-1 RTN CH-2 FLOW CH-2 RTN HALL A FLOW RETURN A RETURN B\n\nSeven of them, hanging on seven wires, all going the same way round.';
 
 const valveText =
-  'The handle takes your hand and does not take your weight. There is a tag on it\nthat tells you what it does, and a lock-off hasp beside the tag, and behind\nthe hasp there is an interlock with the chiller it feeds, and the interlock is\nnot a suggestion.\n\nAlso: every gauge in this building would know within the minute, and one of\nthem is in a room with a man in it.';
+  'The handle takes your hand and does not take your weight. There is a tag on it that tells you what it does, and a lock-off hasp beside the tag, and behind the hasp there is an interlock with the chiller it feeds, and the interlock is not a suggestion.\n\nAlso: every gauge in this building would know within the minute, and one of them is in a room with a man in it.';
 
 // §10.9's "read gauges" — hung on the manifolds (the room's own gauges are
 // otherwise scenery in the description, per this task's own report).
 const gaugesText =
-  'Suction, discharge, and two temperatures for each machine, all of them within\nthe marked bands, all of them where a man who came in here every morning would\nwant to find them.';
+  'Suction, discharge, and two temperatures for each machine, all of them within the marked bands, all of them where a man who came in here every morning would want to find them.';
 
 const manifolds: ObjectDefSlice = {
   location: ACT3_COOLING_PLANT,
@@ -83,10 +83,10 @@ const manifolds: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const returnAExamine =
-  'Twelve inches, lagged to the last inch, with the lagging cut square around the\ntag and the tag stamped RETURN A. The vapour barrier sweats where it has been\nnicked, and the nick has been taped.\n\nIt comes up out of the floor at the back and goes into the header two saddles\nalong.';
+  'Twelve inches, lagged to the last inch, with the lagging cut square around the tag and the tag stamped RETURN A. The vapour barrier sweats where it has been nicked, and the nick has been taped.\n\nIt comes up out of the floor at the back and goes into the header two saddles along.';
 
 const returnATouch =
-  'Through the lagging there is nothing to feel at all, which is what lagging is\nfor.\n\nWhere the lagging is cut back at the tag, the steel is cold — properly cold,\ncold enough that in a room this temperature you would keep your hand on it a\nmoment longer than you needed to.';
+  'Through the lagging there is nothing to feel at all, which is what lagging is for.\n\nWhere the lagging is cut back at the tag, the steel is cold — properly cold, cold enough that in a room this temperature you would keep your hand on it a moment longer than you needed to.';
 
 // `validate.ts`'s `noise-word-vocabulary` check rejects a bare "a" (an
 // English article, `NOISE_WORDS`) as a noun/adjective on ANY object — it is
@@ -111,15 +111,15 @@ const returnA: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const returnBExamine =
-  'Twelve inches. The same saddle rank, the same blue, the same lagging, the same\nbrass disc on the same gauge of wire, stamped in the same hand:\n\n    RETURN B\n\nIt comes up out of the floor beside A and goes into the header two saddles\nfurther along, and there is nothing about it anywhere that is not exactly like\nthe other one, except that its lagging has been cut and re-taped a good deal\nmore often.';
+  'Twelve inches. The same saddle rank, the same blue, the same lagging, the same brass disc on the same gauge of wire, stamped in the same hand:\n\n    RETURN B\n\nIt comes up out of the floor beside A and goes into the header two saddles further along, and there is nothing about it anywhere that is not exactly like the other one, except that its lagging has been cut and re-taped a good deal more often.';
 
-const returnBTouch = 'Warm.\n\nNot hot. Warm the way a mug is warm twenty minutes after. You take your hand\noff it and put it back to be sure, and it is still warm, and A, three feet\naway, is still cold.\n\nWater comes back warm from the thing it was sent to cool.';
+const returnBTouch = 'Warm.\n\nNot hot. Warm the way a mug is warm twenty minutes after. You take your hand off it and put it back to be sure, and it is still warm, and A, three feet away, is still cold.\n\nWater comes back warm from the thing it was sent to cool.';
 
 const returnBFollow =
-  'Up from the floor, into the header, and away along the wall with the rest of\nthem to the chillers, which is the boring half.\n\nDown is the other half, and down goes into the floor, and the floor here is a\npoured slab with a hatch in it at the back of the room.';
+  'Up from the floor, into the header, and away along the wall with the rest of them to the chillers, which is the boring half.\n\nDown is the other half, and down goes into the floor, and the floor here is a poured slab with a hatch in it at the back of the room.';
 
 const returnBSmell =
-  'Warm steel and warm paint. Under it, faintly, the flat mineral smell of\ntreated water where a gland is weeping about a drop an hour into a puddle the\nsize of a coin that has been there long enough to have a ring round it.';
+  'Warm steel and warm paint. Under it, faintly, the flat mineral smell of treated water where a gland is weeping about a drop an hour into a puddle the size of a coin that has been there long enough to have a ring round it.';
 
 const warmReturnEffects: Effect[] = [{ say: returnBTouch }, { grantClue: ACT3_CLUE_WARM_RETURN }, { openQuestion: ACT3_Q_SECOND_RETURN }];
 
@@ -147,13 +147,13 @@ const returnB: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const drawingExamine =
-  'Behind glass, in a frame with one mitre coming apart at the corner: the\nchilled-water system, drawn properly, to a scale, with a title block bottom\nright and a revision table above the title block.\n\nChillers. Pumps. Headers. Flow, in red. Return, in blue.\n\nOne return.\n\nThe revision table has four rows in it. The last is dated 2031 and its\ndescription column reads: CONSTRUCTION ADIT ISOLATED FROM PLANT LOOP.';
+  'Behind glass, in a frame with one mitre coming apart at the corner: the chilled-water system, drawn properly, to a scale, with a title block bottom right and a revision table above the title block.\n\nChillers. Pumps. Headers. Flow, in red. Return, in blue.\n\nOne return.\n\nThe revision table has four rows in it. The last is dated 2031 and its description column reads: CONSTRUCTION ADIT ISOLATED FROM PLANT LOOP.';
 
 const compareDrawingText =
-  'You put a finger on the glass where the returns come into the header. There is\none line there. It is tagged A.\n\nYou take the finger off the glass and look at the wall, where there are two\npipes in two saddles with two brass discs on them — and the second disc is\nstamped in the same hand as the first, by the same person, on the same day,\nout of the same box of blanks.';
+  'You put a finger on the glass where the returns come into the header. There is one line there. It is tagged A.\n\nYou take the finger off the glass and look at the wall, where there are two pipes in two saddles with two brass discs on them — and the second disc is stamped in the same hand as the first, by the same person, on the same day, out of the same box of blanks.';
 
 const drawingBehindText =
-  'Four screws through four brass cups, and behind the frame there will be\nnothing but block and a rectangle of paint the colour the rest of the wall\nused to be.';
+  'Four screws through four brass cups, and behind the frame there will be nothing but block and a rectangle of paint the colour the rest of the wall used to be.';
 
 const compareDrawingEffects: Effect[] = [{ say: compareDrawingText }, { grantClue: ACT3_CLUE_WARM_RETURN }, { openQuestion: ACT3_Q_SECOND_RETURN }];
 
@@ -183,21 +183,21 @@ const drawing: ObjectDefSlice = {
 const hatchExamine: ProseRule[] = [
   {
     when: { flag: ACT3_HATCH_OPEN },
-    text: 'The plate is standing against the wall on its edge, and the hole it came out\nof is a yard square with a ladder going down the near side of it, and the air\nthat comes up out of it is warmer than this room is.',
+    text: 'The plate is standing against the wall on its edge, and the hole it came out of is a yard square with a ladder going down the near side of it, and the air that comes up out of it is warmer than this room is.',
   },
   {
-    text: 'A steel plate about a yard square let into the floor at the back, bolted at\neight points, with a lifting eye at one corner and a stencil across the middle\nof it:\n\n    PIPE CHASE\n    CONFINED SPACE — PERMIT REQUIRED\n\nThe paint on the bolt heads is broken on all eight, which is what bolt heads\nlook like when they have been out and back.',
+    text: 'A steel plate about a yard square let into the floor at the back, bolted at eight points, with a lifting eye at one corner and a stencil across the middle of it:\n\n    PIPE CHASE CONFINED SPACE — PERMIT REQUIRED\n\nThe paint on the bolt heads is broken on all eight, which is what bolt heads look like when they have been out and back.',
   },
 ];
 
 const unboltWithWrenchText =
-  "Jack's wrench off the truck's toolbox fits them, which is not luck; there are\nabout four sizes of bolt in the world and this is one of them.\n\nSeven come out grudgingly. The eighth comes out easy, and then a second one\ncomes out easy, and then you stop and look at the other six, and it becomes\nclear that two of these eight bolts have been doing all of the work for some\ntime and the rest have been resting.\n\nThe plate comes up on the eye and stands against the wall, and out of the hole\ncomes air that is warmer than this room.";
+  "Jack's wrench off the truck's toolbox fits them, which is not luck; there are about four sizes of bolt in the world and this is one of them.\n\nSeven come out grudgingly. The eighth comes out easy, and then a second one comes out easy, and then you stop and look at the other six, and it becomes clear that two of these eight bolts have been doing all of the work for some time and the rest have been resting.\n\nThe plate comes up on the eye and stands against the wall, and out of the hole comes air that is warmer than this room.";
 
 const pryWithLegText =
-  'There is a lip at the eye corner, and there is a chair leg in your possession\nthat has already been asked to do worse than this.\n\nYou get it under, and lean, and the plate comes up against eight bolts that\nturn out to be doing rather less than eight bolts should. Two of them lift\nthrough the plate still in their holes. The rest were never in anything.\n\nThe plate goes over on its edge against the wall, and out of the hole comes\nair that is warmer than this room.';
+  'There is a lip at the eye corner, and there is a chair leg in your possession that has already been asked to do worse than this.\n\nYou get it under, and lean, and the plate comes up against eight bolts that turn out to be doing rather less than eight bolts should. Two of them lift through the plate still in their holes. The rest were never in anything.\n\nThe plate goes over on its edge against the wall, and out of the hole comes air that is warmer than this room.';
 
 const neitherToolText =
-  'Eight bolts, a lifting eye and a lip. You have hands, and hands are the one\ntool this is not going to come up for.\n\nThere is a wrench in the box on the truck and there is a chair leg that has\nbeen earning its keep since the first morning.';
+  'Eight bolts, a lifting eye and a lip. You have hands, and hands are the one tool this is not going to come up for.\n\nThere is a wrench in the box on the truck and there is a chair leg that has been earning its keep since the first morning.';
 
 const openHatchEffects: Effect[] = [
   {
@@ -233,7 +233,7 @@ const pryHatchEffects: Effect[] = [
 // retired for this route; see that file's own header for why it is not
 // deleted outright.
 export const HATCH_DOWN_TEXT =
-  'The ladder goes down the near side of the hole, and it is a proper ladder,\nbolted through the slab, with the rungs worn on top and not on the sides.\n\nThe air coming up past you is warmer than the room and it is moving.';
+  'The ladder goes down the near side of the hole, and it is a proper ladder, bolted through the slab, with the rungs worn on top and not on the sides.\n\nThe air coming up past you is warmer than the room and it is moving.';
 
 const hatchDownEffects: Effect[] = [{ say: HATCH_DOWN_TEXT }, { advanceClock: 10 }, { goto: ACT3_PIPE_CHASE }];
 
@@ -255,9 +255,9 @@ const hatch: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const yardDoorExamine =
-  'Steel, outward-opening, with a panic bar on the inside, a reader on the\noutside, and a rubber mat in front of it that has had a very great deal of\nuse.\n\nFrom in here it opens by being pushed.\n\nEverything in this building opens easily from the inside.';
+  'Steel, outward-opening, with a panic bar on the inside, a reader on the outside, and a rubber mat in front of it that has had a very great deal of use.\n\nFrom in here it opens by being pushed.\n\nEverything in this building opens easily from the inside.';
 
-export const YARD_DOOR_OUT_TEXT = 'The bar goes down under your hip and the door goes out into cold, and the\napron is where you left it, and the light on the pole is doing what it does.';
+export const YARD_DOOR_OUT_TEXT = 'The bar goes down under your hip and the door goes out into cold, and the apron is where you left it, and the light on the pole is doing what it does.';
 
 const yardDoor: ObjectDefSlice = {
   location: ACT3_COOLING_PLANT,
@@ -274,7 +274,7 @@ const yardDoor: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const floorText =
-  'Poured slab, sealed, and slightly damp at the back of the room in a patch that\nhas an edge to it — an edge the shape of somebody having mopped up to a line\nand stopped.';
+  'Poured slab, sealed, and slightly damp at the back of the room in a patch that has an edge to it — an edge the shape of somebody having mopped up to a line and stopped.';
 
 const plantFloor: ObjectDefSlice = {
   location: ACT3_COOLING_PLANT,
@@ -284,7 +284,7 @@ const plantFloor: ObjectDefSlice = {
 };
 
 const stepText =
-  'There is a step by the hall door and it is warm and it is the first warm\nthing in this county that has not been somebody\'s kitchen. You sit on it for a\nminute.';
+  'There is a step by the hall door and it is warm and it is the first warm thing in this county that has not been somebody\'s kitchen. You sit on it for a minute.';
 
 const plantStep: ObjectDefSlice = {
   location: ACT3_COOLING_PLANT,
@@ -359,13 +359,13 @@ if (!ACT1_VERBS[BREAK]!.patterns.includes('V dobj prep iobj')) {
 }
 
 const alarmExamine =
-  'Between the two chillers, at head height on a stanchion, a red steel box with a\nglass front and a small hammer on a chain beside it. Under the glass, a handle,\nand beside the handle a legend:\n\n    CHILLER TRIP - PULL\n\nSomebody has painted the stanchion around the box and cut in neatly at its\nedges, which means the box was there before the paint and nobody has ever had\ncause to take it off.';
+  'Between the two chillers, at head height on a stanchion, a red steel box with a glass front and a small hammer on a chain beside it. Under the glass, a handle, and beside the handle a legend:\n\n    CHILLER TRIP - PULL\n\nSomebody has painted the stanchion around the box and cut in neatly at its edges, which means the box was there before the paint and nobody has ever had cause to take it off.';
 
 const alarmPullAgainText =
-  'The glass is already out of it and the handle is already down, and a handle\nthat is already down is not a plan.';
+  'The glass is already out of it and the handle is already down, and a handle that is already down is not a plan.';
 
 const alarmResetText =
-  'It goes back up, and it stays up, and the chiller does not restart, because\nthese things are built so that a man has to go and look at the thing before the\nthing runs again.\n\nYou are not going to be the man who goes and looks at it.';
+  'It goes back up, and it stays up, and the chiller does not restart, because these things are built so that a man has to go and look at the thing before the thing runs again.\n\nYou are not going to be the man who goes and looks at it.';
 
 const chillerAlarm: ObjectDefSlice = {
   location: ACT3_COOLING_PLANT,

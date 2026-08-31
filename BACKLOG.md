@@ -34,7 +34,7 @@ board above is the plan. This table is what is *left*.
 
 | # | Remaining | Type |
 |---|---|---|
-| post-1.0 | `CALL <name>` dobj forms; `SISSY, HELLO` npc-address grammar; per-route answer variants (`ProseRule[]` on `QuestionDef.answer`); the spec-07 expansion queue (DC/Rushmore/PR/station, Catan) | Engine + content |
+| post-1.0 | `CALL <name>` dobj forms; `SISSY, HELLO` npc-address grammar; per-route answer variants (`ProseRule[]` on `QuestionDef.answer`); the spec-07 expansion queue (DC/Rushmore/PR/station, Catan); `USE <dobj> to <verb> <iobj>` grammar (see below) | Engine + content |
 
 **Ryan's to decide, blocking nothing:** the town still has no name. Wave 3
 dodges it with a `TOWN LIMITS / POP. 412` marker that carries no name, which
@@ -101,6 +101,22 @@ any scene where the player composes text — a `'V text'` pattern in
 `parser/grammar.ts`, plus §2.9's pattern list in the architecture spec.
 Note the censor puzzles (P13, P22) compose through *prompt scripts*, not
 the verb grammar, so they are unaffected.
+
+## Grammar gap: `USE <dobj> to <verb> <iobj>` misroutes to exit-blocked prose
+
+Found post-1.0 (Ryan, playing from the landing with the room key in hand).
+`USE_VERB_ID` only declares the `'V dobj'` pattern (`src/content/world/act1/verbs.ts:838`)
+and does not list "to" as a preposition, so `USE ROOM KEY TO LOCK DOOR` never
+resolves as `USE <dobj> <prep> <iobj>`. The whole tail `"room key to lock
+door"` collapses into one noun phrase, resolves to the door, and — because
+USE-ing a closed exit door falls through to traversal logic — the player
+gets the generic blocked-exit family (`move.blocked`, `src/content/responses.ts:214`,
+"Something stands between you and that direction...") instead of anything
+about locking. Plain `LOCK DOOR` / `CLOSE DOOR` are unaffected and correctly
+hit the door's authored bolt prose. Needs a `'V dobj prep iobj'` pattern (or
+"to" recognized as a preposition) on `USE`, routing to the named verb rather
+than treating it as another noun. Parser grammar — full ceremony, not a
+tiny fix.
 
 ## Known defect in 0.3.0: reload shows a blank transcript
 

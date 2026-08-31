@@ -109,7 +109,7 @@ export const NOLAN_VERBATIM_LINE = "I slept like a stone last night and I couldn
 // ---------------------------------------------------------------------------
 
 export const POKER_NIGHT_DINER_TEXT =
-  'The chairs are down.\n\nThat is the first thing, and it takes a second to work out why it matters:\nevery other time you have stood in this doorway, half the chairs have been\nupside down on the tables at the dark end, and tonight they are down, and the\ntables they belong to are pushed back against the booths to make a floor.\n\nOne table is lit, in the middle of it, under a shade somebody has pulled lower\non its flex. Three people are sitting at it and there is a fourth chair.\n\nNolan has his back to the counter, in a cardigan, dealing. The sheriff is\nacross from him out of uniform except for the badge, which is sewn on. Jack is\nin the third chair with his back to the window, which is where Jack would sit.\n\nPearl is not playing. Pearl is standing at the end of the counter with a cloth\nand the pie case turning behind her, watching the table the way you watch\nweather.';
+  'The chairs are down.\n\nThat is the first thing, and it takes a second to work out why it matters: every other time you have stood in this doorway, half the chairs have been upside down on the tables at the dark end, and tonight they are down, and the tables they belong to are pushed back against the booths to make a floor.\n\nOne table is lit, in the middle of it, under a shade somebody has pulled lower on its flex. Three people are sitting at it and there is a fourth chair.\n\nNolan has his back to the counter, in a cardigan, dealing. The sheriff is across from him out of uniform except for the badge, which is sewn on. Jack is in the third chair with his back to the window, which is where Jack would sit.\n\nPearl is not playing. Pearl is standing at the end of the counter with a cloth and the pie case turning behind her, watching the table the way you watch weather.';
 
 // ---------------------------------------------------------------------------
 // §14.1 — Pearl's greeting, Friday night (wired by `pearl.ts`'s own
@@ -117,7 +117,7 @@ export const POKER_NIGHT_DINER_TEXT =
 // ---------------------------------------------------------------------------
 
 export const POKER_NIGHT_PEARL_GREETING =
-  '"Fridays I don\'t do food after the chairs come down," she says, pouring you\none anyway. "They\'d sit here till Sunday if I fed them."\n\nShe nods at the fourth chair without looking at it. "Nobody\'s in that."';
+  '"Fridays I don\'t do food after the chairs come down," she says, pouring you one anyway. "They\'d sit here till Sunday if I fed them."\n\nShe nods at the fourth chair without looking at it. "Nobody\'s in that."';
 
 // ---------------------------------------------------------------------------
 // §14.2 — outside the window, Friday night (wired by `objects/mainStreet.
@@ -125,46 +125,46 @@ export const POKER_NIGHT_PEARL_GREETING =
 // ---------------------------------------------------------------------------
 
 export const POKER_NIGHT_WINDOW_TEXT =
-  'Gold on the glass, and behind it one low light with four people under it and\nthe rest of the room dark. You can hear that somebody has said something\nfunny. You cannot hear what.';
+  'Gold on the glass, and behind it one low light with four people under it and the rest of the room dark. You can hear that somebody has said something funny. You cannot hear what.';
 
 // ---------------------------------------------------------------------------
 // §15 — sitting down.
 // ---------------------------------------------------------------------------
 
 const STAKE_JACK_TEXT =
-  'You put a hand on the fourth chair. Three people look up, and none of them\nsays the thing you were braced for.\n\n"Sit down," Nolan says.\n\nJack pushes a stack across the felt with the back of his hand, without any\nceremony at all, and says, "That\'s a loan," in the voice of a man who has just\ndecided it is not.\n\nPearl brings a cup nobody asked for and puts it where you cannot knock it\nover.';
+  'You put a hand on the fourth chair. Three people look up, and none of them says the thing you were braced for.\n\n"Sit down," Nolan says.\n\nJack pushes a stack across the felt with the back of his hand, without any ceremony at all, and says, "That\'s a loan," in the voice of a man who has just decided it is not.\n\nPearl brings a cup nobody asked for and puts it where you cannot knock it over.';
 
 const STAKE_OWN_TEXT =
-  'Nobody makes anything of it. Nolan deals you in mid-sentence and Jack moves\nhis elbow.\n\nYou buy in out of the envelope, and the envelope is a good deal lighter than\nit was when you found it in a drawer.';
+  'Nobody makes anything of it. Nolan deals you in mid-sentence and Jack moves his elbow.\n\nYou buy in out of the envelope, and the envelope is a good deal lighter than it was when you found it in a drawer.';
 
 const BANNED_TEXT =
-  'Pearl gets to the end of the counter before you get to the chair.\n\n"Not this week," she says, and she says it the way you would say it to\nsomebody you had decided to go on knowing. "Come in for the eggs."';
+  'Pearl gets to the end of the counter before you get to the chair.\n\n"Not this week," she says, and she says it the way you would say it to somebody you had decided to go on knowing. "Come in for the eggs."';
 
 const WRONG_NIGHT_TEXT =
-  'The chairs are up on the tables at the dark end and there is nobody in the\nroom but Pearl and the pie case.\n\n"Friday," she says, without being asked.';
+  'The chairs are up on the tables at the dark end and there is nobody in the room but Pearl and the pie case.\n\n"Friday," she says, without being asked.';
 
 const STAND_TEXT =
-  'You get up. Nolan says "Right you are" and deals round the gap without any\ncomment, and by the time you are at the door the three of them have closed the\nshape back up.';
+  'You get up. Nolan says "Right you are" and deals round the gap without any comment, and by the time you are at the door the three of them have closed the shape back up.';
 
 // ---------------------------------------------------------------------------
 // §16.2 — Hand 1, Nolan.
 // ---------------------------------------------------------------------------
 
 const HAND1_DEAL_TEXT =
-  `Nolan deals, looks, and pushes a good deal of what is in front of him into the\nmiddle without any change of expression whatever.\n\nThen his hand comes back and his finger goes to the badge on his chest — the\nplant badge, on its clip, that he has not taken off since he came from work —\nand turns it a quarter turn and lets it go.\n\n"${NOLAN_VERBATIM_LINE.replace(/\.$/, "")}," he says, to nobody, while he waits.`;
+  `Nolan deals, looks, and pushes a good deal of what is in front of him into the middle without any change of expression whatever.\n\nThen his hand comes back and his finger goes to the badge on his chest — the plant badge, on its clip, that he has not taken off since he came from work — and turns it a quarter turn and lets it go.\n\n"${NOLAN_VERBATIM_LINE.replace(/\.$/, "")}," he says, to nobody, while he waits.`;
 
 // §16.8 — the second Friday, hand 1 (grants `act2_clue_same_hands`).
 const HAND1_DEAL_TEXT_SECOND_SESSION =
-  'Nolan deals, looks, and pushes a good deal of what is in front of him into the\nmiddle without any change of expression whatever.\n\nThree of a kind. The badge, a quarter turn, let go. The sheriff with her hands\nflat either side of her cup on the hand after, and a pair of nines at the end\nof it in Jack\'s hands.\n\nIt is the same three hands. Card for card, in the same order, with the same\nmoney going the same way round the table.\n\nNobody at the table remarks on it. They are having a nice time.';
+  'Nolan deals, looks, and pushes a good deal of what is in front of him into the middle without any change of expression whatever.\n\nThree of a kind. The badge, a quarter turn, let go. The sheriff with her hands flat either side of her cup on the hand after, and a pair of nines at the end of it in Jack\'s hands.\n\nIt is the same three hands. Card for card, in the same order, with the same money going the same way round the table.\n\nNobody at the table remarks on it. They are having a nice time.';
 
 const HAND1_CALL_WITH_TELL_TEXT =
-  'You call.\n\nHe turns over three of a kind and is genuinely pleased about it, and then you\nturn over what you have, and he is pleased about that too, which is somehow\nworse.\n\n"Well," he says. "That\'s you, then."';
+  'You call.\n\nHe turns over three of a kind and is genuinely pleased about it, and then you turn over what you have, and he is pleased about that too, which is somehow worse.\n\n"Well," he says. "That\'s you, then."';
 
 const HAND1_CALL_WITHOUT_TELL_TEXT =
-  'You call, and he has it, and he had it from the first card, and Jack makes a\nsmall noise into his coffee that he does not apologise for.';
+  'You call, and he has it, and he had it from the first card, and Jack makes a small noise into his coffee that he does not apologise for.';
 
 const HAND1_RAISE_TEXT =
-  'You raise.\n\nNolan looks at it for about two seconds and folds, tidily, the way he does\neverything.\n\n"Not into that," he says, and means it, and will mean it again next week.';
+  'You raise.\n\nNolan looks at it for about two seconds and folds, tidily, the way he does everything.\n\n"Not into that," he says, and means it, and will mean it again next week.';
 
 const HAND1_FOLD_TEXT = 'You fold. The hand goes on without you and takes about a minute.';
 
@@ -173,16 +173,16 @@ const HAND1_FOLD_TEXT = 'You fold. The hand goes on without you and takes about 
 // ---------------------------------------------------------------------------
 
 const HAND2_DEAL_TEXT =
-  'The sheriff deals. She looks at what she has for no longer than it takes to\nlook at it, and raises, and puts her hands flat on the felt on either side of\nher cup.\n\nShe does not say anything. She has not said anything for two hands.';
+  'The sheriff deals. She looks at what she has for no longer than it takes to look at it, and raises, and puts her hands flat on the felt on either side of her cup.\n\nShe does not say anything. She has not said anything for two hands.';
 
 const HAND2_FOLD_TEXT =
-  'You fold.\n\nShe turns them over anyway, because she is not the sort to make you wonder,\nand she had it, and everybody at the table knew she had it including the man\nwho called.';
+  'You fold.\n\nShe turns them over anyway, because she is not the sort to make you wonder, and she had it, and everybody at the table knew she had it including the man who called.';
 
 const HAND2_CALL_TEXT =
-  'You call. She had it. She was always going to have it.\n\n"She doesn\'t do that," Jack says afterwards, mildly, to his cup. "In thirty\nyears I\'ve never seen her do that."';
+  'You call. She had it. She was always going to have it.\n\n"She doesn\'t do that," Jack says afterwards, mildly, to his cup. "In thirty years I\'ve never seen her do that."';
 
 const HAND2_RAISE_TEXT =
-  'You raise into her.\n\nShe calls it without moving anything but her hand, and turns them over, and\nwhat is in front of you goes across the felt to her side, and that is the\nevening.\n\n"Get him a coffee, Pearl," she says. It is the only unkind thing anybody says\nall night, and it is not unkind.';
+  'You raise into her.\n\nShe calls it without moving anything but her hand, and turns them over, and what is in front of you goes across the felt to her side, and that is the evening.\n\n"Get him a coffee, Pearl," she says. It is the only unkind thing anybody says all night, and it is not unkind.';
 
 // ---------------------------------------------------------------------------
 // §16.4 — the gate talk, always (between hands 2 and 3, when there is a
@@ -190,34 +190,34 @@ const HAND2_RAISE_TEXT =
 // ---------------------------------------------------------------------------
 
 const GATE_TALK_TEXT =
-  'Nolan shuffles and does not deal, because he is talking, and the other two let\nhim, because this is the part of Friday that is not cards.\n\n"Tuesday, though," he says. "Tuesday I\'ll be there for the deliveries, and\nthey come in a convoy now, which they never used to. Six of them nose to tail\nand a manifest a yard long, and the whole yard has to be clear for it."\n\n"Clear of what?" says Jack.\n\n"Of me, mostly." He is delighted with this. "You cannot be on the apron when\nthey\'re on the apron. Sheriff\'ll tell you — it\'s her paper that says so."\n\nWhitlock says, "It\'s the county\'s paper. I sign it."\n\n"There you are." He squares the deck. "And then the nights are the nights.\nMaintenance has the building from when the last office light goes off until\nthe first shift comes on, and I have never once been in it while they\'ve got\nit, and I have run that place for eleven years."\n\nHe says the last part like a man saying he has never been to the Grand Canyon.';
+  'Nolan shuffles and does not deal, because he is talking, and the other two let him, because this is the part of Friday that is not cards.\n\n"Tuesday, though," he says. "Tuesday I\'ll be there for the deliveries, and they come in a convoy now, which they never used to. Six of them nose to tail and a manifest a yard long, and the whole yard has to be clear for it."\n\n"Clear of what?" says Jack.\n\n"Of me, mostly." He is delighted with this. "You cannot be on the apron when they\'re on the apron. Sheriff\'ll tell you — it\'s her paper that says so."\n\nWhitlock says, "It\'s the county\'s paper. I sign it."\n\n"There you are." He squares the deck. "And then the nights are the nights. Maintenance has the building from when the last office light goes off until the first shift comes on, and I have never once been in it while they\'ve got it, and I have run that place for eleven years."\n\nHe says the last part like a man saying he has never been to the Grand Canyon.';
 
 // ---------------------------------------------------------------------------
 // §16.5 — Hand 3, Jack deals.
 // ---------------------------------------------------------------------------
 
 const HAND3_DEAL_TEXT =
-  `Jack deals, badly, the way a man deals who learned it in a kitchen.\n\nNolan looks at his cards, and sits back, and while he is sitting back he says,\nin exactly the voice he said it in before, with the same little laugh under\nthe middle of it:\n\n"${NOLAN_VERBATIM_LINE}"\n\nWhitlock says "Mm." Jack does not look up from the deal. Pearl runs water into\nthe sink.`;
+  `Jack deals, badly, the way a man deals who learned it in a kitchen.\n\nNolan looks at his cards, and sits back, and while he is sitting back he says, in exactly the voice he said it in before, with the same little laugh under the middle of it:\n\n"${NOLAN_VERBATIM_LINE}"\n\nWhitlock says "Mm." Jack does not look up from the deal. Pearl runs water into the sink.`;
 
 const HAND3_CALL_WINS_TEXT =
-  'You call, and Jack turns over a pair of nines and looks at them as though they\nhad let him down personally.\n\n"Every week," he says. "Every single week."';
+  'You call, and Jack turns over a pair of nines and looks at them as though they had let him down personally.\n\n"Every week," he says. "Every single week."';
 
-const HAND3_CALL_NOT_ENOUGH_TEXT = 'You call, and it is not enough, and Jack is so surprised to have won that he\ncounts it twice.';
+const HAND3_CALL_NOT_ENOUGH_TEXT = 'You call, and it is not enough, and Jack is so surprised to have won that he counts it twice.';
 
-const HAND3_FOLD_TEXT = 'You fold and watch it out. Jack wins it with a pair of nines and takes about\nas much pleasure in it as he takes in anything.';
+const HAND3_FOLD_TEXT = 'You fold and watch it out. Jack wins it with a pair of nines and takes about as much pleasure in it as he takes in anything.';
 
 // ---------------------------------------------------------------------------
 // §16.6 — the session ends.
 // ---------------------------------------------------------------------------
 
 const SESSION_WON_TEXT =
-  'Nolan puts the deck down squared and says "Well," and that is the game over.\n\nPearl is already stacking the far chairs. Whitlock finishes her coffee\nstanding up. Jack, who has lost, is in a better mood than he has been in since\nyou met him.';
+  'Nolan puts the deck down squared and says "Well," and that is the game over.\n\nPearl is already stacking the far chairs. Whitlock finishes her coffee standing up. Jack, who has lost, is in a better mood than he has been in since you met him.';
 
 const SESSION_LOST_TEXT =
-  'The deck goes down squared, and what you sat down with is distributed round\nthe table in three unequal parts, and nobody says anything about it, which is\nits own kind of manners.\n\n"Friday," Nolan says, on his way past you, as if it were a promise.';
+  'The deck goes down squared, and what you sat down with is distributed round the table in three unequal parts, and nobody says anything about it, which is its own kind of manners.\n\n"Friday," Nolan says, on his way past you, as if it were a promise.';
 
 const SESSION_CAUGHT_TEXT =
-  'The second deck comes out of your sleeve about four inches before Whitlock\'s\nhand comes down flat on the felt.\n\nNobody shouts. Nolan looks at the cards, and then at you, and what is on his\nface is not anger, it is that he is embarrassed on your behalf and cannot\nthink how to help.\n\n"I\'m not going to charge you with anything," Whitlock says. "There\'s no\nstatute and there\'s no complainant and I\'d have to write down what game we\nwere playing." She takes the deck. "I\'m going to remember it, though. That\'s\nthe whole of what happens. I\'ll remember it and you\'ll come back in a week."';
+  'The second deck comes out of your sleeve about four inches before Whitlock\'s hand comes down flat on the felt.\n\nNobody shouts. Nolan looks at the cards, and then at you, and what is on his face is not anger, it is that he is embarrassed on your behalf and cannot think how to help.\n\n"I\'m not going to charge you with anything," Whitlock says. "There\'s no statute and there\'s no complainant and I\'d have to write down what game we were playing." She takes the deck. "I\'m going to remember it, though. That\'s the whole of what happens. I\'ll remember it and you\'ll come back in a week."';
 
 // §16.7's badge loan (`ASK NOLAN ABOUT BADGE`/`SUBLEVEL` at the table,
 // after a win) is wired on Nolan's own topics (`nolan.ts`, this task's own
@@ -230,10 +230,10 @@ const SESSION_CAUGHT_TEXT =
 // ---------------------------------------------------------------------------
 
 const SWAP_FIRST_TEXT =
-  'Jack\'s deck out of the glovebox is the same brand as the one on the table,\nwhich is either luck or is what happens in a county with one shop in it.\n\nThe switch takes about a second and a half and nobody is looking at your\nhands, because nobody at this table has ever had a reason to look at anybody\'s\nhands.\n\nYou win the hand. It is not interesting.';
+  'Jack\'s deck out of the glovebox is the same brand as the one on the table, which is either luck or is what happens in a county with one shop in it.\n\nThe switch takes about a second and a half and nobody is looking at your hands, because nobody at this table has ever had a reason to look at anybody\'s hands.\n\nYou win the hand. It is not interesting.';
 
 const SWAP_SECOND_TEXT =
-  'You have done this once tonight, which means one person at this table now has\na reason to look at your hands, and she is the only one at it whose job that\nis.';
+  'You have done this once tonight, which means one person at this table now has a reason to look at your hands, and she is the only one at it whose job that is.';
 
 // ---------------------------------------------------------------------------
 // §8 — Dad's coaching, emitted before the player's own action on each
@@ -241,13 +241,13 @@ const SWAP_SECOND_TEXT =
 // ---------------------------------------------------------------------------
 
 const DAD_HAND1_COACHING =
-  '"He\'s touching the thing on his shirt," Dad says, in your ear, at a volume\nthat has no idea it is in a public room. "Twice now. He does it when he\'s\nhappy. Call him."';
+  '"He\'s touching the thing on his shirt," Dad says, in your ear, at a volume that has no idea it is in a public room. "Twice now. He does it when he\'s happy. Call him."';
 
 const DAD_HAND2_COACHING =
-  '"No." Flat, immediate. "Not this one. She\'s not moving her hands and she\'s not\ntalking and neither of those is her. Out. Now, kiddo — before you get\ninterested."';
+  '"No." Flat, immediate. "Not this one. She\'s not moving her hands and she\'s not talking and neither of those is her. Out. Now, kiddo — before you get interested."';
 
 const DAD_HAND3_COACHING =
-  '"Right, this one\'s yours." He is delighted. "He\'s counted his chips twice and\nhe\'s sat back and that is a man with nothing, I have seen that exact man in\nthat exact chair for thirty years. Get in there."';
+  '"Right, this one\'s yours." He is delighted. "He\'s counted his chips twice and he\'s sat back and that is a man with nothing, I have seen that exact man in that exact chair for thirty years. Get in there."';
 
 const DAD_HAND3_TOLD_YOU = '"Told you," Dad says warmly, to a room that has moved on.';
 

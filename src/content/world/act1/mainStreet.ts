@@ -70,11 +70,11 @@ const RETURN_VISIT =
 // text loses its "a man still under it" clause — a trim, not new prose
 // (found in the D2 playtest).
 const RETURN_VISIT_ACT2 = RETURN_VISIT.replace(', a man still under it', '');
-const M15_CLAUSE = `And the rail outside the post office, where a man in grey coveralls is\nfinishing a bracket that nobody in this town has looked at in twenty years.`;
+const M15_CLAUSE = `And the rail outside the post office, where a man in grey coveralls is finishing a bracket that nobody in this town has looked at in twenty years.`;
 
 // D2-C amendment (Stage D plan §2 D2; D2 prose doc §20) — Main Street by day, above the night-based first-sight/return-visit split.
 const DAYTIME_TEXT =
-  'Main Street in the daylight is Main Street with the dark taken off it.\n\nBrick both sides, the poles and the wire, the lamp standards out because it is\nday and out anyway. The horses are at the rail and two of them are asleep\nstanding up, which they were also doing in the dark.\n\nA truck goes through, northbound, without slowing, and the sound of it is\navailable for some time after it has gone. A woman comes out of the post\noffice with a parcel under her arm, crosses at the middle of the road because\nthere is nothing to look for, and goes in at a door further down without\nlooking up.\n\nNorth, past the last roof, there is nothing to see at all. Whatever it is that\nsits on the horizon at night does not exist in the morning, and the country\njust goes on being country until it stops.';
+  'Main Street in the daylight is Main Street with the dark taken off it.\n\nBrick both sides, the poles and the wire, the lamp standards out because it is day and out anyway. The horses are at the rail and two of them are asleep standing up, which they were also doing in the dark.\n\nA truck goes through, northbound, without slowing, and the sound of it is available for some time after it has gone. A woman comes out of the post office with a parcel under her arm, crosses at the middle of the road because there is nothing to look for, and goes in at a door further down without looking up.\n\nNorth, past the last roof, there is nothing to see at all. Whatever it is that sits on the horizon at night does not exist in the morning, and the country just goes on being country until it stops.';
 
 const DAYTIME_TEXT_WITH_M15 = `${DAYTIME_TEXT}\n\n${M15_CLAUSE}`;
 
@@ -82,13 +82,13 @@ const DAYTIME_TEXT_WITH_M15 = `${DAYTIME_TEXT}\n\n${M15_CLAUSE}`;
 // crews have gone (`act4_visit_over_day`); rule 1 (§3.2) is the day's work;
 // rule 2 (§3.3) is evening/night, the shut street with nobody on it.
 const ROAD_FINISHED_TEXT =
-  'Main Street is black and even from the store to the motel, and there is a white\nline down the middle of it that nobody in this county has ever had to look at\nbefore.\n\nThe barriers are gone. The horses are back at their own rail.';
+  'Main Street is black and even from the store to the motel, and there is a white line down the middle of it that nobody in this county has ever had to look at before.\n\nThe barriers are gone. The horses are back at their own rail.';
 
 const ROAD_WORK_DAY_TEXT =
-  'Main Street has been opened up.\n\nA milling machine is eating the crown of the road in a strip eight feet wide,\nnorthbound, at about the speed of a man walking to a job he does not much like.\nBehind it a sweeper, and behind the sweeper a length of road the colour road is\nbefore anybody has driven on it.\n\nOrange plastic barriers, weighted with water, run the length of the west side\nin front of the poles, with a gap left at every door.\n\nThe horses have been moved. They are at the rail outside the post office now,\nwhich is thirty feet from where they were, and two of them are asleep standing\nup.';
+  'Main Street has been opened up.\n\nA milling machine is eating the crown of the road in a strip eight feet wide, northbound, at about the speed of a man walking to a job he does not much like. Behind it a sweeper, and behind the sweeper a length of road the colour road is before anybody has driven on it.\n\nOrange plastic barriers, weighted with water, run the length of the west side in front of the poles, with a gap left at every door.\n\nThe horses have been moved. They are at the rail outside the post office now, which is thirty feet from where they were, and two of them are asleep standing up.';
 
 const ROAD_WORK_NIGHT_TEXT =
-  'The street is shut and lit. Barriers down the west side, a lamp on a tripod at\neach end of the works, and a generator on a pallet boxed in with plywood\nagainst the noise it is not making much of.\n\nThe milled strip goes north out of the lamplight, ribbed and pale, and stops\nbeing visible some way before it stops.\n\nThe machines are parked nose to tail behind the barriers with their beds down\nand their lights off, which is how a crew leaves a road it means to come back\nto.';
+  'The street is shut and lit. Barriers down the west side, a lamp on a tripod at each end of the works, and a generator on a pallet boxed in with plywood against the noise it is not making much of.\n\nThe milled strip goes north out of the lamplight, ribbed and pale, and stops being visible some way before it stops.\n\nThe machines are parked nose to tail behind the barriers with their beds down and their lights off, which is how a crew leaves a road it means to come back to.';
 
 const description: ProseRule[] = [
   { when: { all: [{ flag: ACT4_VISIT_ANNOUNCED }, { onOrAfterDay: ACT4_VISIT_OVER_DAY }] }, text: ROAD_FINISHED_TEXT },

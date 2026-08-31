@@ -282,7 +282,7 @@ export const telephoneText = 'Black, heavy, bolted through the counter, with a d
  * ruling).
  */
 export const telephoneCallText =
-  'Black, heavy, bolted through the wood on the working side of the counter, with\na dial. A dial is a machine for somebody who already knows the number.\n\nYou do not know one, and you have no name to put in front of one, which is the\nsame problem wearing a different coat, and there is no book beside the phone to\nlook either of them up in. The one person in this county whose job is to answer\nat this hour keeps a radio for exactly that reason, and is up the street with\nher light on.\n\nYou leave the handset where it is. Nothing tonight is going to be settled by\ndialling.';
+  'Black, heavy, bolted through the wood on the working side of the counter, with a dial. A dial is a machine for somebody who already knows the number.\n\nYou do not know one, and you have no name to put in front of one, which is the same problem wearing a different coat, and there is no book beside the phone to look either of them up in. The one person in this county whose job is to answer at this hour keeps a radio for exactly that reason, and is up the street with her light on.\n\nYou leave the handset where it is. Nothing tonight is going to be settled by dialling.';
 
 /** §4.1 "pour coffee"/"drink coffee"/"take coffee". */
 export const coffeeText =
@@ -344,7 +344,7 @@ export const readCardsText =
 
 /** §9.4's "type reclamation"/"look up reclamation" — bare, self-contained phrase (same idiom as `readCardsText`, above). */
 export const typeReclamationText =
-  'You type RECLAMATION. It thinks for a quarter of a second.\n\n    NO RECORDS MATCH THAT SUBJECT.\n    CHECK SPELLING OR TRY A BROADER TERM.\n\nYou try the broader term. WATER RIGHTS gives eleven items, each with a title, a span and a shelfmark. GROUND WATER — which the cabinet also sends you to — gives four.\n\nThe terminal does not have the heading. It does not have cross-references at all: not empty ones, none. The cabinet has a card pointing at that heading from before anybody typed any of this in.';
+  'You type RECLAMATION. It thinks for a quarter of a second.\n\n    NO RECORDS MATCH THAT SUBJECT. CHECK SPELLING OR TRY A BROADER TERM.\n\nYou try the broader term. WATER RIGHTS gives eleven items, each with a title, a span and a shelfmark. GROUND WATER — which the cabinet also sends you to — gives four.\n\nThe terminal does not have the heading. It does not have cross-references at all: not empty ones, none. The cabinet has a card pointing at that heading from before anybody typed any of this in.';
 
 // ---------------------------------------------------------------------------
 // Sundown Diner (wave 3) — bare/shared-text verbs (same idiom as the blocks

@@ -71,10 +71,10 @@ import { ACT5_RECONCILIATION_RUNNING } from '../act5/ids';
 // ---------------------------------------------------------------------------
 
 const descriptionText =
-  'Grey coveralls, the clean kind. He is working away from you along the rail\nwith the bucket and the ladder squared away at his feet, so that nobody coming\nalong the porch has to step round anything.\n\nHe is about the height of a man. His hair is the colour hair is. You look for\nas long as it is polite to look, and there is nothing on him to hang the\nlooking on — no ring, no watch, no belly, no limp, no radio, no lanyard,\nnothing written anywhere on the coveralls. The brush goes into the paint and\ncomes out and goes along the rail.\n\nAfterwards you find you have kept the rail and not the man.';
+  'Grey coveralls, the clean kind. He is working away from you along the rail with the bucket and the ladder squared away at his feet, so that nobody coming along the porch has to step round anything.\n\nHe is about the height of a man. His hair is the colour hair is. You look for as long as it is polite to look, and there is nothing on him to hang the looking on — no ring, no watch, no belly, no limp, no radio, no lanyard, nothing written anywhere on the coveralls. The brush goes into the paint and comes out and goes along the rail.\n\nAfterwards you find you have kept the rail and not the man.';
 
 const mainStreetDescriptionText =
-  'Grey coveralls, the clean kind. He is at the rail outside the post office with\na wire brush and a tin, taking the rust off the bracket where the rail goes\ninto the wall, and he has laid a cloth on the pavement under it so that what\ncomes off does not go on the pavement.\n\nYou could describe the brush. You could describe the bracket, the tin, the\ncloth, the ends of the cloth weighted with two stones he must have brought.\n\nYou look at him for as long as it is polite to look at a man working, and\nafterwards what you have is the rail.';
+  'Grey coveralls, the clean kind. He is at the rail outside the post office with a wire brush and a tin, taking the rust off the bracket where the rail goes into the wall, and he has laid a cloth on the pavement under it so that what comes off does not go on the pavement.\n\nYou could describe the brush. You could describe the bracket, the tin, the cloth, the ends of the cloth weighted with two stones he must have brought.\n\nYou look at him for as long as it is polite to look at a man working, and afterwards what you have is the rail.';
 
 const description: ProseRule[] = [
   { when: { at: MAIN_STREET }, text: mainStreetDescriptionText },
@@ -87,10 +87,10 @@ const description: ProseRule[] = [
 // ---------------------------------------------------------------------------
 
 const greetingShipped =
-  'He straightens, and nods, and waits with the brush held off the rail until it\nis clear you are not going to need anything.\n\nThen he goes back to the rail.';
+  'He straightens, and nods, and waits with the brush held off the rail until it is clear you are not going to need anything.\n\nThen he goes back to the rail.';
 
 const mainStreetGreetingText =
-  'He straightens. He nods. He waits, with the brush held off the bracket, for as\nlong as it takes you to establish that you have nothing to ask him.\n\nNobody comes out of the post office. Nobody goes past on the pavement. The\nmorning does not change in any respect whatever, and at the end of it he goes\nback to the bracket.';
+  'He straightens. He nods. He waits, with the brush held off the bracket, for as long as it takes you to establish that you have nothing to ask him.\n\nNobody comes out of the post office. Nobody goes past on the pavement. The morning does not change in any respect whatever, and at the end of it he goes back to the bracket.';
 
 const greeting: ProseRule[] = [
   { when: { at: MAIN_STREET }, text: mainStreetGreetingText },
@@ -103,8 +103,8 @@ const greeting: ProseRule[] = [
 // ---------------------------------------------------------------------------
 
 const unknownTopic: string[] = [
-  'He listens to the whole of it. Then he goes back along a length he has already\ndone and does an inch of it again.',
-  'Nothing. Not a rude nothing — he waits to see whether there is more of it, and\nwhen there is not, the brush goes back in the paint.',
+  'He listens to the whole of it. Then he goes back along a length he has already done and does an inch of it again.',
+  'Nothing. Not a rude nothing — he waits to see whether there is more of it, and when there is not, the brush goes back in the paint.',
   'He looks at you while you are talking, which is worse.',
 ];
 
@@ -113,7 +113,7 @@ const unknownTopic: string[] = [
 // ---------------------------------------------------------------------------
 
 const attackText =
-  'You get as far as deciding to.\n\nThen there is nothing in the way of it and nothing behind it, and you are a\nman on a porch with his hands half up, being looked at by somebody who has\nstopped painting and will start again shortly.';
+  'You get as far as deciding to.\n\nThen there is nothing in the way of it and nothing behind it, and you are a man on a porch with his hands half up, being looked at by somebody who has stopped painting and will start again shortly.';
 
 const mainStreetAttackText = 'There is nothing to hit.\n\nHe stops brushing while you decide, and starts again when you have.';
 
@@ -122,7 +122,7 @@ const mainStreetAttackText = 'There is nothing to hit.\n\nHe stops brushing whil
 // ---------------------------------------------------------------------------
 
 const followWatchText =
-  'He does the rail. He does not look up at intervals, or check the lot, or find\na reason to move round the building. He does the rail for as long as you are\nwilling to stand there doing nothing, and he is better at that than you are.';
+  'He does the rail. He does not look up at intervals, or check the lot, or find a reason to move round the building. He does the rail for as long as you are willing to stand there doing nothing, and he is better at that than you are.';
 
 // ---------------------------------------------------------------------------
 // D5, task H — the rounds below Sublevel 6 (D5 prose doc §18; Stage D plan

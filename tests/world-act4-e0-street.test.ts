@@ -440,7 +440,7 @@ describe("the Lobby's staging doors (§9)", () => {
     const { events } = say(at, 'open staging door', store);
     const rendered = text(events);
     expect(rendered).toMatch(/maglock/);
-    expect(rendered).toMatch(/looks up from a folding\ntable/);
+    expect(rendered).toMatch(/looks up from a folding table/);
     assertNoLeak(rendered);
   });
 
@@ -451,7 +451,7 @@ describe("the Lobby's staging doors (§9)", () => {
     const { events } = say(at, 'open staging door', store);
     const rendered = text(events);
     expect(rendered).toMatch(/maglock/);
-    expect(rendered).not.toMatch(/folding\ntable/);
+    expect(rendered).not.toMatch(/folding table/);
   });
 });
 

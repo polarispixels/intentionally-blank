@@ -231,7 +231,7 @@ const catalogueTerminal: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const annexShelfText =
-  'The sign-in book lives on a shelf by the door — one board on two brackets, put up\nby somebody who had a board and two brackets.\n\nUnderneath it, out of anybody\'s eyeline and inside the reach of anybody who has\nworked here, there is a strip of gaffer tape stuck across the underside of the\nboard with a key held flat against the wood by it.\n\nThe tape has gone hard and yellow and lets go all at once.';
+  'The sign-in book lives on a shelf by the door — one board on two brackets, put up by somebody who had a board and two brackets.\n\nUnderneath it, out of anybody\'s eyeline and inside the reach of anybody who has worked here, there is a strip of gaffer tape stuck across the underside of the board with a key held flat against the wood by it.\n\nThe tape has gone hard and yellow and lets go all at once.';
 
 const annexShelfEffects: Effect[] = [{ say: annexShelfText }, { reveal: ACT4_DARKROOM_KEY }];
 
@@ -245,7 +245,7 @@ const annexShelf: ObjectDefSlice = {
 };
 
 const darkroomKeyExamine =
-  'A long key for a mortice lock, older than the door it belongs to by the look of\nit, with a bow you could hang a picture on.\n\nSomebody taped it under a shelf rather than take it home, which is what people do\nabout a key they are not supposed to have and are not prepared to give back.';
+  'A long key for a mortice lock, older than the door it belongs to by the look of it, with a bow you could hang a picture on.\n\nSomebody taped it under a shelf rather than take it home, which is what people do about a key they are not supposed to have and are not prepared to give back.';
 
 const darkroomKey: ObjectDefSlice = {
   location: COUNTY_LIBRARY,
@@ -321,15 +321,15 @@ const darkroomOpenText =
 // [CHAIR_LEG]` here rather than a bare-pry-succeeds `{ has }` gate, this
 // task's own instruction).
 export const DARKROOM_PRY_TEXT =
-  'The frame is soft where the frame always goes soft, which is the bottom eight\ninches on the hinge side, and the leg goes in there and stays.\n\nIt is not a fast job. It is three separate leans with a rest in the middle of\nthem, and at the end of the third the screws come out of the keep rather than the\nlock coming out of the door, which is the good outcome and is not the one you\nwere expecting.\n\nThe door swings in about a foot and stops against something soft on the other\nside of it, and the smell that comes out of the gap has been in there a very long\ntime.';
+  'The frame is soft where the frame always goes soft, which is the bottom eight inches on the hinge side, and the leg goes in there and stays.\n\nIt is not a fast job. It is three separate leans with a rest in the middle of them, and at the end of the third the screws come out of the keep rather than the lock coming out of the door, which is the good outcome and is not the one you were expecting.\n\nThe door swings in about a foot and stops against something soft on the other side of it, and the smell that comes out of the gap has been in there a very long time.';
 
 // §43.2 — UNLOCK DOOR WITH KEY, the `K` route.
 export const DARKROOM_UNLOCK_WITH_KEY_TEXT =
-  'The key goes in the whole way and turns with the long slow travel of a mortice\nthat somebody looked after for a great many years and nobody has touched since.\n\nThe door swings in about a foot and stops against something soft, and the smell\nthat comes out of the gap has been in there a very long time.';
+  'The key goes in the whole way and turns with the long slow travel of a mortice that somebody looked after for a great many years and nobody has touched since.\n\nThe door swings in about a foot and stops against something soft, and the smell that comes out of the gap has been in there a very long time.';
 
 // §43.3 — the door, once open — EXAMINE.
 export const DARKROOM_OPEN_EXAMINE_TEXT =
-  'Open a foot on a room that has no light in it, with a heavy curtain hung inside\nthe frame on a rail so that the door and the curtain cannot both be open, which\nis the whole idea.\n\nThe bulb in the red glass shade over the door is not lit. There is a switch for\nit, on the outside, where a switch for it has to be.';
+  'Open a foot on a room that has no light in it, with a heavy curtain hung inside the frame on a rail so that the door and the curtain cannot both be open, which is the whole idea.\n\nThe bulb in the red glass shade over the door is not lit. There is a switch for it, on the outside, where a switch for it has to be.';
 
 const darkroomOpenEffects: Effect[] = [{ set: [ACT4_DARKROOM_OPEN, true] }, { setState: [DARKROOM_DOOR, 'open', true] }, { setState: [DARKROOM_DOOR, 'locked', false] }];
 
@@ -376,18 +376,18 @@ const countyLibraryNoExitGate: ObjectDefSlice = { location: COUNTY_LIBRARY };
 // ---------------------------------------------------------------------------
 
 const constructionReelDrawerText =
-  'The drawer marked 2028-2031 runs out on its engineered stop. The hubs are\nlabelled in the same hand all the way along, and one of them has been handled\nenough to take the print off the paper.';
+  'The drawer marked 2028-2031 runs out on its engineered stop. The hubs are labelled in the same hand all the way along, and one of them has been handled enough to take the print off the paper.';
 
 const constructionReelReadText =
-  'The crank takes it and the lamp puts the county\'s own newspaper up on the\nground glass four feet wide, and you go through a year of it at the speed of a\nman winding.\n\n' +
+  'The crank takes it and the lamp puts the county\'s own newspaper up on the ground glass four feet wide, and you go through a year of it at the speed of a man winding.\n\n' +
   '    NEW WORKS: FIRST SOD TURNED IN A COLD WIND\n\n' +
-  'A photograph of eleven people in coats on a scraped field, taken from too far\nback, so that everybody in it is a coat. A caption naming all eleven. One of\nthe eleven is named as the senator, and the senator is standing slightly apart\nfrom the rest with his hands behind his back like a man waiting for a bus.\n\n' +
+  'A photograph of eleven people in coats on a scraped field, taken from too far back, so that everybody in it is a coat. A caption naming all eleven. One of the eleven is named as the senator, and the senator is standing slightly apart from the rest with his hands behind his back like a man waiting for a bus.\n\n' +
   'Four months on:\n\n' +
   '    DEDICATION SET FOR SPRING\n\n' +
-  'and a photograph of a bronze plaque on a trestle before it went up, shot\nsquare on, every letter legible:\n\n' +
+  'and a photograph of a bronze plaque on a trestle before it went up, shot square on, every letter legible:\n\n' +
   '    THE BADLANDS FACILITY\n' +
   '    COMMISSIONED 2030\n\n' +
-  'And then, in the following winter, a column about the works closing down, and\na sentence in the middle of it that the man who wrote it did not think was the\ninteresting part of his own paragraph:\n\n' +
+  'And then, in the following winter, a column about the works closing down, and a sentence in the middle of it that the man who wrote it did not think was the interesting part of his own paragraph:\n\n' +
   '    The construction adit, which runs some 1.1 miles from the works to the\n' +
   '    county road, is to be sealed rather than demolished, at the contractor\'s\n' +
   '    request and at a saving to the county.';
@@ -424,7 +424,7 @@ const constructionReel: ObjectDefSlice = {
 };
 
 const constructionReelMapText =
-  'The paper ran the site plan on the day of the dedication, badly, the way a\nnewspaper reproduces a drawing: everything grey, the lettering nearly gone.\n\nThe fence is a rectangle. The works are a shape inside it. And out of the west\nside of the shape, running away from it under the grazing, a double line goes\nout to a small square hatched black, on the county road, at the place where\nthe road makes its one bend before it gives up and goes north.\n\nThe small square has a note against it, four words long, that has survived the\nreproduction better than anything else on the page: *access hatch — keep\nclear.*';
+  'The paper ran the site plan on the day of the dedication, badly, the way a newspaper reproduces a drawing: everything grey, the lettering nearly gone.\n\nThe fence is a rectangle. The works are a shape inside it. And out of the west side of the shape, running away from it under the grazing, a double line goes out to a small square hatched black, on the county road, at the place where the road makes its one bend before it gives up and goes north.\n\nThe small square has a note against it, four words long, that has survived the reproduction better than anything else on the page: *access hatch — keep clear.*';
 
 // "map page" dropped from this sub-part's own noun list (a builder call,
 // same reasoning as above): its own last word "page" is already
@@ -441,8 +441,8 @@ const constructionReelMap: ObjectDefSlice = {
 };
 
 const hearingReelReadText =
-  'The county paper printed the whole of the siting subcommittee when a local man\nwas on it, because a local man was on it, in six-point type across two pages\nunder the heading SENATOR\'S REMARKS IN FULL.\n\n' +
-  'He talks for a long time and enjoys it. There is a paragraph in the middle\nabout the water table.\n\n' +
+  'The county paper printed the whole of the siting subcommittee when a local man was on it, because a local man was on it, in six-point type across two pages under the heading SENATOR\'S REMARKS IN FULL.\n\n' +
+  'He talks for a long time and enjoys it. There is a paragraph in the middle about the water table.\n\n' +
   '    THE CHAIRMAN: And on the aquifer, Senator?\n\n' +
   '    SENATOR: On the aquifer I am satisfied. I have read what the department\n' +
   '    has put in front of me, I have no reason to go behind it, and I would not\n' +
@@ -454,16 +454,16 @@ const hearingReelCompareText =
   'The second time he does not let you get to the end.\n\n' +
   '"No," he says.\n\n' +
   'Nothing else for a moment. The fan.\n\n' +
-  '"I said the department\'s figures were the department\'s figures and I\'d not put\n' +
-  'my name to another man\'s arithmetic, and a fellow in the third row put his pen\n' +
-  'down, and I was pleased with myself the whole drive home." A pause. "You have\n' +
-  'just read me a paragraph where I say I\'m satisfied. I have never in my life\n' +
+  '"I said the department\'s figures were the department\'s figures and I\'d not put ' +
+  'my name to another man\'s arithmetic, and a fellow in the third row put his pen ' +
+  'down, and I was pleased with myself the whole drive home." A pause. "You have ' +
+  'just read me a paragraph where I say I\'m satisfied. I have never in my life ' +
   'been satisfied about water."\n\n' +
   'Then, quite steadily: "Read me the date at the top of the page."\n\n' +
   'You read him the date at the top of the page.\n\n' +
-  '"Right," he says. "So that\'s the county\'s copy, printed the next morning,\n' +
-  'before anybody could have got to it. And it already says that." He is not\n' +
-  'frightened. He sounds, if anything, relieved. "Well. Thirty years and I\'d\n' +
+  '"Right," he says. "So that\'s the county\'s copy, printed the next morning, ' +
+  'before anybody could have got to it. And it already says that." He is not ' +
+  'frightened. He sounds, if anything, relieved. "Well. Thirty years and I\'d ' +
   'started to think I\'d made it up."';
 
 // "COMPARE REEL WITH DAD" cannot be gated object-side on which npc filled

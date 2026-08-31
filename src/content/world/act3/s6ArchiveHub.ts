@@ -78,14 +78,14 @@ import { FRAME_ENTER_BLOCKED_TEXT } from './objects/s6ArchiveHub';
 // ---------------------------------------------------------------------------
 
 const HUB_FIRST_SIGHT =
-  'Smaller than the bay, and colder, and the only room on this floor with a carpet\nin it: grey cord tiles, the kind that go down in an office in a week and are\nstill there thirty years later with the traffic worn into them in a path.\n\nAlong the right-hand wall, a steel bench bolted through the floor, and on the\nbench a terminal, and the terminal is on.\n\nAlong the left-hand wall, standing in the concrete, there are door frames with\nno doors in them. Over the first, a legend, and behind it something that is not\nquite dark. The rest are dark and only one of them says anything.\n\nAt the far end the carpet stops at three steps down into a well, and at the\nbottom of the well there is a door, and it is the heaviest thing you have seen\nin this building.';
+  'Smaller than the bay, and colder, and the only room on this floor with a carpet in it: grey cord tiles, the kind that go down in an office in a week and are still there thirty years later with the traffic worn into them in a path.\n\nAlong the right-hand wall, a steel bench bolted through the floor, and on the bench a terminal, and the terminal is on.\n\nAlong the left-hand wall, standing in the concrete, there are door frames with no doors in them. Over the first, a legend, and behind it something that is not quite dark. The rest are dark and only one of them says anything.\n\nAt the far end the carpet stops at three steps down into a well, and at the bottom of the well there is a door, and it is the heaviest thing you have seen in this building.';
 
-const HUB_LOGGED_IN_DESC = 'The carpet, the bench, the frames along the left, and the well at the end with\nthe door at the bottom of it.\n\nThe terminal is showing you what it has.';
+const HUB_LOGGED_IN_DESC = 'The carpet, the bench, the frames along the left, and the well at the end with the door at the bottom of it.\n\nThe terminal is showing you what it has.';
 
 const HUB_OTHERWISE_DESC =
   '    USER:\n\nand a cursor.';
 
-const HUB_OTHERWISE_LEAD = 'The carpet with the path worn into it. The bench, the terminal, the frames\nalong the left wall, and the three steps down at the end.\n\n';
+const HUB_OTHERWISE_LEAD = 'The carpet with the path worn into it. The bench, the terminal, the frames along the left wall, and the three steps down at the end.\n\n';
 
 const description: ProseRule[] = [
   { when: { not: { flag: ACT3_HUB_SEEN } }, text: HUB_FIRST_SIGHT },
@@ -110,14 +110,14 @@ const onEnter: OnEnterRule[] = [
 // ---------------------------------------------------------------------------
 
 const HUB_LISTEN_TEXT =
-  "The terminal's fan, which is a fan of a certain age and says so.\n\nAnd through the left-hand wall — not past it, through it — the sound of a great\ndeal of water going through something at a steady rate, a long way down,\nwithout a gap in it anywhere.";
+  "The terminal's fan, which is a fan of a certain age and says so.\n\nAnd through the left-hand wall — not past it, through it — the sound of a great deal of water going through something at a steady rate, a long way down, without a gap in it anywhere.";
 
-const HUB_SMELL_TEXT = 'Hot dust off a warm case, cord carpet, and the cold mineral smell that comes up\nout of a tiled well.';
+const HUB_SMELL_TEXT = 'Hot dust off a warm case, cord carpet, and the cold mineral smell that comes up out of a tiled well.';
 
 const HUB_WAIT_TEXT = 'The fan. The water. The cursor, if you have not given it anything to do.';
 
 const HUB_SHOUT_TEXT =
-  'A hard room with a carpet in it does a strange thing with a shout: it takes the\ntop off it and gives you back the bottom, half a beat late, off the tile in the\nwell.';
+  'A hard room with a carpet in it does a strange thing with a shout: it takes the top off it and gives you back the bottom, half a beat late, off the tile in the well.';
 
 // ---------------------------------------------------------------------------
 // §22.2 / §39.2 — bare `LOG IN`/`TYPE`/`PRESS KEY` (`V_TYPE_TERMINAL`,

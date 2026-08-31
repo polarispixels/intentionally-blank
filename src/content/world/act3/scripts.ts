@@ -34,16 +34,16 @@ import {
 } from './ids';
 
 const BEAT_1 =
-  'Jack does not say anything clever. He backs the truck up the perimeter road\nabout two hundred yards, which is further than he needs, and it is the\ndistance of a man who has thought about this in bed.\n\n"Wire\'ll go," he says. "It\'s the posts you feel. Hold the handle above the\ndoor and don\'t hold the dash."';
+  'Jack does not say anything clever. He backs the truck up the perimeter road about two hundred yards, which is further than he needs, and it is the distance of a man who has thought about this in bed.\n\n"Wire\'ll go," he says. "It\'s the posts you feel. Hold the handle above the door and don\'t hold the dash."';
 
 const BEAT_2 =
-  'And then he does not do it fast, which is the part you will keep.\n\nHe comes at the fence at the speed of a man reversing a trailer, in second,\nwith his hands at the top of the wheel, and the front of the truck takes the\nmesh, and the mesh takes two posts out of the ground with a noise like a piano\nbeing carried badly downstairs.\n\nThen the noise is behind you and the truck is on grass and then on concrete\nand Jack is braking gently, the way you brake in a car park.';
+  'And then he does not do it fast, which is the part you will keep.\n\nHe comes at the fence at the speed of a man reversing a trailer, in second, with his hands at the top of the wheel, and the front of the truck takes the mesh, and the mesh takes two posts out of the ground with a noise like a piano being carried badly downstairs.\n\nThen the noise is behind you and the truck is on grass and then on concrete and Jack is braking gently, the way you brake in a car park.';
 
 const BEAT_3 =
-  'He stops in the middle of the apron with the engine running and the pair of\nyou sit there.\n\nThe light on the pole goes round. Down at the plant end the steam goes on\ngoing up and away sideways. A length of mesh is folded back over the near\nwing of the truck and one of the posts is still hooked into it, going along\nfor the ride.\n\nNothing comes. Nothing sounds. Nothing anywhere in the whole lit quarter mile\nalters by one degree.\n\n"Huh," says Jack.';
+  'He stops in the middle of the apron with the engine running and the pair of you sit there.\n\nThe light on the pole goes round. Down at the plant end the steam goes on going up and away sideways. A length of mesh is folded back over the near wing of the truck and one of the posts is still hooked into it, going along for the ride.\n\nNothing comes. Nothing sounds. Nothing anywhere in the whole lit quarter mile alters by one degree.\n\n"Huh," says Jack.';
 
 const BEAT_4 =
-  "He drives the last of it at walking pace, past the painted bays, down to the\nplant end, and puts the truck round the corner of the building out of the\nlight, which he does without discussing it.\n\nThe yard door there is steel with a reader beside it and a rubber mat in\nfront of it that has had a great deal of use. It is not locked from this side\nin any way that matters, because the building's opinion about doors is that\nthe fence has already dealt with all this.";
+  "He drives the last of it at walking pace, past the painted bays, down to the plant end, and puts the truck round the corner of the building out of the light, which he does without discussing it.\n\nThe yard door there is steel with a reader beside it and a rubber mat in front of it that has had a great deal of use. It is not locked from this side in any way that matters, because the building's opinion about doors is that the fence has already dealt with all this.";
 
 /**
  * `act3_ram_fence` — route (c)'s whole sequence: beats 1-3, then M20-D
@@ -110,9 +110,9 @@ import { ACT3_ELEVATOR_RIDE_SCRIPT } from './ids';
 // built `kind: 'beat'` events, since `say` cannot produce them), `advanceClock:
 // 3`, unchanged from D3.
 const RIDE_BEATS: string[] = [
-  'The leaves take their time about closing. The car takes its time about\nstarting.',
-  'It goes down the way freight goes down, without any interest in whether you\nare enjoying it, and the bulb behind its cage shakes very slightly the whole\nway.\n\nThere is time to read the inspection certificate. There is then time to read\nit again.',
-  'And then there is time to notice that a building with five floors under it and\na plant deck on top is not a building that ought to take this long to get to\nthe bottom of — and to arrive at *it is only a slow lift*, and to be very\nnearly satisfied with that.\n\nThe car settles. The leaves start.',
+  'The leaves take their time about closing. The car takes its time about starting.',
+  'It goes down the way freight goes down, without any interest in whether you are enjoying it, and the bulb behind its cage shakes very slightly the whole way.\n\nThere is time to read the inspection certificate. There is then time to read it again.',
+  'And then there is time to notice that a building with five floors under it and a plant deck on top is not a building that ought to take this long to get to the bottom of — and to arrive at *it is only a slow lift*, and to be very nearly satisfied with that.\n\nThe car settles. The leaves start.',
 ];
 
 // D4 task B, §12.1/§21.1: D3's own boundary tail (`act3Boundary`, above) is
@@ -127,9 +127,9 @@ const RIDE_BEATS: string[] = [
 // Edge's `nw` exit (task A) and the chase hatch's `DOWN` (task D) may still
 // reference them — retiring those call sites is those tasks' own work.
 const S1_BEAT_4 =
-  'The leaves go back on a gallery lit like an office, with pumps down one wall\nand a mesh crib down the other and cool air that smells of nothing.';
+  'The leaves go back on a gallery lit like an office, with pumps down one wall and a mesh crib down the other and cool air that smells of nothing.';
 const S5_BEAT_4 =
-  'The leaves go back on quiet.\n\nNot silence — there is a note in it, low, that you get in the back of the jaw\nbefore the ear — but after the hall and the plant it reads as quiet, and the\ngallery in front of you is lit and long and nobody is standing in it.';
+  'The leaves go back on quiet.\n\nNot silence — there is a note in it, low, that you get in the back of the jaw before the ear — but after the hall and the plant it reads as quiet, and the gallery in front of you is lit and long and nobody is standing in it.';
 
 const BEAT4_BY_DEST: Partial<Record<string, string>> = {
   [ACT3_S1_MECHANICAL_GALLERY]: S1_BEAT_4,
@@ -154,9 +154,9 @@ export const act3ElevatorRide: ScriptFn = (world, state, args) => {
 import { ACT3_READER_B4_ROTATION, ACT3_READER_B4_SCRIPT } from './ids';
 import { flag } from '../../../engine/cond';
 
-const READER_B4_SUCCESS_TEXT = 'Green, the lock lets go with a knock you feel in the door leaf, and you are\nthrough.';
+const READER_B4_SUCCESS_TEXT = 'Green, the lock lets go with a knock you feel in the door leaf, and you are through.';
 const READER_B4_FAIL_TEXT =
-  'The diode goes amber, and then goes out, and the lock does not let go.\n\nNo display. No beep. No second light. No reason. It has declined, and there is\nnothing on it anywhere to appeal to.\n\nAsk it again.';
+  'The diode goes amber, and then goes out, and the lock does not let go.\n\nNo display. No beep. No second light. No reason. It has declined, and there is nothing on it anywhere to appeal to.\n\nAsk it again.';
 
 export const act3ReaderB4: ScriptFn = (world, state) => {
   const incremented = apply(world, state, [{ inc: ACT3_READER_B4_ROTATION }], { path: 'script.act3_reader_b4' });
@@ -209,12 +209,12 @@ export const act3InterlockDeath: ScriptFn = (world, state) => {
  */
 const CLOCK_ROTATING_LINES: string[] = [
   'The second hand goes round.',
-  'It is the same clock as the one in the diner and the one over the sheriff\'s\ndoor, which is to say it is a clock.',
+  'It is the same clock as the one in the diner and the one over the sheriff\'s door, which is to say it is a clock.',
   'Nothing else in the room agrees to have an opinion about that.',
 ];
 
 const CLOCK_WINDOW_LINE =
-  'Which is a time at which a man with a job would be asleep, and a wall of\ngauges would be doing whatever it does when nobody is looking at it.';
+  'Which is a time at which a man with a job would be asleep, and a wall of gauges would be doing whatever it does when nobody is looking at it.';
 
 export const act3ReadClock: ScriptFn = (world, state) => {
   const frameText = `The hands say ${clockInWords(state.clock.minute)}.`;
@@ -290,15 +290,15 @@ function hubLoginPromptEvent(): GameEvent {
 export const act3HubLoginOpen: ScriptFn = (_world, state) => ({ state, events: [hubLoginPromptEvent()] });
 
 const HUB_LOGIN_SUCCESS_TEXT =
-  'The cursor sits still for a moment, which the machine in your room never did.\n\n    ACCESS LEVEL: MAINTENANCE\n\n    ARCHIVE ..... SUBJECT LEDGER\n    LOAD ........ ALLOCATION, ROLLING\n    QUEUE ....... RECONCILIATION, PENDING\n\nUpstairs that was the whole answer. Down here it is a heading.';
+  'The cursor sits still for a moment, which the machine in your room never did.\n\n    ACCESS LEVEL: MAINTENANCE\n\n    ARCHIVE ..... SUBJECT LEDGER LOAD ........ ALLOCATION, ROLLING QUEUE ....... RECONCILIATION, PENDING\n\nUpstairs that was the whole answer. Down here it is a heading.';
 
 // E0 task K — §17, the fourth heading. First and last sentences unchanged;
 // `PROFILE ..... BEHAVIORAL, CURRENT` is the new fourth row.
 const HUB_LOGIN_SUCCESS_TEXT_ACT4 =
-  'The cursor sits still for a moment, which the machine in your room never did.\n\n    ACCESS LEVEL: MAINTENANCE\n\n    ARCHIVE ..... SUBJECT LEDGER\n    LOAD ........ ALLOCATION, ROLLING\n    QUEUE ....... RECONCILIATION, PENDING\n    PROFILE ..... BEHAVIORAL, CURRENT\n\nUpstairs that was the whole answer. Down here it is a heading.';
+  'The cursor sits still for a moment, which the machine in your room never did.\n\n    ACCESS LEVEL: MAINTENANCE\n\n    ARCHIVE ..... SUBJECT LEDGER LOAD ........ ALLOCATION, ROLLING QUEUE ....... RECONCILIATION, PENDING PROFILE ..... BEHAVIORAL, CURRENT\n\nUpstairs that was the whole answer. Down here it is a heading.';
 
 const HUB_LOGIN_FAIL_TEXT =
-  '    ACCESS LEVEL: NONE\n\nThe cursor goes back up to USER: and waits, and it will go on doing that for\nas long as you want it to.';
+  '    ACCESS LEVEL: NONE\n\nThe cursor goes back up to USER: and waits, and it will go on doing that for as long as you want it to.';
 
 export const act3HubLoginRespond: ScriptFn = (world, state, args) => {
   const user = String(args?.['user'] ?? '').trim().toLowerCase();
@@ -416,7 +416,7 @@ import { evaluate } from '../../../engine/cond';
 import { ACT4_CLUE_PROFILED, ACT4_PROFILE_SCREEN_SCRIPT, ACT4_PROFILE_SEEN } from '../act4/ids';
 
 const PROFILE_FIRST_READ_SENTENCE =
-  'You take the fourth heading. It comes up as fast as the other three, which is\nto say it was already there.';
+  'You take the fourth heading. It comes up as fast as the other three, which is to say it was already there.';
 
 function profileStrategyWord(world: WorldDef, state: GameState): string {
   const { analytical, social, direct } = state.profile;

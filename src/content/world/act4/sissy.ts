@@ -48,7 +48,7 @@ import { ACT4_MEM_M11 } from './ids';
 // ---------------------------------------------------------------------------
 
 const description =
-  'She is at the fold-down table with her feet hooked under the seat rail and a\nvalve body in bits on a cloth in front of her, doing something to it with a pick,\nand she looks up when the seal goes — not startled, not pleased, in the way you\nlook up when a thing happens at about the time it happens.\n\nSmall, and rope-thin the way people get when the food is adequate and the work is\nconstant. Hair cut by herself with clippers and growing out of it. A crew shirt\nwith the sleeves buttoned at the wrist, which in a room this warm is a choice,\nand it is not a choice she offers you any part of.\n\nShe puts every piece of the valve down inside the lip of the table, every time,\nwithout looking at where she is putting it. Not one of those pieces was ever\ngoing anywhere. It is a habit out of somewhere that is not this room.';
+  'She is at the fold-down table with her feet hooked under the seat rail and a valve body in bits on a cloth in front of her, doing something to it with a pick, and she looks up when the seal goes — not startled, not pleased, in the way you look up when a thing happens at about the time it happens.\n\nSmall, and rope-thin the way people get when the food is adequate and the work is constant. Hair cut by herself with clippers and growing out of it. A crew shirt with the sleeves buttoned at the wrist, which in a room this warm is a choice, and it is not a choice she offers you any part of.\n\nShe puts every piece of the valve down inside the lip of the table, every time, without looking at where she is putting it. Not one of those pieces was ever going anywhere. It is a habit out of somewhere that is not this room.';
 
 // ---------------------------------------------------------------------------
 // §32.0b — greeting, two rules.
@@ -57,7 +57,7 @@ const description =
 const greeting: ProseRule[] = [
   {
     when: { not: { met: ACT4_SISSY } },
-    text: '"You came through the lock," she says.\n\nShe has not stood up. She turns the pick over and puts it down inside the lip.\n\n"That\'s fine. I\'m going to be honest with you: I stopped assuming things about\nwho is on the other side of that door about eight months ago, and it has made me\nmuch easier to live with." A pause that is not for effect; she is looking at the\nsuit rack behind you and doing arithmetic. "You hung it up second from the small\nend."\n\n"Sit down. Mind the seat on your side, the restraint\'s tied off."',
+    text: '"You came through the lock," she says.\n\nShe has not stood up. She turns the pick over and puts it down inside the lip.\n\n"That\'s fine. I\'m going to be honest with you: I stopped assuming things about who is on the other side of that door about eight months ago, and it has made me much easier to live with." A pause that is not for effect; she is looking at the suit rack behind you and doing arithmetic. "You hung it up second from the small end."\n\n"Sit down. Mind the seat on your side, the restraint\'s tied off."',
   },
   {
     text: 'She moves the cloth over an inch so the other seat has table in front of it.',
@@ -71,8 +71,8 @@ const greeting: ProseRule[] = [
 
 const unknownTopicRotation: string[] = [
   '"No," she says, pleasantly, and goes back to the valve.',
-  '"I could invent something. I have a lot of time and I have got very good at it,\nand I have decided it is a bad habit."',
-  'She thinks about it properly, which is worse than being brushed off, and then\nshakes her head once. "That\'s not one I\'ve got."',
+  '"I could invent something. I have a lot of time and I have got very good at it, and I have decided it is a bad habit."',
+  'She thinks about it properly, which is worse than being brushed off, and then shakes her head once. "That\'s not one I\'ve got."',
 ];
 
 const unknownTopic: ProseRule[] = [{ text: unknownTopicRotation, firstOnce: true }];
@@ -87,7 +87,7 @@ const topicSky: TopicDef = {
   id: TOPIC_SKY,
   words: ['sky', 'stars', 'anomaly', 'anomalies', 'reports', 'report', 'the anomaly'],
   response:
-    '"I file it every time and it comes back handled."\n\nShe wipes the pick on the cloth and does not pick anything else up, which is the\nfirst time her hands have been still.\n\n"It started as a calibration problem, which is what everything starts as. You get\na field you know, you put the camera on it, you compare it to the plate, and if\nit doesn\'t match you have got a bad mount or a bad clock or a bad you. I did the\nmount. I did the clock. I did me, twice, and I got somebody at Flight to do me a\nthird time without telling them why."\n\n"It matches. That\'s the thing I keep having to say to people who have stopped\nreading by then. It matches the plate. It matches it too well. There is a\ntolerance you are supposed to see and I am not seeing it, and I have not seen it\nfor a year, and I have written that down forty different ways and every one of\nthem comes back with the same word in the box."\n\n"Handled." She says it without any weight on it at all. "It is a very good word.\nYou can\'t argue with it. There\'s nothing in it to argue with."',
+    '"I file it every time and it comes back handled."\n\nShe wipes the pick on the cloth and does not pick anything else up, which is the first time her hands have been still.\n\n"It started as a calibration problem, which is what everything starts as. You get a field you know, you put the camera on it, you compare it to the plate, and if it doesn\'t match you have got a bad mount or a bad clock or a bad you. I did the mount. I did the clock. I did me, twice, and I got somebody at Flight to do me a third time without telling them why."\n\n"It matches. That\'s the thing I keep having to say to people who have stopped reading by then. It matches the plate. It matches it too well. There is a tolerance you are supposed to see and I am not seeing it, and I have not seen it for a year, and I have written that down forty different ways and every one of them comes back with the same word in the box."\n\n"Handled." She says it without any weight on it at all. "It is a very good word. You can\'t argue with it. There\'s nothing in it to argue with."',
 };
 
 // ---------------------------------------------------------------------------
@@ -98,10 +98,10 @@ const topicSky: TopicDef = {
 const TOPIC_FILM = T('act4_sissy_topic_film');
 
 const topicFilmRule1Text =
-  '"You want the film."\n\nShe is up before she has finished saying it, and along the galley, and into a\nstowage bag by the third handhold that she does not have to look for.\n\n"I was told to stop shooting chemical eleven months ago. It\'s mass, and it\'s mass\nthat comes back up, and there\'s a very good argument for it that I agree with and\nhave not acted on." The canister comes out taped round the join, the grey kind\nwith a grey lid. "I have been shooting one roll a month since, on a tripod,\nexposures long enough to do the job, and I have not sent one frame of it\nanywhere, because the whole point of the argument I am having is that the\npictures keep arriving correct."\n\nShe holds it out and does not let go of it straight away.\n\n"There is no darkroom on this station. There is nowhere within a very long way of\nhere that there is a darkroom. If you are going to do this, do it properly, and\nif it comes out and I am wrong I would quite like to be told that as well."';
+  '"You want the film."\n\nShe is up before she has finished saying it, and along the galley, and into a stowage bag by the third handhold that she does not have to look for.\n\n"I was told to stop shooting chemical eleven months ago. It\'s mass, and it\'s mass that comes back up, and there\'s a very good argument for it that I agree with and have not acted on." The canister comes out taped round the join, the grey kind with a grey lid. "I have been shooting one roll a month since, on a tripod, exposures long enough to do the job, and I have not sent one frame of it anywhere, because the whole point of the argument I am having is that the pictures keep arriving correct."\n\nShe holds it out and does not let go of it straight away.\n\n"There is no darkroom on this station. There is nowhere within a very long way of here that there is a darkroom. If you are going to do this, do it properly, and if it comes out and I am wrong I would quite like to be told that as well."';
 
 const topicFilmRule2Text =
-  '"Who told you about that?"\n\nIt is not hostile. It is the flat question of somebody who has been careful about\none thing for a year and has just found out that the care may have been\ndecorative.\n\n"No. Not yet."';
+  '"Who told you about that?"\n\nIt is not hostile. It is the flat question of somebody who has been careful about one thing for a year and has just found out that the care may have been decorative.\n\n"No. Not yet."';
 
 const topicFilm: TopicDef = {
   id: TOPIC_FILM,
@@ -123,7 +123,7 @@ const topicLuke: TopicDef = {
   id: TOPIC_LUKE,
   words: ['luke', 'president', 'the president'],
   response:
-    '"He writes. He is the only one of them who has never once missed."\n\nShe turns the valve body over.\n\n"Three paragraphs. Ask after the work, one thing about a bill, one thing about\nthe weather where he is, and a line at the bottom that is trying to be funny. I\ncould set my watch by it, and I have, more or less, because there is nothing else\nup here that arrives on a schedule."\n\n"They are very good letters and I could not tell you one thing that has ever been\nin one of them."',
+    '"He writes. He is the only one of them who has never once missed."\n\nShe turns the valve body over.\n\n"Three paragraphs. Ask after the work, one thing about a bill, one thing about the weather where he is, and a line at the bottom that is trying to be funny. I could set my watch by it, and I have, more or less, because there is nothing else up here that arrives on a schedule."\n\n"They are very good letters and I could not tell you one thing that has ever been in one of them."',
 };
 
 // ---------------------------------------------------------------------------
@@ -139,7 +139,7 @@ const topicLaunch: TopicDef = {
   id: TOPIC_LAUNCH,
   words: ['launch', 'brothers', 'the launch', 'her brothers', 'the brothers', 'watched it'],
   response:
-    '"Everybody watched it, is the answer you\'re after. Everybody who could."\n\nShe counts them off on the back of her hand with the pick, which is a thing she\nwould not do if she were thinking about doing it.\n\n"The oldest of the boys had a field and a truck and he had the rest of them out\nin it, which took organising, and he is the one who organised it, because he was\nthe one who organised things. The one who does energy watched it in an airport\nand told me about the airport for an hour afterwards. And the youngest of them\ndrove eleven hours to be in the field, which he has never once mentioned to me,\nwhich is how I know it was eleven hours."\n\nShe stops, and looks at the hand for a second the way you look at a sum that has\ncome out, and goes back to the valve.\n\n"Three brothers, and all three of them in a field in the dark looking up at a\nthing they could not possibly see yet. My mother would have hated it. She\'d have\nmade them come inside."',
+    '"Everybody watched it, is the answer you\'re after. Everybody who could."\n\nShe counts them off on the back of her hand with the pick, which is a thing she would not do if she were thinking about doing it.\n\n"The oldest of the boys had a field and a truck and he had the rest of them out in it, which took organising, and he is the one who organised it, because he was the one who organised things. The one who does energy watched it in an airport and told me about the airport for an hour afterwards. And the youngest of them drove eleven hours to be in the field, which he has never once mentioned to me, which is how I know it was eleven hours."\n\nShe stops, and looks at the hand for a second the way you look at a sum that has come out, and goes back to the valve.\n\n"Three brothers, and all three of them in a field in the dark looking up at a thing they could not possibly see yet. My mother would have hated it. She\'d have made them come inside."',
   effects: [{ set: [ACT4_SISSY_TOPIC_LAUNCH, true] }, { grantClue: ACT4_CLUE_SISSY_COUNTS_THREE }],
 };
 
@@ -153,7 +153,7 @@ const topicJules: TopicDef = {
   id: TOPIC_JULES,
   words: ['jules', 'the missing one', 'i', 'the tattoos'],
   response:
-    '"I don\'t know that name."\n\nShe says it the way she says everything, which is without hedging, and then she\nsits with it for a second longer than the sentence needed.\n\n"The numbers, though. I know about the numbers, and I know what you are going to\nask, because everybody does eventually."\n\n"The first one didn\'t take. That\'s all it is. The man did it, and it looked right\nthe day it was done, and inside a year it had gone to a smudge — which happens; a\nsingle upright is the hardest thing on that whole sheet to keep, because there is\nnothing in it for the skin to hold on to. And rather than sit that one back down\nin the chair and put him through it again, my father moved everybody up a place,\nand the sheet started at two, and that was that."\n\nShe has said this before. It has the shape of a thing said before.\n\n"Which of them was it on?"\n\nThe pick goes down inside the lip of the table.\n\n"It\'ll be one of the boys," she says. "Ask my brother the one who does energy; he\nremembers that day better than any of us. He was six and he has never once shut\nup about it."',
+    '"I don\'t know that name."\n\nShe says it the way she says everything, which is without hedging, and then she sits with it for a second longer than the sentence needed.\n\n"The numbers, though. I know about the numbers, and I know what you are going to ask, because everybody does eventually."\n\n"The first one didn\'t take. That\'s all it is. The man did it, and it looked right the day it was done, and inside a year it had gone to a smudge — which happens; a single upright is the hardest thing on that whole sheet to keep, because there is nothing in it for the skin to hold on to. And rather than sit that one back down in the chair and put him through it again, my father moved everybody up a place, and the sheet started at two, and that was that."\n\nShe has said this before. It has the shape of a thing said before.\n\n"Which of them was it on?"\n\nThe pick goes down inside the lip of the table.\n\n"It\'ll be one of the boys," she says. "Ask my brother the one who does energy; he remembers that day better than any of us. He was six and he has never once shut up about it."',
   effects: [{ grantClue: ACT4_CLUE_SISSYS_REASON }],
 };
 
@@ -167,7 +167,7 @@ const topicJack: TopicDef = {
   id: TOPIC_JACK,
   words: ['jack', 'truck', 'the truck'],
   response:
-    '"Eleven hours," she says. "He drove eleven hours to stand in a field and he has\nnever told me and he never will."\n\n"He writes, and his letters are the ones that read like a man doing homework. I\nknow exactly what they cost him and I would not swap one of them for the whole of\nthe other correspondence."\n\n"He asks me a question in every one. Nobody else asks me a question."',
+    '"Eleven hours," she says. "He drove eleven hours to stand in a field and he has never told me and he never will."\n\n"He writes, and his letters are the ones that read like a man doing homework. I know exactly what they cost him and I would not swap one of them for the whole of the other correspondence."\n\n"He asks me a question in every one. Nobody else asks me a question."',
 };
 
 // ---------------------------------------------------------------------------
@@ -180,7 +180,7 @@ const topicComms: TopicDef = {
   id: TOPIC_COMMS,
   words: ['rig', 'comms', 'delay', 'messages', 'message', 'the rig', 'the delay'],
   response:
-    '"Twelve minutes each way," she says. "That is what we were told at the start and\nit is what is on every timeline anybody has ever sent me, and it is why you do not\nhave conversations up here, you have correspondence."\n\n"You learn to write a message that does not need an answer. Everybody who does\nthis learns it. You put the question at the top and then you put everything the\nother end is going to need in order to answer it underneath, because if you get\nthat wrong you have spent half an hour finding out that you got it wrong."\n\nShe looks at the rig for a moment, and then at the queue on it, and then at the\nvalve.\n\n"I am extremely good at it now," she says. "That is not the compliment it sounds\nlike."',
+    '"Twelve minutes each way," she says. "That is what we were told at the start and it is what is on every timeline anybody has ever sent me, and it is why you do not have conversations up here, you have correspondence."\n\n"You learn to write a message that does not need an answer. Everybody who does this learns it. You put the question at the top and then you put everything the other end is going to need in order to answer it underneath, because if you get that wrong you have spent half an hour finding out that you got it wrong."\n\nShe looks at the rig for a moment, and then at the queue on it, and then at the valve.\n\n"I am extremely good at it now," she says. "That is not the compliment it sounds like."',
 };
 
 // ---------------------------------------------------------------------------
@@ -193,7 +193,7 @@ const topicHome: TopicDef = {
   id: TOPIC_HOME,
   words: ['home', 'house', 'porch', 'the house', 'the porch'],
   response:
-    '"The porch," she says immediately, which surprises her more than it surprises\nyou. "That\'s what I\'ve got. Not the house. The porch, and the top step, and the\nnoise the screen door made, which I could do for you now."\n\n"The rest of it comes and goes. I can tell you the arrangement of a kitchen I have\nnot been in for a long time and I could not tell you the colour of any of it."\n\nShe goes back to the valve.\n\n"I sit up in the dome at night and I have got into the way of putting that porch\nunder it. Which is not what the dome is for. But you have to put something under a\nsky or it is only a lot of light with nothing to be over."',
+    '"The porch," she says immediately, which surprises her more than it surprises you. "That\'s what I\'ve got. Not the house. The porch, and the top step, and the noise the screen door made, which I could do for you now."\n\n"The rest of it comes and goes. I can tell you the arrangement of a kitchen I have not been in for a long time and I could not tell you the colour of any of it."\n\nShe goes back to the valve.\n\n"I sit up in the dome at night and I have got into the way of putting that porch under it. Which is not what the dome is for. But you have to put something under a sky or it is only a lot of light with nothing to be over."',
 };
 
 // ---------------------------------------------------------------------------
@@ -201,10 +201,10 @@ const topicHome: TopicDef = {
 // ---------------------------------------------------------------------------
 
 const SHOW_NIGHT_SKY_POLAROID_TEXT =
-  'She takes it in both hands, which she has not done with anything else you have\nseen her handle, and holds it under the lamp at the wrong angle for looking at a\nphotograph and the right angle for keeping the lamp out of it.\n\nShe looks at it for a long time. Long enough that the fan cycles.\n\n"Who took this?"\n\nYou tell her when, roughly, and where, roughly, and she nods at each of those\nwithout taking her eyes off it, and puts it down on the cloth, and gets up and\ngoes along the galley to the third handhold.\n\n"It\'s out of focus," she says, with her back to you, in the voice of somebody\nbeing scrupulous about the one thing that is going to matter later. "I want that\non the record. It is badly out of focus and you cannot prove anything with it and\nneither can I."\n\nShe comes back with the canister and puts it on the cloth next to the Polaroid,\nand moves the Polaroid a little so that they are square with each other, and does\nnot appear to know she has done it.';
+  'She takes it in both hands, which she has not done with anything else you have seen her handle, and holds it under the lamp at the wrong angle for looking at a photograph and the right angle for keeping the lamp out of it.\n\nShe looks at it for a long time. Long enough that the fan cycles.\n\n"Who took this?"\n\nYou tell her when, roughly, and where, roughly, and she nods at each of those without taking her eyes off it, and puts it down on the cloth, and gets up and goes along the galley to the third handhold.\n\n"It\'s out of focus," she says, with her back to you, in the voice of somebody being scrupulous about the one thing that is going to matter later. "I want that on the record. It is badly out of focus and you cannot prove anything with it and neither can I."\n\nShe comes back with the canister and puts it on the cloth next to the Polaroid, and moves the Polaroid a little so that they are square with each other, and does not appear to know she has done it.';
 
 const SHOW_PORCH_POLAROID_TEXT =
-  'She looks at it for a second and hands it straight back.\n\n"That\'s the porch," she says.\n\nThen, going back to the valve: "There\'s a man on the left of that I could not put\na name to and I have been looking at that step my whole life."\n\nShe does not say it as though it troubles her. She says it the way you mention a\ndraught.';
+  'She looks at it for a second and hands it straight back.\n\n"That\'s the porch," she says.\n\nThen, going back to the valve: "There\'s a man on the left of that I could not put a name to and I have been looking at that step my whole life."\n\nShe does not say it as though it troubles her. She says it the way you mention a draught.';
 
 const SHOW_FEDORA_TEXT = '"It\'s a hat," she says.';
 

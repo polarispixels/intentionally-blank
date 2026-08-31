@@ -63,10 +63,10 @@ const decodedText =
   "With the shorthand broken it stops being a wall and starts being a man's week, over and over, for two thirds of a book: valves, bearings, a door that sticks, a contractor who does not come.\n\nAnd then, from about the middle, the other kind of line, in among the valves, never once flagged or underlined or set apart:\n\n    B4 corridor is 41' longer inside than on plans.\n\n    Why is there a second chilled-water return?\n\n    Sublevel 6 drawing does not exist.\n\n    Asked Nolan. Says there is no Sublevel 6.\n\n    I HAVE BEEN ON SUBLEVEL 6.\n\nThe last of those is the only thing in the entire book written in capitals, and the pencil went through the paper on the S.";
 
 const partlyDecodedText =
-  'It is still mostly shorthand, and you are still mostly not reading it — but about one line in three now arrives whole, the way a language you once had comes back at you sideways:\n\n    Cooling loop 7B vibration\n    Replace actuator - south manifold\n    Badge reader B4 intermittent\n    Generator inspection 0700\n\nOrdinary. All of it ordinary. And then a line you can read every character of and cannot do anything with:\n\n    Asked Nolan. Says there is no Sublevel 6.\n\nThe rest of that page is shorthand and the shorthand on it is smaller and faster than the shorthand on the page before.';
+  'It is still mostly shorthand, and you are still mostly not reading it — but about one line in three now arrives whole, the way a language you once had comes back at you sideways:\n\n    Cooling loop 7B vibration Replace actuator - south manifold Badge reader B4 intermittent Generator inspection 0700\n\nOrdinary. All of it ordinary. And then a line you can read every character of and cannot do anything with:\n\n    Asked Nolan. Says there is no Sublevel 6.\n\nThe rest of that page is shorthand and the shorthand on it is smaller and faster than the shorthand on the page before.';
 
 const opaqueText =
-  'It is written in a facilities shorthand by somebody who never expected to have to explain it, and a page of it looks like this:\n\n    7B vib — 3rd time. chk brg tmp @ p4 nights\n    s.man act — recd, not fitted, ask G\n    Badge reader B4 intermittent\n    tkt 2214 — 2231 — 2244, all cleared, all no fault fnd\n    Asked Nolan. Says there is no Sublevel 6.\n\nTwo lines in every dozen are English. The rest is a man writing to the only person who was ever going to read it.';
+  'It is written in a facilities shorthand by somebody who never expected to have to explain it, and a page of it looks like this:\n\n    7B vib — 3rd time. chk brg tmp @ p4 nights s.man act — recd, not fitted, ask G Badge reader B4 intermittent tkt 2214 — 2231 — 2244, all cleared, all no fault fnd Asked Nolan. Says there is no Sublevel 6.\n\nTwo lines in every dozen are English. The rest is a man writing to the only person who was ever going to read it.';
 
 const notebookText: ProseRule[] = [
   { when: { flag: ACT2_SHORTHAND_DECODED }, text: decodedText },
@@ -147,7 +147,7 @@ const notebook: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const backCoverText =
-  'Inside the back cover, in pencil, in a hand doing its best to be legible for once:\n\n    admin\n    admin-password\n\nThat is all that is written in there. It is written the way you write down something you have just been handed and do not intend to be told twice.';
+  'Inside the back cover, in pencil, in a hand doing its best to be legible for once:\n\n    admin admin-password\n\nThat is all that is written in there. It is written the way you write down something you have just been handed and do not intend to be told twice.';
 
 const notebookBackCover: ObjectDefSlice = {
   location: { on: ACT2_NOTEBOOK },

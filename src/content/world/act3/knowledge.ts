@@ -90,7 +90,7 @@ export const ACT3_CLUES: WorldSlice['clues'] = {
   [ACT3_CLUE_GATE_RHYTHM]: {
     title: 'The gate, watched a while',
     detail:
-      'The light on the pole goes round on an interval that does not vary. The\ncamera on the gatepost never moves at all — it is fixed on the turnstile, not\nthe fence. The gate motor runs twice for nothing, on a schedule of its own.\n\nNothing out here looks at the fence. Everything out here looks at the door.',
+      'The light on the pole goes round on an interval that does not vary. The camera on the gatepost never moves at all — it is fixed on the turnstile, not the fence. The gate motor runs twice for nothing, on a schedule of its own.\n\nNothing out here looks at the fence. Everything out here looks at the door.',
   },
 };
 
@@ -426,12 +426,12 @@ export const ACT3_D4B_CLUES: NonNullable<WorldSlice['clues']> = {
   [ACT3_CLUE_J_HAND]: {
     title: 'The card, in the same hand as the notebook',
     detail:
-      'The same pressure. The same small fast letters leaning the same way. The full\nstop after the J is put down hard enough to be a decision, and there is one\nexactly like it after every abbreviation in the book. He took a tape out of\nthis rack and did not bring it back.',
+      'The same pressure. The same small fast letters leaning the same way. The full stop after the J is put down hard enough to be a decision, and there is one exactly like it after every abbreviation in the book. He took a tape out of this rack and did not bring it back.',
   },
   [ACT3_CLUE_NO_LOWER]: {
     title: 'More polish on the blank than on S5',
     detail:
-      'The polish on it is deeper than the polish on S5, and S5 is the button that\ntakes a man to the bottom of his own building.',
+      'The polish on it is deeper than the polish on S5, and S5 is the button that takes a man to the bottom of his own building.',
   },
 };
 
@@ -458,7 +458,7 @@ export const ACT3_D4C_CLUES: NonNullable<WorldSlice['clues']> = {
   [ACT3_CLUE_THREE_AM_DIP]: {
     title: 'FDR 3, down at three in the morning',
     detail:
-      'FDR 3 has moved. It is down, and it has been down long enough that the\nneedle is sitting rather than settling.\n\nLow on the glass of FDR 3\'s bezel, inside it, where you would have to have\ntaken the bezel off to do it, there is a pencil line. It is not dated and it\nis not initialled and it is not on any other gauge in the room.',
+      'FDR 3 has moved. It is down, and it has been down long enough that the needle is sitting rather than settling.\n\nLow on the glass of FDR 3\'s bezel, inside it, where you would have to have taken the bezel off to do it, there is a pencil line. It is not dated and it is not initialled and it is not on any other gauge in the room.',
   },
   // §9.4 — verbatim, the whole block (the doc's own note calls it "the
   // single most important block in the wave" and it does no arithmetic,
@@ -466,13 +466,13 @@ export const ACT3_D4C_CLUES: NonNullable<WorldSlice['clues']> = {
   [ACT3_CLUE_BASELINE_MATCHES_AUDIT]: {
     title: 'The DIFFERENCE column, met on the wall',
     detail:
-      "His FILED column and the tag that says HALL A are the same number.\n\nHis TAKEN column and the big face on the generation side are the same\nnumber, give or take whichever month you put your thumb on.\n\nAnd the third column — the one he ruled himself, and headed DIFFERENCE, and\nsat with for four days before he would put it in an envelope — that one is\nnot a subtraction down here.\n\nIt is a gauge. It has a bezel and a brass tag and a red line painted on the\nglass, and somebody comes along this wall every morning to make sure it is\nwhere it was.",
+      "His FILED column and the tag that says HALL A are the same number.\n\nHis TAKEN column and the big face on the generation side are the same number, give or take whichever month you put your thumb on.\n\nAnd the third column — the one he ruled himself, and headed DIFFERENCE, and sat with for four days before he would put it in an envelope — that one is not a subtraction down here.\n\nIt is a gauge. It has a bezel and a brass tag and a red line painted on the glass, and somebody comes along this wall every morning to make sure it is where it was.",
   },
   // §9.8 — the pad's own words, verbatim.
   [ACT3_CLUE_S6_DOOR_REFUSES]: {
     title: 'ACCESS LEVEL: MAINTENANCE, and still DENIED',
     detail:
-      'The pad did not refuse the words. It read them, agreed with them, and\ndeclined to open.\n\nWhich means the words are not wrong. They are only shallow.',
+      'The pad did not refuse the words. It read them, agreed with them, and declined to open.\n\nWhich means the words are not wrong. They are only shallow.',
   },
 };
 
@@ -489,7 +489,7 @@ export const ACT3_D4_TASK_A_CLUES: NonNullable<WorldSlice['clues']> = {
   [ACT3_CLUE_SEAL_FROM_INSIDE]: {
     title: 'The cutting went in from the far side',
     detail:
-      'Through the middle of the plug there is a hole. It is not a crack and it is\nnot a failure. It is about two feet by three, and its edges were cut, and\nthe cutting went in from the far side: every broken edge on this face is\nturned towards you, and every spall on this face has fallen this way, at\nyour feet.\n\nThe cut edges are not sharp. Somebody went round them afterwards with\nsomething, the way you do when a thing is going to be used more than once.',
+      'Through the middle of the plug there is a hole. It is not a crack and it is not a failure. It is about two feet by three, and its edges were cut, and the cutting went in from the far side: every broken edge on this face is turned towards you, and every spall on this face has fallen this way, at your feet.\n\nThe cut edges are not sharp. Somebody went round them afterwards with something, the way you do when a thing is going to be used more than once.',
   },
 };
 
@@ -520,21 +520,21 @@ export const ACT3_D5_QUESTIONS: NonNullable<WorldSlice['questions']> = {
     openWhen: { flag: ACT2_STARTED },
     answerWhen: { clue: ACT3_CLUE_JULES_DEPRECATED },
     answer:
-      'The archive ledger on Sublevel 6 has one result for Jules. STATUS: DEPRECATED.\nRECORDS: RECONCILED. ASSOCIATIONS: RECONCILED. SNAPSHOT: ARCHIVED / ROOT. NO\nFURTHER ACTION.',
+      'The archive ledger on Sublevel 6 has one result for Jules. STATUS: DEPRECATED. RECORDS: RECONCILED. ASSOCIATIONS: RECONCILED. SNAPSHOT: ARCHIVED / ROOT. NO FURTHER ACTION.',
   },
   [ACT3_Q_WHO_HIT_YOU]: {
     text: 'Who hit you?',
     openWhen: { visited: YOUR_ROOM },
     answerWhen: { clue: ACT3_CLUE_REACQUIRE },
     answer:
-      'The reconciliation queue on Sublevel 6 lists three pending jobs. NOLAN, R:\nmaintenance, routine. JACK IV: memory reconciliation. SUBJECT [UNRESOLVED]:\nre-acquire, last known Main St / top floor rear.',
+      'The reconciliation queue on Sublevel 6 lists three pending jobs. NOLAN, R: maintenance, routine. JACK IV: memory reconciliation. SUBJECT [UNRESOLVED]: re-acquire, last known Main St / top floor rear.',
   },
   [ACT3_Q_ARCHIVE_TERMINAL]: {
     text: 'There is a terminal at the bottom of the building, and it is on. What does it know, and how deep do the two words go?',
     openWhen: { visited: ACT3_S6_ARCHIVE_HUB },
     answerWhen: { clue: ACT3_CLUE_JULES_DEPRECATED },
     answer:
-      'The archive ledger on Sublevel 6 has one result for Jules. STATUS: DEPRECATED.\nRECORDS: RECONCILED. ASSOCIATIONS: RECONCILED. SNAPSHOT: ARCHIVED / ROOT. NO\nFURTHER ACTION.',
+      'The archive ledger on Sublevel 6 has one result for Jules. STATUS: DEPRECATED. RECORDS: RECONCILED. ASSOCIATIONS: RECONCILED. SNAPSHOT: ARCHIVED / ROOT. NO FURTHER ACTION.',
   },
   [ACT3_Q_WHAT_ARE_THESE_PEOPLE]: {
     text: 'What are these people — and what am I?',
@@ -568,7 +568,7 @@ export const ACT3_D5_TASK_H_CLUES: NonNullable<WorldSlice['clues']> = {
   [ACT3_CLUE_ROUNDS]: {
     title: 'Nights, below Sublevel 5, one man',
     detail:
-      'Nights, below Sublevel 5, one man: the bay from about ten until half past\neleven, the archive room until one, Sublevel 5 until half past two, the bay\nagain until four. After four, nothing.',
+      'Nights, below Sublevel 5, one man: the bay from about ten until half past eleven, the archive room until one, Sublevel 5 until half past two, the bay again until four. After four, nothing.',
   },
 };
 
@@ -603,12 +603,12 @@ export const ACT3_D5_TASK_F_CLUES: NonNullable<WorldSlice['clues']> = {
   [ACT3_CLUE_CHAIRS]: {
     title: 'One hook says NOLAN',
     detail:
-      'Sublevel 6 is a room full of reclining chairs with restraints on them, set to\nindividual people, with a rail of named hooks along the wall. One hook says\nNOLAN.',
+      'Sublevel 6 is a room full of reclining chairs with restraints on them, set to individual people, with a rail of named hooks along the wall. One hook says NOLAN.',
   },
   [ACT3_CLUE_UV_GHOST]: {
     title: 'One upright stroke, closed top and bottom',
     detail:
-      'Under the inspection lamp on Sublevel 6, the smooth patch inside the left\nforearm has a mark in it: one upright stroke, closed top and bottom. It is not\nvisible in ordinary light.',
+      'Under the inspection lamp on Sublevel 6, the smooth patch inside the left forearm has a mark in it: one upright stroke, closed top and bottom. It is not visible in ordinary light.',
   },
   // Composed from §6.1's/§6.2's own sentences only (no detail given in
   // §2): the night reading that identifies the chair as his, and the day
@@ -616,13 +616,13 @@ export const ACT3_D5_TASK_F_CLUES: NonNullable<WorldSlice['clues']> = {
   [ACT3_CLUE_NOLAN_CHAIR]: {
     title: 'A groove in the vinyl, about the width of a thumb',
     detail:
-      'A chair like the others, opposite the hook with his name on it, and Nolan is\nin it.\n\nThere is a groove in the vinyl of the right-hand arm, about the width of a\nthumb, in the place a thumb would go on a man who holds an arm rest.',
+      'A chair like the others, opposite the hook with his name on it, and Nolan is in it.\n\nThere is a groove in the vinyl of the right-hand arm, about the width of a thumb, in the place a thumb would go on a man who holds an arm rest.',
   },
   // Composed from §5.3's own sentences only (no detail given in §2).
   [ACT3_CLUE_PEELED_HOOK]: {
     title: 'You can see where the letters were and you cannot read them',
     detail:
-      'The tape has been peeled off. What is left is the clean stripe where it was,\nand the gum, and the gum has gone grey and taken a print of the paint. You can\nsee where the letters were and you cannot read them.\n\nThe chair opposite this hook is set. The stem is at its own mark and the\nfootrest is at its own mark and the paper across the head end is fresh.',
+      'The tape has been peeled off. What is left is the clean stripe where it was, and the gum, and the gum has gone grey and taken a print of the paint. You can see where the letters were and you cannot read them.\n\nThe chair opposite this hook is set. The stem is at its own mark and the footrest is at its own mark and the paper across the head end is fresh.',
   },
 };
 
@@ -723,31 +723,31 @@ export const ACT3_D5_TASK_G_CLUES: NonNullable<WorldSlice['clues']> = {
   [ACT3_CLUE_JULES_DEPRECATED]: {
     title: 'SUBJECT JULES I — DEPRECATED',
     detail:
-      'The archive ledger on Sublevel 6 has one result for Jules. STATUS: DEPRECATED.\nRECORDS: RECONCILED. ASSOCIATIONS: RECONCILED. SNAPSHOT: ARCHIVED / ROOT. NO\nFURTHER ACTION.',
+      'The archive ledger on Sublevel 6 has one result for Jules. STATUS: DEPRECATED. RECORDS: RECONCILED. ASSOCIATIONS: RECONCILED. SNAPSHOT: ARCHIVED / ROOT. NO FURTHER ACTION.',
   },
   [ACT3_CLUE_TOWN_RUNS_HERE]: {
     title: 'Every notch above the line',
     detail:
-      "The archive's load trace has a notch in it every night. Laid against Eli's\nFILED figure of 460, every notch falls in the part of the load that was never\nfiled for. The part of the building with the machines in it does not vary.",
+      "The archive's load trace has a notch in it every night. Laid against Eli's FILED figure of 460, every notch falls in the part of the load that was never filed for. The part of the building with the machines in it does not vary.",
   },
   [ACT3_CLUE_REACQUIRE]: {
     title: 'SUBJECT [UNRESOLVED] — RE-ACQUIRE',
     detail:
-      'The reconciliation queue on Sublevel 6 lists three pending jobs. NOLAN, R:\nmaintenance, routine. JACK IV: memory reconciliation. SUBJECT [UNRESOLVED]:\nre-acquire, last known Main St / top floor rear.',
+      'The reconciliation queue on Sublevel 6 lists three pending jobs. NOLAN, R: maintenance, routine. JACK IV: memory reconciliation. SUBJECT [UNRESOLVED]: re-acquire, last known Main St / top floor rear.',
   },
   // §27.1/§27.4 — composed only from the gate frames' own examine/legend
   // text (no authored "Clue detail" block exists for this one in the doc).
   [ACT3_CLUE_GATES]: {
     title: 'Openings in the wall, and nothing hung in them',
     detail:
-      'Openings in the left-hand wall, door height and a little wider than a door,\nwith nothing hung in any of them: no leaf, no frame within the frame, no\nhinge, no keep, no threshold strip.\n\nOver the first, a strip of engraved plastic: ESCAPE RM. Over the second: HAB.\nThe rest have the slot for a strip and no strip in the slot.\n\nThe frames are not holes in this wall. They are in it.',
+      'Openings in the left-hand wall, door height and a little wider than a door, with nothing hung in any of them: no leaf, no frame within the frame, no hinge, no keep, no threshold strip.\n\nOver the first, a strip of engraved plastic: ESCAPE RM. Over the second: HAB. The rest have the slot for a strip and no strip in the slot.\n\nThe frames are not holes in this wall. They are in it.',
   },
   // §28.1-§28.6 — composed only from the root door's own examine/refusal
   // text (no authored "Clue detail" block exists for this one either).
   [ACT3_CLUE_ROOT_REFUSES]: {
     title: 'ACCESS LEVEL: MAINTENANCE. DENIED. There is a level under this one.',
     detail:
-      'A door at the bottom of a well, thicker than the frame it stands in, hung on\nfour hinges, with no handle, no window, no legend, no keyway, and a reader\nbeside it with no light in it at all.\n\nA badge held to the reader gets nothing: no diode, no beat, no NOLAN. The\nreader has never been switched on.\n\nThe terminal answers for it instead: ACCESS LEVEL: MAINTENANCE. DENIED. There\nis a level under this one.\n\nKnuckles on the door make a smaller noise than they make on your own hand.\nPast the warmth of it, a long way past it, water is going through something\nat a steady rate.',
+      'A door at the bottom of a well, thicker than the frame it stands in, hung on four hinges, with no handle, no window, no legend, no keyway, and a reader beside it with no light in it at all.\n\nA badge held to the reader gets nothing: no diode, no beat, no NOLAN. The reader has never been switched on.\n\nThe terminal answers for it instead: ACCESS LEVEL: MAINTENANCE. DENIED. There is a level under this one.\n\nKnuckles on the door make a smaller noise than they make on your own hand. Past the warmth of it, a long way past it, water is going through something at a steady rate.',
   },
 };
 

@@ -48,7 +48,7 @@ export const act5AnteLoginOpen: ScriptFn = (_world, state) => ({ state, events: 
  * contains `NOT RECOGNIZED`.
  */
 const ANTE_LOGIN_SUCCESS_TEXT =
-  "    RECOGNIZED\n\nUpstairs the machine put one more word in front of that one. Every time, at\nthat speed, for a name, for a word, for nothing whatsoever.\n\nIt is not in front of it now.\n\n    ACCESS LEVEL: ROOT\n    RECONCILIATION ................. RUNNING\n\nAcross the room something in the frame of the door with nothing round it lets\ngo, once, and the leaf comes off its seal and stands about a finger's width\nopen, and stays there.";
+  "    RECOGNIZED\n\nUpstairs the machine put one more word in front of that one. Every time, at that speed, for a name, for a word, for nothing whatsoever.\n\nIt is not in front of it now.\n\n    ACCESS LEVEL: ROOT RECONCILIATION ................. RUNNING\n\nAcross the room something in the frame of the door with nothing round it lets go, once, and the leaf comes off its seal and stands about a finger's width open, and stays there.";
 
 /**
  * §12.3 — any other pair. The middle line is `act1/verbs.ts`'s

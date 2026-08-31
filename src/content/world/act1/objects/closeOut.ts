@@ -94,7 +94,7 @@ const workOrderExamine =
   'A facility form, reassembled and held down by whatever is to hand. Preprinted in two colours on paper chosen to survive being filed. There is a department block, a routing line, a box for an authorising signature, and a diagonal band across the middle where the strips went somewhere else.\n\nWhoever signed it signed it in the part that is missing.';
 
 const workOrderReadText =
-  'The header is a form number and a revision date and nothing you can use.\n\nThree lines of the body survive:\n\n    S6      ACCESS REVOKED - J.\n    EFFECTIVE IMMEDIATELY. BADGE RETAINED AT GATE.\n    ROUTING: BOX 141\n\nUnder those, where somebody has to say why, there is a printed word and a blank after it, and the blank was never filled in.';
+  'The header is a form number and a revision date and nothing you can use.\n\nThree lines of the body survive:\n\n    S6      ACCESS REVOKED - J.\n    EFFECTIVE IMMEDIATELY. BADGE RETAINED AT GATE. ROUTING: BOX 141\n\nUnder those, where somebody has to say why, there is a printed word and a blank after it, and the blank was never filled in.';
 
 const workOrder: ObjectDefSlice = {
   location: 'nowhere', // granted by ASSEMBLE STRIPS' success effects
@@ -134,7 +134,7 @@ const intactPolaroids: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const claimTicketText =
-  'A stub of card, perforated down one edge where its twin was torn off, printed in the same red and yellow as the cup.\n\n    WALL DRUG\n    HOLD FOR PICKUP\n    No. 4417\n\nNo date on it anywhere. No name. On the back there is a printed line where a depositor writes what he has left, and the line is empty.';
+  'A stub of card, perforated down one edge where its twin was torn off, printed in the same red and yellow as the cup.\n\n    WALL DRUG HOLD FOR PICKUP No. 4417\n\nNo date on it anywhere. No name. On the back there is a printed line where a depositor writes what he has left, and the line is empty.';
 
 const claimTicket: ObjectDefSlice = {
   location: 'nowhere', // granted by the boxes' own OPEN/TURN/UNLOCK rule 1
@@ -219,7 +219,7 @@ const cashEnvelope: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const matchbookText =
-  'A book of matches, the cover folded back and creased flat the way people do when they are thinking about something else.\n\n    THE ARROWHEAD\n    MOTEL\n    VACANCY\n\nThe matches are all still in it. The striker on the back has been used exactly once, at one corner, by somebody who then did not light anything.';
+  'A book of matches, the cover folded back and creased flat the way people do when they are thinking about something else.\n\n    THE ARROWHEAD MOTEL VACANCY\n\nThe matches are all still in it. The striker on the back has been used exactly once, at one corner, by somebody who then did not light anything.';
 
 // D4 task A amendment (§5.2) — "LIGHT MATCH"/"LIGHT MATCHBOOK", a two-turn
 // light. The shipped `examine`/`read` above is untouched (§21.1's own
@@ -241,7 +241,7 @@ const CURRENTLY_DARK: Cond = {
 };
 
 const lightMatchStrikeText =
-  'The striker takes it on the second go. The tunnel comes as far forward as a\nmatch will bring it — a length of wall, the tops of the rails, your own hand\nenormous and orange — and everything past that becomes considerably darker\nthan it was.';
+  'The striker takes it on the second go. The tunnel comes as far forward as a match will bring it — a length of wall, the tops of the rails, your own hand enormous and orange — and everything past that becomes considerably darker than it was.';
 
 const lightMatchNotDarkText = 'You strike one, look at it, and put it out, and the room is exactly as well lit as it was.';
 

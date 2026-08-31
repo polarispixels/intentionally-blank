@@ -40,7 +40,7 @@ import { ACT2_ADAPTER_CHAIN, ACT2_ADAPTER_PARTS, ACT2_HONOR_BOX, ACT2_JUNK_DRAWE
 // ---------------------------------------------------------------------------
 
 const postcardExamine =
-  'A wire spinner stands inside the left-hand window, turned so its face is to the street. The cards are in it thick, and because that is how a rack works, half of them are in backwards. What you get, mostly, is captions.\n\n    GREETINGS FROM THE BADLANDS\n    WALL DRUG - FREE ICE WATER\n    THE MISSOURI AT SUNSET\n    MOUNT RUSHMORE NATIONAL MEMORIAL - HOME OF THE FIVE FACES\n    JACKALOPE (LIVE)\n\nThe glass is cold and the rack is on the other side of it.';
+  'A wire spinner stands inside the left-hand window, turned so its face is to the street. The cards are in it thick, and because that is how a rack works, half of them are in backwards. What you get, mostly, is captions.\n\n    GREETINGS FROM THE BADLANDS WALL DRUG - FREE ICE WATER THE MISSOURI AT SUNSET MOUNT RUSHMORE NATIONAL MEMORIAL - HOME OF THE FIVE FACES JACKALOPE (LIVE)\n\nThe glass is cold and the rack is on the other side of it.';
 const postcardExamineEffects: Effect[] = [{ say: postcardExamine }, { grantClue: CLUE_FIVE_FACES }, { set: [FLAG_READ_POSTCARDS, true] }];
 
 const turnRackText = "You would have to be on the other side of the window to turn it. From here the Rushmore card gives you an eighth of an inch of its edge and the back of the one standing in front of it.";
@@ -258,14 +258,14 @@ export const GENERAL_STORE_OBJECTS: Record<string, ObjectDefSlice> = {
 export const SHOP_OPEN: Cond = { all: [{ flag: ACT2_STARTED }, { any: [{ clockPhase: 'morning' }, { clockPhase: 'afternoon' }] }] };
 
 const honorBoxExamine =
-  'A cigar box, the lid held shut by a screw through the hinge side and a slot\ncut in the top with a knife by somebody who was not showing off. It does not\nrattle. It has weight.\n\nA card is propped against it in the same firm hand as everything else in this\ncounty that is not typed:\n\n    PLEASE LEAVE WHAT IT\'S WORTH.\n    THE PENCIL IS FOR THE BOOK.\n\nThe book is a school exercise book, open, with a pencil on a string beside it.\nPeople have written down what they took. Nobody has written down what they\npaid.';
+  'A cigar box, the lid held shut by a screw through the hinge side and a slot cut in the top with a knife by somebody who was not showing off. It does not rattle. It has weight.\n\nA card is propped against it in the same firm hand as everything else in this county that is not typed:\n\n    PLEASE LEAVE WHAT IT\'S WORTH. THE PENCIL IS FOR THE BOOK.\n\nThe book is a school exercise book, open, with a pencil on a string beside it. People have written down what they took. Nobody has written down what they paid.';
 
 const honorBoxOpenText =
-  'There is a shop with nobody in it, a box with money in it, and a screw you\ncould get out with the flat of a key. You put the box back exactly where it\nwas standing, which takes a moment, because you had already picked it up.';
+  'There is a shop with nobody in it, a box with money in it, and a screw you could get out with the flat of a key. You put the box back exactly where it was standing, which takes a moment, because you had already picked it up.';
 
 /** §4.2's `PAY` — see `act1/generalStore.ts`'s own room-level handler (bare verb; no dobj exists to hang this on). */
 export const HONOR_BOX_PAY_TEXT =
-  'You take out what the parts are worth and post it through the slot, and it\ngoes down onto the rest of it without much of a sound, so there is a good deal\nof the rest of it.\n\nThen you take the pencil on its string and write down what you took, in the\ncolumn where everybody else has written down what they took, and the line\nabove yours is somebody\'s tinned peaches.';
+  'You take out what the parts are worth and post it through the slot, and it goes down onto the rest of it without much of a sound, so there is a good deal of the rest of it.\n\nThen you take the pencil on its string and write down what you took, in the column where everybody else has written down what they took, and the line above yours is somebody\'s tinned peaches.';
 
 const honorBox: ObjectDefSlice = {
   location: { in: STORE_DOOR },
@@ -279,7 +279,7 @@ const honorBox: ObjectDefSlice = {
 };
 
 const junkDrawerExamine =
-  'Under the counter on the customer side, standing an inch open the way it was\nstanding an inch open through the glass at four in the morning.\n\nIt is the drawer every shop has: the drawer for the thing that is not\nanything. Fuse wire. A bulldog clip with no jaw spring. Two keys on a loop of\ngarden twine. A rubber stamp with the date wheels seized. Batteries of a size\nthat stopped being a size.\n\nAnd, further back, where a drawer keeps what it has been keeping longest,\nthree items that are all the same kind of item.';
+  'Under the counter on the customer side, standing an inch open the way it was standing an inch open through the glass at four in the morning.\n\nIt is the drawer every shop has: the drawer for the thing that is not anything. Fuse wire. A bulldog clip with no jaw spring. Two keys on a loop of garden twine. A rubber stamp with the date wheels seized. Batteries of a size that stopped being a size.\n\nAnd, further back, where a drawer keeps what it has been keeping longest, three items that are all the same kind of item.';
 
 const junkDrawer: ObjectDefSlice = {
   location: { in: STORE_DOOR },
@@ -298,13 +298,13 @@ const junkDrawer: ObjectDefSlice = {
 };
 
 const partsExamine =
-  '    a gender changer, in chromed pot metal, with pins on both faces and a\n    thumbscrew missing from one side\n\n    a short ribbon lead with a keyed collar at one end and nothing keyed\n    about the other\n\n    a converter in a die-cast box the size of a bar of soap, with a switch\n    marked DCE / DTE and a label in typewriter capitals reading SERIAL\n\nEvery one of them was made to join a thing to a thing that neither of them was\never going to meet again. Nobody in this county has needed any of them since\nbefore the sign over the door was last painted.\n\nThey fit each other. You can see that they fit each other from here.';
+  '    a gender changer, in chromed pot metal, with pins on both faces and a\n    thumbscrew missing from one side\n\n    a short ribbon lead with a keyed collar at one end and nothing keyed about the other\n\n    a converter in a die-cast box the size of a bar of soap, with a switch marked DCE / DTE and a label in typewriter capitals reading SERIAL\n\nEvery one of them was made to join a thing to a thing that neither of them was ever going to meet again. Nobody in this county has needed any of them since before the sign over the door was last painted.\n\nThey fit each other. You can see that they fit each other from here.';
 
 const combineSuccessText =
-  'The gender changer goes onto the converter. The ribbon lead goes onto the\ngender changer. Each join takes a shove and then goes home with the small\nsatisfaction of a thing designed by somebody who expected to be shoved.\n\nWhat you are holding is about nine inches long, weighs more than the machine\nit is going to plug into deserves, and has one end shaped like this decade and\none end shaped like an argument that decade lost.\n\nYou put it in your coat. There is now a chain of adapters in your coat, which\nis either going to work or is going to be a story.';
+  'The gender changer goes onto the converter. The ribbon lead goes onto the gender changer. Each join takes a shove and then goes home with the small satisfaction of a thing designed by somebody who expected to be shoved.\n\nWhat you are holding is about nine inches long, weighs more than the machine it is going to plug into deserves, and has one end shaped like this decade and one end shaped like an argument that decade lost.\n\nYou put it in your coat. There is now a chain of adapters in your coat, which is either going to work or is going to be a story.';
 
 /** Transcribed for completeness (hard rule 5); unreachable in this build — `act2_adapter_parts` is one collectible bundle, never partially held, so `COMBINE`'s "not held yet" branch below always has all three or none. Flagged in this task's report. */
-const combineMissingPartText = 'Two of the three will go together. Two of the three get you to a shape that is\nstill not the shape you need.';
+const combineMissingPartText = 'Two of the three will go together. Two of the three get you to a shape that is still not the shape you need.';
 
 const combineEffects: Effect[] = [{ say: combineSuccessText }, { move: [ACT2_ADAPTER_PARTS, 'nowhere'] }, { move: [ACT2_ADAPTER_CHAIN, 'inventory'] }];
 
@@ -327,7 +327,7 @@ const chain: ObjectDefSlice = {
   // Deliberately NOT "chain" (§29.2 — the water crock's chained cup already owns it).
   nouns: ['adapter', 'adapters', 'adapter chain', 'lead', 'converter'],
   portable: true,
-  description: 'About nine inches of obsolete adapters, shoved home end to end: a gender\nchanger, a ribbon lead, a converter. One end is shaped like this decade. One\nend is shaped like an argument that decade lost.',
+  description: 'About nine inches of obsolete adapters, shoved home end to end: a gender changer, a ribbon lead, a converter. One end is shaped like this decade. One end is shaped like an argument that decade lost.',
 };
 
 export const ACT2_GENERAL_STORE_D2_OBJECTS: Record<string, ObjectDefSlice> = {

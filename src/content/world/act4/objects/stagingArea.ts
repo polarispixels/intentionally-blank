@@ -42,10 +42,10 @@ import { PUSH_PAST_DETAIL_TEXT } from '../verbs';
 // ---------------------------------------------------------------------------
 
 const WHITEBOARD_EXAMINE_TEXT =
-  "The county's grid is still on it, ruled in permanent marker by somebody with a\nstraightedge, and this week there is a dry-wipe hand in it that is not the\ncounty's: enormous, upright, all capitals, made to be read from the back of a\nroom by a person walking.\n\n    LOT / ARRIVE          PRINCIPAL\n    PLANT FLOOR           PRINCIPAL, ESCORT\n    STAGING — HOLD        PRINCIPAL\n    MAIN ST — SPRAY       ------------\n    LOT / DEPART          PRINCIPAL\n\nThe left-hand column is where the times go. They have been wiped and put back\nso often that the column is grey the whole way down, and what is in it now\ncannot be read from here and cannot be read from a foot away either.\n\nThe fourth row has a line through it, drawn with the straightedge, which means\nsomebody had the straightedge in his hand at the time.\n\nNothing on the board says who PRINCIPAL is, and nothing on it says the name of\nthe building.";
+  "The county's grid is still on it, ruled in permanent marker by somebody with a straightedge, and this week there is a dry-wipe hand in it that is not the county's: enormous, upright, all capitals, made to be read from the back of a room by a person walking.\n\n    LOT / ARRIVE          PRINCIPAL\n    PLANT FLOOR           PRINCIPAL, ESCORT\n    STAGING — HOLD        PRINCIPAL\n    MAIN ST — SPRAY       ------------\n    LOT / DEPART          PRINCIPAL\n\nThe left-hand column is where the times go. They have been wiped and put back so often that the column is grey the whole way down, and what is in it now cannot be read from here and cannot be read from a foot away either.\n\nThe fourth row has a line through it, drawn with the straightedge, which means somebody had the straightedge in his hand at the time.\n\nNothing on the board says who PRINCIPAL is, and nothing on it says the name of the building.";
 
 const WHITEBOARD_DEFENSE_TEXT =
-  'There is a man at each end of this room being paid to notice exactly this, and\nyou are going to be in here for a while yet.\n\nYou put your hands where they were.';
+  'There is a man at each end of this room being paid to notice exactly this, and you are going to be in here for a while yet.\n\nYou put your hands where they were.';
 
 const whiteboard: ObjectDefSlice = {
   location: ACT4_STAGING_AREA,
@@ -69,10 +69,10 @@ const whiteboard: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const TABLE_EXAMINE_TEXT =
-  'Trestles under a roll of white paper, and the paper has been pulled off the\ndispenser a little short, so the last table is bare at the end and somebody has\nput the pens there to cover it.\n\nA wire basket of pens with a contractor\'s name down the barrel. A jug of water\nwith the condensation gone off it. Glasses, upside down, on a folded napkin\nbecause there was no tray.\n\nAt the top of it, a folder, squared to the edge by somebody who squares things.';
+  'Trestles under a roll of white paper, and the paper has been pulled off the dispenser a little short, so the last table is bare at the end and somebody has put the pens there to cover it.\n\nA wire basket of pens with a contractor\'s name down the barrel. A jug of water with the condensation gone off it. Glasses, upside down, on a folded napkin because there was no tray.\n\nAt the top of it, a folder, squared to the edge by somebody who squares things.';
 
 const TABLE_SIT_TEXT =
-  'There is a chair on your side. It is not the chair anybody expects you to take\nand you take it anyway, and neither of the men at the doors does anything at\nall about it, which you find you would have preferred them to.';
+  'There is a chair on your side. It is not the chair anybody expects you to take and you take it anyway, and neither of the men at the doors does anything at all about it, which you find you would have preferred them to.';
 
 const table: ObjectDefSlice = {
   location: ACT4_STAGING_AREA,
@@ -90,11 +90,11 @@ const table: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const FOLDER_EXAMINE_TEXT =
-  'Brown card, worn soft at the corners, with a rubber band round it gone flat\nwhere it sits. It is not a government folder; it is the sort of folder a man\nbuys in a shop.\n\nNothing is written on the front. The back has been written on and rubbed out.\n\nIt is open, and what is in it is letters.';
+  'Brown card, worn soft at the corners, with a rubber band round it gone flat where it sits. It is not a government folder; it is the sort of folder a man buys in a shop.\n\nNothing is written on the front. The back has been written on and rubbed out.\n\nIt is open, and what is in it is letters.';
 
 /** Shared by TAKE FOLDER and TAKE LETTERS (§6.2's own heading groups both). */
 const TAKE_FOLDER_OR_LETTERS_TEXT =
-  'The man at the far door does not move and does not need to. You put it back\ndown and square it to the edge of the table, because that is how you found it,\nand because it is his.';
+  'The man at the far door does not move and does not need to. You put it back down and square it to the edge of the table, because that is how you found it, and because it is his.';
 
 const folder: ObjectDefSlice = {
   location: { on: ACT4_CONFERENCE_TABLE },
@@ -110,10 +110,10 @@ const folder: ObjectDefSlice = {
 };
 
 const LETTERS_READ_TEXT =
-  'They are in the folder in the order they came, oldest at the bottom, each one\nstill in its envelope with the envelope tucked in behind it.\n\n    Hi Luke —\n\n    Everything\'s fine here. Busy, the good kind of busy. Shop\'s steady, the\n    weather\'s been kind, and I\'ve nothing to complain about that anybody\n    would want to hear.\n\n    Don\'t worry about us. Come out when you can and don\'t make a thing of\n    it.\n\n    Jack\n\nThe next one is that letter with the weather changed. The one under it is that\nletter with the weather changed.\n\nSquare capitals, pressed hard, the L\'s finished with a separate stroke.\n\nEvery one of them is cheerful. Not one of them asks him for anything, and the\nlast one in the folder came inside the last five weeks.';
+  'They are in the folder in the order they came, oldest at the bottom, each one still in its envelope with the envelope tucked in behind it.\n\n    Hi Luke —\n\n    Everything\'s fine here. Busy, the good kind of busy. Shop\'s steady, the weather\'s been kind, and I\'ve nothing to complain about that anybody would want to hear.\n\n    Don\'t worry about us. Come out when you can and don\'t make a thing of it.\n\n    Jack\n\nThe next one is that letter with the weather changed. The one under it is that letter with the weather changed.\n\nSquare capitals, pressed hard, the L\'s finished with a separate stroke.\n\nEvery one of them is cheerful. Not one of them asks him for anything, and the last one in the folder came inside the last five weeks.';
 
 const LETTERS_EXAMINE_TEXT =
-  'No crossings-out. Not one, anywhere in the folder, from a man writing at a\nkitchen table with a pen he did not choose.\n\nThey are also all the same length. Every one of them goes down the sheet to\nabout the same place and stops there, the way a form stops.\n\nHeld up to the window, the pressure is even the whole way through, with nowhere\non the sheet where the pen stopped while somebody thought.';
+  'No crossings-out. Not one, anywhere in the folder, from a man writing at a kitchen table with a pen he did not choose.\n\nThey are also all the same length. Every one of them goes down the sheet to about the same place and stops there, the way a form stops.\n\nHeld up to the window, the pressure is even the whole way through, with nowhere on the sheet where the pen stopped while somebody thought.';
 
 const letters: ObjectDefSlice = {
   location: { in: ACT4_LUKES_FOLDER },
@@ -136,10 +136,10 @@ const letters: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const WINDOW_EXAMINE_TEXT =
-  'The lot has been swept, and the weeds along the base of the fence have been\nsprayed and have not had time to go brown.\n\nThe cars are nose out with a man standing between each pair of them, and none\nof the men is looking at the same thing as any of the others, which is the\nwhole of the trick and takes years.\n\nPast the cars, the gatehouse. Past the gatehouse, the county road, where\nsomebody has been out with a machine and put a fresh white edge line down the\nside of it as far as you can see from this window.\n\nAt the far end of what you can see from this window, the edge line stops.';
+  'The lot has been swept, and the weeds along the base of the fence have been sprayed and have not had time to go brown.\n\nThe cars are nose out with a man standing between each pair of them, and none of the men is looking at the same thing as any of the others, which is the whole of the trick and takes years.\n\nPast the cars, the gatehouse. Past the gatehouse, the county road, where somebody has been out with a machine and put a fresh white edge line down the side of it as far as you can see from this window.\n\nAt the far end of what you can see from this window, the edge line stops.';
 
 const WINDOW_OPEN_TEXT =
-  'Sealed unit, no opening light, and a bead of mastic all the way round it that\nhas gone hard and yellow and is original.\n\nThere are people in this room who would notice the first minute of any serious\nattempt on it.';
+  'Sealed unit, no opening light, and a bead of mastic all the way round it that has gone hard and yellow and is original.\n\nThere are people in this room who would notice the first minute of any serious attempt on it.';
 
 const window_: ObjectDefSlice = {
   location: ACT4_STAGING_AREA,
@@ -157,10 +157,10 @@ const window_: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const DETAIL_EXAMINE_TEXT =
-  'Two of them, and there is nothing to say about how they look, because that has\nbeen worked at.\n\nSuits that fit. Shoes that will not squeak on terrazzo. An earpiece each, and a\nlapel pin that is not a flag and is not anything else either.\n\nNeither has a hand in a pocket. Neither is leaning on anything. They have\narranged it so that the room has two doors and each door has a man in front of\nit looking at the other man\'s door.';
+  'Two of them, and there is nothing to say about how they look, because that has been worked at.\n\nSuits that fit. Shoes that will not squeak on terrazzo. An earpiece each, and a lapel pin that is not a flag and is not anything else either.\n\nNeither has a hand in a pocket. Neither is leaning on anything. They have arranged it so that the room has two doors and each door has a man in front of it looking at the other man\'s door.';
 
 const DETAIL_TALK_TEXT =
-  '"Sir."\n\nThat is the whole of it and will be every time. He is not being rude; he has\nbeen given one word for this and told to use it until you go away.';
+  '"Sir."\n\nThat is the whole of it and will be every time. He is not being rude; he has been given one word for this and told to use it until you go away.';
 
 const detail: ObjectDefSlice = {
   // §37.2's own ruling: present in the Staging Area, and — as the
@@ -186,10 +186,10 @@ const detail: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const URN_EXAMINE_TEXT =
-  'A stainless catering urn on a card table, with a lead running along the\nskirting and a plastic cup upside down over the tap so that it does not drip on\nthe floor.\n\nIt is not the building\'s; the building has a machine through a door. This one\nhas a dent in the side the size of a hip, a piece of tape round one handle, and\nthe last of somebody\'s writing on the tape in laundry marker, gone to about two\nletters.';
+  'A stainless catering urn on a card table, with a lead running along the skirting and a plastic cup upside down over the tap so that it does not drip on the floor.\n\nIt is not the building\'s; the building has a machine through a door. This one has a dent in the side the size of a hip, a piece of tape round one handle, and the last of somebody\'s writing on the tape in laundry marker, gone to about two letters.';
 
 const URN_DRINK_TEXT =
-  'It is good coffee, and it is too strong, and it has been standing for a while\nin a way that has not improved it and has not spoiled it either.\n\nYou have had this before. You have had this a great many mornings, at a counter\nthirty-two miles from here, from a woman who does not stop pouring until you\nput your hand over the cup.';
+  'It is good coffee, and it is too strong, and it has been standing for a while in a way that has not improved it and has not spoiled it either.\n\nYou have had this before. You have had this a great many mornings, at a counter thirty-two miles from here, from a woman who does not stop pouring until you put your hand over the cup.';
 
 const urn: ObjectDefSlice = {
   location: ACT4_STAGING_AREA,
@@ -210,10 +210,10 @@ const urn: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const OFFICE_REPLY_READ_TEXT =
-  '    Dear Sir or Madam:\n\n        Thank you for writing. The President is grateful for the interest and\n    support of citizens across the country and reads as much of his\n    correspondence as the demands of the office allow. Your comments have\n    been noted and forwarded to the appropriate office.\n\n    With best wishes,\n\n    Correspondence Unit\n\nThe whole of it is handwritten, which is not how an office of that size answers\nanybody, and the hand is a good one.';
+  '    Dear Sir or Madam:\n\n        Thank you for writing. The President is grateful for the interest and support of citizens across the country and reads as much of his correspondence as the demands of the office allow. Your comments have been noted and forwarded to the appropriate office.\n\n    With best wishes,\n\n    Correspondence Unit\n\nThe whole of it is handwritten, which is not how an office of that size answers anybody, and the hand is a good one.';
 
 const OFFICE_REPLY_EXAMINE_TEXT =
-  'Good paper. A printed heading. An even upright hand with the loops closed, and\na signature under the last line that is not a name and is not quite a mark\neither.\n\nThere is one crease in it and it is the one it got in the box.';
+  'Good paper. A printed heading. An even upright hand with the loops closed, and a signature under the last line that is not a name and is not quite a mark either.\n\nThere is one crease in it and it is the one it got in the box.';
 
 const officeReply: ObjectDefSlice = {
   location: 'nowhere',
@@ -241,7 +241,7 @@ const officeReply: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 export const SHOW_TO_DETAIL_TEXT =
-  'He takes it. That is the part you had not prepared for: he takes it, reads all\nof it, turns it over and reads the back, with the flat attention of a man\ntrained to find the one wrong thing who has not yet had a week where he did not.\n\nThen he hands it back.\n\n"Thank you, sir," he says, and puts himself where he was standing, which is\nbetween you and the door.\n\nEverything in your pockets belonged to somebody else first, and none of it has\na name on it that is yours, because there is not one for it to have.';
+  'He takes it. That is the part you had not prepared for: he takes it, reads all of it, turns it over and reads the back, with the flat attention of a man trained to find the one wrong thing who has not yet had a week where he did not.\n\nThen he hands it back.\n\n"Thank you, sir," he says, and puts himself where he was standing, which is between you and the door.\n\nEverything in your pockets belonged to somebody else first, and none of it has a name on it that is yours, because there is not one for it to have.';
 
 export const SHOW_TO_DETAIL_EFFECTS: Effect[] = [{ say: SHOW_TO_DETAIL_TEXT }, { grantClue: ACT4_CLUE_DETAIL_REFUSES }];
 
@@ -259,7 +259,7 @@ export const SHOW_TO_DETAIL_EFFECTS: Effect[] = [{ say: SHOW_TO_DETAIL_TEXT }, {
 // ---------------------------------------------------------------------------
 
 export const FOLLOW_LUKE_GONE_TEXT =
-  'He left the way men like him leave, which is out of a door somebody else is\nholding, into a car somebody else is driving.\n\nWhat is in that lot now is tape on the asphalt, a coned lane nobody needs, and\na county man taking the cones up in no particular hurry.';
+  'He left the way men like him leave, which is out of a door somebody else is holding, into a car somebody else is driving.\n\nWhat is in that lot now is tape on the asphalt, a coned lane nobody needs, and a county man taking the cones up in no particular hurry.';
 
 // ---------------------------------------------------------------------------
 // Stage F1 — `FOLLOW LUKE` by name, once he is genuinely gone. See

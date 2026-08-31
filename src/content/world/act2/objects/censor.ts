@@ -69,17 +69,17 @@ import { ACT4_CLUE_ELIS_REASON, ACT4_REPLY_ELI_NUMERALS, ACT4_STARTED } from '..
 // ---------------------------------------------------------------------------
 
 export const ACT2_WRITE_AWAY_TEXT =
-  'The pen is on a chain in the post office and the paper is behind the rack in\nthe post office, and this is not the post office.';
+  'The pen is on a chain in the post office and the paper is behind the rack in the post office, and this is not the post office.';
 
 // ---------------------------------------------------------------------------
 // §10.2 — the prompt itself.
 // ---------------------------------------------------------------------------
 
 const COMPOSE_OPEN_BODY =
-  'You take a sheet off the back of the rack and put it on the ledge under the\nbrass, and the pen comes off its chain the length of a pen.';
+  'You take a sheet off the back of the rack and put it on the ledge under the brass, and the pen comes off its chain the length of a pen.';
 
 const COMPOSE_ON_SUBMIT_TEXT =
-  'You read it back once with the pen still in your hand, the way you read a thing\nback when you are not going to get another go at it.\n\nThen you write the box number on the back for the answer to come to, because\nthere is no other address in this county that is yours.';
+  'You read it back once with the pen still in your hand, the way you read a thing back when you are not going to get another go at it.\n\nThen you write the box number on the back for the answer to come to, because there is no other address in this county that is yours.';
 
 const COMPOSE_TO_EMPTY_TEXT = 'A letter to nobody is a diary, and you have not got the temperament.';
 
@@ -87,7 +87,7 @@ const COMPOSE_MESSAGE_EMPTY_TEXT =
   'You have written a name at the top of a blank sheet of paper.\n\nYou are, in fairness, in the right building for it.';
 
 const COMPOSE_CANCEL_TEXT =
-  'The sheet goes back behind the rack, face down, which is a thing you do\nwithout deciding to.';
+  'The sheet goes back behind the rack, face down, which is a thing you do without deciding to.';
 
 function composePromptEvent(): GameEvent {
   return {
@@ -160,13 +160,13 @@ export const act2ComposeRespond: ScriptFn = (world, state, args) => {
 // ---------------------------------------------------------------------------
 
 const FOLD_BEFORE_M13_TEXT =
-  'You fold it in three, the way a letter goes in an envelope, and it is a letter\nfolded in three.';
+  'You fold it in three, the way a letter goes in an envelope, and it is a letter folded in three.';
 
 const FOLD_AFTER_M13_TEXT =
-  'You fold it in half and then take the corner back on itself, and your hands do\nthe next part before you have looked at them: over, under, the small hard\ncrease along the third that makes the whole thing lie flat and stay shut with\nnothing holding it.\n\nYou know a fold now. You did not know it a week ago.\n\nThe finished thing is the size of a playing card and it does not need an\nenvelope, which is the entire point of it and always was.';
+  'You fold it in half and then take the corner back on itself, and your hands do the next part before you have looked at them: over, under, the small hard crease along the third that makes the whole thing lie flat and stay shut with nothing holding it.\n\nYou know a fold now. You did not know it a week ago.\n\nThe finished thing is the size of a playing card and it does not need an envelope, which is the entire point of it and always was.';
 
 const UNFOLD_TEXT =
-  'It opens along its own creases and lies flat, and the creases stay in it,\nbecause that is what creases are for.';
+  'It opens along its own creases and lies flat, and the creases stay in it, because that is what creases are for.';
 
 const letterFoldEffects: Effect[] = [
   {
@@ -190,7 +190,7 @@ const letterUnfoldEffects: Effect[] = [{ say: UNFOLD_TEXT }, { setProp: [ACT2_LE
 // ---------------------------------------------------------------------------
 
 const POST_TEXT =
-  "OUT OF TOWN takes it. The felt in the flap means the brass does not bang, so\nthe last thing you get is the sound of a sheet of paper landing on other\nsheets of paper somewhere below the floor.\n\nThat is the whole of it. It is now somebody else's for a while.";
+  "OUT OF TOWN takes it. The felt in the flap means the brass does not bang, so the last thing you get is the sound of a sheet of paper landing on other sheets of paper somewhere below the floor.\n\nThat is the whole of it. It is now somebody else's for a while.";
 
 // E0 task J — §21, canon 110's third slot. Checked BEFORE `censorVerdict`'s
 // own result is used (below): `censorVerdict` is still called, unmodified,
@@ -272,7 +272,7 @@ export const ACT2_ELI_REPLY_EVENT: EventDef = {
 // ---------------------------------------------------------------------------
 
 const EXAMINE_FOLD_TEXT =
-  'There is no envelope on any of these and there never has been. The sheet is\nthe envelope: over, under, and a hard crease along the third that holds it\nshut against a mail sack and a hundred miles.\n\nYou turn it over in your fingers to find where it starts, and your hands find\nit before your eyes do.';
+  'There is no envelope on any of these and there never has been. The sheet is the envelope: over, under, and a hard crease along the third that holds it shut against a mail sack and a hundred miles.\n\nYou turn it over in your fingers to find where it starts, and your hands find it before your eyes do.';
 
 const examineFoldEffects: Effect[] = [{ say: EXAMINE_FOLD_TEXT }, { set: [ACT2_EXAMINED_ELI_FOLD, true] }];
 
@@ -302,10 +302,10 @@ const REPLY_REWRITTEN_READ_TEXT =
   '    How is everybody? Give them all my love, every one of them, and tell\n' +
   '    them I am sorry I am hopeless.\n\n' +
   '    Eli\n\n' +
-  'It is warm, it is well written, it is signed the way he signs things, and it\nanswers the letter you sent in the sense that it arrived afterwards.';
+  'It is warm, it is well written, it is signed the way he signs things, and it answers the letter you sent in the sense that it arrived afterwards.';
 
 const REPLY_REWRITTEN_EXAMINE_TEXT =
-  'The hand is the hand. Upright, even, the loops closed. You have Jack\'s word\nthat it is a hand you could hang on a wall, and this is that hand.\n\nIt is also fast. A hand like that is slow to make. This one has been made at\nthe speed of somebody who has done a great many of them.';
+  'The hand is the hand. Upright, even, the loops closed. You have Jack\'s word that it is a hand you could hang on a wall, and this is that hand.\n\nIt is also fast. A hand like that is slow to make. This one has been made at the speed of somebody who has done a great many of them.';
 
 // `adjectives: ['first']` makes "FIRST REPLY" actually resolve to this
 // object rather than (silently) doing nothing — `grammar.ts`'s `toPhrase`
@@ -378,7 +378,7 @@ const REPLY_AUDIT_READ_TEXT =
   '    E.';
 
 const REPLY_AUDIT_EXAMINE_TEXT =
-  'Down the side of the second sheet, in the same upright hand, somebody has gone\nthrough the lines you copied out for him and written what they say.\n\nNot translated — *annotated*, the way you annotate a colleague. A hook is a\nvalve. A doubled stroke is a shift. The long tail on the end of a run is a\nfloor.\n\nUnder the last of it: *whoever writes like this does it for a living and does\nit fast and has been doing it for years. Where did you get this.*\n\nThe shorthand in the notebook is not a wall any more.';
+  'Down the side of the second sheet, in the same upright hand, somebody has gone\nthrough the lines you copied out for him and written what they say.\n\nNot translated — *annotated*, the way you annotate a colleague. A hook is a valve. A doubled stroke is a shift. The long tail on the end of a run is a floor.\n\nUnder the last of it: *whoever writes like this does it for a living and does it fast and has been doing it for years. Where did you get this.*\n\nThe shorthand in the notebook is not a wall any more.';
 
 const replyAudit: ObjectDefSlice = {
   location: 'nowhere',
@@ -405,10 +405,10 @@ const replyAudit: ObjectDefSlice = {
 // ---------------------------------------------------------------------------
 
 const RULER_EXAMINE_FIRST_TEXT =
-  'Folded in with the sheets, a strip of the same paper about the length of a\nhand.\n\nIt has been creased across at intervals, and the intervals are exact. Not\nneat — exact, the way a thing is exact when the person making it did not\nmeasure and did not need to. You can put a thumbnail in any crease and the\nnext one is where your thumb says it will be.\n\nThere is nothing written on it anywhere.';
+  'Folded in with the sheets, a strip of the same paper about the length of a hand.\n\nIt has been creased across at intervals, and the intervals are exact. Not neat — exact, the way a thing is exact when the person making it did not measure and did not need to. You can put a thumbnail in any crease and the next one is where your thumb says it will be.\n\nThere is nothing written on it anywhere.';
 
 const RULER_EXAMINE_AGAIN_TEXT =
-  'The creases run all the way to the short end, and the last two are closer\ntogether than the rest, and that is not a mistake either.';
+  'The creases run all the way to the short end, and the last two are closer together than the rest, and that is not a mistake either.';
 
 const rulerExamineEffects: Effect[] = [
   {
@@ -453,13 +453,13 @@ const origamiRuler: ObjectDefSlice = {
 // crashed on the object (found by the E3 integration playtest). The player's
 // own words are never printed (constitution §31).
 const LETTER_OUT_EXAMINE_FOLDED =
-  'Folded, it is the size of a playing card and weighs about as much as one.\nNo envelope, no gum, no string: over, under, the hard crease along the\nthird, and everything you had to say is shut inside paper by paper alone.\n\nThe box number ended up on the outside, upside down. The fold did not\nconsult you.';
+  'Folded, it is the size of a playing card and weighs about as much as one. No envelope, no gum, no string: over, under, the hard crease along the third, and everything you had to say is shut inside paper by paper alone.\n\nThe box number ended up on the outside, upside down. The fold did not consult you.';
 
 const LETTER_OUT_EXAMINE_FLAT =
-  'The free paper off the back of the rack, thin enough that the pen has come\nthrough in the places where you leaned on it. The lines start level and\nend up running downhill toward the right margin, which is where lines go\nwhen a man stops watching them.\n\nOn the back, the number of a box in this building, in the same pen and a\nslower hand.';
+  'The free paper off the back of the rack, thin enough that the pen has come through in the places where you leaned on it. The lines start level and end up running downhill toward the right margin, which is where lines go when a man stops watching them.\n\nOn the back, the number of a box in this building, in the same pen and a slower hand.';
 
 const LETTER_OUT_READ =
-  'You read it back, and it is worse coming out than it was going in, which\nis what second readings are for.\n\nThe hand is small and quick and slopes to the right. It is yours. You do\nnot remember learning it. It went on being yours anyway.';
+  'You read it back, and it is worse coming out than it was going in, which is what second readings are for.\n\nThe hand is small and quick and slopes to the right. It is yours. You do not remember learning it. It went on being yours anyway.';
 
 const letterOut: ObjectDefSlice = {
   location: 'nowhere',

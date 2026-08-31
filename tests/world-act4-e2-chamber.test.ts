@@ -235,7 +235,7 @@ describe('the Chamber — twelve objects', () => {
     const store = new MemoryStore();
     const { session } = inChamber();
     const { session: after, events } = say(session, 'look in jar', store);
-    expect(text(events)).toMatch(/small flat key on a\nloop of green string/);
+    expect(text(events)).toMatch(/small flat key on a loop of green string/);
     expect(after.state.objects[ACT4_SPARE_KEY]?.hidden).toBe(false);
   });
 
@@ -270,8 +270,8 @@ describe('the Chamber — twelve objects', () => {
     const { session } = inChamber();
     const first = text(say(session, 'open curtain', store).events);
     const second = text(say(session, 'pull curtain', store).events);
-    expect(first).toMatch(/keep drawing\ncurtain/);
-    expect(second).toMatch(/keep drawing\ncurtain/);
+    expect(first).toMatch(/keep drawing curtain/);
+    expect(second).toMatch(/keep drawing curtain/);
   });
 
   it('the grey door and its panel (§21.1)', () => {
@@ -303,7 +303,7 @@ describe('P23 — the three performances', () => {
     expect(text(unlockEvents)).toMatch(/comes out on wooden runners/);
 
     const { session: after, events } = say(unlocked, 'x camera', store);
-    expect(text(events)).toMatch(/checking a thing that\nwanted checking/);
+    expect(text(events)).toMatch(/checking a thing that wanted checking/);
     expect(after.state.flags[ACT4_CHAMBER_COPY_FOUND]).toBe(true);
   });
 
@@ -337,7 +337,7 @@ describe('the assist (§22) — act4_chamber_failures >= 2', () => {
     ({ session: current } = say(current, 'x camera', store));
     ({ session: current } = say(current, 'search drawer', store)); // repeat search — inc to 1
     const { events } = say(current, 'look in jar', store); // jar already empty — inc to 2, assist fires this turn
-    expect(text(events)).toMatch(/You've been first since before she\nwas born/);
+    expect(text(events)).toMatch(/You've been first since before she was born/);
   });
 });
 
