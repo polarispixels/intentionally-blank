@@ -265,6 +265,33 @@ describe('evaluate(): weekday arm', () => {
   });
 });
 
+describe('evaluate(): onOrAfterDay arm (ADR 0011, Stage D E2)', () => {
+  it('is false when the flag is unset (its declared default, false)', () => {
+    const state = baseState({ clock: { day: 99, minute: 0 } });
+    expect(evaluate(FIXTURE_WORLD, state, { onOrAfterDay: FLAG_BOOL })).toBe(false);
+  });
+
+  it('is false the day before the due day', () => {
+    const state = baseState({ clock: { day: 4, minute: 0 }, flags: { [FLAG_NUM]: 5 } });
+    expect(evaluate(FIXTURE_WORLD, state, { onOrAfterDay: FLAG_NUM })).toBe(false);
+  });
+
+  it('is true on the due day', () => {
+    const state = baseState({ clock: { day: 5, minute: 0 }, flags: { [FLAG_NUM]: 5 } });
+    expect(evaluate(FIXTURE_WORLD, state, { onOrAfterDay: FLAG_NUM })).toBe(true);
+  });
+
+  it('is true after the due day', () => {
+    const state = baseState({ clock: { day: 6, minute: 0 }, flags: { [FLAG_NUM]: 5 } });
+    expect(evaluate(FIXTURE_WORLD, state, { onOrAfterDay: FLAG_NUM })).toBe(true);
+  });
+
+  it('is false when the flag holds a string, and never throws', () => {
+    const state = baseState({ clock: { day: 99, minute: 0 }, flags: { [FLAG_NUM]: 'not a day' } });
+    expect(evaluate(FIXTURE_WORLD, state, { onOrAfterDay: FLAG_NUM })).toBe(false);
+  });
+});
+
 describe('evaluate(): profileLeader arm', () => {
   it('is true only for the strict tally leader', () => {
     const state = baseState({ profile: { analytical: 5, social: 2, direct: 1 } });

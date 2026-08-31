@@ -5,10 +5,12 @@
 // file owns only the room's own description, senses, room-specific
 // responses, and exits.
 
+import type { Cond } from '../../../engine/cond';
 import type { ExitDefSlice, HandlerDef, RoomDefSlice } from '../../../engine/world';
 import type { ProseRule } from '../../../engine/prose';
 import { LISTEN, SLEEP, SMELL, WAIT } from './verbs';
-import { CLUE_HIRED, FLAG_MET_JACK, FLAG_VISITED_MOTEL, JACKS_MOTEL, JACKS_MOTEL_NO_EXIT_GATE, MAIN_STREET, V_LOOK_UP } from './ids';
+import { CLUE_HIRED, FLAG_MET_JACK, FLAG_VISITED_MOTEL, JACK, JACKS_MOTEL, JACKS_MOTEL_NO_EXIT_GATE, MAIN_STREET, MONSTER_TRUCK, V_LOOK_UP } from './ids';
+import { ACT2_STARTED } from '../act2/ids';
 
 // ---------------------------------------------------------------------------
 // §3.1 — description
@@ -35,7 +37,24 @@ const FIRST_SIGHT = [
 const RETURN_VISIT =
   'Asphalt, the sign on its post, eight doors under a walkway, the truck backed in across four spaces. Number four open, light on. The road back into town is behind you.';
 
+// D0 amendment — presence-and-passage prose document §2.3, transcribed
+// exactly (hard rule 5). No first-sight variant (the shipped `FIRST_SIGHT`
+// above is the scene where the player meets Jack and cannot fire after
+// `act2_started`, since the ride north requires him) — `RETURN_VISIT` only.
+// The truck is a state, not a schedule, so the two rules are distinguished
+// by `objectAt`, not by time of day; both additionally gated on
+// `act2_started` (the document's own wiring table).
+const JACK_ABSENT: Cond = { not: { npcAt: [JACK, JACKS_MOTEL] } };
+
+const MOTEL_TRUCK_PRESENT =
+  'Asphalt, the sign on its post, eight doors under a walkway, the truck backed in across four spaces. Number four is shut, and the light behind the screen is on, because it is always on. The chair faces the lot and has nobody in it. The road back into town is behind you.';
+
+const MOTEL_TRUCK_GONE =
+  'Asphalt, the sign on its post, eight doors under a walkway, and a gap in the middle of the lot the width of something that is not there. Number four is shut, and the light behind the screen is on, because it is always on. The chair faces the lot and has nobody in it. The road back into town is behind you.';
+
 const description: ProseRule[] = [
+  { when: { all: [{ flag: ACT2_STARTED }, JACK_ABSENT, { objectAt: [MONSTER_TRUCK, JACKS_MOTEL] }] }, text: MOTEL_TRUCK_PRESENT },
+  { when: { all: [{ flag: ACT2_STARTED }, JACK_ABSENT] }, text: MOTEL_TRUCK_GONE },
   { when: { not: { flag: FLAG_VISITED_MOTEL } }, text: FIRST_SIGHT },
   { text: RETURN_VISIT },
 ];

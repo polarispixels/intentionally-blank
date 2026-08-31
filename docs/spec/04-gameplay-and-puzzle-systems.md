@@ -1,6 +1,6 @@
 # 04 - Gameplay and Puzzle Systems
 
-**Spec version:** `0.2.9`
+**Spec version:** `0.10.0`
 
 # 1. Core Interaction Loop
 
@@ -449,6 +449,8 @@ Hints should be optional.
 ---
 
 # 16. Time and NPC Movement
+
+> **Canon register entry 47 (v0.10.0):** day 1 is a Wednesday and the game opens at 04:20; weekday numbers live only in `src/content/world/act2/calendar.ts`; no weekday or clock time is ever printed. See ADR 0011.
 
 Inspired by *Deadline*, important NPCs may:
 

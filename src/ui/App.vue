@@ -10,7 +10,9 @@ import { DeterministicParser } from '../engine/interpreter';
 import { compileVocabulary } from '../engine/parser';
 import type { DeathOption } from '../session/session';
 import { RESTART_PROMPT_SCRIPTS } from '../session/session';
-import { WORLD } from '../content/world/act1';
+// The shipped game: the whole assembled world (Act I + Act II + Act III
+// slices), not just Act I (ADR 0011 item 3; Stage D E3).
+import { WORLD } from '../content/world/game';
 import { GAME_VERSION } from '../version';
 import {
   chooseDeathOption,

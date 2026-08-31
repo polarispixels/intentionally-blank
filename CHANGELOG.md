@@ -12,6 +12,45 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.10.0] - 2026-08-31
+
+**Stage D begins.** D0 — the calendar, world assembly, and the town learning
+to pass time. No new rooms; Act I plays byte-for-byte as before.
+
+### Added
+
+- **The game starts at 04:20 on a Wednesday** (`WorldMeta.startClock`,
+  canon register 47). The engine clock and the fiction agreed for the
+  first time; every Act I NPC still stands where v0.9.0 put them.
+- **`WAIT UNTIL MORNING / AFTERNOON / EVENING / NIGHT`** (and dawn, noon,
+  dusk, midnight) pass the day in one line, indoors or out; **`SLEEP`**
+  works on Your Room's floor and in unit five, paid through Sunday, and is
+  refused in voice elsewhere. All of it wakes only after the first ride
+  north (`act2_started`), so Act I is one night still.
+- **The town in Act II, staged**: Marlow off mornings and afternoons,
+  Whitlock at the diner on Friday nights, Jack at Pearl's counter every
+  morning with a plate and a folder he is not reading; the front desk and
+  the sheriff's office found empty — the card against the bell, the radio
+  talking to the chair (`docs/superpowers/specs/2026-09-08-stage-d0-presence-and-passage.md`).
+- **`{ onOrAfterDay }`** — a condition for "the day this was set, plus N";
+  Act II's letters and poker bans need it (ADR 0011).
+- **One world from act slices**: `src/content/world/game.ts` assembles
+  `ACT1_SLICE + ACT2_SLICE + ACT3_SLICE`, throwing on a duplicate id; the
+  CLI and the shell default to it.
+
+### Decisions
+
+- **ADR 0011** — the calendar and world assembly. Canon register **47–55**
+  (Stage D's staging questions: the poker cast, the odd key opens the
+  tunnel hatch, the deck in the glovebox and the pencil in the cache, the
+  facility's two names, Zone 1's Act II schedules, where Dad boots, the
+  chairs on Sublevel 6, sleep and horses and the store by day). The Stage D
+  plan is the build order: D1 the ride and Wall Drug next.
+- Validator: 39 warnings, five new (the pass-time verbs' words against
+  shipped nouns), all pinned.
+
+1087 tests (from 1050).
+
 ## [0.9.0] - 2026-08-31
 
 **Act I is complete.** Twelve rooms, four characters, P1–P8, R1–R3, and a

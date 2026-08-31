@@ -8,7 +8,7 @@
 import type { ExitDefSlice, HandlerDef, RoomDefSlice } from '../../../engine/world';
 import type { ProseRule } from '../../../engine/prose';
 import { LISTEN, SLEEP, SMELL, WAIT } from './verbs';
-import { FLAG_MET_PEARL, FLAG_VISITED_DINER, MAIN_STREET, SUNDOWN_DINER, SUNDOWN_DINER_NO_EXIT_GATE, V_LOOK_UP } from './ids';
+import { FLAG_MET_PEARL, FLAG_VISITED_DINER, JACK, MAIN_STREET, SUNDOWN_DINER, SUNDOWN_DINER_NO_EXIT_GATE, V_LOOK_UP } from './ids';
 
 // ---------------------------------------------------------------------------
 // §3.1 — description
@@ -24,8 +24,15 @@ const FIRST_SIGHT = [
 const RETURN_VISIT =
   'Warm, and the griddle up, and the chairs still stacked over the tables at the dark end. The counter, the mugs, the pie case, the photographs. Pearl, doing four things.';
 
+// D0 (presence-and-passage §2.4, the writer's proposal, accepted by the main
+// session): from `act2_started` Jack's morning post is this counter, and the
+// engine carries presence in prose — so the return visit says so while he is
+// here. `npcAt` is only ever true once his Act II schedule rule fires.
+const RETURN_VISIT_WITH_JACK = `${RETURN_VISIT} And at the counter, third stool from the end, Jack, with a plate in front of him and a folder he is not reading.`;
+
 const description: ProseRule[] = [
   { when: { not: { flag: FLAG_VISITED_DINER } }, text: FIRST_SIGHT },
+  { when: { npcAt: [JACK, SUNDOWN_DINER] }, text: RETURN_VISIT_WITH_JACK },
   { text: RETURN_VISIT },
 ];
 

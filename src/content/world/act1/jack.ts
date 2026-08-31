@@ -88,12 +88,14 @@ import {
   MUG,
   PAGE_78,
   ROOM_KEY,
+  SUNDOWN_DINER,
   V_ATTACK,
   V_FOLLOW,
   V_HUG,
   V_KISS,
   WORK_ORDER,
 } from './ids';
+import { ACT2_JACK_AWAY, ACT2_STARTED } from '../act2/ids';
 
 // ---------------------------------------------------------------------------
 // §6.3 — unknownTopic
@@ -117,6 +119,19 @@ const description =
 // ---------------------------------------------------------------------------
 
 const greeting: ProseRule[] = [
+  // D0 amendment — the presence-and-passage prose document PART THREE §4,
+  // transcribed exactly (hard rule 5). Prepended above every shipped rule
+  // so it wins wherever Jack is actually at the counter (only reachable
+  // post-`act2_started`, `{ npcAt: [JACK, SUNDOWN_DINER] }`'s own morning
+  // schedule rule, above); the four rules below are otherwise unchanged
+  // and still answer at the motel.
+  {
+    when: { at: SUNDOWN_DINER },
+    text: [
+      'He is on the third stool from the end, plate in front of him, cup filled twice already without his asking. "You came down," he says. "Told you about this counter." He does not ask how you slept, which is new.',
+      'He got here before the griddle did — his stool is the warm one, and Pearl has stopped saying anything to him. "Sit," he says, and moves a folder off the stool beside him without looking at it.',
+    ],
+  },
   {
     // Reachable as of v0.8.0 — see this file's header.
     when: { not: { met: JACK } },
@@ -124,14 +139,14 @@ const greeting: ProseRule[] = [
       'He gets the chair out from under the table with his foot and stands there until you are in it.\n\n"Nine last night," he says. "Then ten. Then I walked down to Marlow\'s at midnight and stood in the street like a fool." He is looking at the side of your head the whole time. "How long have you had that?"\n\nYou do not know. He takes that the way he is going to take everything else tonight, which is straight on.',
   },
   {
-    when: { flag: FLAG_TOLD_JACK_ABOUT_ROOM },
+    when: { all: [{ flag: FLAG_TOLD_JACK_ABOUT_ROOM }, { at: JACKS_MOTEL }] },
     text: [
       'He does not sit down now. He talks at the window end of the room, with the curtain moved about two inches.',
       '"Truck\'s got gas in it," he says, apropos of nothing at all, which is what he says now instead of asking whether you are all right.',
     ],
   },
   {
-    when: { memory: MEM_M1_HIRING },
+    when: { all: [{ memory: MEM_M1_HIRING }, { at: JACKS_MOTEL }] },
     text:
       '"You want the coffee out of that machine, or you want to walk down to Pearl\'s when it\'s light," he says. "I know which I\'d do."\n\nIt is not the first time he has offered you that counter.',
   },
@@ -466,7 +481,15 @@ export const jack: NpcDefSlice = {
   // Main-session decision — see this file's header. §6's own header calls
   // for a phase-based schedule the engine's own clock start (07:00) can't
   // support without putting Jack in the wrong place at the game's opening.
-  schedule: [{ room: JACKS_MOTEL }],
+  // D0 amendment (Stage D plan §2's D0 table; ADR 0011 rule 5): prepended,
+  // gated on `act2_started` — Jack at the diner counter mornings (canon
+  // 52), unless the travel script has him pinned away
+  // (`act2_jack_away`). Before `act2_started` the single unconditional
+  // post below is the whole schedule, unchanged since v0.9.0.
+  schedule: [
+    { when: { all: [{ flag: ACT2_STARTED }, { clockPhase: 'morning' }, { not: { flag: ACT2_JACK_AWAY } }] }, room: SUNDOWN_DINER },
+    { room: JACKS_MOTEL },
+  ],
   nouns: ['jack', 'man', 'brother', 'client', 'driver'],
   adjectives: ['big', 'wide'],
   name: 'Jack',

@@ -385,6 +385,7 @@ export type Cond =
   | { clock: { day?: number; after?: number; before?: number } } // raw minutes — rare, precise cases only
   | { clockPhase: DayPhase }            // canon A9: the normal way to write schedules
   | { weekday: number }                 // 0-based, for weekly windows (poker night, trash day)
+  | { onOrAfterDay: FlagId }             // true iff the flag holds a number and clock.day >= it (Stage D, 2026-08-31, ADR 0011)
   | { profileLeader: ActionClass }
   | { chance?: never }                                         // deliberately absent: no RNG
   | { all: Cond[] } | { any: Cond[] } | { not: Cond };

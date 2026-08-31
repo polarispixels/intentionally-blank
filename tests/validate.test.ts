@@ -131,6 +131,16 @@ describe('validate — referential integrity', () => {
     expect(findingsOf(qWorld, 'unknown-question-ref').length).toBeGreaterThan(0);
   });
 
+  it('flags an onOrAfterDay Cond referencing an undeclared flag (ADR 0011, Stage D E2)', () => {
+    const world: WorldDef = {
+      ...FIXTURE_WORLD,
+      rooms: { ...FIXTURE_WORLD.rooms, [ROOM_A]: { dark: { onOrAfterDay: F('nonexistent_due_day_flag') } } },
+    };
+    const findings = findingsOf(world, 'unknown-flag-ref');
+    expect(findings.length).toBeGreaterThan(0);
+    expect(findings[0]!.message).toContain('nonexistent_due_day_flag');
+  });
+
   it('does not flag Conds that reference real memory/clue/question ids', () => {
     const world: WorldDef = {
       ...FIXTURE_WORLD,
@@ -276,6 +286,32 @@ describe('validate — meta.phases duplicate start minute', () => {
     };
     const findings = findingsOf(world, 'meta-duplicate-phase-start');
     expect(findings.length).toBeGreaterThan(0);
+    expect(findings[0]!.severity).toBe('error');
+  });
+});
+
+describe('validate — meta.startClock (ADR 0011, Stage D E1)', () => {
+  it('accepts a world with no startClock declared', () => {
+    expect(FIXTURE_WORLD.meta.startClock).toBeUndefined();
+    expect(findingsOf(FIXTURE_WORLD, 'meta-start-clock-invalid')).toEqual([]);
+  });
+
+  it('accepts a valid startClock', () => {
+    const world: WorldDef = { ...FIXTURE_WORLD, meta: { ...FIXTURE_WORLD.meta, startClock: { day: 1, minute: 260 } } };
+    expect(findingsOf(world, 'meta-start-clock-invalid')).toEqual([]);
+  });
+
+  it('rejects minute 1440 (out of range)', () => {
+    const world: WorldDef = { ...FIXTURE_WORLD, meta: { ...FIXTURE_WORLD.meta, startClock: { day: 1, minute: 1440 } } };
+    const findings = findingsOf(world, 'meta-start-clock-invalid');
+    expect(findings).toHaveLength(1);
+    expect(findings[0]!.severity).toBe('error');
+  });
+
+  it('rejects day 0', () => {
+    const world: WorldDef = { ...FIXTURE_WORLD, meta: { ...FIXTURE_WORLD.meta, startClock: { day: 0, minute: 0 } } };
+    const findings = findingsOf(world, 'meta-start-clock-invalid');
+    expect(findings).toHaveLength(1);
     expect(findings[0]!.severity).toBe('error');
   });
 });

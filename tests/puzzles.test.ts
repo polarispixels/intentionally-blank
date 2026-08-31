@@ -386,6 +386,25 @@ describe('validate(): puzzle clock-free-solution rule', () => {
     expect(validate(world).filter((f) => f.code === 'puzzle-no-clock-free-solution')).toEqual([]);
   });
 
+  it('rejects a puzzle whose only solution route is onOrAfterDay-gated, with no missedRecovery (ADR 0011, Stage D E2)', () => {
+    const world: WorldDef = {
+      ...FIXTURE_WORLD,
+      puzzles: {
+        [P('fixture_due_day_puzzle')]: {
+          id: P('fixture_due_day_puzzle'),
+          name: 'due day puzzle',
+          solvedWhen: { flag: FLAG_PUZZLE_ROUTE_A },
+          solutions: [{ id: 'only_route', class: 'direct', note: 'wait for the reply', route: { onOrAfterDay: F('fixture_due_day') } }],
+          hints: ['nudge'],
+        },
+      },
+    };
+    const findings = validate(world).filter((f) => f.code === 'puzzle-no-clock-free-solution');
+    expect(findings).toHaveLength(1);
+    expect(findings[0]!.severity).toBe('error');
+    expect(findings[0]!.message).toContain('fixture_due_day_puzzle');
+  });
+
   it('a puzzle with at least one clock-free route among several is clean, even if another route is clock-gated', () => {
     const world: WorldDef = {
       ...FIXTURE_WORLD,

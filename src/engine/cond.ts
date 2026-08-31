@@ -53,6 +53,11 @@ export type Cond =
   | { clock: { day?: number; after?: number; before?: number } } // raw minutes — rare, precise cases only
   | { clockPhase: DayPhase } // the normal way to write schedules; via clock.ts's phase()
   | { weekday: number } // 0-based; via clock.ts's weekday()
+  // true iff the flag holds a `number` and `state.clock.day >= it` — a due
+  // day set by an effect, compared to the live clock (ADR 0011, Stage D
+  // E2). Never throws: any non-number value (including a due-day flag's
+  // usual unset default, `false`) is simply false.
+  | { onOrAfterDay: FlagId }
   | { profileLeader: ActionClass }
   | { chance?: never } // deliberately absent: no RNG
   | { all: Cond[] }
@@ -166,6 +171,11 @@ export function evaluate(world: WorldDef, state: GameState, cond: Cond): boolean
 
   if ('clockPhase' in cond) return phase(world.meta, state.clock) === cond.clockPhase;
   if ('weekday' in cond) return weekday(world.meta, state.clock) === cond.weekday;
+
+  if ('onOrAfterDay' in cond) {
+    const value = flag(world, state, cond.onOrAfterDay);
+    return typeof value === 'number' && state.clock.day >= value;
+  }
 
   if ('profileLeader' in cond) {
     // Strict max only — a tie has no leader. Picking one by declaration

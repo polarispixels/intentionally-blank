@@ -66,6 +66,7 @@ import {
   ROOM_KEY,
   MARLOW,
 } from './ids';
+import { ACT2_STARTED } from '../act2/ids';
 import type { Cond } from '../../../engine/cond';
 
 // ---------------------------------------------------------------------------
@@ -313,7 +314,12 @@ export const marlow: NpcDefSlice = {
   // sending him offstage — the room does not function without him — until
   // the architect either fixes the start-time hardcode or the game
   // actually derives a real starting clockPhase for Act I.
+  // D0 amendment (Stage D plan §2's D0 table; ADR 0011 rule 5): prepended,
+  // gated on `act2_started` so this world's own Act I fixture is
+  // untouched — before it, the three rules below are the whole schedule,
+  // unchanged since v0.9.0.
   schedule: [
+    { when: { all: [{ flag: ACT2_STARTED }, { any: [{ clockPhase: 'morning' }, { clockPhase: 'afternoon' }] }] }, room: 'offstage' },
     { when: { clockPhase: 'night' }, room: FRONT_DESK },
     { when: { clockPhase: 'evening' }, room: FRONT_DESK },
     { room: FRONT_DESK },

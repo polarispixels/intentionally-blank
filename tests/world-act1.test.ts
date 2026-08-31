@@ -120,12 +120,27 @@ describe('validate — Act I room 1', () => {
   // This task's own other additions (`act1_assemble`, "dial" on TURN,
   // `'V dobj prep iobj'` on PRY) add zero further collisions — none of
   // those is typable bare.
-  it('produces exactly the 28 expected verb-noun-collision warnings, no others', () => {
+  //
+  // Stage D0 (`act2/verbs.ts`'s four `WAIT UNTIL <phase>` verbs) adds five
+  // more, both genuine and both already anticipated by the plan's own
+  // literal word list: "wait till <phase>" shares its token "till" with
+  // the general store's and the diner's own counter noun "till" (three
+  // hits — morning/afternoon/evening — the plan asked for "till" on all
+  // four, but the fourth collides on a second word first and validate only
+  // ever reports the first collision per verb, per this rule's own scan
+  // order), and "wait until night" shares "night" with Marlow's own
+  // adjective "night" (`marlow.ts`'s `adjectives`).
+  it('produces exactly the 33 expected verb-noun-collision warnings, no others', () => {
     const warnings = validate(WORLD).filter((f) => f.severity === 'warning');
     const collisions = warnings.filter((f) => f.code === 'verb-noun-collision');
-    expect(collisions.length).toBe(28);
+    expect(collisions.length).toBe(33);
     expect(collisions.map((f) => f.message).sort()).toEqual(
       [
+        "verb \"act2_wait_until_afternoon\" can be typed bare and its word \"till\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act2_wait_until_evening\" can be typed bare and its word \"till\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act2_wait_until_morning\" can be typed bare and its word \"till\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act2_wait_until_night\" can be typed bare and its word \"night\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act2_wait_until_night\" can be typed bare and its word \"till\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act1_eat\" can be typed bare and its word \"order\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act1_eat_pie\" can be typed bare and its word \"pie\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act1_eat_pill\" can be typed bare and its word \"pill\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
@@ -229,9 +244,10 @@ describe('validate — Act I room 1', () => {
   // RECONCILED (wave 5, Nolan's Yard + Close-out): 1 (grey/FEDORA) + 1
   // (shed/KEYRING) + 28 (verb-noun) + 4 (object-noun) = 34 — see the two
   // room-description tests and the verb-noun test above for what each new
-  // one is and who added it.
-  it('produces exactly thirty-four warnings total, no others', () => {
+  // one is and who added it. Stage D0 adds 5 more verb-noun collisions
+  // (above): 34 + 5 = 39.
+  it('produces exactly thirty-nine warnings total, no others', () => {
     const warnings = validate(WORLD).filter((f) => f.severity === 'warning');
-    expect(warnings.length).toBe(34);
+    expect(warnings.length).toBe(39);
   });
 });

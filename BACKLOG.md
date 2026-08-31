@@ -20,7 +20,7 @@ Maintenance rules:
 | A | Story + engine architecture: five-act causal spine, puzzle network, room list, NPC agendas, memory system, save/undo design; canon decisions registered in `docs/spec/09` | docs site | ✅ **complete v0.2.9** — story architecture (41 rooms, 28 puzzles, 5 acts) + engine v2 architecture + ADRs 0008–0010; 15 canon decisions promoted (register entries 3–17) |
 | B | Engine v2 (world model, parser v2, save/undo/autosave, map + open-questions UI) + the opening room (M1) | 0.3.0 | ✅ **shipped v0.3.0** — 23 tasks, 729 tests; the live URL is now the real game |
 | C | Act I: town, client, missing sibling, notebook trail (M2–M4) | 0.4–0.9 | ✅ **shipped v0.9.0** — 12 rooms, 4 NPCs, P1–P8, R1–R3, M1/M3; clean-save playthrough fixture `tests/fixtures/playthrough-act1.txt` is the act's regression gate |
-| D | Acts II–III: data center, underground, Dad on the USB, contradictions | 0.10–0.15 | 🚧 **starting** — plan: `docs/superpowers/specs/2026-09-07-stage-d-plan.md` (six waves D0–D5; D0 = calendar/engine, ADR 0011) |
+| D | Acts II–III: data center, underground, Dad on the USB, contradictions | 0.10–0.15 | 🚧 in progress — D0 shipped v0.10.0 (calendar, assembly, pass-time; ADR 0011); plan: `docs/superpowers/specs/2026-09-07-stage-d-plan.md`; D1 (the ride, Wall Drug) next |
 | E | Acts IV–V: reality travel, identity, the recursive ending | 0.16–0.18 | queued |
 | F | Hints, playtester sweeps, replay content, polish | 1.0.0 | queued |
 
@@ -34,7 +34,6 @@ board above is the plan. This table is what is *left*.
 
 | # | Remaining | Type |
 |---|---|---|
-| D0 | Stage D engine + calendar: `startClock`, `onOrAfterDay`, world assembly (ADR 0011), pass-time verbs, Zone 1 presence variants | Engine + content |
 | D1–D5 | The ride north + Wall Drug; the town in daylight (Dad, censor, poker); the facility surface; the descent; Sublevel 6 | Content |
 | E | Acts IV–V: identity thread, the archive environments, the root console | Content |
 | F | Hints across all acts, `playtester` agent, replay content, 1.0 polish | Content + process |

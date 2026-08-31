@@ -45,6 +45,17 @@ describe('phase()', () => {
     expect(phase(scrambled, { day: 1, minute: 1000 })).toBe('morning');
   });
 
+  it('resolves minute 260 (04:20) under Act I\'s own phase table to "night" (ADR 0011: startClock 04:20)', () => {
+    // Act I's phase table (src/content/world/act1/world.ts): morning 420,
+    // afternoon 720, evening 1080, night 1320 — night wraps past midnight
+    // and covers 22:00..06:59, so 04:20 (minute 260) falls inside it.
+    const act1Meta: WorldMeta = {
+      phases: { morning: 420, afternoon: 720, evening: 1080, night: 1320 },
+      weekLength: 7,
+    };
+    expect(phase(act1Meta, { day: 1, minute: 260 })).toBe('night');
+  });
+
   it('rejects a phases table with duplicate start minutes', () => {
     const duplicate: WorldMeta = {
       phases: { morning: 0, afternoon: 0, evening: 600, night: 1200 },

@@ -133,9 +133,11 @@ export type GameEvent =
  * cannot start a game, so this throws rather than guessing a room.
  *
  * Two content decisions this task made, absent a spec-literal answer:
- *   - The starting clock is day 1 at the minute `meta.phases.morning` marks
- *     — "world time from day one" (§4.1) doesn't pin an exact minute, and
- *     the worked opening room (§2.10) reads as a morning scene.
+ *   - The starting clock is `meta.startClock` when declared (ADR 0011,
+ *     Stage D `E1`), else day 1 at the minute `meta.phases.morning` marks —
+ *     "world time from day one" (§4.1) doesn't pin an exact minute absent a
+ *     declared `startClock`, and the worked opening room (§2.10) reads as a
+ *     morning scene.
  *   - `visited[startRoom] = 0` is seeded up front. The player begins in that
  *     room without an `onEnter`-triggering transition into it, and `GO TO`
  *     / the map view (§6.1) only ever route through `visited` rooms — if
@@ -148,7 +150,7 @@ export function initialState(world: WorldDef): GameState {
     throw new Error('initialState: world.meta.startRoom is not declared');
   }
   return {
-    clock: { day: 1, minute: world.meta.phases.morning },
+    clock: world.meta.startClock ?? { day: 1, minute: world.meta.phases.morning },
     location: startRoom,
     objects: {},
     npcs: {},

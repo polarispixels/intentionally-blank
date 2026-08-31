@@ -57,6 +57,16 @@ describe('initialState(world)', () => {
     expect(initialState(FIXTURE_WORLD).clock).toEqual({ day: 1, minute: 360 });
   });
 
+  it('uses meta.startClock when declared, instead of the morning-phase default (ADR 0011)', () => {
+    const world = { ...FIXTURE_WORLD, meta: { ...FIXTURE_WORLD.meta, startClock: { day: 1, minute: 260 } } };
+    expect(initialState(world).clock).toEqual({ day: 1, minute: 260 });
+  });
+
+  it('defaults to phases.morning when startClock is absent', () => {
+    expect(FIXTURE_WORLD.meta.startClock).toBeUndefined();
+    expect(initialState(FIXTURE_WORLD).clock).toEqual({ day: 1, minute: FIXTURE_WORLD.meta.phases.morning });
+  });
+
   it('marks the start room visited at turn 0', () => {
     expect(initialState(FIXTURE_WORLD).visited).toEqual({ [ROOM_A]: 0 });
   });

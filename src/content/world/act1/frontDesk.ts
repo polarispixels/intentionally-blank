@@ -8,7 +8,8 @@ import type { Cond } from '../../../engine/cond';
 import type { HandlerDef, OnEnterRule, RoomDefSlice } from '../../../engine/world';
 import type { ProseRule } from '../../../engine/prose';
 import { LISTEN, WAIT, checkDateText, findNameText } from './verbs';
-import { CLUE_REGISTER_GAP, FLAG_MET_MARLOW, FLAG_REGISTER_GAP_SEEN, LANDING, MAIN_STREET, STREET_DOOR, V_CHECK_DATE, V_FIND_MY_NAME, V_LOOK_OUTSIDE, V_WHOAMI } from './ids';
+import { CLUE_REGISTER_GAP, FLAG_MET_MARLOW, FLAG_REGISTER_GAP_SEEN, FRONT_DESK, LANDING, MAIN_STREET, MARLOW, STREET_DOOR, V_CHECK_DATE, V_FIND_MY_NAME, V_LOOK_OUTSIDE, V_WHOAMI } from './ids';
+import { ACT2_SEEN_DESK_EMPTY, ACT2_STARTED } from '../act2/ids';
 
 const FIRST_SIGHT = [
   'The stairs come down into a lobby built for more people than are using it. Ten or eleven chairs stand around a low table with the magazines squared to the corner, and none of them are lit; all the light in this room comes off one green-shaded lamp at the front desk and gives out about four feet from where it starts.',
@@ -21,7 +22,24 @@ const RETURN_VISIT =
 
 const MET_MARLOW: Cond = { flag: FLAG_MET_MARLOW };
 
+// D0 amendment — presence-and-passage prose document §2.1, transcribed
+// exactly (hard rule 5). Two rules, prepended above the shipped pair
+// (unedited): the long variant fires the first time the desk is found
+// empty (`ACT2_SEEN_DESK_EMPTY`, set by this room's own `onEnter` below,
+// per the document's §5.3 q1 recommendation — `FLAG_MET_MARLOW` is set on
+// first entry, long before `act2_started` can ever be true, so it cannot
+// gate "first empty" itself), the short variant every time after.
+const DESK_EMPTY_FIRST =
+  'The lamp is on and giving out about four feet from where it starts, the same as it does with a man sitting under it. Most of the hooks still have their keys. The register is open on the counter, still facing out at whoever is next.\n\nPropped against the bell, a card: BACK SHORTLY, in a hand that has written it many times.';
+
+const DESK_EMPTY_AFTER =
+  'The lamp, the hooks, the chairs nobody is in, and the register open on the counter facing out. The card is still propped against the bell. It is still shortly.';
+
+const MARLOW_ABSENT: Cond = { not: { npcAt: [MARLOW, FRONT_DESK] } };
+
 const description: ProseRule[] = [
+  { when: { all: [{ flag: ACT2_STARTED }, MARLOW_ABSENT, { not: { flag: ACT2_SEEN_DESK_EMPTY } }] }, text: DESK_EMPTY_FIRST },
+  { when: { all: [{ flag: ACT2_STARTED }, MARLOW_ABSENT] }, text: DESK_EMPTY_AFTER },
   { when: { not: MET_MARLOW }, text: FIRST_SIGHT },
   { text: RETURN_VISIT },
 ];
@@ -74,7 +92,13 @@ const roomHandlers: HandlerDef[] = [
   },
 ];
 
-const onEnter: OnEnterRule[] = [{ effects: [{ set: [FLAG_MET_MARLOW, true] }] }];
+const onEnter: OnEnterRule[] = [
+  { effects: [{ set: [FLAG_MET_MARLOW, true] }] },
+  // §5.3 q1's recommendation — sets AFTER the description above has
+  // already rendered (`move.ts`'s `renderArrival` order), so the very
+  // first empty-desk render still gets the long variant.
+  { when: { all: [{ flag: ACT2_STARTED }, MARLOW_ABSENT] }, once: true, effects: [{ set: [ACT2_SEEN_DESK_EMPTY, true] }] },
+];
 
 export const frontDeskRoom: RoomDefSlice = {
   name: 'Front Desk',

@@ -46,6 +46,10 @@
 // id → script id, supplied by whoever assembles the world. A `prompt`
 // event whose id has no entry there is reported (not crashed) and simply
 // can't be answered — an authoring gap, not a CLI bug.
+//
+// Default world (ADR 0011 item 3; Stage D E3): `src/content/world/game.ts`,
+// the whole assembled game (Act I + Act II + Act III slices), not just
+// Act I.
 
 import { createInterface } from 'node:readline';
 import { existsSync, readFileSync } from 'node:fs';
@@ -58,7 +62,7 @@ import { compileVocabulary } from '../engine/parser';
 import type { CompiledVocabulary } from '../engine/parser';
 import { availableHints, mapView, memoriesView, notebookView, questionsView, revealHint } from '../engine/views';
 import type { GameEvent, WorldDef } from '../engine/world';
-import { WORLD as ACT1_WORLD } from '../content/world/act1';
+import { WORLD as SHIPPED_WORLD } from '../content/world/game';
 import {
   deathOptions,
   exportSave,
@@ -360,7 +364,7 @@ async function feed(line: string): Promise<void> {
 async function main(): Promise<void> {
   if (worldPath === undefined) {
     // No --world flag: the real shipped game (task 22's default-world wiring).
-    WORLD = ACT1_WORLD;
+    WORLD = SHIPPED_WORLD;
     PROMPT_SCRIPTS = RESTART_PROMPT_SCRIPTS;
   } else {
     const mod = await loadWorldModule(worldPath);

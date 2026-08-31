@@ -43,7 +43,7 @@ import type { ActionClass, DayPhase, Direction, FlagId, FlagValue, MemoryId, Clu
 import type { Effect } from './effects';
 import type { Prose } from './prose';
 import { objectLocation, objectState } from './resolve';
-import type { GameEvent, GameState } from './gamestate';
+import type { Clock, GameEvent, GameState } from './gamestate';
 
 export type { Clock, GameEvent, GameState, NpcOverlay, ObjectOverlay, Phase } from './gamestate';
 export { initialState } from './gamestate';
@@ -76,6 +76,16 @@ export interface WorldMeta {
    * — that addition happens in `effects.ts`, before `tick` ever runs.
    */
   minutesPerTurn?: number;
+  /**
+   * Where `initialState` puts the clock; default `{ day: 1, minute:
+   * phases.morning }` for fixtures that predate it (ADR 0011, Stage D
+   * `E1`). Act I's fiction opens at 04:20, not the engine's old fixed
+   * 07:00 — this is what let `startClock: { day: 1, minute: 260 }` fix
+   * that without touching `GameState`/`SaveFile`. `validate.ts`'s
+   * `meta-start-clock-invalid` rejects `day < 1` or a `minute` outside
+   * `[0, 1440)`.
+   */
+  startClock?: Clock;
 }
 
 /**

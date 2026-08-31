@@ -4,6 +4,7 @@
 // register entry 28: she has a night post — see `whitlock.ts`'s own
 // schedule comment.
 
+import type { Cond } from '../../../engine/cond';
 import type { ExitDefSlice, HandlerDef, RoomDefSlice } from '../../../engine/world';
 import type { ProseRule } from '../../../engine/prose';
 import { LISTEN, SLEEP, SMELL, WAIT } from './verbs';
@@ -19,7 +20,9 @@ import {
   V_TYPE_TERMINAL,
   V_WHAT_YEAR,
   V_WHOAMI,
+  WHITLOCK,
 } from './ids';
+import { ACT2_SEEN_OFFICE_EMPTY, ACT2_STARTED } from '../act2/ids';
 
 // ---------------------------------------------------------------------------
 // §12.1 — description
@@ -35,7 +38,24 @@ const FIRST_SIGHT = [
 const RETURN_VISIT =
   'Warm, and lit, and the coffee still going. The counter, the map, the wire door, the cell with its door hooked back. Whitlock at the desk with something in front of her that is not you.';
 
+// D0 amendment — presence-and-passage prose document §2.2, transcribed
+// exactly (hard rule 5). Same shape as `frontDesk.ts`'s own amendment: the
+// long variant fires the first time the office is found empty
+// (`ACT2_SEEN_OFFICE_EMPTY`, set by this room's own `onEnter` below —
+// `FLAG_VISITED_SHERIFF_OFFICE` is set on first entry, long before
+// `act2_started`, so it cannot gate "first empty" itself, §5.3 q1), the
+// short variant every time after.
+const OFFICE_EMPTY_FIRST =
+  'The light is on and the blind is still an inch short of the sill. Behind the counter the chair is pushed back at the angle chairs get pushed back at, and the form is face down with a pen across it.\n\nThe radio is still going, low, giving road numbers to a room with nobody in it. She told you it has to have somebody beside it.';
+
+const OFFICE_EMPTY_AFTER =
+  'Warm, and lit, and the coffee still going. The counter, the map, the wire door, the cell with its door hooked back. The radio, talking to the chair.';
+
+const WHITLOCK_ABSENT: Cond = { not: { npcAt: [WHITLOCK, SHERIFF_OFFICE] } };
+
 const description: ProseRule[] = [
+  { when: { all: [{ flag: ACT2_STARTED }, WHITLOCK_ABSENT, { not: { flag: ACT2_SEEN_OFFICE_EMPTY } }] }, text: OFFICE_EMPTY_FIRST },
+  { when: { all: [{ flag: ACT2_STARTED }, WHITLOCK_ABSENT] }, text: OFFICE_EMPTY_AFTER },
   { when: { not: { flag: FLAG_VISITED_SHERIFF_OFFICE } }, text: FIRST_SIGHT },
   { text: RETURN_VISIT },
 ];
@@ -89,7 +109,13 @@ const roomHandlers: HandlerDef[] = [
 // her own greeting rule 1 (which the schema can never run an `Effect` from
 // — see `whitlock.ts`'s own header note, same engine gap `frontDesk.ts`/
 // `marlow.ts` already document for `met_marlow`).
-const onEnter: RoomDefSlice['onEnter'] = [{ effects: [{ set: [FLAG_VISITED_SHERIFF_OFFICE, true] }, { set: [FLAG_MET_WHITLOCK, true] }] }];
+const onEnter: RoomDefSlice['onEnter'] = [
+  { effects: [{ set: [FLAG_VISITED_SHERIFF_OFFICE, true] }, { set: [FLAG_MET_WHITLOCK, true] }] },
+  // §5.3 q1's recommendation — sets AFTER the description above has
+  // already rendered, so the very first empty-office render still gets
+  // the long variant.
+  { when: { all: [{ flag: ACT2_STARTED }, WHITLOCK_ABSENT] }, once: true, effects: [{ set: [ACT2_SEEN_OFFICE_EMPTY, true] }] },
+];
 
 // §12.5's "every other direction — in-world, not the build boundary."
 const noOtherExitText = 'The office is a counter, a desk, and a cell, and you are on the public side of the first of them.';

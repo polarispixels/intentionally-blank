@@ -33,10 +33,13 @@ import {
   FLAG_WHITLOCK_RAN_YOU,
   PAGE_78,
   SHERIFF_OFFICE,
+  SUNDOWN_DINER,
   V_ATTACK,
   V_FOLLOW,
   WHITLOCK,
 } from './ids';
+import { ACT2_STARTED } from '../act2/ids';
+import { POKER_NIGHT } from '../act2/calendar';
 
 // ---------------------------------------------------------------------------
 // §12.6.2 — unknownTopic
@@ -223,7 +226,11 @@ const followText = '"I\'m not going anywhere." She turns a page. "That\'s the jo
 
 export const whitlock: NpcDefSlice = {
   // Canon register entry 28 — the night post, transcribed exactly from §12.6's own header.
+  // D0 amendment (Stage D plan §2's D0 table; ADR 0011 rule 5): prepended,
+  // gated on `act2_started` — the poker game's own night, not Whitlock's
+  // ordinary one. Afternoons are already offstage below; unchanged.
   schedule: [
+    { when: { all: [{ flag: ACT2_STARTED }, POKER_NIGHT] }, room: SUNDOWN_DINER },
     { when: { clockPhase: 'night' }, room: SHERIFF_OFFICE },
     { when: { clockPhase: 'morning' }, room: SHERIFF_OFFICE },
     { when: { clockPhase: 'afternoon' }, room: 'offstage' },

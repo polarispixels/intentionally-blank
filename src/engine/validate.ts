@@ -45,6 +45,7 @@ export function validate(world: WorldDef): Finding[] {
   checkResponseFamilies(world, findings);
   checkQuestionPhrasing(world, findings);
   checkPhaseTable(world, findings);
+  checkStartClock(world, findings);
   checkVerbDefaults(world, findings);
   checkPlotCriticalStrandEffects(world, findings);
   checkVocabularyCollisions(world, findings);
@@ -188,6 +189,7 @@ function checkCondRefs(world: WorldDef, cond: Cond, path: string, findings: Find
       checkNpcRef(world, leaf.npcAt[0], path, findings);
       checkRoomRef(world, leaf.npcAt[1], path, findings);
     } else if ('met' in leaf) checkNpcRef(world, leaf.met, path, findings);
+    else if ('onOrAfterDay' in leaf) checkFlagRef(world, leaf.onOrAfterDay, path, findings);
     // clock / clockPhase / weekday / profileLeader: no id reference to check.
   });
 }
@@ -568,6 +570,27 @@ function checkPhaseTable(world: WorldDef, findings: Finding[]): void {
       continue;
     }
     seen.set(start, name);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// meta.startClock: `day >= 1`, `minute` in `[0, 1440)` (ADR 0011, Stage D
+// E1). `initialState` doesn't itself validate the shape it's handed — this
+// is the content-test-time catch for a typo'd minute/day before it ever
+// reaches a playthrough.
+// ---------------------------------------------------------------------------
+
+function checkStartClock(world: WorldDef, findings: Finding[]): void {
+  const startClock = world.meta.startClock;
+  if (startClock === undefined) return;
+  const { day, minute } = startClock;
+  if (day < 1 || minute < 0 || minute >= 1440) {
+    findings.push(
+      error(
+        'meta-start-clock-invalid',
+        `meta.startClock ${JSON.stringify(startClock)} is invalid — day must be >= 1 and minute must be in [0, 1440)`,
+      ),
+    );
   }
 }
 
@@ -1100,11 +1123,16 @@ function checkClueQuestionRefs(world: WorldDef, findings: Finding[]): void {
 // `PuzzleSolution.route` for why that's the deliberate, safe default.
 // ---------------------------------------------------------------------------
 
-/** Whether `route` (or any nested leaf of it) mentions the clock — §4.3.4's disqualifying terms. */
+/**
+ * Whether `route` (or any nested leaf of it) mentions the clock — §4.3.4's
+ * disqualifying terms. `onOrAfterDay` counts too (ADR 0011, Stage D E2): a
+ * due day is a window exactly like a raw `clock`/`clockPhase`/`weekday`
+ * term — missing it can strand the player the same way.
+ */
 function routeMentionsClock(route: Cond): boolean {
   let found = false;
   walkCond(route, (leaf) => {
-    if ('clock' in leaf || 'clockPhase' in leaf || 'weekday' in leaf) found = true;
+    if ('clock' in leaf || 'clockPhase' in leaf || 'weekday' in leaf || 'onOrAfterDay' in leaf) found = true;
   });
   return found;
 }
