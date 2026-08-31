@@ -1,0 +1,181 @@
+// Act III, Stage D5, task G — the S6 Archive Hub room
+// (`docs/superpowers/specs/2026-09-13-stage-d5-prose.md` §21, §30, §31,
+// §39.4). Standard tier. Every string transcribed exactly (hard rule 5).
+//
+// Bare-verb dispatch note (see `objects/s6ArchiveHub.ts`'s own header on
+// `V_ACT3_GRAPH_AXIS`): `actions.ts`'s `performAction` only ever consults a
+// ROOM's own `handlers` for a verb with no `dobj` at all — every bare
+// fixed-phrase verb this task declares (`LOG IN`/`TYPE`, the four ledger
+// name-searches, `PRINT LEDGER`, `CHANGE SCALE`/`LOOK AT AXIS`, the two
+// queue phrases, `BAY`) is therefore wired HERE, on the room, never on an
+// object, even where the underlying object (the ledger, the graph, the
+// queue) already exists.
+
+import type { HandlerDef, OnEnterRule, RoomDefSlice } from '../../../engine/world';
+import type { ProseRule } from '../../../engine/prose';
+import { HELLO, LISTEN, SEARCH, SMELL, WAIT, YELL } from '../act1/verbs';
+import { V_TYPE_TERMINAL } from '../act1/ids';
+import {
+  ACT3_CLUE_ROOT_REFUSES,
+  ACT3_HUB_LOGGED_IN,
+  ACT3_HUB_LOGIN_OPEN_SCRIPT,
+  ACT3_HUB_SEEN,
+  ACT3_LEDGER_SEARCH_OPEN_SCRIPT,
+  ACT3_S6_ARCHIVE_HUB,
+  ACT3_S6_BOUNDARY_GATE,
+  ACT3_S6_MAINTENANCE_BAY,
+  V_ACT3_GRAPH_AXIS,
+  V_ACT3_LEDGER_JULES,
+  V_ACT3_LEDGER_NOLAN,
+  V_ACT3_LEDGER_OTHER,
+  V_ACT3_LEDGER_PRINT,
+  V_ACT3_LEDGER_SELF,
+  V_ACT3_QUEUE_EDIT,
+  V_ACT3_QUEUE_SEARCH_JULES,
+  V_ACT3_TO_BAY,
+} from './ids';
+import {
+  GRAPH_AXIS_TEXT,
+  LEDGER_JULES_EFFECTS,
+  LEDGER_NOLAN_EFFECTS,
+  LEDGER_OTHER_EFFECTS,
+  LEDGER_PRINT_TEXT,
+  LEDGER_SELF_EFFECTS,
+  QUEUE_EDIT_REFUSED_TEXT,
+  QUEUE_SEARCH_JULES_TEXT,
+  ROOT_DOOR_DOWN_BOUNDARY_TEXT,
+  TERMINAL_ALREADY_LOGGED_IN_TEXT,
+} from './objects/s6ArchiveHub';
+
+// ---------------------------------------------------------------------------
+// §21.1 — description.
+// ---------------------------------------------------------------------------
+
+const HUB_FIRST_SIGHT =
+  'Smaller than the bay, and colder, and the only room on this floor with a carpet\nin it: grey cord tiles, the kind that go down in an office in a week and are\nstill there thirty years later with the traffic worn into them in a path.\n\nAlong the right-hand wall, a steel bench bolted through the floor, and on the\nbench a terminal, and the terminal is on.\n\nAlong the left-hand wall, standing in the concrete, there are door frames with\nno doors in them. Over the first, a legend, and behind it something that is not\nquite dark. The rest are dark and only one of them says anything.\n\nAt the far end the carpet stops at three steps down into a well, and at the\nbottom of the well there is a door, and it is the heaviest thing you have seen\nin this building.';
+
+const HUB_LOGGED_IN_DESC = 'The carpet, the bench, the frames along the left, and the well at the end with\nthe door at the bottom of it.\n\nThe terminal is showing you what it has.';
+
+const HUB_OTHERWISE_DESC =
+  '    USER:\n\nand a cursor.';
+
+const HUB_OTHERWISE_LEAD = 'The carpet with the path worn into it. The bench, the terminal, the frames\nalong the left wall, and the three steps down at the end.\n\n';
+
+const description: ProseRule[] = [
+  { when: { not: { flag: ACT3_HUB_SEEN } }, text: HUB_FIRST_SIGHT },
+  { when: { flag: ACT3_HUB_LOGGED_IN }, text: HUB_LOGGED_IN_DESC },
+  { text: `${HUB_OTHERWISE_LEAD}${HUB_OTHERWISE_DESC}` },
+];
+
+const onEnter: OnEnterRule[] = [{ effects: [{ set: [ACT3_HUB_SEEN, true] }] }];
+
+// ---------------------------------------------------------------------------
+// §30 — room-level senses and responses.
+// ---------------------------------------------------------------------------
+
+const HUB_LISTEN_TEXT =
+  "The terminal's fan, which is a fan of a certain age and says so.\n\nAnd through the left-hand wall — not past it, through it — the sound of a great\ndeal of water going through something at a steady rate, a long way down,\nwithout a gap in it anywhere.";
+
+const HUB_SMELL_TEXT = 'Hot dust off a warm case, cord carpet, and the cold mineral smell that comes up\nout of a tiled well.';
+
+const HUB_WAIT_TEXT = 'The fan. The water. The cursor, if you have not given it anything to do.';
+
+const HUB_SHOUT_TEXT =
+  'A hard room with a carpet in it does a strange thing with a shout: it takes the\ntop off it and gives you back the bottom, half a beat late, off the tile in the\nwell.';
+
+// ---------------------------------------------------------------------------
+// §22.2 / §39.2 — bare `LOG IN`/`TYPE`/`PRESS KEY` (`V_TYPE_TERMINAL`,
+// `act1/ids.ts`, bare `'V'`). Not the opening room's own script — this is
+// the Hub's own independent login.
+// ---------------------------------------------------------------------------
+
+const loginHandlers: HandlerDef[] = [
+  {
+    verbs: [V_TYPE_TERMINAL],
+    when: { not: { flag: ACT3_HUB_LOGGED_IN } },
+    effects: [{ script: { id: ACT3_HUB_LOGIN_OPEN_SCRIPT } }],
+  },
+  { verbs: [V_TYPE_TERMINAL], effects: [{ say: TERMINAL_ALREADY_LOGGED_IN_TEXT }] },
+];
+
+// ---------------------------------------------------------------------------
+// §23, §39.2's "search" row — bare `SEARCH` (no dobj) opens the same
+// one-field prompt `SEARCH LEDGER` does (`objects/s6ArchiveHub.ts`'s own
+// `ledger` handler). Only meaningful once logged in.
+// ---------------------------------------------------------------------------
+
+const bareSearchHandler: HandlerDef = {
+  verbs: [SEARCH],
+  when: { flag: ACT3_HUB_LOGGED_IN },
+  effects: [{ script: { id: ACT3_LEDGER_SEARCH_OPEN_SCRIPT } }],
+};
+
+// ---------------------------------------------------------------------------
+// §23.2-§23.6 — the four ledger name-search groups plus PRINT LEDGER, all
+// bare fixed phrases (see this file's own header). Gated on being logged
+// in — before login the ledger doesn't exist and these commands should not
+// do anything special.
+// ---------------------------------------------------------------------------
+
+const ledgerBareHandlers: HandlerDef[] = [
+  { verbs: [V_ACT3_LEDGER_JULES], when: { flag: ACT3_HUB_LOGGED_IN }, effects: LEDGER_JULES_EFFECTS },
+  { verbs: [V_ACT3_LEDGER_NOLAN], when: { flag: ACT3_HUB_LOGGED_IN }, effects: LEDGER_NOLAN_EFFECTS },
+  { verbs: [V_ACT3_LEDGER_SELF], when: { flag: ACT3_HUB_LOGGED_IN }, effects: LEDGER_SELF_EFFECTS },
+  { verbs: [V_ACT3_LEDGER_OTHER], when: { flag: ACT3_HUB_LOGGED_IN }, effects: LEDGER_OTHER_EFFECTS },
+  { verbs: [V_ACT3_LEDGER_PRINT], when: { flag: ACT3_HUB_LOGGED_IN }, effects: [{ say: LEDGER_PRINT_TEXT }] },
+];
+
+// ---------------------------------------------------------------------------
+// §24.2 — "CHANGE SCALE"/"LOOK AT AXIS" (bare).
+// ---------------------------------------------------------------------------
+
+const graphBareHandler: HandlerDef = {
+  verbs: [V_ACT3_GRAPH_AXIS],
+  when: { flag: ACT3_HUB_LOGGED_IN },
+  effects: [{ say: GRAPH_AXIS_TEXT }],
+};
+
+// ---------------------------------------------------------------------------
+// §25.3/§25.4 — the queue's two bare phrases.
+// ---------------------------------------------------------------------------
+
+const queueBareHandlers: HandlerDef[] = [
+  { verbs: [V_ACT3_QUEUE_EDIT], when: { flag: ACT3_HUB_LOGGED_IN }, effects: [{ say: QUEUE_EDIT_REFUSED_TEXT }] },
+  { verbs: [V_ACT3_QUEUE_SEARCH_JULES], when: { flag: ACT3_HUB_LOGGED_IN }, effects: [{ say: QUEUE_SEARCH_JULES_TEXT }] },
+];
+
+// ---------------------------------------------------------------------------
+// §39.4 — exits. `west` is the ordinary, tested route back to the Bay;
+// `V_ACT3_TO_BAY` ("BAY") is a bare-phrase synonym. "back" is deliberately
+// not wired here — see `ids.ts`'s own doc comment on `V_ACT3_TO_BAY`.
+// ---------------------------------------------------------------------------
+
+const bayExitHandler: HandlerDef = { verbs: [V_ACT3_TO_BAY], effects: [{ goto: ACT3_S6_MAINTENANCE_BAY }] };
+
+export const s6ArchiveHubRoom: RoomDefSlice = {
+  name: 'Archive Hub',
+  aliases: ['archive hub', 'hub', 's6 archive hub'],
+  description,
+  onEnter,
+  exits: [
+    { dir: 'w', to: ACT3_S6_MAINTENANCE_BAY, minutes: 1 },
+    // §31.2 — the boundary's second entry point. Never open (no
+    // `container` on the gate object), gated on the root door's own
+    // refusal clue, self-looped (the player stays in the Hub). Same "one
+    // system.buildBoundary" idiom `pipeChase.ts`'s own `down` exit uses.
+    { dir: 'down', to: ACT3_S6_ARCHIVE_HUB, door: ACT3_S6_BOUNDARY_GATE, when: { clue: ACT3_CLUE_ROOT_REFUSES }, blockedText: ROOT_DOOR_DOWN_BOUNDARY_TEXT },
+  ],
+  handlers: [
+    ...loginHandlers,
+    bareSearchHandler,
+    ...ledgerBareHandlers,
+    graphBareHandler,
+    ...queueBareHandlers,
+    bayExitHandler,
+    { verbs: [LISTEN], effects: [{ say: HUB_LISTEN_TEXT }] },
+    { verbs: [SMELL], effects: [{ say: HUB_SMELL_TEXT }] },
+    { verbs: [WAIT], effects: [{ say: HUB_WAIT_TEXT }] },
+    { verbs: [YELL, HELLO], effects: [{ say: HUB_SHOUT_TEXT }] },
+  ],
+};
+

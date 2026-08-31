@@ -557,4 +557,122 @@ look
 ask dad about the seal
 ask dad about the rails
 ask dad about the interlock
+nw
+down
+north
+down
+down
+look
+down
+look
+x chairs
+x chair
+count chairs
+sit in chair
+look under chair
+x hooks
+x nolan hook
+x peeled hook
+read names
+x nolan's chair
+x straps
+x anchor
+x uv lamp
+turn on uv lamp
+examine arm under lamp
+put notebook under lamp
+x clock
+read clock
+x cabinet
+pull lever
+eat tablet
+x drain
+x coveralls
+x wall
+listen
+x door
+east
+look
+x terminal
+x screen
+read ledger
+log in
+admin
+wrong
+log in
+admin
+admin-password
+x terminal
+read ledger
+search ledger for jules
+search ledger for nolan
+search ledger for me
+search ledger for jack
+print ledger
+read graph
+look at axis
+compare notebook with graph
+compare audit with graph
+read graph
+read queue
+read queue
+delete queue
+search queue for jules
+x frames
+touch gate
+read legends
+enter gate
+x root door
+knock on door
+use badge
+open root door
+listen at door
+down
+put usb in terminal
+x bench
+listen
+x rig
+x usb
+put usb in terminal
+west
+up
+out
+up
+south
+up
+out
+go to motel
+look
+wait until night
+look
+go to town edge
+nw
+down
+north
+press l
+x alarm
+pull alarm
+reset alarm
+down
+down
+look
+x sleepers
+x woman
+x nolan
+wake nolan
+wake nolan
+examine nolan under lamp
+take badge
+x nolan hook
+put badge back
+undo strap
+pull strap
+wear coveralls
+look
+east
+look
+west
+remove coveralls
+listen
+wait
 version

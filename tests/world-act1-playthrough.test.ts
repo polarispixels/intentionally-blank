@@ -595,9 +595,9 @@ describe('Main Street — wave-3 amendments (diner/library/town edge reachable, 
     expect(chunks[10]).toContain('the billboard, on two legs in the dirt');
   });
 
-  it('a second N fires the one remaining build boundary, at Town Edge', () => {
-    expect(chunks[11]).toContain('END OF BUILD');
-    expect(chunks[11]).toContain('North is the county road, thirty-two miles of it');
+  it('a second N reaches the in-world north refusal at Town Edge (Stage D addenda §1.1) — no END OF BUILD remains', () => {
+    expect(chunks[11]).not.toContain('END OF BUILD');
+    expect(chunks[11]).toContain('You go as far as the cattle guard');
   });
 
   it('S from Town Edge returns to Main Street', () => {

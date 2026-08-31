@@ -2,29 +2,28 @@
 // Light tier, 3 objects (`objects/pipeChase.ts`). No death in the chase, in
 // any wave (§11's own header line).
 //
-// Three exits (§21.4): `up` to the Cooling Plant (§11.5 — D3's own hatch
-// `DOWN` now lands here for real, `objects/coolingPlant.ts`'s own amendment,
-// this task's); `out`/`s5`/`sideways` to S5 (task C's own room — C wires
-// S5's own `down` into here, per this task's own briefing); and `down` —
-// the wave's one surviving `system.buildBoundary` (§13, §21.1), self-looped
-// through the same never-open `ACT3_BOUNDARY_GATE` D3 declared for the (now
-// retired) hatch route (`objects/coolingPlant.ts`).
+// Three exits (§21.4, amended by D5 §39.1): `up` to the Cooling Plant
+// (§11.5 — D3's own hatch `DOWN` now lands here for real, `objects/
+// coolingPlant.ts`'s own amendment, this task's); `out`/`s5`/`sideways` to
+// S5 (task C's own room — C wires S5's own `down` into here, per this
+// task's own briefing); and `down` — RETIRED as a boundary in Stage D5
+// (task F's own amendment, this file): it is now a real exit to the S6
+// Maintenance Bay. `ACT3_BOUNDARY_GATE` (D3's, `objects/coolingPlant.ts`)
+// is no longer referenced from this file at all — the wave's one
+// surviving boundary now lives at the Archive Hub (D5 §31).
 //
 // ENGINE GAP (same one `coolingPlant.ts`'s own header documents): direction
 // verbs are intercepted by the engine before any room-level handler ever
 // sees them (`respond.ts`: `dir !== undefined && dobj === undefined` routes
-// straight to `traverseDirection`), and `ExitDefSlice.blockedText` always
-// renders `kind: 'prose'`, never `kind: 'system'` — a content-only
-// approximation. The `down` exit below concatenates §13's in-world
-// paragraph with its system line into one string for exactly that reason,
-// the same idiom D3's own hatch exit used.
+// straight to `traverseDirection`) — noted here for the `up`/`out` exits
+// below; irrelevant to `down` now that it's a plain, ungated exit.
 
 import type { ExitDefSlice, OnEnterRule, RoomDefSlice } from '../../../engine/world';
 import type { Effect } from '../../../engine/effects';
 import type { ProseRule } from '../../../engine/prose';
 import { HELLO, LISTEN, SLEEP, SMELL, WAIT, YELL } from '../act1/verbs';
 import { V_ACT2_WAIT_UNTIL_AFTERNOON, V_ACT2_WAIT_UNTIL_EVENING, V_ACT2_WAIT_UNTIL_MORNING, V_ACT2_WAIT_UNTIL_NIGHT } from '../act2/ids';
-import { ACT3_BOUNDARY_GATE, ACT3_COOLING_PLANT, ACT3_PIPE_CHASE, ACT3_PIPE_CHASE_SEEN, ACT3_S5_REACTOR_INTERFACE, V_ACT3_SIDEWAYS } from './ids';
+import { ACT3_COOLING_PLANT, ACT3_PIPE_CHASE, ACT3_PIPE_CHASE_SEEN, ACT3_S5_REACTOR_INTERFACE, ACT3_S6_MAINTENANCE_BAY, V_ACT3_SIDEWAYS } from './ids';
 
 // ---------------------------------------------------------------------------
 // §11.1 — description. Gated on `ACT3_PIPE_CHASE_SEEN`, NOT `{ not: {
@@ -72,24 +71,26 @@ const outExit: ExitDefSlice = { dir: 'out', to: ACT3_S5_REACTOR_INTERFACE, minut
 const sidewaysEffects: Effect[] = [{ goto: ACT3_S5_REACTOR_INTERFACE }, { advanceClock: 1 }];
 
 // ---------------------------------------------------------------------------
-// §13 — the boundary. One door (`ACT3_BOUNDARY_GATE`, declared in D3's own
-// `ids.ts`/`objects/coolingPlant.ts` for the now-retired hatch route, reused
-// here rather than a second gate object — "one door", per this task's own
-// briefing): it has no `container` at all, so `objectState`'s own default
-// (`resolve.ts`: `declared?.container?.open ?? false`) keeps it permanently
-// closed, and the exit self-loops (`to: ACT3_PIPE_CHASE`) rather than ever
-// actually traversing.
+// §13/§39.1 (D5) — the boundary is RETIRED here. `DOWN` is now a real exit
+// to the S6 Maintenance Bay, 1 minute, D4's own in-world descent paragraph
+// kept VERBATIM as the `travelText` (hard rule 5); the system line that
+// followed it ("END OF BUILD... Sublevel 6 is not in this version.") is
+// deleted in this same change, along with the never-open
+// `ACT3_BOUNDARY_GATE` gate on this exit — the wave's one surviving
+// boundary now lives at the Archive Hub instead (D5 prose doc §31, task
+// G's own room). `ACT3_BOUNDARY_GATE` itself is untouched (still declared
+// in `objects/coolingPlant.ts`, still used by that room's own hatch loop).
 // ---------------------------------------------------------------------------
 
-export const CHASE_BOUNDARY_TEXT =
-  'The ladder goes on.\n\nThere is no landing here, no plate across it, no permit stencil and nothing\nbolted over the opening; the shaft simply continues, formed the same, with the\nsame bolts in the same string, and the air coming up it is warmer than the air\nyou are standing in and it is moving.\n\nSomewhere a long way below you, water is going through something at a steady\nrate, and it is the only thing there is to hear.\n\nEND OF BUILD\n\nAct III continues below this floor. Sublevel 6 is not in this version.';
+export const CHASE_DESCENT_TEXT =
+  'The ladder goes on.\n\nThere is no landing here, no plate across it, no permit stencil and nothing\nbolted over the opening; the shaft simply continues, formed the same, with the\nsame bolts in the same string, and the air coming up it is warmer than the air\nyou are standing in and it is moving.\n\nSomewhere a long way below you, water is going through something at a steady\nrate, and it is the only thing there is to hear.';
 
 // `act3_q_when_unwatched`'s own `openWhen: { visited: act3_pipe_chase }`
 // (`knowledge.ts`'s wave-D4-shared block) already opens it the moment the
-// player arrives here at all, by any route — so hitting this boundary needs
-// no separate effect to guarantee it "opens if §9.6 did not" (§13's own
-// note): visiting the room already does.
-const downExit: ExitDefSlice = { dir: 'down', to: ACT3_PIPE_CHASE, door: ACT3_BOUNDARY_GATE, blockedText: CHASE_BOUNDARY_TEXT };
+// player arrives here at all, by any route; its own `answerWhen: {
+// visited: act3_s6_maintenance_bay }` (D5 task F's edit, same file) answers
+// it the moment this exit is actually taken.
+const downExit: ExitDefSlice = { dir: 'down', to: ACT3_S6_MAINTENANCE_BAY, travelText: CHASE_DESCENT_TEXT, minutes: 1 };
 
 // ---------------------------------------------------------------------------
 // §11.6 — room-level senses and responses.

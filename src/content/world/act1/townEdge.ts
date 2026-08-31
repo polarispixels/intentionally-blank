@@ -21,7 +21,7 @@
 import type { ExitDefSlice, HandlerDef, RoomDefSlice } from '../../../engine/world';
 import type { ProseRule } from '../../../engine/prose';
 import { HELLO, LISTEN, SMELL, WAIT, YELL } from './verbs';
-import { CLAIM_TICKET, FLAG_VISITED_TOWN_EDGE, MAIN_STREET, MONSTER_TRUCK, NOLANS_YARD, TOWN_EDGE, TOWN_EDGE_BOUNDARY_GATE, TOWN_EDGE_NO_EXIT_GATE, V_LOOK_UP } from './ids';
+import { CLAIM_TICKET, FLAG_OFFERED_THE_RIDE, FLAG_VISITED_TOWN_EDGE, MAIN_STREET, MONSTER_TRUCK, NOLANS_YARD, TOWN_EDGE, TOWN_EDGE_BOUNDARY_GATE, TOWN_EDGE_NO_EXIT_GATE, V_LOOK_UP } from './ids';
 import { ACT2_HORSE_BORROWED, ACT2_KNOWS_TUNNEL_MOUTH, ACT2_MEM_M15, ACT2_STARTED, ACT2_TRAVEL_SCRIPT, ACT2_WALL_DRUG_EMPORIUM, V_ACT2_DRIVE_TO_PLANT } from '../act2/ids';
 import { ACT2_DRIVE_TO_PLANT_EFFECTS } from '../act2/scripts';
 // D3, task A — "RIDE TO PLANT" (§3, ruling 1), mirroring "DRIVE TO PLANT" just below.
@@ -92,20 +92,9 @@ const roomHandlers: HandlerDef[] = [
 
 const onEnter: RoomDefSlice['onEnter'] = [{ effects: [{ set: [FLAG_VISITED_TOWN_EDGE, true] }] }];
 
-// §14's build boundary text — this room's own exported constant (hard rule
-// 5: transcribed verbatim from §14's "the `north` variant, which now lives
-// here"). NOT added to `responses.ts` (out of this task's module — a
-// separate task deletes Main Street's old `north` variant there and, if it
-// needs a `{ ref }`, can point at this constant instead).
-export const TOWN_EDGE_BOUNDARY_NORTH_TEXT =
-  'END OF BUILD\n\nNorth is the county road, thirty-two miles of it, and what the lights are. None of it is in this version.';
-
 /**
  * §13.4's rule 1 (wave 5) — the in-world redirect once the player holds the
- * claim ticket (granted by the concurrent Close-out task's own §9.5). Rule
- * 2 (below) is `TOWN_EDGE_BOUNDARY_NORTH_TEXT`, unedited — kept as this
- * exit's final unconditional fallback (see this file's own D1 comment on
- * why, immediately below).
+ * claim ticket (granted by the concurrent Close-out task's own §9.5).
  */
 const NORTH_REDIRECT_WITH_TICKET_TEXT =
   'Thirty-two miles of it, in the dark, on a county road, with a card in your pocket that says HOLD FOR PICKUP and no hour of the day printed on it anywhere.\n\nThe truck is in the motel lot, and the man who owns it has asked you twice where.';
@@ -119,27 +108,38 @@ const NORTH_STARTED_TEXT =
   'Thirty-two miles of county road, on foot, at whatever hour this now is.\n\nThere is a truck. Failing the truck there is a rail on Main Street with a knot\nin it that a child could get out of. Failing both of those there is standing\nhere, which you have now done.';
 
 /**
- * D1 amendment — three rules, not the doc's own two. §18's own text says
- * "`TOWN_EDGE_BOUNDARY_NORTH_TEXT` leaves this exit," but the doc only
- * supplies conditional rules for `act2_started` and `has: CLAIM_TICKET` —
- * with neither true (the ordinary start of the game, before the player has
- * ever picked up the ticket or ridden anywhere), no rule would match at all,
- * and `prose.render` throws rather than rendering nothing ("no rule ...
- * matched, and none is unconditional" — confirmed against `prose.ts`;
- * `validate.ts`'s own `checkRoomExits` does not check `blockedText` for a
- * missing fallback, so this would only surface as a runtime crash on `GO
- * NORTH` from a fresh game, not a `validate(WORLD)` finding). Kept as an
- * unconditional third rule instead of deleted outright: it reproduces
- * exactly the shipped v0.9.0 behavior for that one remaining state (neither
- * flag holds), so no player-visible regression, and it genuinely does
- * "leave this exit" for every state D1 actually changes (once `act2_started`
- * or the ticket is held). See this task's report.
+ * Stage D addenda §1.1 (`docs/superpowers/specs/2026-09-14-stage-d-addenda-
+ * prose.md`) — the unconditional last rule, before the ride has ever been
+ * offered. Replaces the former `TOWN_EDGE_BOUNDARY_NORTH_TEXT` (`END OF
+ * BUILD`), now deleted from the game (§8 ruling q1: the exit goes fully
+ * in-world, register 92). Text transcribed verbatim (hard rule 5).
+ */
+const TOWN_EDGE_BEFORE_OFFER_TEXT =
+  'You go as far as the cattle guard, put a foot on the first pipe, and look at\nwhat is on the other side of it.\n\nThirty-two of them, in the dark, on a road with no shoulder worth the name and\nnothing coming the other way to be seen by. A mile out there would be no glow\nbehind you and not appreciably more of one in front.\n\nYou take the foot off the pipe. There is a town behind you with vehicles in it,\nand every one of them belongs to somebody who is still awake.';
+
+/**
+ * Stage D addenda §1.2 — once Jack has offered the ride
+ * (`FLAG_OFFERED_THE_RIDE`). Text transcribed verbatim (hard rule 5).
+ */
+const TOWN_EDGE_OFFER_STANDS_TEXT =
+  'The offer stands. It has a truck under it, and a man who has driven that road\nenough times to have stopped noticing the signs.\n\nYou could go north on foot anyway, on the strength of being a man who does not\nwait for other people. Thirty-two of them would take that out of you before the\ncounty had finished with you, and you would arrive with nothing to show for it\nexcept having arrived.';
+
+/**
+ * Stage D addenda §1 — now four rules, not three. §8 ruling q2: §1.2 is
+ * ordered ABOVE the shipped ticket rule (not below it) — the offer is
+ * triggered by `SHOW TICKET TO JACK` / `ASK JACK ABOUT WALL DRUG`, so a
+ * player who has been offered the ride is almost always also holding the
+ * ticket, and with the ticket rule first §1.2 would be dead text. §1.1 (the
+ * addenda doc's own unconditional rule) replaces the former
+ * `TOWN_EDGE_BOUNDARY_NORTH_TEXT` fallback outright — that constant is
+ * deleted, not kept alongside it (§8 ruling q1).
  */
 /** Exported so `objects/townEdge.ts`'s own `billboardClose`/`roadNorth` handlers can reach the same act2_started-aware text instead of the stale shipped one (this task's own consistency call — see that file's own comment). */
 export const northBlockedText: ProseRule[] = [
   { when: { flag: ACT2_STARTED }, text: NORTH_STARTED_TEXT },
+  { when: { flag: FLAG_OFFERED_THE_RIDE }, text: TOWN_EDGE_OFFER_STANDS_TEXT },
   { when: { has: CLAIM_TICKET }, text: NORTH_REDIRECT_WITH_TICKET_TEXT },
-  { text: TOWN_EDGE_BOUNDARY_NORTH_TEXT },
+  { text: TOWN_EDGE_BEFORE_OFFER_TEXT },
 ];
 
 // D4 task A amendment (D4 prose doc §3, §12.4, §21.1) — D3's boundary on

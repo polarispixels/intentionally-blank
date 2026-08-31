@@ -40,7 +40,10 @@ describe('Stage D4 — the descent on a clean save', () => {
       // the chase and the boundary
       'The ladder goes on.',
       'Somebody uses the bottom of this building. When?',
-      'END OF BUILD',
+      // since v0.15.0 the chase's `down` is real: the Bay at night, first sight,
+      // and the Custodian's 22:00 round sends the player straight back up
+      'The ladder ends on a floor, and the floor is tiled',
+      'There is a man in the room.',
       // S5
       'HALL A     460',
       'The hands say',

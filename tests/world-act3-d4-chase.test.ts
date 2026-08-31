@@ -18,6 +18,7 @@ import {
   ACT3_PIPE_CHASE,
   ACT3_Q_WHEN_UNWATCHED,
   ACT3_S5_REACTOR_INTERFACE,
+  ACT3_S6_MAINTENANCE_BAY,
 } from '../src/content/world/act3/ids';
 
 const TEST_WORLD: WorldDef = WORLD;
@@ -164,14 +165,19 @@ describe('The Pipe Chase — exits (§21.4)', () => {
     }
   });
 
-  it('DOWN renders the wave\'s one surviving boundary and does not move the player', () => {
+  // D5 task F retires this boundary (§39.1): `DOWN` is now a real exit to
+  // the S6 Maintenance Bay. D4's own in-world descent paragraph is kept
+  // verbatim as the arrival's `travelText`; the system line that used to
+  // follow it is gone, and so is the never-open gate. See
+  // `world-act3-d5-bay.test.ts` for the Bay's own coverage.
+  it('DOWN keeps D4\'s descent text verbatim, advances the clock, and now actually reaches the Bay', () => {
     const store = new MemoryStore();
     const session = atChase();
     const result = say(session, 'down', store);
-    expect(text(result.events)).toMatch(/END OF BUILD/);
-    expect(text(result.events)).toMatch(/Sublevel 6 is not in this version/);
     expect(text(result.events)).toMatch(/The ladder goes on/);
-    expect(result.session.state.location).toBe(ACT3_PIPE_CHASE);
+    expect(text(result.events)).not.toMatch(/END OF BUILD/);
+    expect(text(result.events)).not.toMatch(/Sublevel 6 is not in this version/);
+    expect(result.session.state.location).toBe(ACT3_S6_MAINTENANCE_BAY);
   });
 });
 

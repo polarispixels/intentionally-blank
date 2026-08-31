@@ -79,8 +79,14 @@ const onEnter: RoomDefSlice['onEnter'] = [{ effects: [{ set: [ACT2_VISITED_EMPOR
 
 const travelTextToCorridor = 'Past the end of the counter, past the hatch, and through a doorway that has had its door taken off and never replaced.';
 
+// Stage D addenda §2 (`docs/superpowers/specs/2026-09-14-stage-d-addenda-
+// prose.md`) — replaces the shipped first-night text whole (§8 ruling q3):
+// that text was never a system line, but it was pinned to the first night
+// (`a head that has already been hit once tonight`), and by v0.14.0 the
+// player reaches this room in daylight, days later. Text transcribed
+// verbatim (hard rule 5).
 const southBlockedText =
-  'Thirty-two miles of county road, in the dark, on foot. That is not a journey, it is a decision, and it is one you would be making with a head that has already been hit once tonight.\n\nThere is a truck in the lot. Failing that there is an animal, and failing that there is morning.';
+  'Out through the doors, down the boards, across the lot, and then thirty-two\nmiles of county road with the signs along it counting nothing down.\n\nWhatever you came out here on is in that lot, in sight of the door, and it will\ngo back the way it came whenever you ask it to. Walking would be a way of\nproving something to a road, and this road has never once given any sign of\nkeeping score.';
 
 const outText = 'You go out as far as the boards. Signs, lot, road, and about a hundred miles of country arranged around a shop.\n\nWhatever you came for is not out here.';
 

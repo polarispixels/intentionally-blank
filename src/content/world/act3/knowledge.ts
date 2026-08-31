@@ -11,10 +11,27 @@
 
 import type { Cond } from '../../../engine/cond';
 import type { WorldSlice } from '../game';
-import { MONSTER_TRUCK, WORK_ORDER } from '../act1/ids';
-import { ACT2_NOLAN, ACT2_NOLAN_BADGE, ACT2_Q_INSIDE_THE_PLANT } from '../act2/ids';
+import { MONSTER_TRUCK, WORK_ORDER, YOUR_ROOM } from '../act1/ids';
+import { ACT2_NOLAN, ACT2_NOLAN_BADGE, ACT2_Q_INSIDE_THE_PLANT, ACT2_STARTED } from '../act2/ids';
 import { DELIVERY_MORNING } from '../act2/calendar';
 import {
+  ACT3_ALARM_PULLED,
+  ACT3_CLUE_TOWN_RUNS_HERE,
+  ACT3_DAD_HEARD_HIM,
+  ACT3_HUB_LOGGED_IN,
+  ACT3_KNOWS_WHO_HIT_YOU,
+  ACT3_Q_ARCHIVE_TERMINAL,
+  ACT3_Q_WHAT_ARE_THESE_PEOPLE,
+  ACT3_Q_WHAT_HAPPENED_TO_JULES,
+  ACT3_Q_WHO_HIT_YOU,
+  ACT3_REACHED_S6,
+  ACT3_S6_ARCHIVE_HUB,
+  ACT3_S6_MAINTENANCE_BAY,
+  ACT3_TOOK_NOLAN_BADGE,
+  ACT3_UNBUCKLED_STRAP,
+  ACT3_UV_LAMP_ON,
+  ACT3_UV_SEEN_ARM,
+  ACT3_WEARING_COVERALLS,
   ACT3_AT_TUNNEL_MOUTH,
   ACT3_BASELINE_MATCHED,
   ACT3_BYPASS_SEEN,
@@ -323,7 +340,13 @@ export const ACT3_D4_QUESTIONS: NonNullable<WorldSlice['questions']> = {
   [ACT3_Q_WHEN_UNWATCHED]: {
     text: 'Somebody uses the bottom of this building. When?',
     openWhen: { visited: ACT3_PIPE_CHASE },
-    // Not answerable in D4 — its floor is D5's (§2 "Puzzles closed and opened", P19).
+    // D5 task F — answered on first arrival in the Bay (§3, §39.3's own
+    // instruction to edit this in place). `answer` is composed only from
+    // §3.1 rule 2's own sentences (hard rule 5): the night first-sight
+    // description's opening line and its own "They are asleep" — the
+    // room full where by day it stands empty.
+    answerWhen: { visited: ACT3_S6_MAINTENANCE_BAY },
+    answer: 'The ladder ends on a floor, and the floor is tiled, and the room is full.\n\nThey are asleep.',
   },
 };
 
@@ -447,3 +470,344 @@ export const ACT3_D4_TASK_A_CLUES: NonNullable<WorldSlice['clues']> = {
 };
 
 // --- D4 builders append below this line (Edit tool only; one block per task, labelled) ---
+
+// ---------------------------------------------------------------------------
+// Wave D5 shared — Sublevel 6 (D5 prose doc §2). Written by the main session
+// before the builders ran. Builders add their own CLUE / PUZZLE / MEMORY
+// definitions in their own labelled block below the anchor (Edit tool).
+// ---------------------------------------------------------------------------
+
+export const ACT3_D5_FLAGS: WorldSlice['flags'] = {
+  [ACT3_REACHED_S6]: { default: false, doc: 'set by the first onEnter of the Bay (§3); the Act III milestone — Stage E reads it; the Bay description rules; Dad §19' },
+  [ACT3_WEARING_COVERALLS]: { default: false, doc: 'set by WEAR COVERALLS (§12.2), cleared by REMOVE; the four spotted events not-arm (§18) and the passed beat (§18.6)' },
+  [ACT3_UV_LAMP_ON]: { default: false, doc: 'set by TURN ON LAMP (§8.2); EXAMINE ARM UNDER LAMP gate (§8.3); the lamp examine' },
+  [ACT3_UV_SEEN_ARM]: { default: false, doc: 'set by EXAMINE ARM UNDER LAMP (§8.3); P21 seed — nothing in Stage D reads it' },
+  [ACT3_HUB_LOGGED_IN]: { default: false, doc: 'set by the login script success arm (§22.3); the ledger, graph and queue existence; the terminal description rule 2' },
+  [ACT3_KNOWS_WHO_HIT_YOU]: { default: false, doc: 'set by READ QUEUE (§25); M16 selection' },
+  [ACT3_ALARM_PULLED]: { default: false, doc: 'set by PULL CHILLER ALARM (§20.2); the Custodian offstage schedule rule; cleared by §20.3' },
+  [ACT3_TOOK_NOLAN_BADGE]: { default: false, doc: 'set by TAKE BADGE from the hook (§6.5); the hook description' },
+  [ACT3_UNBUCKLED_STRAP]: { default: false, doc: 'set by UNDO STRAP at night (§7.3); the strap second-attempt rule' },
+  [ACT3_DAD_HEARD_HIM]: { default: false, doc: 'set by the S5 push (§19.1); suppresses the push on later entries' },
+};
+
+export const ACT3_D5_QUESTIONS: NonNullable<WorldSlice['questions']> = {
+  [ACT3_Q_WHAT_HAPPENED_TO_JULES]: {
+    text: 'What happened to Jules?',
+    openWhen: { flag: ACT2_STARTED },
+    answerWhen: { clue: ACT3_CLUE_JULES_DEPRECATED },
+    answer:
+      'The archive ledger on Sublevel 6 has one result for Jules. STATUS: DEPRECATED.\nRECORDS: RECONCILED. ASSOCIATIONS: RECONCILED. SNAPSHOT: ARCHIVED / ROOT. NO\nFURTHER ACTION.',
+  },
+  [ACT3_Q_WHO_HIT_YOU]: {
+    text: 'Who hit you?',
+    openWhen: { visited: YOUR_ROOM },
+    answerWhen: { clue: ACT3_CLUE_REACQUIRE },
+    answer:
+      'The reconciliation queue on Sublevel 6 lists three pending jobs. NOLAN, R:\nmaintenance, routine. JACK IV: memory reconciliation. SUBJECT [UNRESOLVED]:\nre-acquire, last known Main St / top floor rear.',
+  },
+  [ACT3_Q_ARCHIVE_TERMINAL]: {
+    text: 'There is a terminal at the bottom of the building, and it is on. What does it know, and how deep do the two words go?',
+    openWhen: { visited: ACT3_S6_ARCHIVE_HUB },
+    answerWhen: { clue: ACT3_CLUE_JULES_DEPRECATED },
+    answer:
+      'The archive ledger on Sublevel 6 has one result for Jules. STATUS: DEPRECATED.\nRECORDS: RECONCILED. ASSOCIATIONS: RECONCILED. SNAPSHOT: ARCHIVED / ROOT. NO\nFURTHER ACTION.',
+  },
+  [ACT3_Q_WHAT_ARE_THESE_PEOPLE]: {
+    text: 'What are these people — and what am I?',
+    openWhen: { clue: ACT3_CLUE_TOWN_RUNS_HERE },
+    // The Act IV hand-off (§2, §36 q1; register 88). Not answerable in Stage D.
+  },
+};
+
+// --- D5 task H ---
+// The Custodian's rounds, the four spotted events, the chiller alarm, and
+// Dad on the rig (D5 prose doc §18-§20, §2). `ACT3_CLUE_ROUNDS`'s id is the
+// main session's own (declared in `ids.ts`, before this task ran); this
+// task supplies its title/detail only. `ACT3_ALARM_RESET_DUE` is this
+// task's own flag (`ids.ts`, this task's own block) — the alarm's reset
+// timer, not in the prose doc (§20.3's own header leaves the mechanism to
+// "builder's call" — see `events.ts`'s header for the chosen one).
+
+import { ACT3_ALARM_RESET_DUE, ACT3_CLUE_ROUNDS } from './ids';
+
+export const ACT3_D5_TASK_H_FLAGS: WorldSlice['flags'] = {
+  [ACT3_ALARM_RESET_DUE]: { default: false, doc: 'set by act3AlarmPull (events.ts) to the absolute minute 30 past the pull; read by act3AlarmReset; false = unset' },
+};
+
+// §2's own "Clue detail text" — the only place in this wave where the
+// rounds are written down. Transcribed verbatim (hard rule 5); the doc
+// gives no title for this clue, so the title is its own detail's first
+// clause, verbatim (same "title composed only from the doc's own
+// sentences" idiom `ACT3_D4_TASK_A_CLUES`'s own header states for
+// `ACT3_CLUE_SEAL_FROM_INSIDE`, above).
+export const ACT3_D5_TASK_H_CLUES: NonNullable<WorldSlice['clues']> = {
+  [ACT3_CLUE_ROUNDS]: {
+    title: 'Nights, below Sublevel 5, one man',
+    detail:
+      'Nights, below Sublevel 5, one man: the bay from about ten until half past\neleven, the archive room until one, Sublevel 5 until half past two, the bay\nagain until four. After four, nothing.',
+  },
+};
+
+// =============================================================================
+// D5, task F — the S6 Maintenance Bay: the four clues this task's own
+// objects grant, P19 (the night schedule, solved), and M9 (seeded, fires on
+// first entry). `act3_clue_chairs`/`act3_clue_uv_ghost` use §2's own
+// verbatim detail text; `act3_clue_nolan_chair`/`act3_clue_peeled_hook`
+// have no detail given in §2, so title/detail are composed only from
+// §6's/§5.3's own sentences (hard rule 5) — listed in this task's report
+// for voice review. `act3_clue_rounds` is task H's own (declared in
+// `ids.ts`, granted there); not this task's to define.
+// =============================================================================
+
+// NOTE (task G, flagged in its report): this import used to re-list
+// `ACT3_ALARM_PULLED`/`ACT3_READ_GAUGES_NIGHT` (a hard `Duplicate
+// identifier` parse error — both are already imported in the shared block
+// at the top of this file), which broke module load for every test in the
+// repo, not just task F's own. Deduplicated here; task F's own five other
+// names are untouched.
+import { ACT3_CHAIR_SAT_TRIED, ACT3_CLUE_NOLAN_CHAIR, ACT3_CLUE_PEELED_HOOK, ACT3_MEM_M9, ACT3_P19_NIGHT_SCHEDULE } from './ids';
+import { ACT3_CLUE_CHAIRS, ACT3_CLUE_UV_GHOST } from './ids';
+
+// Mechanical flag only (not §2's own table) — gates §4.2's `SIT`
+// first/second-and-later split.
+export const ACT3_D5_TASK_F_FLAGS: WorldSlice['flags'] = {
+  [ACT3_CHAIR_SAT_TRIED]: { default: false, doc: 'set by the first SIT attempt on the chairs (§4.2) — gates the second-and-later text' },
+};
+
+export const ACT3_D5_TASK_F_CLUES: NonNullable<WorldSlice['clues']> = {
+  // §2's own "Clue detail text" — verbatim.
+  [ACT3_CLUE_CHAIRS]: {
+    title: 'One hook says NOLAN',
+    detail:
+      'Sublevel 6 is a room full of reclining chairs with restraints on them, set to\nindividual people, with a rail of named hooks along the wall. One hook says\nNOLAN.',
+  },
+  [ACT3_CLUE_UV_GHOST]: {
+    title: 'One upright stroke, closed top and bottom',
+    detail:
+      'Under the inspection lamp on Sublevel 6, the smooth patch inside the left\nforearm has a mark in it: one upright stroke, closed top and bottom. It is not\nvisible in ordinary light.',
+  },
+  // Composed from §6.1's/§6.2's own sentences only (no detail given in
+  // §2): the night reading that identifies the chair as his, and the day
+  // reading's own physical evidence (the worn groove).
+  [ACT3_CLUE_NOLAN_CHAIR]: {
+    title: 'A groove in the vinyl, about the width of a thumb',
+    detail:
+      'A chair like the others, opposite the hook with his name on it, and Nolan is\nin it.\n\nThere is a groove in the vinyl of the right-hand arm, about the width of a\nthumb, in the place a thumb would go on a man who holds an arm rest.',
+  },
+  // Composed from §5.3's own sentences only (no detail given in §2).
+  [ACT3_CLUE_PEELED_HOOK]: {
+    title: 'You can see where the letters were and you cannot read them',
+    detail:
+      'The tape has been peeled off. What is left is the clean stripe where it was,\nand the gum, and the gum has gone grey and taken a print of the paint. You can\nsee where the letters were and you cannot read them.\n\nThe chair opposite this hook is set. The stem is at its own mark and the\nfootrest is at its own mark and the paper across the head end is fresh.',
+  },
+};
+
+// P19 — solved the moment the player reaches the Bay at all (§2's own
+// ruling: "solvedWhen: { visited: act3_s6_maintenance_bay }"), same shape
+// as `ACT3_D4_PUZZLES`. Four honest routes (§2): the clock/gauges, the
+// coveralls, Dad, and the alarm — `route` conds reference each route's own
+// already-declared flag/clue (`ACT3_CLUE_ROUNDS` is task H's own, granted
+// by Dad's topic_rounds).
+export const ACT3_D5_TASK_F_PUZZLES: NonNullable<WorldSlice['puzzles']> = {
+  [ACT3_P19_NIGHT_SCHEDULE]: {
+    id: ACT3_P19_NIGHT_SCHEDULE,
+    name: 'The night schedule',
+    question: ACT3_Q_WHEN_UNWATCHED,
+    solvedWhen: { visited: ACT3_S6_MAINTENANCE_BAY },
+    solutions: [
+      {
+        id: 'clock',
+        class: 'analytical',
+        note: "READ GAUGES in S5's night window (D4 §9.3) and READ CLOCK on the Bay's own wall clock (§9.2).",
+        route: { flag: ACT3_READ_GAUGES_NIGHT },
+      },
+      {
+        id: 'coveralls',
+        class: 'direct',
+        note: 'WEAR COVERALLS (§12.2) and walk the floor as staff.',
+        route: { flag: ACT3_WEARING_COVERALLS },
+      },
+      {
+        id: 'dad',
+        class: 'social',
+        note: 'ASK DAD ABOUT ROUNDS (§19.2).',
+        route: { clue: ACT3_CLUE_ROUNDS },
+      },
+      {
+        id: 'alarm',
+        class: 'direct',
+        note: 'PULL CHILLER ALARM (§20, clock-free).',
+        route: { flag: ACT3_ALARM_PULLED },
+      },
+    ],
+    hints: [],
+  },
+};
+
+// M9 — seeded, fires on the first entry to the Bay, after the description
+// (§17, §39.3). `lines` transcribed verbatim (hard rule 5), one entry per
+// paragraph.
+export const ACT3_D5_TASK_F_MEMORIES: NonNullable<WorldSlice['memories']> = {
+  [ACT3_MEM_M9]: {
+    title: 'A Hand On A Shoulder',
+    lines: [
+      'Rows, in the dark, and every row full.',
+      'Somebody walking the line between them — not hurrying, stopping where they stop, moving on. A board of some kind held against the chest the way you hold a board. The sound of a buckle being done up two rows over, and a while later, another one.',
+      'And then a hand coming down on your shoulder from behind. Flat, and warm, and entirely without hurry: the way you touch somebody you are not intending to wake.',
+      'You are not frightened.',
+      'That is the part you keep. There is a hand on your shoulder in the dark, in a room full of strapped-in sleeping people, and you are not frightened, and you cannot think of a single reason why not.',
+    ],
+    trigger: { when: { visited: ACT3_S6_MAINTENANCE_BAY } },
+  },
+};
+
+// ---------------------------------------------------------------------------
+// D5 task G — the Archive Hub: the ledger's clue (R10), the graph's clue
+// (R11), the queue's clue (R12), the gate frames' clue, and the root
+// door's clue; P20 (the ledger); the three M16 variants (§21-§31, §39.3).
+// Titles/details composed only from each granting section's own sentences
+// (hard rule 5) — `act3_clue_jules_deprecated`/`act3_clue_town_runs_here`/
+// `act3_clue_reacquire` use the doc's own "Clue detail" blocks verbatim
+// (§23.2, §24.3, §25.1); `act3_clue_gates`/`act3_clue_root_refuses` have no
+// authored clue-detail block in the doc, so their title/detail are this
+// task's own composition from §27's/§28's own sentences only — listed in
+// this task's report.
+// ---------------------------------------------------------------------------
+
+import { ACT3_CLUE_JULES_DEPRECATED, ACT3_CLUE_REACQUIRE } from './ids';
+import { ACT3_CLUE_GATES, ACT3_CLUE_ROOT_REFUSES } from './ids';
+import { ACT3_P20_LEDGER } from './ids';
+import { ACT3_MEM_M16_A, ACT3_MEM_M16_D, ACT3_MEM_M16_S } from './ids';
+import { ACT3_HUB_SEEN } from './ids';
+
+export const ACT3_D5_TASK_G_FLAGS: WorldSlice['flags'] = {
+  [ACT3_HUB_SEEN]: { default: false, doc: 'set by the Hub\'s own first onEnter (§21) — gates the description\'s "first sight" rule; `{ not: { visited } }` cannot do this (`move.ts`\'s `renderArrival` marks `visited` before rendering `description`)' },
+};
+
+export const ACT3_D5_TASK_G_CLUES: NonNullable<WorldSlice['clues']> = {
+  [ACT3_CLUE_JULES_DEPRECATED]: {
+    title: 'SUBJECT JULES I — DEPRECATED',
+    detail:
+      'The archive ledger on Sublevel 6 has one result for Jules. STATUS: DEPRECATED.\nRECORDS: RECONCILED. ASSOCIATIONS: RECONCILED. SNAPSHOT: ARCHIVED / ROOT. NO\nFURTHER ACTION.',
+  },
+  [ACT3_CLUE_TOWN_RUNS_HERE]: {
+    title: 'Every notch above the line',
+    detail:
+      "The archive's load trace has a notch in it every night. Laid against Eli's\nFILED figure of 460, every notch falls in the part of the load that was never\nfiled for. The part of the building with the machines in it does not vary.",
+  },
+  [ACT3_CLUE_REACQUIRE]: {
+    title: 'SUBJECT [UNRESOLVED] — RE-ACQUIRE',
+    detail:
+      'The reconciliation queue on Sublevel 6 lists three pending jobs. NOLAN, R:\nmaintenance, routine. JACK IV: memory reconciliation. SUBJECT [UNRESOLVED]:\nre-acquire, last known Main St / top floor rear.',
+  },
+  // §27.1/§27.4 — composed only from the gate frames' own examine/legend
+  // text (no authored "Clue detail" block exists for this one in the doc).
+  [ACT3_CLUE_GATES]: {
+    title: 'Openings in the wall, and nothing hung in them',
+    detail:
+      'Openings in the left-hand wall, door height and a little wider than a door,\nwith nothing hung in any of them: no leaf, no frame within the frame, no\nhinge, no keep, no threshold strip.\n\nOver the first, a strip of engraved plastic: ESCAPE RM. Over the second: HAB.\nThe rest have the slot for a strip and no strip in the slot.\n\nThe frames are not holes in this wall. They are in it.',
+  },
+  // §28.1-§28.6 — composed only from the root door's own examine/refusal
+  // text (no authored "Clue detail" block exists for this one either).
+  [ACT3_CLUE_ROOT_REFUSES]: {
+    title: 'ACCESS LEVEL: MAINTENANCE. DENIED. There is a level under this one.',
+    detail:
+      'A door at the bottom of a well, thicker than the frame it stands in, hung on\nfour hinges, with no handle, no window, no legend, no keyway, and a reader\nbeside it with no light in it at all.\n\nA badge held to the reader gets nothing: no diode, no beat, no NOLAN. The\nreader has never been switched on.\n\nThe terminal answers for it instead: ACCESS LEVEL: MAINTENANCE. DENIED. There\nis a level under this one.\n\nKnuckles on the door make a smaller noise than they make on your own hand.\nPast the warmth of it, a long way past it, water is going through something\nat a steady rate.',
+  },
+};
+
+// §23.1-§23.2 — P20's solvedWhen is the same clue R10 grants; R11/R12 are
+// extras beyond the gate, not part of it (§2, §39.1). `hints` has no
+// authored ladder in the doc (unlike censor/microfiche's own) — this
+// task's own short, instructional composition, flagged in this task's
+// report as a builder call (same class of gap as `ACT2_WRITE_AWAY_TEXT`).
+export const ACT3_D5_TASK_G_PUZZLES: NonNullable<WorldSlice['puzzles']> = {
+  [ACT3_P20_LEDGER]: {
+    id: ACT3_P20_LEDGER,
+    name: 'The archive ledger',
+    question: ACT3_Q_ARCHIVE_TERMINAL,
+    solvedWhen: { clue: ACT3_CLUE_JULES_DEPRECATED },
+    solutions: [
+      {
+        id: 'search_jules',
+        class: 'analytical',
+        note: 'Log in at the Sublevel 6 terminal (the credentials that opened everything else this week) and SEARCH LEDGER FOR JULES.',
+      },
+    ],
+    hints: [
+      'The terminal on Sublevel 6 is on, and it has been on a long time. Whatever answered you once already, up at street level, still answers down here.',
+      'LOG IN. The credentials that opened everything else this week open this too.',
+      'Once you are in, SEARCH LEDGER FOR JULES.',
+    ],
+  },
+};
+
+// §26 — exactly one variant ever fires, selected on the highest action-class
+// counter at trigger time (architecture §5); same mutual-exclusion idiom as
+// `act1/knowledge.ts`'s `MEM_M3_ANALYTICAL`/`_SOCIAL`/`_DIRECT` (`profileLeader`
+// cond, each variant's `not: { any: [...] }` excluding the other two — the
+// social variant is the default when no class leads). `lines` transcribed
+// verbatim (hard rule 5), one entry per paragraph; the four-word apology and
+// "Then white." are shared verbatim across all three, per the doc's own note
+// that the three "share their last two words."
+export const ACT3_D5_TASK_G_MEMORIES: NonNullable<WorldSlice['memories']> = {
+  [ACT3_MEM_M16_A]: {
+    title: 'Nothing In His Hands',
+    lines: [
+      'A door, and a knock on it of exactly the right length: two, and then nothing, which is what a man knocks when he is not selling anything.',
+      'You open it. The chain is off. That is the first thing you cannot make come out any other way — the chain is off, which means you took it off, which means you had already decided about him through the wood.',
+      'Grey coveralls. Nothing in his hands. That is the second thing. There was nothing in his hands when the door came open and there was something in them a short time later, and the part in between is not there, and you have gone at it from both ends.',
+      '"Sorry about this," he says.',
+      'Then white.',
+    ],
+    trigger: {
+      when: {
+        all: [
+          { clue: ACT3_CLUE_REACQUIRE },
+          { profileLeader: 'analytical' },
+          { not: { any: [{ memory: ACT3_MEM_M16_S }, { memory: ACT3_MEM_M16_D }] } },
+        ],
+      },
+    },
+  },
+  [ACT3_MEM_M16_S]: {
+    title: 'He Wiped His Feet',
+    lines: [
+      'A knock, and you open the door, and there is a man on the landing standing carefully far enough back from it.',
+      'He waits to be asked. That is what you keep — a man on a landing at that hour, waiting, and when you step aside he wipes his feet on the way in.',
+      '"Sorry about this."',
+      'He says it the way you say it to somebody whose morning you are about to put out. There is no threat anywhere in that room. There is nobody in that room who wants anything from you, and that includes him, and you have never in your life been less afraid of anybody.',
+      'Then white.',
+    ],
+    trigger: {
+      when: {
+        all: [
+          { clue: ACT3_CLUE_REACQUIRE },
+          { not: { any: [{ profileLeader: 'analytical' }, { profileLeader: 'direct' }] } },
+          { not: { any: [{ memory: ACT3_MEM_M16_A }, { memory: ACT3_MEM_M16_D }] } },
+        ],
+      },
+    },
+  },
+  [ACT3_MEM_M16_D]: {
+    title: 'The Floor Comes Up',
+    lines: [
+      'The door, and the landing light behind him, and a man in coveralls who does not come in until you move.',
+      'Your hand goes up. Not to him — to the frame, because you are already going, and the arm arrives late and does not find it.',
+      '"Sorry about this."',
+      'The floor comes up at the shoulder first, and the last thing still working is hearing, and what it brings you is a man going round a room very quietly, opening things, and not finding it.',
+      'Then white.',
+    ],
+    trigger: {
+      when: {
+        all: [
+          { clue: ACT3_CLUE_REACQUIRE },
+          { profileLeader: 'direct' },
+          { not: { any: [{ memory: ACT3_MEM_M16_A }, { memory: ACT3_MEM_M16_S }] } },
+        ],
+      },
+    },
+  },
+};
+
+// --- D5 builders append below this line (Edit tool only; one block per task, labelled) ---

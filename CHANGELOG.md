@@ -12,6 +12,73 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.15.0] - 2026-08-31
+
+**Stage D5 — Sublevel 6.** Act III ends; Stage D is complete
+(`docs/superpowers/specs/2026-09-13-stage-d5-prose.md`, plus the addenda
+`2026-09-14-stage-d-addenda-prose.md`).
+
+### Added
+
+- **The Maintenance Bay.** Hospital tile with a fall to a brass drain; rows
+  of reclining chairs on pedestals, every one of them set to a person (R9);
+  a rail of hooks with names under them, of which the game prints one; the
+  straps lined with sheepskin; the UV inspection lamp at the head of the
+  first chair, and what it shows on the inside of the left forearm; the
+  clock in words; the dispenser (*ONE ON RISING*); the coveralls — the
+  game's first wearable; and by night the room full, nobody pulling against
+  anything, and **Nolan asleep in the chair opposite his own hook**, badge
+  on the hook, the strap not tight (*it was never going to be the strap
+  that kept him here*). M9, *A Hand On A Shoulder*, on first entry.
+- **The Archive Hub.** The same tea-coloured machine, on, with no burn in
+  the phosphor; the login (`USER:` / `PASSWORD:`, the two words from the
+  back cover, and *Upstairs that was the whole answer. Down here it is a
+  heading.*); the subject ledger and one result for Jules (R10 — `STATUS
+  DEPRECATED`, *He is here. He has been here the whole time, in a field,
+  with a word in it.*); the load graph with Eli's 460 ruled across it (R11
+  — every notch above the line; the Act IV question opens); the
+  reconciliation queue (R12 — `SUBJECT [UNRESOLVED] — RE-ACQUIRE`, *Top
+  floor, back*); **M16, the attack, in one of three tellings** sharing four
+  words; the gate frames; the root door and its five refusals; Dad refusing
+  the dock. The Act III boundary: *Act III ends here.*
+- **The Custodian's rounds.** Nights below S5 on a schedule; spotted in the
+  Bay, the Hub, S5 or the chase he does nothing at all, and the player
+  leaves; in the coveralls he nods, once. The chiller alarm in the plant
+  brings him up to see about it. Dad on the rounds, on listening, on the
+  chairs, and one push on S5 (*"Stop."*).
+- **Stage D addenda** from the playthroughs: Town Edge `NORTH` and Wall
+  Drug `SOUTH` on foot are in-world refusals (no `END OF BUILD` on a built
+  road); `COUNT GAUGES` refuses in the room's voice; the chase bottom never
+  lets go of a carried thing (`DROP` / `THROW` / `PUT … IN OPENING`);
+  `LISTEN DOWN`; `COMPARE LOGBOOK WITH NOTEBOOK`; Jack's toolbox described.
+- Questions: *What happened to Jules?*, *Who hit you?* and the archive
+  terminal are now ledger questions and are answered here; *What are these
+  people — and what am I?* opens on R11 and hands to Act IV.
+
+### Changed
+
+- **Room handlers that name an instrument answer a carried object** (engine):
+  "put anything in the opening" reaches the room's own handler when the
+  carried object's handlers have nothing to say.
+- **A bare verb whose default is `{name}`-templated** no longer prints the
+  brace; it answers with the global `bareVerb` family.
+- **The room listing's "There is X here" is for the floor** — a moved object
+  resting on or in another object is that object's to describe.
+- A failed Hub login closes the prompt (re-opening it swallowed every later
+  command); the badge rests on Nolan's hook only at night and only when the
+  player does not already carry it; `restart encounter` after the Bay
+  returns to the Bay's checkpoint (the newest), which the D4 fixture now
+  reflects; noun trims (`legends`, `anchor`, `tablet`, `EAT`).
+
+### Decisions
+
+Canon register 80–93: the Bay's contents, one name on the rail, the UV mark
+described and never named, the ledger's record shape, *deprecated* as
+system-only vocabulary, R11 as a figure, the one place the system names the
+player, nobody below speaks, the Act III boundary text, the narrator may
+read a figure, the tunnel in two rooms, carried objects are never put beyond
+reach, the highway boundaries in-world, declining a count is not counting.
+
 ## [0.14.0] - 2026-08-31
 
 **Stage D4 — the descent.** Everything under the building down to the

@@ -170,10 +170,10 @@ describe('Town Edge — a real playthrough, teleported in (§12-§14)', () => {
     expect(feed(fresh(), 'climb frame').text).toContain('You put a hand on it and take it off again.');
   });
 
-  it('GO TO WALL DRUG routes to the build boundary, north — no separate string', () => {
+  it('GO TO WALL DRUG routes to the same in-world north refusal (Stage D addenda §1.1) — no separate string, no END OF BUILD', () => {
     const text = feed(fresh(), 'go to wall drug').text;
-    expect(text).toContain('END OF BUILD');
-    expect(text).toContain('thirty-two miles of it');
+    expect(text).not.toContain('END OF BUILD');
+    expect(text).toContain('You go as far as the cattle guard');
   });
 
   // -------------------------------------------------------------------
@@ -223,15 +223,17 @@ describe('Town Edge — a real playthrough, teleported in (§12-§14)', () => {
     expect(feed(fresh(), 'cross cattle guard').text).toContain('one dead thistle');
   });
 
-  it('FOLLOW ROAD routes to the build boundary, north', () => {
-    expect(feed(fresh(), 'follow road').text).toContain('END OF BUILD');
+  it('FOLLOW ROAD routes to the same in-world north refusal (Stage D addenda §1.1), not END OF BUILD', () => {
+    const text = feed(fresh(), 'follow road').text;
+    expect(text).not.toContain('END OF BUILD');
+    expect(text).toContain('You go as far as the cattle guard');
   });
 
-  it('GO NORTH / WALK NORTH / N / NORTH all reach the same build boundary as the real exit', () => {
+  it('GO NORTH / WALK NORTH / N / NORTH all reach the same in-world refusal as the real exit (Stage D addenda §1.1)', () => {
     for (const input of ['go north', 'walk north', 'n', 'north']) {
       const text = feed(fresh(), input).text;
-      expect(text).toContain('END OF BUILD');
-      expect(text).toContain('North is the county road, thirty-two miles of it');
+      expect(text).not.toContain('END OF BUILD');
+      expect(text).toContain('You go as far as the cattle guard');
     }
   });
 

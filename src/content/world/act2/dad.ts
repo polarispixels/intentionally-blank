@@ -68,6 +68,16 @@
 // only the reverse (an `ids.ts` file importing another act's `ids.ts`
 // "up" the layer it doesn't already depend on) would cycle, and this is a
 // non-ids module importing an `ids.ts` file, which is fine.
+//
+// D5 TASK H — three more topics (`docs/superpowers/specs/2026-09-13-
+// stage-d5-prose.md` §19.2-§19.4), inserted above D4 task E's three (§39.1:
+// "gains four topics inserted above D4's three; none deleted" — the fourth
+// addition, §19.1's push, is `act3/events.ts`'s `ACT3_DAD_PUSH_S5_EVENT`,
+// not a topic): `topic_rounds` (`ProseRule[]` on `npcAt`, five rules —
+// Bay/Hub/S5/Chase then an unconditional catch-all for `offstage`/the alarm
+// route), `topic_how_do_you_know` (one response, no gate), `topic_chairs`
+// (`when: { flag: ACT3_REACHED_S6 }`). Canon 61/47 both hold: no rule
+// prints a clock time, only durations in words (§19's own note).
 
 import type { Effect } from '../../../engine/effects';
 import { apply } from '../../../engine/effects';
@@ -78,12 +88,22 @@ import type { ProseRule } from '../../../engine/prose';
 import type { Cond } from '../../../engine/cond';
 import { INTACT_POLAROIDS, JACK, TERMINAL, V_ATTACK, V_HUG, V_KISS, YOUR_ROOM } from '../act1/ids';
 import { TOUCH } from '../act1/verbs';
-import { ACT3_BYPASS_SEEN, ACT3_SAW_SEAL, ACT3_WALKED_TUNNEL } from '../act3/ids';
+import {
+  ACT3_BYPASS_SEEN,
+  ACT3_PIPE_CHASE,
+  ACT3_REACHED_S6,
+  ACT3_S5_REACTOR_INTERFACE,
+  ACT3_S6_ARCHIVE_HUB,
+  ACT3_S6_MAINTENANCE_BAY,
+  ACT3_SAW_SEAL,
+  ACT3_WALKED_TUNNEL,
+} from '../act3/ids';
 import {
   ACT2_CACHE_POLAROID,
   ACT2_CLUE_DAD_BOOTS,
   ACT2_CLUE_DAD_CUTOFF,
   ACT2_CLUE_SERVICE_TUNNEL,
+  ACT2_CUSTODIAN,
   ACT2_DAD,
   ACT2_DAD_BLOCK_JACK,
   ACT2_DAD_BLOCK_JULES,
@@ -92,11 +112,13 @@ import {
   ACT2_DAD_SAID_MANNERISM,
   ACT2_DAD_TOLD_HEARING,
   ACT2_DAD_TOLD_TUNNEL,
+  ACT2_DAD_TOPIC_CHAIRS as TOPIC_CHAIRS,
   ACT2_DAD_TOPIC_COPY as TOPIC_COPY,
   ACT2_DAD_TOPIC_ELI as TOPIC_ELI,
   ACT2_DAD_TOPIC_FACILITY as TOPIC_FACILITY,
   ACT2_DAD_TOPIC_HEADACHES as TOPIC_HEADACHES,
   ACT2_DAD_TOPIC_HEARING as TOPIC_HEARING,
+  ACT2_DAD_TOPIC_HOW_DO_YOU_KNOW as TOPIC_HOW_DO_YOU_KNOW,
   ACT2_DAD_TOPIC_INTERLOCK as TOPIC_INTERLOCK,
   ACT2_DAD_TOPIC_JACK as TOPIC_JACK,
   ACT2_DAD_TOPIC_JULES as TOPIC_JULES,
@@ -104,6 +126,7 @@ import {
   ACT2_DAD_TOPIC_LUKE as TOPIC_LUKE,
   ACT2_DAD_TOPIC_POKER as TOPIC_POKER,
   ACT2_DAD_TOPIC_RAILS as TOPIC_RAILS,
+  ACT2_DAD_TOPIC_ROUNDS as TOPIC_ROUNDS,
   ACT2_DAD_TOPIC_SEAL as TOPIC_SEAL,
   ACT2_DAD_TOPIC_SELF as TOPIC_SELF,
   ACT2_DAD_TOPIC_SISSY as TOPIC_SISSY,
@@ -172,6 +195,39 @@ export const ACT2_DAD_MANNERISM_EVENT: EventDef = {
 const cutoffIfHeardFamily: Effect = { if: { when: { met: JACK }, then: [{ grantClue: ACT2_CLUE_DAD_CUTOFF }] } };
 
 const topics: TopicDef[] = [
+  // D5 task H (§19.2-§19.4) — inserted above D4 task E's own three (D5
+  // prose doc §39.1: "gains four topics inserted above D4's three; none
+  // deleted" — the fourth addition, §19.1's push, is an `EventDef`, not a
+  // topic: `act3/events.ts`'s `ACT3_DAD_PUSH_S5_EVENT`). All three are
+  // reachable only while Dad is addressable at all — which, per D2 §4.4's
+  // own design (`following` is his only pinned position, set by the rig's
+  // PUT-IN/TAKE), means the rig is carried into whatever room the player is
+  // asking from — so no extra "rig carried" `when` is authored here beyond
+  // what ASK/TELL's own scope resolution already requires.
+  {
+    id: TOPIC_ROUNDS,
+    words: ['rounds', 'custodian', 'the man', 'where is he', 'time'],
+    response: [
+      { when: { npcAt: [ACT2_CUSTODIAN, ACT3_S6_MAINTENANCE_BAY] }, text: '"He\'s in the room with the chairs. Has been eleven minutes."\n\nNo drama in it at all — the voice he would use about a kettle.\n\n"I can\'t see him, kiddo, I can hear him, and a man doing a job makes a noise\nwith a shape to it. He has done that room twice tonight and both times it took\nhim about the same, and both times he went the same way after."' },
+      { when: { npcAt: [ACT2_CUSTODIAN, ACT3_S6_ARCHIVE_HUB] }, text: '"Next room along. The one with the machine in it."\n\n"How do I know which? Because a door on a closer makes one noise and a door on\na latch makes another, and I have had a very quiet week."' },
+      { when: { npcAt: [ACT2_CUSTODIAN, ACT3_S5_REACTOR_INTERFACE] }, text: '"He\'s up a floor. The room with the wall of dials — the one where the note\ncomes up through your boots."\n\n"He is not in a hurry. He has not been in a hurry once, and I have been\nlistening to him for hours."' },
+      { when: { npcAt: [ACT2_CUSTODIAN, ACT3_PIPE_CHASE] }, text: '"He\'s in the pipe. On the ladder, I\'d say, because there is a thing a boot does\non a rung that it does on nothing else."\n\n"Don\'t go up. That\'s not advice, kiddo, that\'s arithmetic — he is between you\nand the top and he is going the same way you want to go."' },
+      { text: '"Nothing. And I mean nothing — no door, no boot, no tin being set down on\nanything."\n\n"Which is either very good, or he has finished for the night, and I have not\nworked out how to tell those apart from in here."' },
+    ],
+  },
+  {
+    id: TOPIC_HOW_DO_YOU_KNOW,
+    words: ['listening', 'hearing', 'how do you know'],
+    response:
+      '"Because there is nothing else to do." He is not complaining; he is explaining\na method. "You put a man in a building with no eyes and he will have the\nplumbing off by heart inside a day."\n\n"Every room down here has a noise. Every door has a different noise. A pump\nstarting is not a pump stopping. And a man walking on tile is not a man walking\non a grating, and I am not going to pretend that is clever, because it is\nnine-tenths of an engineer\'s job and always was."',
+  },
+  {
+    id: TOPIC_CHAIRS,
+    words: ['chairs', 'the room'],
+    when: { flag: ACT3_REACHED_S6 },
+    response:
+      'You describe it to him. The rows, the hooks, the paper on the headrests, the\nstraps and the sheepskin on them.\n\nHe does not answer for long enough that you check the battery.\n\n"Right," he says.\n\nThen: "No. Say the bit about the sheepskin again."\n\nYou say it again.\n\n"Somebody sat down and thought about that," says Dad, and does not say anything\nelse for a while, and when he comes back he asks about the drain instead.',
+  },
   // D4 task E (§14) — inserted above the shipped fifteen (§21.1: "none
   // deleted"). Location-agnostic (canon 53); no repeat/"block" rule — the
   // doc writes one response each.

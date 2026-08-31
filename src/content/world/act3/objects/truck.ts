@@ -18,15 +18,34 @@
 // check at all, but declaring it explicitly documents the intent the same
 // way the glovebox's own comment does).
 //
-// NO EXAMINE PROSE (ruling 4, explicit): neither the toolbox nor the
-// wrench has authored text — the built-in EXAMINE/OPEN families stand.
-// Flagged here as a `narrative-writer` need, not silently invented around.
+// NO EXAMINE PROSE ON THE WRENCH (ruling 4's original scope, now half-closed):
+// the wrench still has no authored text — the built-in EXAMINE/OPEN families
+// stand for it, flagged here as a `narrative-writer` need. The toolbox's own
+// gap is CLOSED by Stage D addenda §6
+// (`docs/superpowers/specs/2026-09-14-stage-d-addenda-prose.md`) —
+// `EXAMINE`/`SEARCH` now render its own two-rule `ProseRule[]`, below.
 
 import type { ObjectDefSlice } from '../../../../engine/world';
 import type { ProseRule } from '../../../../engine/prose';
 import { MONSTER_TRUCK } from '../../act1/ids';
-import { EXAMINE, TAKE, TURN_OFF, TURN_ON } from '../../act1/verbs';
+import { EXAMINE, SEARCH, TAKE, TURN_OFF, TURN_ON } from '../../act1/verbs';
 import { ACT3_HEADLAMP, ACT3_HEADLAMP_ON, ACT3_HEADLAMP_TAKEN, ACT3_TRUCK_TOOLBOX, ACT3_WRENCH } from '../ids';
+
+// Stage D addenda §6 — `X TOOLBOX` / `SEARCH TOOLBOX`. Rule order: the
+// headlamp-taken flag first, then the unconditional §6.1 — the box is full
+// far longer than it is empty, so the empty state is the exception and
+// takes the gate (the doc's own note). Text transcribed verbatim (hard
+// rule 5).
+const toolboxWithHeadlampText =
+  'A steel box across the bed behind the cab, lid up, at shoulder height, because\neverything on this truck is at shoulder height.\n\nA coil of jump lead with the clamps taped apart so they cannot find each other.\nA wrench with the shine worn off its jaws. A tray of the fine grey silt that\nevery toolbox in this county has a layer of.\n\nUnder the coil, where you would only find it by moving the coil, there is a\nheadlamp.';
+
+const toolboxAfterHeadlampText =
+  'A steel box across the bed behind the cab, lid up, at shoulder height, because\neverything on this truck is at shoulder height.\n\nA coil of jump lead with the clamps taped apart so they cannot find each other.\nA wrench with the shine worn off its jaws. A tray of the fine grey silt that\nevery toolbox in this county has a layer of.\n\nThe coil is lying where you left it after taking what was under it.';
+
+const toolboxExamineProse: ProseRule[] = [
+  { when: { flag: ACT3_HEADLAMP_TAKEN }, text: toolboxAfterHeadlampText },
+  { text: toolboxWithHeadlampText },
+];
 
 const toolbox: ObjectDefSlice = {
   location: { on: MONSTER_TRUCK },
@@ -34,6 +53,7 @@ const toolbox: ObjectDefSlice = {
   container: { open: true, transparent: true },
   portable: false,
   nouns: ['toolbox', 'tool box', 'tool chest'],
+  handlers: [{ verbs: [EXAMINE, SEARCH], effects: [{ say: toolboxExamineProse }] }],
 };
 
 const wrench: ObjectDefSlice = {

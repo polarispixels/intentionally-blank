@@ -1,6 +1,6 @@
 # 09 - Canon Decisions Register
 
-**Spec version:** `0.14.0`
+**Spec version:** `0.15.0`
 
 During the full-game build (see `docs/DEVELOPMENT.md`, "Full-game build
 protocol") the main session is authorized to resolve `WORKING IDEA` and
@@ -103,6 +103,9 @@ consistent), what it forecloses, and where it now lives in the spec.
 | 88 | 2026-08-31 | The Act III boundary's system text | **`END OF BUILD` / `Act III ends here. What is through the frames, and what is under the door at the end of this room, are the next version.`** — the only system line that names an act. | It is the act boundary and the acceptance check for the Act IV hand-off. | The plan's draft, which refers to the player's feelings and an internal stage name. | D5 prose §31.3 |
 | 89 | 2026-08-31 | May the narrator say a figure he reads off a sheet? (§24.3's *Four hundred and sixty*) | **Yes — reading a written figure is not counting.** Entry 70 governs counting; a number the player reads off Eli's sheet, the wall or a screen may be spoken in words once, to place it. | The alternative was a narrator who could not say what he was holding against the glass. | Any subtraction, unit, or a figure the narrator arrived at himself. | D5 prose §24.3 |
 | 90 | 2026-08-31 | The Service Tunnel's shape in the engine (D4 §18 q6 revisited at integration) | **Two rooms — `act3_tunnel_mouth` and `act3_service_tunnel` (below) — not one room with a position flag.** The prose splits at D4 §6.1 rule 2 / rule 3 exactly as the writer offered. | A bare `DOWN` at the mouth must walk the mile and render the dark; the engine renders arrival on a room change and nothing else, and a self-loop exit with side effects is a hack the save format would have to carry forever. | One-room tunnels anywhere; exits that mutate state without moving the player. | D4 prose §6, §18 q6 |
+| 91 | 2026-08-31 | May a carried object ever be put beyond reach? (the chase bottom's DROP/THROW, addenda §4.1) | **No. No shaft, drain, grating, well or window in Acts III–V ever takes a carried thing; the narrator holds it out and brings the hand back in.** | One unremarkable verb must never strand a plot-critical item; the refusal is also the better sentence. | Any "it is gone" response to a carried object; any puzzle that needs one dropped down something. | Addenda prose §4.1 |
+| 92 | 2026-08-31 | The highway boundaries on foot (Town Edge `north`, Wall Drug `south`) | **Fully in-world. No `END OF BUILD` anywhere the fiction has a road; walking thirty-two miles is refused by the narrator, at whatever hour, with the ride the player has.** | The road north was built in D1; a system line at its foot end was a leftover, not a boundary. | Any system text on a built road. | Addenda prose §1, §2 |
+| 93 | 2026-08-31 | Is declining a count a count? (`COUNT GAUGES`, addenda §3; entry 70) | **No. A refusal may say the word *total* and name that a number was asked for, so long as it produces none.** | Entry 70 forbids the narrator arriving at a number, not acknowledging the request. | A refusal that leaks a figure or a range. | Addenda prose §3 |
 
 ## Stage A promotion (entries 3–17)
 

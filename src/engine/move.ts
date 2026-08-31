@@ -71,7 +71,7 @@ import { objectState } from './resolve';
 import { render } from './prose';
 import { tick } from './tick';
 import type { ExitDefSlice, GameEvent, GameState, ObjectDefSlice, WorldDef } from './world';
-import { isDark, objectHasBeenMoved, objectsListedInRoom } from './world';
+import { isDark, objectHasBeenMoved, objectLocation, objectsListedInRoom } from './world';
 
 /**
  * Reserved verb ids for the twelve exit directions (§2.4's `ExitDef.dir`
@@ -330,7 +330,10 @@ function renderRoomListing(world: WorldDef, state: GameState, roomId: RoomId): {
   for (const id of ids) {
     const def = world.objects![id]!;
     const name = def.name ?? id;
-    if (objectHasBeenMoved(current, id)) {
+    // v0.15.0: the generic "There is X here" line is for things resting on
+    // the room's floor. A moved object on or in another object (a badge hung
+    // back on its hook) is that object's business to describe.
+    if (objectHasBeenMoved(current, id) && typeof objectLocation(world, current, id) === 'string') {
       const rendered = render(world, current, `room.${roomId}.listing.${id}`, { ref: GENERIC_LISTING_FAMILY }, { name: articleizedName(def, name) });
       current = rendered.state;
       events.push({ type: 'line', kind: 'prose', text: rendered.text });

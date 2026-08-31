@@ -407,6 +407,11 @@ export const ACT2_DAD_TOPIC_SEAL = T('act2_dad_topic_seal');
 export const ACT2_DAD_TOPIC_RAILS = T('act2_dad_topic_rails');
 export const ACT2_DAD_TOPIC_INTERLOCK = T('act2_dad_topic_interlock');
 
+/** D5 task H — three more topics (`act2/dad.ts`), inserted above D4 task E's three (D5 prose doc §19.2-§19.4). Declared here for the same directory-scan reason as the fifteen/three above. */
+export const ACT2_DAD_TOPIC_ROUNDS = T('act2_dad_topic_rounds');
+export const ACT2_DAD_TOPIC_HOW_DO_YOU_KNOW = T('act2_dad_topic_how_do_you_know');
+export const ACT2_DAD_TOPIC_CHAIRS = T('act2_dad_topic_chairs');
+
 // ---------------------------------------------------------------------------
 // D2-C — the Friday table, Nolan, the Custodian's town post, Main Street by
 // day, the buzz, four memories, and the moved boundary (Stage D plan §2 D2

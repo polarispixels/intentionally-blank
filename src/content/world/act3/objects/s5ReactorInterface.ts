@@ -38,11 +38,10 @@
 //     without breaking `EXAMINE` everywhere else that phrase is typed; it
 //     renders the clock's own `examine` text instead. `READ CLOCK`/`WHAT
 //     TIME IS IT`/`CHECK TIME` all reach the frame.
-//   - `COUNT GAUGES` (§22.15, canon 70) has no exact refusal line authored
-//     anywhere in the doc. Reusing the gauge wall's own §9.2 `EXAMINE` text
-//     verbatim (rather than composing new prose) satisfies "refuses, in the
-//     room's own voice" without inventing a sentence; a bespoke line is a
-//     narrative-writer need if the main session wants one.
+//   - `COUNT GAUGES` (§22.15, canon 70): CLOSED by Stage D addenda §3
+//     (`docs/superpowers/specs/2026-09-14-stage-d-addenda-prose.md`) — a
+//     bespoke refusal (`gaugesCountText`) now stands in place of the
+//     gauge wall's own `EXAMINE` text this bullet used to describe reusing.
 //   - "PULL LEVER" (§10.2's own header) has no literal lever object anywhere
 //     in §10.1's own furniture (a wheel, a keyswitch, two buttons) — "lever"
 //     is added as an extra noun on the interlock itself (deviating one word
@@ -109,6 +108,12 @@ const gaugesExamine =
 const gaugesTouch =
   'The glass is cold and the needle behind it does not care what you do to the\nglass, which is the entire reason anybody still fits these.';
 
+// Stage D addenda §3 (`docs/superpowers/specs/2026-09-14-stage-d-addenda-
+// prose.md`) — `COUNT GAUGES`. Refuses the total by name (canon 70; addenda
+// §8 ruling 5 — declining a count is not counting), no digit anywhere.
+const gaugesCountText =
+  'You get partway along the top rank before the exercise turns on you. There are\nas many of them as the wall was built to hold, which is a fact about a wall,\nand you did not come down here for a fact about a wall.\n\nWhat is on the faces is one question and what is on the tags underneath them is\nanother, and neither of them is answered by arriving at a total.';
+
 // §9.3, rule 1 — the night window (grants the clue, sets the flag).
 const gaugesReadNight =
   '    HALL A     460\n    FDR 3      408\n\nand then back to the big face on the generation side, the one with the\nwidest bezel in the room:\n\n    GEN        868\n\nHALL A has not moved. HALL A does not move; a hall of machines does the same\nthing at three in the morning that it does at three in the afternoon, and\nthat is the entire reason people put them out here where nothing else is.\n\nFDR 3 has moved. It is down, and it has been down long enough that the\nneedle is sitting rather than settling.\n\nLow on the glass of FDR 3\'s bezel, inside it, where you would have to have\ntaken the bezel off to do it, there is a pencil line. It is at the needle. It\nis not dated and it is not initialled and it is not on any other gauge in\nthe room.';
@@ -157,17 +162,22 @@ const gauges: ObjectDefSlice = {
   location: ACT3_S5_REACTOR_INTERFACE,
   name: 'gauges',
   portable: false,
-  nouns: ['gauges', 'gauge', 'wall', 'gauge wall', 'dials', 'dial faces', 'needles', 'needle', 'meters', 'meter', 'bezels', 'tags', 'glass', 'rank', 'instruments'],
+  // "feeder"/"feeders" added (Stage D addenda §9 item 5) so `COUNT FEEDERS`
+  // resolves against this object at all — it did not before.
+  nouns: ['gauges', 'gauge', 'wall', 'gauge wall', 'dials', 'dial faces', 'needles', 'needle', 'meters', 'meter', 'bezels', 'tags', 'glass', 'rank', 'instruments', 'feeder', 'feeders'],
   handlers: [
     { verbs: [EXAMINE], effects: [{ say: gaugesExamine }] },
     { verbs: [TOUCH], effects: [{ say: gaugesTouch }] },
     { verbs: [READ], effects: gaugesReadEffects },
     // "COMPARE AUDIT WITH GAUGES" itself is wired on the audit object below
     // (dobj = the audit; this object only ever sees it as `withInstrument`).
-    // §22.15/canon 70 — COUNT must refuse, in the room's own voice; reusing
-    // the wall's own EXAMINE text verbatim rather than inventing a refusal
-    // (see this file's own header gap).
-    { verbs: [V_COUNT], effects: [{ say: gaugesExamine }] },
+    // Stage D addenda §3 — COUNT GAUGES declines the total by name rather
+    // than re-saying the wall's own EXAMINE text (this handler's former
+    // shape, flagged in this file's own header as a gap — that gap is
+    // closed by this addendum). No digit, no clue, no flag: declining a
+    // count is not counting (addenda §8 ruling 5), and nothing here is
+    // granted. Text transcribed verbatim (hard rule 5).
+    { verbs: [V_COUNT], effects: [{ say: gaugesCountText }] },
   ],
 };
 
@@ -224,16 +234,35 @@ const chaseBottomTouchReturnB = 'Warm. The same warm. Four floors below the room
 export const chaseBottomLookDownText =
   'Ladder, pipe, ladder, pipe, and then the point at which what you are looking at\nstops being a thing you can see and starts being a direction.';
 
+// Stage D addenda §4.2 — `LISTEN DOWN` / `LISTEN AT THE OPENING`. "down" is
+// added to this object's own noun list (§9 item 2) so `LISTEN DOWN` (and
+// `EXAMINE DOWN`) resolve at all — D4 §9.6 listed it, and shipping dropped
+// it. Text transcribed verbatim (hard rule 5).
+const chaseBottomListenText =
+  'You put your head into the opening and hold still.\n\nWarm air coming up. Water in Return B going the other way. Under both of them,\nfrom somewhere with no edges in it, a sound like a room being large.\n\nIt does not arrive from a distance. It is already there, the way the note in\nthis room is already there, and it stops the moment you notice you are\nlistening for the end of it.';
+
+// Stage D addenda §4.1 — `DROP <thing> DOWN THE SHAFT` / `THROW <thing>
+// DOWN` / `PUT <thing> IN OPENING`. Exported: this can never be a handler on
+// this object (the resolved `dobj` is whatever the player is carrying, not
+// the chase bottom itself — the chase bottom is only ever the `iobj`); the
+// room shell (`../s5ReactorInterface.ts`) wires it, matching on
+// `withInstrument: [ACT3_CHASE_BOTTOM]`. Addenda §8 ruling 4: a carried
+// object is never put beyond reach — no `move` effect here, ever (register
+// 91). Text transcribed verbatim (hard rule 5).
+export const chaseBottomDropDownText =
+  'You hold it out over the opening and hold it there.\n\nWhat you want is a number: let go, listen, multiply, know. What you have in\nyour hand is something you were given, argued for, or levered out of something\nelse, and the shaft is not in the business of giving things back.\n\nYour hand comes in. The question stands, and so does the object, in your\npocket, where it is useful.';
+
 const chaseBottomDownEffects: Effect[] = [{ goto: ACT3_PIPE_CHASE }, { advanceClock: 1 }];
 
 const chaseBottom: ObjectDefSlice = {
   location: ACT3_S5_REACTOR_INTERFACE,
   name: 'chase bottom',
   portable: false,
-  nouns: ['opening', 'hole', 'ladder', 'shaft', 'chase', 'pipe chase', 'returns', 'return', 'pipes', 'bends', 'flange', 'valve'],
+  nouns: ['opening', 'hole', 'ladder', 'shaft', 'chase', 'pipe chase', 'returns', 'return', 'pipes', 'bends', 'flange', 'valve', 'down'],
   handlers: [
     { verbs: [EXAMINE], effects: [{ say: chaseBottomExamine }] },
     { verbs: [TOUCH], effects: [{ say: chaseBottomTouchReturnB }] },
+    { verbs: [LISTEN], effects: [{ say: chaseBottomListenText }] },
     { verbs: [DIRECTION_VERB_IDS.in], effects: chaseBottomDownEffects },
   ],
 };
@@ -392,12 +421,21 @@ const bench: ObjectDefSlice = {
 const readLogbookText =
   'Columns of the same three numbers, in pencil, morning after morning, going\nback further than the book has pages for.\n\nThey are the numbers on the wall. Every one of them. Down the whole page and\ndown the page before it, without a variation big enough to be worth the ink.\n\nThen the entries stop, and the ruling goes on.';
 
+// Stage D addenda §5 — `COMPARE LOGBOOK WITH NOTEBOOK`. Same idiom as
+// `corridorB4.ts`'s own `lifeSafetyPlan` handler for `V_FIT`/`ACT2_NOTEBOOK`.
+// Grants nothing, sets nothing. Text transcribed verbatim (hard rule 5).
+const compareLogbookNotebookText =
+  'You get the notebook out and hold it open beside the wire holder, which is the\ncorrect instinct and the wrong book.\n\nFigures. Columns of them, in pencil, ruled and dated and signed by nobody.\nThere is not a word on the page — not a note, not a margin, not so much as a\ncrossed-out one — and a hand is made of words.\n\nTwo men can write the same three numbers the same way, and all that proves is\nthat the numbers were the same.';
+
 const logbook: ObjectDefSlice = {
   location: ACT3_S5_REACTOR_INTERFACE,
   name: 'logbook',
   portable: false,
   nouns: ['logbook', 'log book', 'log'],
-  handlers: [{ verbs: [EXAMINE, READ], effects: [{ say: readLogbookText }] }],
+  handlers: [
+    { verbs: [EXAMINE, READ], effects: [{ say: readLogbookText }] },
+    { verbs: [V_FIT], withInstrument: [ACT2_NOTEBOOK], when: { has: ACT2_NOTEBOOK }, effects: [{ say: compareLogbookNotebookText }] },
+  ],
 };
 
 const touchWallText =

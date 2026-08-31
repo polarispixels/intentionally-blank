@@ -46,7 +46,8 @@
 import type { Effect } from '../../../engine/effects';
 import type { EventDef, NpcDefSlice, ObjectDefSlice, ShowResponseDef, TopicDef } from '../../../engine/world';
 import type { ProseRule } from '../../../engine/prose';
-import { EXAMINE, SHOW } from '../act1/verbs';
+import type { Cond } from '../../../engine/cond';
+import { EXAMINE, SHOW, TAKE } from '../act1/verbs';
 import { USE_VERB_ID } from '../../../engine/move';
 import { NOLANS_YARD, PO_BOX_SLIP, SUNDOWN_DINER, V_FOLLOW, V_WATCH, WORK_ORDER } from '../act1/ids';
 import { POKER_NIGHT } from './calendar';
@@ -60,6 +61,15 @@ import { POKER_NIGHT } from './calendar';
 // explicitly has bridging Acts II and III). `act3/ids.ts` does not import
 // anything from this file, so no cycle exists either way.
 import { ACT3_LOBBY, ACT3_NOLAN_TOPIC_BADGE_WORK, ACT3_NOLAN_TOPIC_HEADACHES_WORK, ACT3_NOLAN_TOPIC_JULES_WORK, ACT3_NOLAN_TOPIC_NIGHTS_WORK, ACT3_NOLAN_TOPIC_SUBLEVEL_WORK, ACT3_PERIMETER_ROAD, ACT3_RODE_FENCE, ACT3_GATE_READER } from '../act3/ids';
+// D5, task F — Nolan's night post, replacing D2's `offstage` night rule
+// (§6 header, §39.1; §36 q12's own ruling: from `act2_started`, unconditionally).
+// `nolanChairNightText` is owned by `act3/objects/s6MaintenanceBay.ts` (§6.1)
+// and reused here verbatim (hard rule 5) rather than duplicated, for
+// `EXAMINE NOLAN` bare at night — the same "own the text once" idiom this
+// file already follows for `NOLAN_SUBLEVEL_LINE`.
+import { ACT3_CLUE_NOLAN_CHAIR, ACT3_S6_MAINTENANCE_BAY, ACT3_TOOK_NOLAN_BADGE } from '../act3/ids';
+import { nolanChairNightText } from '../act3/objects/s6MaintenanceBay';
+import { SHAKE } from '../act1/verbs';
 // D3, task A — route (a)'s "USE BADGE"/"SHOW BADGE TO READER" (§5.1) and
 // route (a')'s "FOLLOW NOLAN" at the perimeter (§5.2). Both effects arrays
 // live in `act3/objects/perimeterRoad.ts` (the room this scene plays out
@@ -404,14 +414,66 @@ const unknownTopicAtWork: string[] = ['"On the floor I\'m no use for anything bu
 const followInsideText =
   '"You\'ll want to stay this side of the turnstile, or with me, and I\'m going to\nthe plant floor." He is already going. "There\'s a kettle behind the desk and\nnobody minds."';
 
+// =============================================================================
+// D5, task F — Nolan asleep in the Bay at night (§6.3, §6.4, §6.1). He has
+// no topics there (§6 header: "no topics here, no greeting, and no
+// unknownTopic — every attempt at conversation resolves to §6.3 or §6.4").
+// This engine gives ASK/TELL no `handlers` rung at all (`respond.ts`:
+// `NPC_VERB_IDS.ask`/`.tell` dispatch straight into topic matching, never
+// through `NpcDefSlice.handlers`) and TALK TO/HELLO/"WAKE" — the same verb
+// id, `act1/verbs.ts`'s own `HELLO` already lists "wake" among its words,
+// added for Nolan's Yard — resolve only through `greeting`, never
+// `handlers` either. So: every one of his OWN existing topics (all D2's,
+// none of which is gated away from any room) is wrapped here with `{ not:
+// { at: act3_s6_maintenance_bay } }` ANDed onto its own `when`, so all of
+// them fall through to `unknownTopic` at the Bay; a Bay-gated rule
+// prepended to `unknownTopic` and to `greeting` then gives EVERY ASK
+// (whatever the topic) and every WAKE/TALK TO the same §6.3 text. `SHAKE`
+// is an ordinary verb (not one of `hasNpcSemantics`'s four), so it DOES
+// reach `NpcDefSlice.handlers` normally — added there, prepended.
+//
+// ROTATION CAVEAT (escalated, not guessed): §6.3 specifies a UNIQUE first
+// line and then "a rotation of two" forever after. `greeting`/`unknownTopic`
+// carry no `Effect` channel (no way to `set` a flag from inside a `Prose`
+// rule — the same gap this file's own header already documents for
+// `ACT2_MET_NOLAN_HOME`), so there is no boolean this task can flip to
+// remember "already tried once." The 3-line array below relies on
+// `prose.ts`'s own per-node rotation counter (`n % text.length`) instead,
+// which is a true, infinite modulo cycle: attempts 1/2/3 give the doc's own
+// three lines in order, and attempt 4 wraps back to the long first-attempt
+// paragraph rather than sticking on the second line forever (§40 item 1's
+// own suggested refinement — not implemented; it would need a persisted
+// flag this engine has no way to set from a greeting/topic response).
+// `SHAKE` (via `handlers`, which DOES carry `Effect`s) could be made exact,
+// but is left sharing the same three-line array/limitation for consistency
+// with WAKE/TALK/ASK rather than behaving differently from them.
+// =============================================================================
+
+const nolanBayWakeFirstText =
+  'You say his name. Not loudly.\n\nHe does not do any of the things a sleeping man does when somebody says his\nname in a room. He does not shift, or half-surface, or make the noise, or turn\nhis head a quarter of an inch toward it and go back down.\n\nHis breathing goes on at the rate it was going at.\n\nThe strap across his chest is not tight, and it was never going to be the strap\nthat kept him here.';
+
+const nolanBayWakeAgainText = 'You say it again, at the volume you would use to a man across a yard.\n\nThe clock over the door goes on doing the only work being done in this room.';
+
+const nolanBayWakeHandText = "His hand is warm. It is the ordinary warmth of a hand. You put it back where it\nwas on the arm of the chair, with the palm up, the way it was.";
+
+const nolanBayWakeRotation: string[] = [nolanBayWakeFirstText, nolanBayWakeAgainText, nolanBayWakeHandText];
+
+/** Every D2/D3 topic, gated away from the Bay (this section's own header). */
+function notInBay(topic: TopicDef): TopicDef {
+  const away: Cond = { not: { at: ACT3_S6_MAINTENANCE_BAY } };
+  return { ...topic, when: topic.when === undefined ? away : { all: [topic.when, away] } };
+}
+
 export const nolan: NpcDefSlice = {
-  // Poker night and the evening-at-home rule stay (this task's ruling 1,
-  // unchanged); the D3 retarget (plan §4.7 / this task's ruling 2) adds two
-  // rules after them: the tailgate window (07:00–07:30, the raw-minute
-  // `clock` arm) puts him at the perimeter, then the rest of morning and
-  // all of afternoon puts him in the Lobby. Night still falls through to
-  // the final `offstage` fallback, unchanged.
+  // D5, task F — his night post (§6 header, §39.1, §36 q12), prepended
+  // above his shipped set, replacing D2's fallthrough-to-`offstage` at
+  // night. Poker night and the evening-at-home rule stay (this task's
+  // ruling 1, unchanged); the D3 retarget (plan §4.7 / this task's ruling
+  // 2) adds two rules after them: the tailgate window (07:00–07:30, the
+  // raw-minute `clock` arm) puts him at the perimeter, then the rest of
+  // morning and all of afternoon puts him in the Lobby.
   schedule: [
+    { when: { all: [{ flag: ACT2_STARTED }, { clockPhase: 'night' }] }, room: ACT3_S6_MAINTENANCE_BAY },
     { when: { all: [{ flag: ACT2_STARTED }, POKER_NIGHT] }, room: SUNDOWN_DINER },
     { when: { all: [{ flag: ACT2_STARTED }, { clockPhase: 'evening' }] }, room: NOLANS_YARD },
     { when: { all: [{ flag: ACT2_STARTED }, { clockPhase: 'morning' }, { clock: { after: 420, before: 450 } }] }, room: ACT3_PERIMETER_ROAD },
@@ -421,18 +483,46 @@ export const nolan: NpcDefSlice = {
   nouns: ['nolan', 'man', 'manager', 'neighbour'],
   pronoun: 'he',
   greeting: [
+    // D5, task F — WAKE/TALK TO at the Bay, at night (§6.3). Prepended
+    // first so it wins outright while he's there (his own schedule only
+    // ever puts him there at night).
+    { when: { at: ACT3_S6_MAINTENANCE_BAY }, text: nolanBayWakeRotation },
     { when: { all: [{ at: ACT3_LOBBY }, { flag: ACT3_RODE_FENCE }] }, text: greetingFenceVariantText },
     { when: { all: [{ at: ACT3_LOBBY }, { not: { met: ACT2_NOLAN } }] }, text: greetingWorkFirstText },
     { when: { at: ACT3_LOBBY }, text: greetingWorkRotationText },
     ...greeting,
   ] satisfies ProseRule[],
-  topics: [topicSublevelAtWork, topicBadgeAtWork, topicJulesAtWork, topicHeadachesAtWork, topicNightsAtWork, topicBadgeLoan, topicSublevel, topicJules, topicBadge, topicHeadaches, topicTrash, topicPoker, topicNights, topicUnreachable],
-  unknownTopic: [{ when: { at: ACT3_LOBBY }, text: unknownTopicAtWork }, { text: unknownTopic }] satisfies ProseRule[],
+  // D5, task F — every existing topic gated away from the Bay (this
+  // section's own header); no topic of his own is authored for it.
+  topics: [topicSublevelAtWork, topicBadgeAtWork, topicJulesAtWork, topicHeadachesAtWork, topicNightsAtWork, topicBadgeLoan, topicSublevel, topicJules, topicBadge, topicHeadaches, topicTrash, topicPoker, topicNights, topicUnreachable].map(notInBay),
+  unknownTopic: [
+    // D5, task F — ASK NOLAN ABOUT anything, at the Bay, at night (§6.3):
+    // every one of his own topics is gated away above, so any ASK/TELL
+    // there falls straight through to this rule.
+    { when: { at: ACT3_S6_MAINTENANCE_BAY }, text: nolanBayWakeRotation },
+    { when: { at: ACT3_LOBBY }, text: unknownTopicAtWork },
+    { text: unknownTopic },
+  ] satisfies ProseRule[],
   showResponses: [
     { objects: [WORK_ORDER], response: trashResponse, effects: trashEffects },
     { objects: [PO_BOX_SLIP], response: rentNoticeResponse },
   ] satisfies ShowResponseDef[],
   handlers: [
+    // D5, task F — EXAMINE NOLAN, at the Bay, at night (§6.1): reuses
+    // `act3/objects/s6MaintenanceBay.ts`'s own text verbatim (§6.1 is
+    // granted there too, on the chair object, for `EXAMINE NOLAN'S CHAIR`;
+    // granting it twice is harmless — `grantClue` is idempotent).
+    { verbs: [EXAMINE], when: { at: ACT3_S6_MAINTENANCE_BAY }, effects: [{ say: nolanChairNightText }, { grantClue: ACT3_CLUE_NOLAN_CHAIR }] },
+    // D5, task F — SHAKE NOLAN, at the Bay, at night (§6.3) — `SHAKE` is
+    // an ordinary verb (not one of `hasNpcSemantics`'s four: ask/tell/show/
+    // talk), so it DOES reach this `handlers` rung normally.
+    { verbs: [SHAKE], when: { at: ACT3_S6_MAINTENANCE_BAY }, effects: [{ say: nolanBayWakeRotation }] },
+    // D5, task F — EXAMINE NOLAN UNDER LAMP/PUT NOLAN'S ARM UNDER LAMP
+    // (§6.4) reaches this NPC only through the room's own bare fixed-phrase
+    // verb (`s6MaintenanceBay.ts`, this task's own room shell, using its own
+    // `nolanUnderLampText`, `objects/s6MaintenanceBay.ts`) — a bare
+    // `'V'`-pattern verb never resolves a `dobj`, so it can never reach an
+    // NPC target (this `handlers` list) at all; nothing to wire here.
     { verbs: [EXAMINE], when: { at: ACT3_LOBBY }, effects: [{ say: examineAtWorkText }] },
     { verbs: [EXAMINE], effects: [{ say: examineText }] },
     {
@@ -467,15 +557,39 @@ export const ACT2_NOLAN_MET_EVENT: EventDef = {
 };
 
 export const nolanBadge: ObjectDefSlice = {
+  // D5, task F (§6.5): starts on Nolan's own hook in the Bay rather than
+  // `'nowhere'` — every acquisition route (poker night's loan, route (a)'s
+  // reader, and this task's own hook) already moves it with a plain
+  // `{ move: [id, 'inventory'] }` regardless of where it started, so this
+  // is a change of default placement only, not of any route's own logic.
+  // Without it, "TAKE BADGE" in the Bay has nothing in scope to resolve —
+  // `scope()` only ever finds an object at its own true `location`.
+  // v0.15.0 playtest: rests `'nowhere'` — the Bay's own `onEnter` hangs it on
+  // NOLAN's hook at night when the player does not hold it (D2's loan puts it
+  // in his pocket long before), and sends it away again by day.
   location: 'nowhere',
   name: 'badge',
   portable: true,
   // No examine text is authored (§16.7's own ruling) — the built-in stands.
   nouns: ['badge', "nolan's badge", 'lanyard'],
-  // D3, task A — route (a), "USE BADGE" / "SHOW BADGE TO READER" (§5.1).
-  // Gated `{ at: act3_perimeter_road }` so the badge does nothing special
-  // anywhere else it might be shown/used.
   handlers: [
+    // D5, task F — "TAKE BADGE" from the hook, at night, if not already
+    // held (§6.5). Prepended first so it wins over the built-in TAKE
+    // (portable:true would otherwise just move it silently).
+    {
+      verbs: [TAKE],
+      when: { all: [{ clockPhase: 'night' }, { not: { has: ACT2_NOLAN_BADGE } }] },
+      effects: [
+        {
+          say: 'You unwind the lanyard from the hook, twice, the way it went on.\n\nThe photograph is a man who has just been told to look at the camera and has\ndone it exactly. The badge weighs nothing at all and it opens the gate, the\nlobby, the halls and the lift, and he told you that himself, on a step, in a\ncardigan, with a dog across his feet.\n\nHe does not move.',
+        },
+        { move: [ACT2_NOLAN_BADGE, 'inventory'] },
+        { set: [ACT3_TOOK_NOLAN_BADGE, true] },
+      ],
+    },
+    // D3, task A — route (a), "USE BADGE" / "SHOW BADGE TO READER" (§5.1).
+    // Gated `{ at: act3_perimeter_road }` so the badge does nothing special
+    // anywhere else it might be shown/used.
     { verbs: [USE_VERB_ID], when: { at: ACT3_PERIMETER_ROAD }, effects: ROUTE_A_BADGE_EFFECTS },
     { verbs: [SHOW], withInstrument: [ACT3_GATE_READER], effects: ROUTE_A_BADGE_EFFECTS },
   ],

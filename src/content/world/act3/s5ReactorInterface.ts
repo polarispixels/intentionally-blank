@@ -9,8 +9,9 @@
 
 import type { ExitDefSlice, OnEnterRule, RoomDefSlice } from '../../../engine/world';
 import type { ProseRule } from '../../../engine/prose';
-import { HELLO, LISTEN, SMELL, WAIT, YELL } from '../act1/verbs';
+import { DROP, HELLO, LISTEN, PUT_IN, SMELL, WAIT, YELL } from '../act1/verbs';
 import {
+  ACT3_CHASE_BOTTOM,
   ACT3_CHECKPOINT_S5,
   ACT3_PIPE_CHASE,
   ACT3_S1_MECHANICAL_GALLERY,
@@ -20,9 +21,10 @@ import {
   V_ACT3_LOOK_DOWN_SHAFT,
   V_ACT3_TURN_TO_NORMAL,
   V_ACT3_TYPE_PAD,
+  V_THROW,
 } from './ids';
 import { ACT3_READ_CLOCK_SCRIPT } from './ids';
-import { chaseBottomLookDownText, s6PadEffects, turnKeyswitchEffects } from './objects/s5ReactorInterface';
+import { chaseBottomDropDownText, chaseBottomLookDownText, s6PadEffects, turnKeyswitchEffects } from './objects/s5ReactorInterface';
 
 // ---------------------------------------------------------------------------
 // §9.1 — description. Rule 1 is gated on `act3_s5_seen` (set by `onEnter`,
@@ -100,5 +102,13 @@ export const s5ReactorInterfaceRoom: RoomDefSlice = {
     { verbs: [V_ACT3_TYPE_PAD], when: { at: ACT3_S5_REACTOR_INTERFACE }, effects: s6PadEffects },
     { verbs: [V_ACT3_CHECK_TIME], when: { at: ACT3_S5_REACTOR_INTERFACE }, effects: [{ script: { id: ACT3_READ_CLOCK_SCRIPT } }] },
     { verbs: [V_ACT3_LOOK_DOWN_SHAFT], when: { at: ACT3_S5_REACTOR_INTERFACE }, effects: [{ say: chaseBottomLookDownText }] },
+    // Stage D addenda §4.1 — `DROP <thing> DOWN THE SHAFT` / `THROW <thing>
+    // DOWN` / `PUT <thing> IN OPENING`, for ANY carried object (the resolved
+    // `dobj` is whatever the player is holding, never the chase bottom
+    // itself, so this can't be a handler on that object — see
+    // `objects/s5ReactorInterface.ts`'s own header note on
+    // `chaseBottomDropDownText`). Addenda §8 ruling 4: never a `move` effect
+    // here — the object stays held (register 91).
+    { verbs: [PUT_IN, DROP, V_THROW], withInstrument: [ACT3_CHASE_BOTTOM], effects: [{ say: chaseBottomDropDownText }] },
   ],
 };

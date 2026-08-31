@@ -22,7 +22,7 @@ import type { HandlerDef, RoomDefSlice } from '../../../engine/world';
 import type { RoomId } from '../../../engine/ids';
 import { ACT3_CLUES, ACT3_D3B_CLUES, ACT3_D3B_FLAGS, ACT3_FLAGS, ACT3_MEMORIES, ACT3_PUZZLES } from './knowledge';
 import { ACT3_D3C_CLUES, ACT3_D3C_FLAGS, ACT3_D3C_MEMORIES, ACT3_D3C_PUZZLES, ACT3_D3C_QUESTIONS } from './knowledge';
-import { ACT3_D4_FLAGS, ACT3_D4_QUESTIONS } from './knowledge';
+import { ACT3_D4_FLAGS, ACT3_D4_QUESTIONS, ACT3_D5_FLAGS, ACT3_D5_QUESTIONS } from './knowledge';
 // D4 task B — S1's own clues (§8.6, §12.2).
 import { ACT3_D4B_CLUES } from './knowledge';
 // --- D4 builders: add your own imports below this line (Edit tool only) ---
@@ -73,6 +73,61 @@ import { ACT3_TUNNEL_APPROACH_GATE_SYNC_EVENT, ACT3_TUNNEL_DESCENT_GATE_SYNC_EVE
 import { ACT3_MATCH_TICK_EVENT, ACT3_SERVICE_TUNNEL_EXTRA_OBJECTS, ACT3_SERVICE_TUNNEL_OBJECTS } from './objects/serviceTunnel';
 import { ACT3_SERVICE_TUNNEL, ACT3_TUNNEL_MOUTH } from './ids';
 
+// --- D5 task H ---
+// The Custodian's rounds, the four spotted events, the alarm's reset, and
+// Dad's S5 push (D5 prose doc §18-§20, §39). The schedule itself is
+// `act2/custodian.ts`'s own edit — no import needed here for it (an NPC's
+// schedule isn't part of a `WorldSlice`'s own keyed tables; `act2/index.ts`
+// already registers `custodian`/`dad` as NPCs and this task edited their
+// definitions in place).
+import { ACT3_D5_TASK_H_CLUES, ACT3_D5_TASK_H_FLAGS } from './knowledge';
+import { ACT3_D5_TASK_H_VERBS } from './verbs';
+import {
+  ACT3_DAD_PUSH_S5_EVENT,
+  ACT3_EV_PASSED_EVENT,
+  ACT3_EV_SPOTTED_BAY_EVENT,
+  ACT3_EV_SPOTTED_CHASE_EVENT,
+  ACT3_EV_SPOTTED_HUB_EVENT,
+  ACT3_EV_SPOTTED_S5_EVENT,
+  ACT3_ALARM_RESET_EVENT,
+  act3AlarmPull,
+  act3AlarmReset,
+} from './events';
+import { ACT3_ALARM_PULL_SCRIPT, ACT3_ALARM_RESET_SCRIPT } from './ids';
+
+// --- D5 task F ---
+// The S6 Maintenance Bay (D5 prose doc §3-§17, §39, §40): the room itself,
+// its 12 objects, the clue/puzzle/memory definitions this task owns
+// (`knowledge.ts`), and the Bay's own wall-clock script.
+import { ACT3_D5_TASK_F_CLUES, ACT3_D5_TASK_F_FLAGS, ACT3_D5_TASK_F_MEMORIES, ACT3_D5_TASK_F_PUZZLES } from './knowledge';
+import { ACT3_D5_TASK_F_VERBS } from './verbs';
+import { s6MaintenanceBayRoom } from './s6MaintenanceBay';
+import { ACT3_S6_MAINTENANCE_BAY_OBJECTS } from './objects/s6MaintenanceBay';
+import { act3ReadBayClock } from './scripts';
+import { ACT3_READ_BAY_CLOCK_SCRIPT, ACT3_S6_MAINTENANCE_BAY } from './ids';
+
+// --- D5 task G ---
+// The S6 Archive Hub (D5 prose doc §21-§31, §39, §40): the room itself,
+// its objects (the terminal + screen sub-part, ledger, load graph, queue,
+// gate frames, root door, the boundary's one gate object), the login and
+// ledger-search prompt scripts, and this task's own clue/puzzle/memory
+// definitions (`knowledge.ts`).
+import { ACT3_D5_TASK_G_CLUES, ACT3_D5_TASK_G_FLAGS, ACT3_D5_TASK_G_MEMORIES, ACT3_D5_TASK_G_PUZZLES } from './knowledge';
+import { ACT3_D5_TASK_G_VERBS } from './verbs';
+import { s6ArchiveHubRoom } from './s6ArchiveHub';
+import { ACT3_S6_ARCHIVE_HUB_OBJECTS } from './objects/s6ArchiveHub';
+import { act3HubLoginOpen, act3HubLoginRespond, act3LedgerSearchOpen, act3LedgerSearchRespond } from './scripts';
+import {
+  ACT3_HUB_LOGIN_OPEN_SCRIPT,
+  ACT3_HUB_LOGIN_PROMPT_ID,
+  ACT3_HUB_LOGIN_SCRIPT,
+  ACT3_LEDGER_SEARCH_OPEN_SCRIPT,
+  ACT3_LEDGER_SEARCH_PROMPT_ID,
+  ACT3_LEDGER_SEARCH_RESPOND_SCRIPT,
+  ACT3_S6_ARCHIVE_HUB,
+} from './ids';
+import type { ScriptId } from '../../../engine/ids';
+
 // ---------------------------------------------------------------------------
 // D3-A — task A's own Perimeter Road & Gatehouse room/objects/travel script
 // have now landed (`perimeterRoad.ts`, `objects/perimeterRoad.ts`,
@@ -119,12 +174,34 @@ for (const entry of D3_ROOMS) {
 }
 
 export const ACT3_SLICE: WorldSlice = {
-  flags: { ...ACT3_FLAGS, ...ACT3_D3B_FLAGS, ...ACT3_D3C_FLAGS, ...ACT3_D4_FLAGS, ...ACT3_D4_TASK_D_FLAGS, ...ACT3_D4C_FLAGS, ...ACT3_D4_TASK_A_FLAGS },
-  clues: { ...ACT3_CLUES, ...ACT3_D3B_CLUES, ...ACT3_D3C_CLUES, ...ACT3_D4B_CLUES, ...ACT3_D4C_CLUES, ...ACT3_D4_TASK_A_CLUES },
-  questions: { ...ACT3_D3C_QUESTIONS, ...ACT3_D4_QUESTIONS },
-  puzzles: { ...ACT3_PUZZLES, ...ACT3_D3C_PUZZLES, ...ACT3_D4_PUZZLES },
-  memories: { ...ACT3_MEMORIES, ...ACT3_D3C_MEMORIES },
-  verbs: { ...ACT3_VERBS, ...ACT3_D4_TASK_A_VERBS },
+  flags: {
+    ...ACT3_FLAGS,
+    ...ACT3_D3B_FLAGS,
+    ...ACT3_D3C_FLAGS,
+    ...ACT3_D4_FLAGS,
+    ...ACT3_D5_FLAGS,
+    ...ACT3_D4_TASK_D_FLAGS,
+    ...ACT3_D4C_FLAGS,
+    ...ACT3_D4_TASK_A_FLAGS,
+    ...ACT3_D5_TASK_H_FLAGS,
+    ...ACT3_D5_TASK_F_FLAGS,
+    ...ACT3_D5_TASK_G_FLAGS,
+  },
+  clues: {
+    ...ACT3_CLUES,
+    ...ACT3_D3B_CLUES,
+    ...ACT3_D3C_CLUES,
+    ...ACT3_D4B_CLUES,
+    ...ACT3_D4C_CLUES,
+    ...ACT3_D4_TASK_A_CLUES,
+    ...ACT3_D5_TASK_H_CLUES,
+    ...ACT3_D5_TASK_F_CLUES,
+    ...ACT3_D5_TASK_G_CLUES,
+  },
+  questions: { ...ACT3_D3C_QUESTIONS, ...ACT3_D4_QUESTIONS, ...ACT3_D5_QUESTIONS },
+  puzzles: { ...ACT3_PUZZLES, ...ACT3_D3C_PUZZLES, ...ACT3_D4_PUZZLES, ...ACT3_D5_TASK_F_PUZZLES, ...ACT3_D5_TASK_G_PUZZLES },
+  memories: { ...ACT3_MEMORIES, ...ACT3_D3C_MEMORIES, ...ACT3_D5_TASK_F_MEMORIES, ...ACT3_D5_TASK_G_MEMORIES },
+  verbs: { ...ACT3_VERBS, ...ACT3_D4_TASK_A_VERBS, ...ACT3_D5_TASK_H_VERBS, ...ACT3_D5_TASK_F_VERBS, ...ACT3_D5_TASK_G_VERBS },
   rooms: {
     [ACT3_LOBBY]: lobbyRoom,
     [ACT3_DATA_HALL_A]: dataHallARoom,
@@ -140,6 +217,10 @@ export const ACT3_SLICE: WorldSlice = {
     // D4 task A:
     [ACT3_TUNNEL_MOUTH]: tunnelMouthRoom,
     [ACT3_SERVICE_TUNNEL]: serviceTunnelRoom,
+    // D5 task F:
+    [ACT3_S6_MAINTENANCE_BAY]: s6MaintenanceBayRoom,
+    // D5 task G:
+    [ACT3_S6_ARCHIVE_HUB]: s6ArchiveHubRoom,
   },
   objects: {
     ...ACT3_LOBBY_OBJECTS,
@@ -171,6 +252,10 @@ export const ACT3_SLICE: WorldSlice = {
     ...ACT3_TUNNEL_MOUTH_EXTRA_OBJECTS,
     ...ACT3_SERVICE_TUNNEL_OBJECTS,
     ...ACT3_SERVICE_TUNNEL_EXTRA_OBJECTS,
+    // D5 task F:
+    ...ACT3_S6_MAINTENANCE_BAY_OBJECTS,
+    // D5 task G:
+    ...ACT3_S6_ARCHIVE_HUB_OBJECTS,
   },
   events: {
     [ACT3_LOBBY_READER_OPENS_EVENT.id]: ACT3_LOBBY_READER_OPENS_EVENT,
@@ -178,6 +263,14 @@ export const ACT3_SLICE: WorldSlice = {
     [ACT3_TUNNEL_APPROACH_GATE_SYNC_EVENT.id]: ACT3_TUNNEL_APPROACH_GATE_SYNC_EVENT,
     [ACT3_TUNNEL_DESCENT_GATE_SYNC_EVENT.id]: ACT3_TUNNEL_DESCENT_GATE_SYNC_EVENT,
     [ACT3_MATCH_TICK_EVENT.id]: ACT3_MATCH_TICK_EVENT,
+    // D5 task H: the four spotted events, the coveralls' nod, Dad's S5 push, the alarm's automatic reset.
+    [ACT3_EV_SPOTTED_BAY_EVENT.id]: ACT3_EV_SPOTTED_BAY_EVENT,
+    [ACT3_EV_SPOTTED_HUB_EVENT.id]: ACT3_EV_SPOTTED_HUB_EVENT,
+    [ACT3_EV_SPOTTED_S5_EVENT.id]: ACT3_EV_SPOTTED_S5_EVENT,
+    [ACT3_EV_SPOTTED_CHASE_EVENT.id]: ACT3_EV_SPOTTED_CHASE_EVENT,
+    [ACT3_EV_PASSED_EVENT.id]: ACT3_EV_PASSED_EVENT,
+    [ACT3_DAD_PUSH_S5_EVENT.id]: ACT3_DAD_PUSH_S5_EVENT,
+    [ACT3_ALARM_RESET_EVENT.id]: ACT3_ALARM_RESET_EVENT,
   },
   scripts: {
     [ACT3_ELEVATOR_RIDE_SCRIPT]: act3ElevatorRide,
@@ -186,5 +279,28 @@ export const ACT3_SLICE: WorldSlice = {
     // D4 task C:
     [ACT3_INTERLOCK_DEATH_SCRIPT]: act3InterlockDeath,
     [ACT3_READ_CLOCK_SCRIPT]: act3ReadClock,
+    // D5 task H: the alarm's pull/reset scripts.
+    [ACT3_ALARM_PULL_SCRIPT]: act3AlarmPull,
+    [ACT3_ALARM_RESET_SCRIPT]: act3AlarmReset,
+    // D5 task F:
+    [ACT3_READ_BAY_CLOCK_SCRIPT]: act3ReadBayClock,
+    // D5 task G: the Hub's own login prompt (open + respond) and the
+    // ledger's own bare-SEARCH prompt (open + respond).
+    [ACT3_HUB_LOGIN_OPEN_SCRIPT]: act3HubLoginOpen,
+    [ACT3_HUB_LOGIN_SCRIPT]: act3HubLoginRespond,
+    [ACT3_LEDGER_SEARCH_OPEN_SCRIPT]: act3LedgerSearchOpen,
+    [ACT3_LEDGER_SEARCH_RESPOND_SCRIPT]: act3LedgerSearchRespond,
   },
+};
+
+/**
+ * `src/cli/repl.ts`'s `--world` module convention (§18's PROMPT ROUND-TRIP
+ * gap) — prompt id -> the script that closes it, same idiom as
+ * `ACT2_CENSOR_PROMPT_SCRIPTS` (`act2/index.ts`). Wired into
+ * `src/content/world/game.ts`'s own `PROMPT_SCRIPTS` export by that file
+ * (a one-line merge; the CLI and `App.vue` already spread that map).
+ */
+export const ACT3_HUB_PROMPT_SCRIPTS: Record<string, ScriptId> = {
+  [ACT3_HUB_LOGIN_PROMPT_ID]: ACT3_HUB_LOGIN_SCRIPT,
+  [ACT3_LEDGER_SEARCH_PROMPT_ID]: ACT3_LEDGER_SEARCH_RESPOND_SCRIPT,
 };

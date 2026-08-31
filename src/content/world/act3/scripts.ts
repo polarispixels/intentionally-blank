@@ -237,3 +237,125 @@ export const act3ReadClock: ScriptFn = (world, state) => {
 };
 
 export { ACT3_INTERLOCK_DEATH_SCRIPT, ACT3_READ_CLOCK_SCRIPT };
+
+// ---------------------------------------------------------------------------
+// D5 task F — the Bay's own wall clock (§9.2). `clockInWords` is reused
+// unchanged from `./time` (§35/§39.3: "do not write a second one"); the
+// rotating second line is this room's own three, sharing no phrase with
+// `CLOCK_ROTATING_LINES` above (§35's own note that the two rotations share
+// nothing). No S5-style "window line" — the Bay's clock is a fact about
+// the room, not a descent-timing tool (§9's own header).
+// ---------------------------------------------------------------------------
+
+const BAY_CLOCK_ROTATING_LINES: string[] = [
+  'Nobody in this room is going to need that.',
+  'It agrees with the one on Sublevel 5, which somebody has to have seen to.',
+  'It is running, and it is the only thing on this floor that is doing anything you can watch.',
+];
+
+export const act3ReadBayClock: ScriptFn = (world, state) => {
+  const frameText = `The hands say ${clockInWords(state.clock.minute)}.`;
+  return apply(world, state, [{ say: frameText }, { say: BAY_CLOCK_ROTATING_LINES }], { path: 'script.act3_read_bay_clock' });
+};
+
+// ---------------------------------------------------------------------------
+// D5 task G — the Archive Hub's login prompt (§22.2-§22.4). Two fields, in
+// order (`user` then `password`); success/failure text and the field
+// labels are transcribed verbatim (hard rule 5). Same "open script builds
+// the `prompt` event by hand, respond script checks credentials, a failed
+// attempt re-opens the same prompt" idiom as `mvp-prologue.ts`'s
+// `openLoginPromptScript`/`respondLoginPromptScript` (`openPrompt` itself
+// stays the documented no-op — `effects.ts`). Deliberately NOT the opening
+// room's own script/prompt id (§22.2's own instruction) — this is a
+// second, independent login, reusing only the credentials, never the
+// mechanism's ids.
+// ---------------------------------------------------------------------------
+
+import { ACT3_HUB_LOGIN_OPEN_SCRIPT, ACT3_HUB_LOGIN_PROMPT_ID, ACT3_HUB_LOGGED_IN, ACT3_LEDGER, ACT3_LOAD_GRAPH, ACT3_QUEUE } from './ids';
+import { ACT3_HUB_LOGIN_SCRIPT } from './ids';
+
+function hubLoginFields(): { name: string; placeholder?: string; secret?: boolean }[] {
+  return [
+    { name: 'user', placeholder: 'USER:' },
+    { name: 'password', placeholder: 'PASSWORD:', secret: true },
+  ];
+}
+
+function hubLoginPromptEvent(): GameEvent {
+  return { type: 'prompt', id: ACT3_HUB_LOGIN_PROMPT_ID, title: 'LOG IN', body: '', fields: hubLoginFields() };
+}
+
+export const act3HubLoginOpen: ScriptFn = (_world, state) => ({ state, events: [hubLoginPromptEvent()] });
+
+const HUB_LOGIN_SUCCESS_TEXT =
+  'The cursor sits still for a moment, which the machine in your room never did.\n\n    ACCESS LEVEL: MAINTENANCE\n\n    ARCHIVE ..... SUBJECT LEDGER\n    LOAD ........ ALLOCATION, ROLLING\n    QUEUE ....... RECONCILIATION, PENDING\n\nUpstairs that was the whole answer. Down here it is a heading.';
+
+const HUB_LOGIN_FAIL_TEXT =
+  '    ACCESS LEVEL: NONE\n\nThe cursor goes back up to USER: and waits, and it will go on doing that for\nas long as you want it to.';
+
+export const act3HubLoginRespond: ScriptFn = (world, state, args) => {
+  const user = String(args?.['user'] ?? '').trim().toLowerCase();
+  const password = String(args?.['password'] ?? '').trim().toLowerCase();
+
+  if (user === 'admin' && password === 'admin-password') {
+    const applied = apply(
+      world,
+      state,
+      [
+        { set: [ACT3_HUB_LOGGED_IN, true] },
+        { reveal: ACT3_LEDGER },
+        { reveal: ACT3_LOAD_GRAPH },
+        { reveal: ACT3_QUEUE },
+        { say: HUB_LOGIN_SUCCESS_TEXT },
+      ],
+      { path: 'script.act3_hub_login.success' },
+    );
+    return { state: applied.state, events: [{ type: 'promptClosed', id: ACT3_HUB_LOGIN_PROMPT_ID }, ...applied.events] };
+  }
+
+  const applied = apply(world, state, [{ say: HUB_LOGIN_FAIL_TEXT }], { path: 'script.act3_hub_login.fail' });
+  return {
+    state: applied.state,
+    // The failure CLOSES the prompt (v0.15.0 playtest): re-opening it here
+    // swallowed every following command as prompt input, so one wrong
+    // password locked the player into the login forever. "The cursor goes
+    // back up to USER: and waits" is the machine's posture; the player types
+    // LOG IN again.
+    events: [{ type: 'promptClosed', id: ACT3_HUB_LOGIN_PROMPT_ID }, ...applied.events],
+  };
+};
+
+export { ACT3_HUB_LOGIN_OPEN_SCRIPT, ACT3_HUB_LOGIN_SCRIPT };
+
+// ---------------------------------------------------------------------------
+// D5 task G — the ledger's own bare `SEARCH LEDGER`/`SEARCH` prompt (§23,
+// §39.2's "search" row; this task's own mechanism, not named by the plan).
+// One field (`search`), routed exactly the same way the fixed name-phrases
+// on the Hub room (`s6ArchiveHub.ts`) are: jules -> R10, nolan -> §23.3,
+// me/myself/the investigator/blank -> §23.4, anything else -> §23.5.
+// ---------------------------------------------------------------------------
+
+import { ACT3_LEDGER_SEARCH_OPEN_SCRIPT, ACT3_LEDGER_SEARCH_PROMPT_ID, ACT3_LEDGER_SEARCH_RESPOND_SCRIPT } from './ids';
+import {
+  LEDGER_JULES_EFFECTS,
+  LEDGER_NOLAN_EFFECTS,
+  LEDGER_OTHER_EFFECTS,
+  LEDGER_SELF_EFFECTS,
+} from './objects/s6ArchiveHub';
+
+function ledgerSearchPromptEvent(): GameEvent {
+  return { type: 'prompt', id: ACT3_LEDGER_SEARCH_PROMPT_ID, title: 'SEARCH', body: '', fields: [{ name: 'search', placeholder: 'SEARCH:' }] };
+}
+
+export const act3LedgerSearchOpen: ScriptFn = (_world, state) => ({ state, events: [ledgerSearchPromptEvent()] });
+
+const SELF_WORDS = new Set(['me', 'myself', 'the investigator', 'investigator']);
+
+export const act3LedgerSearchRespond: ScriptFn = (world, state, args) => {
+  const input = String(args?.['search'] ?? '').trim().toLowerCase();
+  const effects = input === 'jules' ? LEDGER_JULES_EFFECTS : input === 'nolan' ? LEDGER_NOLAN_EFFECTS : input === '' || SELF_WORDS.has(input) ? LEDGER_SELF_EFFECTS : LEDGER_OTHER_EFFECTS;
+  const applied = apply(world, state, effects, { path: 'script.act3_ledger_search_respond' });
+  return { state: applied.state, events: [{ type: 'promptClosed', id: ACT3_LEDGER_SEARCH_PROMPT_ID }, ...applied.events] };
+};
+
+export { ACT3_LEDGER_SEARCH_OPEN_SCRIPT, ACT3_LEDGER_SEARCH_RESPOND_SCRIPT };

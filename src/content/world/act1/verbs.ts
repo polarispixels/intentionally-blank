@@ -646,7 +646,7 @@ export const ACT1_VERBS: Record<string, VerbDef> = {
   // Sundown Diner (wave 3) — new verbs. `default`s reuse the closest
   // existing authored family where this room's own text doesn't apply
   // globally (same idiom as the blocks above).
-  [V_EAT]: { id: V_EAT, words: ['eat', 'order food', 'order breakfast', 'ask for food'], patterns: ['V'], class: 'direct', default: dinerEatText },
+  [V_EAT]: { id: V_EAT, words: ['eat', 'swallow', 'order food', 'order breakfast', 'ask for food'], patterns: ['V', 'V dobj'], class: 'direct', default: dinerEatText },
   // §4.3/§4.4's "order coffee"/"order pie"/"ask for pie" — generic default
   // reuses the closest existing authored family (this verb is never reached
   // bare in this build; `coffee_urn`'s and `pie_case`'s own handlers,

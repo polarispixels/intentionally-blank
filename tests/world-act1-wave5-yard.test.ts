@@ -139,11 +139,13 @@ describe('Town Edge — the wave 5 amendments (§13)', () => {
     expect(diagCodes(events)).toEqual([]);
   });
 
-  it('north without the claim ticket is still END OF BUILD', () => {
+  it('north without the claim ticket reaches the in-world refusal (Stage D addenda §1.1), not END OF BUILD', () => {
     const store = new MemoryStore();
     const { session: atEdge } = enterFresh(TOWN_EDGE);
     const { events } = say(atEdge, 'north', store);
-    expect(text(events)).toContain('END OF BUILD');
+    const rendered = text(events);
+    expect(rendered).not.toContain('END OF BUILD');
+    expect(rendered).toContain('You go as far as the cattle guard');
   });
 
   it('north with the claim ticket redirects in-world instead', () => {

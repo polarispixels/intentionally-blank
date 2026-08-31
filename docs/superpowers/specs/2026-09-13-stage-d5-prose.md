@@ -1,6 +1,6 @@
 # Act III Wave D5 — Sublevel 6
 
-**Status (main session, 2026-08-31):** accepted whole for wiring as v0.15.0 — no cuts (§42.1 declined: the Bay's overrun is the mandated night state, and tier ceilings are furniture-only, entry 46); §36 rulings: q1–q12 as recommended (register 80–88; q5 `act3_ev_passed` is wired; q10 one gate object, two effects; q12 Nolan's night post from `act2_started`); §38 none wired; §24.3's spoken *Four hundred and sixty* ruled a reading, not a count (89). Original: draft for main-session voice review · **Author:** `narrative-writer`
+**Status (main session, 2026-08-31):** **wired and shipped v0.15.0**; accepted whole — no cuts (§42.1 declined: the Bay's overrun is the mandated night state, and tier ceilings are furniture-only, entry 46); §36 rulings: q1–q12 as recommended (register 80–88; q5 `act3_ev_passed` is wired; q10 one gate object, two effects; q12 Nolan's night post from `act2_started`); §38 none wired; §24.3's spoken *Four hundred and sixty* ruled a reading, not a count (89). Original: draft for main-session voice review · **Author:** `narrative-writer`
 · **Date:** 2026-09-13
 **Covers:** the end of Act III and the end of Stage D — the **S6 Maintenance
 Bay** (hero, 12 objects), the **S6 Archive Hub** (standard, 6 objects plus the

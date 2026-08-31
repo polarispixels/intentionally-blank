@@ -31,7 +31,7 @@ import {
   ACT2_USB,
   ACT2_WALL_DRUG_EMPORIUM,
 } from '../src/content/world/act2/ids';
-import { ACT3_PERIMETER_ROAD } from '../src/content/world/act3/ids';
+import { ACT3_PERIMETER_ROAD, ACT3_S6_MAINTENANCE_BAY } from '../src/content/world/act3/ids';
 
 const TEST_WORLD: WorldDef = WORLD;
 const vocab = compileVocabulary(TEST_WORLD);
@@ -207,12 +207,18 @@ describe('The Act I ladder man', () => {
 // ---------------------------------------------------------------------------
 
 describe('The Custodian — posts', () => {
-  it('is at the Emporium in the afternoon (after act2_started) and offstage at night', () => {
+  it('is at the Emporium in the afternoon (after act2_started), and below Sublevel 6 on his rounds at night', () => {
     const afternoon: GameState = { ...createSession(TEST_WORLD).state, clock: { day: 1, minute: 720 }, flags: { [ACT2_STARTED]: true } };
     expect(npcRoom(TEST_WORLD, afternoon, ACT2_CUSTODIAN)).toBe(ACT2_WALL_DRUG_EMPORIUM);
 
+    // D5 task H supersedes this file's own original "offstage at night"
+    // (Stage D plan §2 D5's rounds table; D5 prose doc §18, §39.1: "gains
+    // the five night rules ... the Act II morning/afternoon posts are
+    // unchanged" — only the night behavior changes). 22:00 is the Bay
+    // window (22:00-23:30); see `tests/world-act3-d5-rounds.test.ts` for
+    // the rest of the rounds.
     const night: GameState = { ...createSession(TEST_WORLD).state, clock: { day: 1, minute: 1320 }, flags: { [ACT2_STARTED]: true } };
-    expect(npcRoom(TEST_WORLD, night, ACT2_CUSTODIAN)).toBe('offstage');
+    expect(npcRoom(TEST_WORLD, night, ACT2_CUSTODIAN)).toBe(ACT3_S6_MAINTENANCE_BAY);
   });
 
   it('EXAMINE CUSTODIAN sets act2_saw_custodian_painting', () => {

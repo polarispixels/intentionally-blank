@@ -23,7 +23,7 @@ import type { ScriptId } from '../../engine/ids';
 import type { WorldDef } from '../../engine/world';
 import { ACT1_SLICE } from './act1/slice';
 import { ACT2_SLICE, ACT2_CENSOR_PROMPT_SCRIPTS } from './act2/index';
-import { ACT3_SLICE } from './act3/index';
+import { ACT3_SLICE, ACT3_HUB_PROMPT_SCRIPTS } from './act3/index';
 
 /**
  * A `WorldSlice` is every keyed table of `WorldDef` an act can contribute,
@@ -117,4 +117,4 @@ export const WORLD: WorldDef = assemble(ACT1_SLICE, ACT2_SLICE, ACT3_SLICE);
  * it; the CLI and the shell merge this over the session layer's own RESTART
  * prompts. Each act's slice exports its own entries; they are merged here.
  */
-export const PROMPT_SCRIPTS: Record<string, ScriptId> = { ...ACT2_CENSOR_PROMPT_SCRIPTS };
+export const PROMPT_SCRIPTS: Record<string, ScriptId> = { ...ACT2_CENSOR_PROMPT_SCRIPTS, ...ACT3_HUB_PROMPT_SCRIPTS };

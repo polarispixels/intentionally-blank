@@ -92,6 +92,18 @@ export function performAction(world: WorldDef, state: GameState, input: ActionIn
   const handler = input.dobj !== undefined ? findHandler(world, state, input) : undefined;
   if (handler !== undefined) return applyHandler(world, state, input, handler, verbDef);
 
+  // v0.15.0: a room handler that NAMES an instrument (`withInstrument` of
+  // ids or 'any') answers "<verb> <anything carried> <prep> <that thing>"
+  // when the carried object's own handlers have nothing to say — "PUT
+  // NOTEBOOK IN OPENING" / "DROP KEYRING DOWN THE SHAFT" at S5's chase
+  // bottom (addenda §4.1, register 91). Checked before the built-in, or
+  // DROP would simply succeed. Room handlers without `withInstrument` are
+  // never consulted for a resolved `dobj` (the "§8 gap 3" rule below).
+  if (input.dobj !== undefined && input.iobj !== undefined) {
+    const instrumentHandler = findRoomInstrumentHandler(world, state, input);
+    if (instrumentHandler !== undefined) return applyHandler(world, state, input, instrumentHandler, verbDef);
+  }
+
   const builtin = input.dobj !== undefined ? BUILTINS[input.verb] : undefined;
   if (builtin !== undefined) return builtin(world, state, input, verbDef);
 
@@ -138,6 +150,19 @@ function findRoomHandler(world: WorldDef, state: GameState, input: ActionInput):
   );
 }
 
+/** Room handlers that name an instrument (ids or 'any') — see `performAction`'s instrument branch. */
+function findRoomInstrumentHandler(world: WorldDef, state: GameState, input: ActionInput): HandlerDef | undefined {
+  const handlers = world.rooms?.[state.location]?.handlers ?? [];
+  return handlers.find(
+    (h) =>
+      h.withInstrument !== undefined &&
+      h.withInstrument !== 'none' &&
+      h.verbs.includes(input.verb) &&
+      (h.when === undefined || evaluate(world, state, h.when)) &&
+      instrumentMatches(h.withInstrument, input.iobj),
+  );
+}
+
 function instrumentMatches(withInstrument: HandlerDef['withInstrument'], iobj: ObjectId | undefined): boolean {
   if (withInstrument === undefined) return true;
   if (withInstrument === 'any') return iobj !== undefined;
@@ -169,7 +194,15 @@ function fallbackToVerbDefault(world: WorldDef, state: GameState, input: ActionI
     throw new Error(`performAction: verb "${input.verb}" has no default family, and no handler or built-in matched`);
   }
   const ctx = contextFor(world, input, verbDefaultPath(input.verb));
-  const rendered = render(world, state, ctx.path!, verbDef.default, ctx);
+  let rendered = render(world, state, ctx.path!, verbDef.default, ctx);
+  if (input.dobj === undefined && rendered.text.includes('{name}') && world.responses?.['bareVerb'] !== undefined) {
+    // v0.15.0: a bare call whose default is `{name}`-templated (a verb that
+    // declares 'V' but borrowed an object family as its default — twenty of
+    // them in Act III) has nothing to fill the slot with. Rather than print
+    // the brace, answer with the global `bareVerb` family, the same way
+    // `respond.ts` does for a bare non-built-in verb.
+    rendered = render(world, state, 'bareVerb', family(world, 'bareVerb'), { verb: verbDef.words[0] ?? input.verb });
+  }
   const events: GameEvent[] = [{ type: 'line', kind: 'prose', text: rendered.text }];
   // §8 gap 6: the diag means "nobody authored anything better" — false for
   // a bare call to a verb whose OWN grammar declares a bare `'V'` pattern

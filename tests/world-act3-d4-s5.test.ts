@@ -159,7 +159,8 @@ describe('READ GAUGES by phase (§9.3)', () => {
   });
 
   it('a second read in the same window gives the shorter "down again" text', () => {
-    const session = atS5({ clock: { day: 1, minute: 120 } });
+    // 03:20 — inside the one-to-four window, outside the Custodian's S5 round (D5).
+    const session = atS5({ clock: { day: 1, minute: 200 } });
     const store = new MemoryStore();
     const first = say(session, 'read gauges', store);
     const second = say(first.session, 'read gauges', store);

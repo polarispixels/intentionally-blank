@@ -13,7 +13,7 @@
 
 import type { VerbDef } from '../../../engine/world';
 import { VERB_DEFAULTS } from '../../responses';
-import { ACT1_VERBS } from '../act1/verbs';
+import { ACT1_VERBS, DROP } from '../act1/verbs';
 import { V_CALL, V_MEASURE } from '../act1/ids';
 import { ACT2_DRIVE_TO_PLANT_TEXT } from '../act2/scripts';
 import { V_LOOK_DOWN_AISLE, V_PACE, V_UNBOLT } from './ids';
@@ -28,6 +28,7 @@ import {
   V_ACT3_TURN_TO_NORMAL,
   V_ACT3_TYPE_PAD,
 } from './ids';
+import { V_THROW } from './ids';
 
 export const LOOK_DOWN_AISLE_TEXT =
   'You put your eye down the aisle and the rows run until they stop being rows.\n\nSomewhere along there the two sides meet. There is no door in that end wall,\nbecause that end wall is a good way past the point at which you stopped being\nable to see one.';
@@ -230,7 +231,39 @@ export const ACT3_VERBS: Record<string, VerbDef> = {
     class: 'analytical',
     default: VERB_DEFAULTS.touch,
   },
+
+  // -------------------------------------------------------------------------
+  // --- Addenda ---
+  // Stage D addenda (`docs/superpowers/specs/2026-09-14-stage-d-addenda-
+  // prose.md` §4.1, §9 item 1) — "THROW <thing> DOWN/INTO/IN/AT," a new
+  // global verb. Bare-safe default (same reasoning as `V_ACT3_SIDEWAYS`'s
+  // own, above): nothing outside the chase bottom's own room-level handler
+  // (`../s5ReactorInterface.ts`) gives this verb a handler, so it must never
+  // narrate an actual throw.
+  // -------------------------------------------------------------------------
+  [V_THROW]: {
+    id: V_THROW,
+    words: ['throw', 'toss', 'chuck'],
+    patterns: ['V dobj', 'V dobj prep iobj'],
+    preps: ['down', 'into', 'in', 'at'],
+    class: 'direct',
+    default: VERB_DEFAULTS.wait,
+  },
 };
+
+// --- Addenda ---
+// Stage D addenda §4.1 — `DROP <thing> DOWN THE SHAFT` ships `'V dobj'`-only
+// (`act1/verbs.ts`); the chase bottom's own room-level handler needs `'V
+// dobj prep iobj'` with preps "down"/"into"/"in" to reach it at all. Same
+// idempotent in-place mutation idiom this file already uses above for
+// `V_MEASURE`/`V_CALL`/`USE_VERB_ID`/`OPEN`.
+if (!ACT1_VERBS[DROP]!.patterns.includes('V dobj prep iobj')) {
+  ACT1_VERBS[DROP] = {
+    ...ACT1_VERBS[DROP]!,
+    patterns: [...ACT1_VERBS[DROP]!.patterns, 'V dobj prep iobj'],
+    preps: [...(ACT1_VERBS[DROP]!.preps ?? []), 'down', 'into', 'in'],
+  };
+}
 
 // §9.8 — "USE NOTEBOOK ON PAD" needs `USE_VERB_ID` (`engine/move.ts`,
 // registered bare-`'V dobj'`-only in `act1/verbs.ts`) to also carry `'V dobj
@@ -286,5 +319,268 @@ export const ACT3_D4_TASK_A_VERBS: Record<string, VerbDef> = {
     patterns: ['V dobj'],
     class: 'direct',
     default: VERB_DEFAULTS.touch,
+  },
+};
+
+// -----------------------------------------------------------------------------
+// D5, task H — the chiller alarm (`objects/coolingPlant.ts`, D5 prose doc
+// §20). "PULL ALARM"/"BREAK GLASS"/"HIT GLASS WITH HAMMER" reach it through
+// already-shipped verbs (`PULL`/`BREAK`, `act1/verbs.ts`) plus that object's
+// own nouns and a local `BREAK` pattern mutation (done in that file, not
+// here — it's specific to that one object's hammer sub-detail).
+//
+// PATTERN, corrected from an earlier draft of this file (flagged in this
+// task's report): `'V'` (bare, no `dobj`) can NEVER reach an object's own
+// `handlers` — `actions.ts`'s `performAction` only consults `dobj`-less
+// input against `world.rooms[location].handlers`, never
+// `world.objects[dobj].handlers` (there is no `dobj` to look one up by).
+// The Cooling Plant's own room file is D3/D4 task C's, not this task's ("add
+// only your object," this task's brief) — so a room-level handler isn't an
+// option here — and both actions are object-targeted anyway, so `'V dobj'`
+// (a real `dobj`, resolved against this object's own nouns) is the correct
+// shape, not a bare phrase. "TRIP CHILLER" therefore parses as verb "trip" +
+// dobj "chiller" — a bare noun the alarm box itself now answers to (the
+// room's two actual chiller units are prose only, D3 §10, never their own
+// object; the alarm is the only addressable target that name could mean).
+// "PUSH HANDLE UP" is dropped (this task's own call, not the doc's): its
+// particle trails the dobj ("push [handle] up"), a shape `'V dobj prep
+// iobj'` doesn't cover (no second object) and this DSL has no other pattern
+// for — "RESET ALARM"/"RESET THE ALARM" alone carries §20.5.
+// -----------------------------------------------------------------------------
+
+import { V_ACT3_RESET_ALARM, V_ACT3_TRIP_CHILLER } from './ids';
+
+export const ACT3_D5_TASK_H_VERBS: Record<string, VerbDef> = {
+  // §20.2 — "TRIP CHILLER"/"TRIP THE CHILLER" — verb "trip", dobj "chiller"
+  // (the alarm object's own noun, `objects/coolingPlant.ts`).
+  [V_ACT3_TRIP_CHILLER]: {
+    id: V_ACT3_TRIP_CHILLER,
+    words: ['trip'],
+    patterns: ['V dobj'],
+    class: 'direct',
+    default: VERB_DEFAULTS.touch,
+  },
+  // §20.5 — "RESET ALARM"/"RESET THE ALARM" — verb "reset", dobj "alarm."
+  [V_ACT3_RESET_ALARM]: {
+    id: V_ACT3_RESET_ALARM,
+    words: ['reset'],
+    patterns: ['V dobj'],
+    class: 'direct',
+    default: VERB_DEFAULTS.touch,
+  },
+};
+
+// -----------------------------------------------------------------------------
+// D5 task F — the S6 Maintenance Bay (§5.4). "READ NAMES" needs no new verb
+// (READ + the badge hooks' own "names" noun, `objects/s6MaintenanceBay.ts`);
+// "SEARCH HOOKS FOR JULES"/"LOOK FOR JULES ON THE RAIL" would resolve as
+// SEARCH's own `'V dobj'` pattern swallowing "hooks for jules" as one dobj
+// phrase and failing to match any noun — a new bare fixed-phrase verb, same
+// idiom as `V_ACT3_CHECK_TIME` above.
+// -----------------------------------------------------------------------------
+
+import { V_ACT3_ARM_UNDER_LAMP, V_ACT3_BADGE_UNDER_LAMP, V_ACT3_HANG_BADGE, V_ACT3_NOLAN_UNDER_LAMP, V_ACT3_NOTEBOOK_UNDER_LAMP, V_ACT3_SEARCH_RAIL_FOR_JULES, V_ACT3_UNDO } from './ids';
+import { PULL } from '../act1/verbs';
+
+// §7.4 — "TEST STRAP" reaches `PULL`'s own handler (`objects/
+// s6MaintenanceBay.ts`) through a new synonym word, added in place — same
+// idempotent mutation idiom this file already uses for `V_MEASURE`/
+// `V_CALL`/`OPEN`/`USE_VERB_ID` above.
+if (!ACT1_VERBS[PULL]!.words.includes('test')) {
+  ACT1_VERBS[PULL] = { ...ACT1_VERBS[PULL]!, words: [...ACT1_VERBS[PULL]!.words, 'test'] };
+}
+
+export const ACT3_D5_TASK_F_VERBS: Record<string, VerbDef> = {
+  [V_ACT3_SEARCH_RAIL_FOR_JULES]: {
+    id: V_ACT3_SEARCH_RAIL_FOR_JULES,
+    words: ['search hooks for jules', 'look for jules on the rail', 'search rail for jules'],
+    patterns: ['V'],
+    class: 'analytical',
+    default: VERB_DEFAULTS.touch,
+  },
+  // §6.4 — "EXAMINE NOLAN UNDER LAMP"/"PUT NOLAN'S ARM UNDER LAMP."
+  [V_ACT3_NOLAN_UNDER_LAMP]: {
+    id: V_ACT3_NOLAN_UNDER_LAMP,
+    words: ['examine nolan under lamp', "put nolan's arm under lamp", 'put nolans arm under lamp'],
+    patterns: ['V'],
+    class: 'analytical',
+    default: VERB_DEFAULTS.touch,
+  },
+  // §8.3 — "EXAMINE ARM UNDER LAMP"/"PUT ARM UNDER LAMP." ("ROLL UP SLEEVE"
+  // already parses, `V_ROLL_UP` + the forearm's own bare noun "sleeve"
+  // — act1/objects/self.ts, out of this task's module — reaching THIS
+  // room's own lamp-lit reveal instead of the shipped forearm text would
+  // need a conditional added to that object's own handler; escalated in
+  // this task's report rather than guessed.)
+  [V_ACT3_ARM_UNDER_LAMP]: {
+    id: V_ACT3_ARM_UNDER_LAMP,
+    words: ['examine arm under lamp', 'put arm under lamp', 'put my arm under lamp'],
+    patterns: ['V'],
+    class: 'analytical',
+    default: VERB_DEFAULTS.touch,
+  },
+  // §8.4 — "PUT NOTEBOOK/PAGE/SHEET UNDER LAMP."
+  [V_ACT3_NOTEBOOK_UNDER_LAMP]: {
+    id: V_ACT3_NOTEBOOK_UNDER_LAMP,
+    words: ['put notebook under lamp', 'put page under lamp', 'put sheet under lamp'],
+    patterns: ['V'],
+    class: 'analytical',
+    default: VERB_DEFAULTS.touch,
+  },
+  // §8.5 — "PUT BADGE/POLAROID UNDER LAMP"/"SHINE LAMP ON CHAIR."
+  [V_ACT3_BADGE_UNDER_LAMP]: {
+    id: V_ACT3_BADGE_UNDER_LAMP,
+    words: ['put badge under lamp', 'put polaroid under lamp', 'shine lamp on chair'],
+    patterns: ['V'],
+    class: 'analytical',
+    default: VERB_DEFAULTS.touch,
+  },
+  // §6.6 — "PUT BADGE BACK"/"HANG BADGE ON HOOK."
+  [V_ACT3_HANG_BADGE]: {
+    id: V_ACT3_HANG_BADGE,
+    words: ['put badge back', 'hang badge on hook'],
+    patterns: ['V'],
+    class: 'direct',
+    default: VERB_DEFAULTS.touch,
+  },
+  // §7.3 — "UNDO STRAP"/"UNBUCKLE STRAP."
+  [V_ACT3_UNDO]: {
+    id: V_ACT3_UNDO,
+    words: ['undo', 'unbuckle'],
+    patterns: ['V dobj'],
+    class: 'direct',
+    default: VERB_DEFAULTS.touch,
+  },
+};
+
+// -----------------------------------------------------------------------------
+// D5 task G — the Archive Hub: the ledger's four bare name-searches plus
+// PRINT LEDGER, the graph's CHANGE SCALE/LOOK AT AXIS, the queue's two bare
+// phrases, and BAY (§21-§31, §39). All bare fixed phrases, same idiom as
+// `V_LOOK_DOWN_AISLE`/`V_ACT3_CHECK_TIME` above — the grammar has no
+// free-text `iobj` for the ledger/queue searches (§39's own note), and the
+// graph's CHANGE SCALE/LOOK AT AXIS/the queue's phrases name no
+// addressable noun of their own. Two in-place amendments to shipped verbs,
+// same idempotent mutation idiom this file already uses repeatedly above
+// (checked-then-mutated, safe under a double import):
+//   - `BREAK` gains `'V dobj prep iobj'` with prep "with," so "HIT DOOR
+//     WITH CHAIR LEG" (§28.5) parses at all — it shipped `'V dobj'`-only.
+//   - `SEARCH` gains bare `'V'`, so bare `SEARCH` (no dobj, §39.2's own
+//     "search" row) reaches the Hub room's own handler — it shipped `'V
+//     dobj'`-only.
+// "UNPLUG TERMINAL" (§22.5) needs no new word or mutation at all: "unplug"
+// is already exclusively `V_UNPLUG`'s (act1/ids.ts, `act1/verbs.ts`,
+// `patterns: ['V dobj']`) — the terminal's own object handler
+// (`objects/s6ArchiveHub.ts`) answers it directly, alongside `TURN_OFF`.
+// -----------------------------------------------------------------------------
+
+import { BREAK, SEARCH } from '../act1/verbs';
+import {
+  V_ACT3_GRAPH_AXIS,
+  V_ACT3_LEDGER_JULES,
+  V_ACT3_LEDGER_NOLAN,
+  V_ACT3_LEDGER_OTHER,
+  V_ACT3_LEDGER_PRINT,
+  V_ACT3_LEDGER_SELF,
+  V_ACT3_QUEUE_EDIT,
+  V_ACT3_QUEUE_SEARCH_JULES,
+  V_ACT3_TO_BAY,
+} from './ids';
+
+if (!ACT1_VERBS[BREAK]!.patterns.includes('V dobj prep iobj')) {
+  ACT1_VERBS[BREAK] = {
+    ...ACT1_VERBS[BREAK]!,
+    patterns: [...ACT1_VERBS[BREAK]!.patterns, 'V dobj prep iobj'],
+    preps: [...(ACT1_VERBS[BREAK]!.preps ?? []), 'with'],
+  };
+}
+
+if (!ACT1_VERBS[SEARCH]!.patterns.includes('V')) {
+  ACT1_VERBS[SEARCH] = { ...ACT1_VERBS[SEARCH]!, patterns: [...ACT1_VERBS[SEARCH]!.patterns, 'V'] };
+}
+
+export const ACT3_D5_TASK_G_VERBS: Record<string, VerbDef> = {
+  // §23.2 — "SEARCH LEDGER FOR JULES"/"LOOK UP JULES"/"TYPE JULES."
+  [V_ACT3_LEDGER_JULES]: {
+    id: V_ACT3_LEDGER_JULES,
+    words: ['search ledger for jules', 'look up jules', 'type jules'],
+    patterns: ['V'],
+    class: 'analytical',
+    default: VERB_DEFAULTS.touch,
+  },
+  // §23.3 — "SEARCH LEDGER FOR NOLAN."
+  [V_ACT3_LEDGER_NOLAN]: {
+    id: V_ACT3_LEDGER_NOLAN,
+    words: ['search ledger for nolan'],
+    patterns: ['V'],
+    class: 'analytical',
+    default: VERB_DEFAULTS.touch,
+  },
+  // §23.4 — "SEARCH LEDGER FOR ME"/"FOR MYSELF"/"FOR THE INVESTIGATOR."
+  [V_ACT3_LEDGER_SELF]: {
+    id: V_ACT3_LEDGER_SELF,
+    words: ['search ledger for me', 'search ledger for myself', 'search ledger for the investigator'],
+    patterns: ['V'],
+    class: 'analytical',
+    default: VERB_DEFAULTS.touch,
+  },
+  // §23.5 — any other name the player knows.
+  [V_ACT3_LEDGER_OTHER]: {
+    id: V_ACT3_LEDGER_OTHER,
+    words: [
+      'search ledger for jack',
+      'search ledger for whitlock',
+      'search ledger for marlow',
+      'search ledger for pearl',
+      'search ledger for dot',
+      'search ledger for eli',
+      'search ledger for luke',
+      'search ledger for sissy',
+    ],
+    patterns: ['V'],
+    class: 'analytical',
+    default: VERB_DEFAULTS.touch,
+  },
+  // §23.6 — "PRINT LEDGER"/"COPY LEDGER"/"WRITE DOWN LEDGER."
+  [V_ACT3_LEDGER_PRINT]: {
+    id: V_ACT3_LEDGER_PRINT,
+    words: ['print ledger', 'copy ledger', 'write down ledger'],
+    patterns: ['V'],
+    class: 'analytical',
+    default: VERB_DEFAULTS.touch,
+  },
+  // §24.2 — "CHANGE SCALE"/"LOOK AT AXIS."
+  [V_ACT3_GRAPH_AXIS]: {
+    id: V_ACT3_GRAPH_AXIS,
+    words: ['change scale', 'look at axis'],
+    patterns: ['V'],
+    class: 'analytical',
+    default: VERB_DEFAULTS.touch,
+  },
+  // §25.3 — "DELETE QUEUE"/"CANCEL JOB"/"EDIT QUEUE"/"REMOVE MY LINE."
+  [V_ACT3_QUEUE_EDIT]: {
+    id: V_ACT3_QUEUE_EDIT,
+    words: ['delete queue', 'cancel job', 'edit queue', 'remove my line'],
+    patterns: ['V'],
+    class: 'direct',
+    default: VERB_DEFAULTS.touch,
+  },
+  // §25.4 — "SEARCH QUEUE FOR JULES."
+  [V_ACT3_QUEUE_SEARCH_JULES]: {
+    id: V_ACT3_QUEUE_SEARCH_JULES,
+    words: ['search queue for jules'],
+    patterns: ['V'],
+    class: 'analytical',
+    default: VERB_DEFAULTS.touch,
+  },
+  // §39.4 — "BAY," a bare-phrase synonym for the ordinary `west` exit back
+  // to the Maintenance Bay ("back" is deliberately not wired — see
+  // `ids.ts`'s own doc comment on this id).
+  [V_ACT3_TO_BAY]: {
+    id: V_ACT3_TO_BAY,
+    words: ['bay'],
+    patterns: ['V'],
+    class: 'direct',
+    default: VERB_DEFAULTS.wait,
   },
 };

@@ -50,6 +50,15 @@ import type { ProseRule } from '../../../engine/prose';
 import { ACT2_EXAMINED_CUSTODIAN, ACT2_SAW_CUSTODIAN_PAINTING, ACT2_STARTED, ACT2_WALL_DRUG_EMPORIUM } from './ids';
 import { CLUE_VISITOR_UNREMARKABLE, MAIN_STREET, V_ATTACK, V_FOLLOW, V_WATCH } from '../act1/ids';
 import { EXAMINE } from '../act1/verbs';
+import { NIGHT } from './calendar';
+import {
+  ACT3_ALARM_PULLED,
+  ACT3_ALERTNESS,
+  ACT3_PIPE_CHASE,
+  ACT3_S5_REACTOR_INTERFACE,
+  ACT3_S6_ARCHIVE_HUB,
+  ACT3_S6_MAINTENANCE_BAY,
+} from '../act3/ids';
 
 // ---------------------------------------------------------------------------
 // §8.1 (D1, shipped) / §18.1 (D2-C, this task) — EXAMINE.
@@ -109,9 +118,38 @@ const mainStreetAttackText = 'There is nothing to hit.\n\nHe stops brushing whil
 const followWatchText =
   'He does the rail. He does not look up at intervals, or check the lot, or find\na reason to move round the building. He does the rail for as long as you are\nwilling to stand there doing nothing, and he is better at that than you are.';
 
+// ---------------------------------------------------------------------------
+// D5, task H — the rounds below Sublevel 6 (D5 prose doc §18; Stage D plan
+// §2 D5's own rounds table, adopted unchanged, raw-minute windows). The
+// `act3_alarm_pulled` rule goes ABOVE every night/day rule (§18's own
+// header: "inserted above all of them") so the diversion overrides whatever
+// window would otherwise apply.
+//
+// DEVIATION FROM THE PLAN'S OWN PSEUDOCODE — flagged in this task's report.
+// The plan ANDs `NIGHT` (`clockPhase: 'night'`) into the alertness-gated
+// chase rule's window (21:30-22:00, raw minutes 1290-1320). But
+// `act1/slice.ts`'s own `meta.phases` starts the `'night'` phase at minute
+// 1320 (22:00) — confirmed against `tests/clock.test.ts` ("minute 1319 is
+// evening; minute 1320 is night") — so `clockPhase: 'night'` is FALSE for
+// the entirety of 1290-1319. ANDing it in would make this rule permanently
+// unreachable, contradicting this wave's own acceptance test (the chase at
+// 21:40, alertness >= 1). The raw `clock` window alone already restricts
+// this rule to the exact minutes named, so `NIGHT` is redundant even where
+// it does hold (the other four rules, all within the actual `'night'`
+// phase) and actively wrong for this first one — dropped here, kept on the
+// other four for fidelity to the plan's own table.
+// ---------------------------------------------------------------------------
+
 export const custodian: NpcDefSlice = {
   // D2-C: Main Street mornings, ABOVE D1's own afternoon Emporium rule.
+  // D5 task H: the alarm's override, then the rounds, ABOVE both.
   schedule: [
+    { when: { flag: ACT3_ALARM_PULLED }, room: 'offstage' },
+    { when: { all: [{ flag: ACT3_ALERTNESS, atLeast: 1 }, { clock: { after: 1290, before: 1320 } }] }, room: ACT3_PIPE_CHASE }, // 21:30-22:00, alert only
+    { when: { all: [NIGHT, { clock: { after: 1320, before: 1410 } }] }, room: ACT3_S6_MAINTENANCE_BAY }, // 22:00-23:30
+    { when: { all: [NIGHT, { any: [{ clock: { after: 1410 } }, { clock: { before: 60 } }] }] }, room: ACT3_S6_ARCHIVE_HUB }, // 23:30-01:00
+    { when: { all: [NIGHT, { clock: { after: 60, before: 150 } }] }, room: ACT3_S5_REACTOR_INTERFACE }, // 01:00-02:30
+    { when: { all: [NIGHT, { clock: { after: 150, before: 240 } }] }, room: ACT3_S6_MAINTENANCE_BAY }, // 02:30-04:00
     { when: { all: [{ flag: ACT2_STARTED }, { clockPhase: 'morning' }] }, room: MAIN_STREET },
     { when: { all: [{ flag: ACT2_STARTED }, { clockPhase: 'afternoon' }] }, room: ACT2_WALL_DRUG_EMPORIUM },
     { room: 'offstage' },

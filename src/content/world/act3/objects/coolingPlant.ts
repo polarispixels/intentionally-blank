@@ -22,11 +22,14 @@ import type { ObjectDefSlice } from '../../../../engine/world';
 import type { ProseRule } from '../../../../engine/prose';
 import { DIRECTION_VERB_IDS } from '../../../../engine/move';
 import { CHAIR_LEG } from '../../act1/ids';
-import { EXAMINE, LOOK_BEHIND, OPEN, PRY, READ, SIT, SMELL, TAKE, TOUCH } from '../../act1/verbs';
+import { ACT1_VERBS, BREAK, EXAMINE, LOOK_BEHIND, OPEN, PRY, PULL, READ, SIT, SMELL, TAKE, TOUCH } from '../../act1/verbs';
 import { V_FIT } from '../../act2/ids';
 import {
+  ACT3_ALARM_PULLED,
+  ACT3_ALARM_PULL_SCRIPT,
   ACT3_BOUNDARY_GATE,
   ACT3_CHASE_HATCH,
+  ACT3_CHILLER_ALARM,
   ACT3_CLUE_WARM_RETURN,
   ACT3_COOLING_PLANT,
   ACT3_HATCH_OPEN,
@@ -41,6 +44,8 @@ import {
   ACT3_RETURN_B,
   ACT3_WRENCH,
   ACT3_YARD_DOOR,
+  V_ACT3_RESET_ALARM,
+  V_ACT3_TRIP_CHILLER,
   V_UNBOLT,
 } from '../ids';
 
@@ -320,11 +325,75 @@ const boundaryGate: ObjectDefSlice = { location: ACT3_COOLING_PLANT };
 // §21.3's own documented fallback: only the chair-leg route works).
 const wrenchOverlay: ObjectDefSlice = { location: 'nowhere', name: 'wrench', portable: true, nouns: ['wrench', 'spanner', 'socket'] };
 
+// ---------------------------------------------------------------------------
+// D5, task H — the chiller alarm (D5 prose doc §20; Stage D plan §2 D5's
+// "P19's P route, clock-free"). Addressable without being listed, like the
+// elevator's own certificate (`elevator.ts`) — not part of this room's own
+// 7-object tier (D3 §10), added to `ACT3_COOLING_PLANT_EXTRA_OBJECTS`
+// alongside the floor/step/boundary/wrench below.
+//
+// VERBS — "PULL ALARM"/"BREAK GLASS" reach it through the already-shipped
+// `PULL`/`BREAK` verbs (`act1/verbs.ts`, both already `'V dobj'`) plus this
+// object's own nouns; no new verb needed for either. "HIT GLASS WITH
+// HAMMER" needs `BREAK` (which already claims the word "hit") to also carry
+// `'V dobj prep iobj'` — the same idempotent in-place-mutation idiom
+// `act3/verbs.ts` already uses for `OPEN`/`MEASURE`/`CALL`/`USE`, done here
+// rather than in that shared file since it's local to this one object (the
+// hammer is this object's own sub-detail, not a separate item). "TRIP
+// CHILLER" and "RESET ALARM" are new `'V dobj'` verbs
+// (`V_ACT3_TRIP_CHILLER`/`V_ACT3_RESET_ALARM`, `ids.ts`/`verbs.ts`, this
+// task's own block — see `verbs.ts`'s own header for why these are `'V
+// dobj'`, not the bare `'V'` an earlier draft used: a bare verb never
+// reaches an object's own `handlers`, only a room's, and this room's file
+// isn't this task's to edit). "Chiller" is added to this object's own nouns
+// below so "TRIP CHILLER" has a `dobj` to resolve — the room's two actual
+// chiller units are prose only (D3 §10) and were never their own object.
+// ---------------------------------------------------------------------------
+
+if (!ACT1_VERBS[BREAK]!.patterns.includes('V dobj prep iobj')) {
+  ACT1_VERBS[BREAK] = {
+    ...ACT1_VERBS[BREAK]!,
+    patterns: [...ACT1_VERBS[BREAK]!.patterns, 'V dobj prep iobj'],
+    preps: [...(ACT1_VERBS[BREAK]!.preps ?? []), 'with'],
+  };
+}
+
+const alarmExamine =
+  'Between the two chillers, at head height on a stanchion, a red steel box with a\nglass front and a small hammer on a chain beside it. Under the glass, a handle,\nand beside the handle a legend:\n\n    CHILLER TRIP - PULL\n\nSomebody has painted the stanchion around the box and cut in neatly at its\nedges, which means the box was there before the paint and nobody has ever had\ncause to take it off.';
+
+const alarmPullAgainText =
+  'The glass is already out of it and the handle is already down, and a handle\nthat is already down is not a plan.';
+
+const alarmResetText =
+  'It goes back up, and it stays up, and the chiller does not restart, because\nthese things are built so that a man has to go and look at the thing before the\nthing runs again.\n\nYou are not going to be the man who goes and looks at it.';
+
+const chillerAlarm: ObjectDefSlice = {
+  location: ACT3_COOLING_PLANT,
+  name: 'chiller alarm',
+  nouns: ['alarm', 'chiller alarm', 'alarm box', 'box', 'glass', 'handle', 'hammer', 'stanchion', 'legend', 'chiller'],
+  handlers: [
+    { verbs: [EXAMINE], effects: [{ say: alarmExamine }] },
+    // §20.4 — a second pull while already pulled. Listed first: HandlerDef
+    // resolution is first-match-wins on (verb, `when`), so this guarded
+    // entry intercepts before the unguarded first-pull handler below.
+    { verbs: [PULL, BREAK, V_ACT3_TRIP_CHILLER], when: { flag: ACT3_ALARM_PULLED }, effects: [{ say: alarmPullAgainText }] },
+    // §20.2 — the first pull. `act3AlarmPull` (`events.ts`) prints the beat,
+    // sets the flag, and stores the reset-due minute — see that file's own
+    // header for why a script rather than a plain `set` is needed.
+    { verbs: [PULL, BREAK, V_ACT3_TRIP_CHILLER], effects: [{ script: { id: ACT3_ALARM_PULL_SCRIPT } }] },
+    // §20.5 — the honest failure: pushing the handle back up does not clear
+    // `act3_alarm_pulled` (only §20.3's automatic reset, `events.ts`, does
+    // that) — see this task's report for why.
+    { verbs: [V_ACT3_RESET_ALARM], when: { flag: ACT3_ALARM_PULLED }, effects: [{ say: alarmResetText }] },
+  ],
+};
+
 export const ACT3_COOLING_PLANT_EXTRA_OBJECTS: Record<string, ObjectDefSlice> = {
   [ACT3_PLANT_FLOOR]: plantFloor,
   [ACT3_PLANT_STEP]: plantStep,
   [ACT3_BOUNDARY_GATE]: boundaryGate,
   [ACT3_WRENCH]: wrenchOverlay,
+  [ACT3_CHILLER_ALARM]: chillerAlarm,
 };
 
 // Re-exported so `coolingPlant.ts` (the room file) can build the room's own

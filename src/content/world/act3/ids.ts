@@ -595,3 +595,287 @@ export const EVENT_ACT3_MATCH_TICK = 'act3_ev_match_tick';
 export const EVENT_ACT3_TUNNEL_DESCENT_GATE_SYNC = 'act3_ev_tunnel_descent_gate_sync';
 
 // --- D4 builders append below this line (Edit tool only; one block per task, labelled) ---
+
+// ---------------------------------------------------------------------------
+// Wave D5 shared — Sublevel 6 (`docs/superpowers/specs/2026-09-13-stage-d5-
+// prose.md` §2, §39.3). Written by the main session before the D5 builders
+// ran. Builders ADD their own object/verb/event/script ids below the anchor
+// at the end of this file, with the Edit tool, never Write.
+// ---------------------------------------------------------------------------
+
+// Rooms (§39.4)
+export const ACT3_S6_MAINTENANCE_BAY = R('act3_s6_maintenance_bay');
+export const ACT3_S6_ARCHIVE_HUB = R('act3_s6_archive_hub');
+
+// Flags (§2)
+export const ACT3_REACHED_S6 = F('act3_reached_s6');
+export const ACT3_WEARING_COVERALLS = F('act3_wearing_coveralls');
+export const ACT3_UV_LAMP_ON = F('act3_uv_lamp_on');
+export const ACT3_UV_SEEN_ARM = F('act3_uv_seen_arm');
+export const ACT3_HUB_LOGGED_IN = F('act3_hub_logged_in');
+export const ACT3_KNOWS_WHO_HIT_YOU = F('act3_knows_who_hit_you');
+export const ACT3_ALARM_PULLED = F('act3_alarm_pulled');
+export const ACT3_TOOK_NOLAN_BADGE = F('act3_took_nolan_badge');
+export const ACT3_UNBUCKLED_STRAP = F('act3_unbuckled_strap');
+export const ACT3_DAD_HEARD_HIM = F('act3_dad_heard_him');
+
+// Clues (§2)
+export const ACT3_CLUE_CHAIRS = C('act3_clue_chairs');
+export const ACT3_CLUE_NOLAN_CHAIR = C('act3_clue_nolan_chair');
+export const ACT3_CLUE_PEELED_HOOK = C('act3_clue_peeled_hook');
+export const ACT3_CLUE_ROUNDS = C('act3_clue_rounds');
+export const ACT3_CLUE_UV_GHOST = C('act3_clue_uv_ghost');
+export const ACT3_CLUE_JULES_DEPRECATED = C('act3_clue_jules_deprecated');
+export const ACT3_CLUE_TOWN_RUNS_HERE = C('act3_clue_town_runs_here');
+export const ACT3_CLUE_REACQUIRE = C('act3_clue_reacquire');
+export const ACT3_CLUE_GATES = C('act3_clue_gates');
+export const ACT3_CLUE_ROOT_REFUSES = C('act3_clue_root_refuses');
+
+// Questions (§2). The doc assumed `act2_q_what_happened_to_jules`,
+// `act1_q_who_hit_me` and `act3_q_archive_terminal` already existed; none
+// did, so the main session declares them here (their texts are the main
+// session's, flagged for Ryan in the D5 status line).
+export const ACT3_Q_WHAT_HAPPENED_TO_JULES = Q('act3_q_what_happened_to_jules');
+export const ACT3_Q_WHO_HIT_YOU = Q('act3_q_who_hit_you');
+export const ACT3_Q_ARCHIVE_TERMINAL = Q('act3_q_archive_terminal');
+export const ACT3_Q_WHAT_ARE_THESE_PEOPLE = Q('act3_q_what_are_these_people');
+
+// Puzzles (§2)
+export const ACT3_P19_NIGHT_SCHEDULE = P('act3_p19_night_schedule');
+export const ACT3_P20_LEDGER = P('act3_p20_ledger');
+
+// Memories (§2)
+export const ACT3_MEM_M9 = M('act3_mem_m9');
+export const ACT3_MEM_M16_A = M('act3_mem_m16_a');
+export const ACT3_MEM_M16_S = M('act3_mem_m16_s');
+export const ACT3_MEM_M16_D = M('act3_mem_m16_d');
+
+// Checkpoint (§39.3) and the Hub login prompt script (§22.2)
+export const ACT3_CHECKPOINT_S6 = 'act3_s6';
+export const ACT3_HUB_LOGIN_SCRIPT = S('act3_hub_login');
+
+// --- D5 task H ---
+// The Custodian's rounds, the four spotted events, the chiller alarm, and
+// Dad on the rig (D5 prose doc §18-§20, §39, §40; Stage D plan §2 D5's
+// rounds table). `act3/events.ts` (new) holds the EventDefs; the alarm
+// object lives in `act3/objects/coolingPlant.ts`; the schedule itself is
+// `act2/custodian.ts`'s own edit (no id declared here for it — a
+// `ScheduleRule` carries no id).
+
+// `world.events` keys — bare strings, same idiom as `EVENT_ACT3_LOBBY_READER_OPENS` above.
+export const EVENT_ACT3_EV_SPOTTED_BAY = 'act3_ev_spotted_bay';
+export const EVENT_ACT3_EV_SPOTTED_HUB = 'act3_ev_spotted_hub';
+export const EVENT_ACT3_EV_SPOTTED_S5 = 'act3_ev_spotted_s5';
+export const EVENT_ACT3_EV_SPOTTED_CHASE = 'act3_ev_spotted_chase';
+/** §18.6 — proposed, wired per the status line ("recommend wiring it," §36 q5). */
+export const EVENT_ACT3_EV_PASSED = 'act3_ev_passed';
+/** §19.1 — the S5 push, `once: true`. */
+export const EVENT_ACT3_DAD_PUSH_S5 = 'act3_ev_dad_push_s5';
+/** §20.3 — the automatic reset, `once: false`. */
+export const EVENT_ACT3_ALARM_RESET = 'act3_ev_alarm_reset';
+
+/** §20 — the alarm box, addressable without being listed (`objects/coolingPlant.ts`'s `ACT3_COOLING_PLANT_EXTRA_OBJECTS`), like D3's certificate. */
+export const ACT3_CHILLER_ALARM = O('act3_chiller_alarm');
+
+/**
+ * §20's own timer state — not in the prose doc (which leaves the reset
+ * mechanism to "builder's call, documented in the wiring notes," Stage D
+ * plan §2 D5). Numeric: the absolute minute (`clock.day * 1440 +
+ * clock.minute`) 30 minutes past the pull, set by `act3AlarmPull`
+ * (`events.ts`) and read by `act3AlarmReset` (same file) — see that
+ * file's own header for why a `{ script }` effect is needed at all (the
+ * `Cond` DSL has no flag-vs-flag arithmetic).
+ */
+export const ACT3_ALARM_RESET_DUE = F('act3_alarm_reset_due');
+
+// Verbs (§20.2/§20.5). "PULL ALARM"/"BREAK GLASS" reach the alarm box via
+// the already-shipped `PULL`/`BREAK` verbs (`act1/verbs.ts`) plus this
+// object's own nouns — no new verb needed for either. "HIT GLASS WITH
+// HAMMER" reaches it via `BREAK`'s own already-claimed word "hit" plus a
+// `'V dobj prep iobj'` pattern added to `BREAK` in `objects/coolingPlant.ts`
+// (the same idempotent in-place-mutation idiom `verbs.ts` already uses for
+// `OPEN`/`MEASURE`/`CALL`/`USE`), so only "TRIP CHILLER" and "RESET
+// ALARM"/"PUSH HANDLE UP" need new verbs.
+export const V_ACT3_TRIP_CHILLER = V('act3_trip_chiller');
+export const V_ACT3_RESET_ALARM = V('act3_reset_alarm');
+
+// Scripts (`objects/coolingPlant.ts`'s alarm handler; `events.ts`'s reset
+// `EventDef`) — see `events.ts`'s own header.
+export const ACT3_ALARM_PULL_SCRIPT = S('act3_alarm_pull');
+export const ACT3_ALARM_RESET_SCRIPT = S('act3_alarm_reset');
+
+// ---------------------------------------------------------------------------
+// --- Addenda ---
+// Stage D addenda (`docs/superpowers/specs/2026-09-14-stage-d-addenda-
+// prose.md` §4.1, §9 item 1) — "THROW <thing> DOWN/INTO/IN/AT," a new global
+// verb. Proposed by the doc's own §9, not assumed; wired against the chase
+// bottom (`act3/s5ReactorInterface.ts`'s room-level handler).
+// ---------------------------------------------------------------------------
+export const V_THROW = V('act3_throw');
+
+// ---------------------------------------------------------------------------
+// --- D5 task F ---
+// The S6 Maintenance Bay — the room's own 12 objects, one new verb, and one
+// new script (`docs/superpowers/specs/2026-09-13-stage-d5-prose.md` §3-§17,
+// §39, §40). The room id, every flag/clue/question/puzzle/memory id, and
+// the checkpoint string are all declared above (wave D5 shared) — this
+// block adds only what that shared section left to this task: the Bay's
+// objects, `V_ACT3_SEARCH_RAIL_FOR_JULES` (§5.4's two non-READ phrasings —
+// "READ NAMES" reaches the hooks through the already-shipped READ verb,
+// needing no new word), and `ACT3_READ_BAY_CLOCK_SCRIPT` (§9.2 — its own
+// frame/rotation text, never `act3ReadClock`'s S5 lines; `clockInWords`
+// itself is reused unchanged from `./time`).
+// ---------------------------------------------------------------------------
+
+// Objects (§4-§16). `ACT3_CHAIR_PEDESTAL` is an uncounted sub-part (same
+// idiom as `ACT3_LOBBY_BENCH`) so `EXAMINE PEDESTAL` (§4.6) can carry its
+// own distinct text without colliding with the chairs' own `EXAMINE` (§4.1)
+// on the same object — the engine has no way to tell which of an object's
+// several nouns resolved a given verb, so two genuinely different
+// `EXAMINE` answers for the same verb need two objects.
+// Mechanical flag (not in §2's own table, same "builder adds a small
+// implementation-detail flag" idiom as `ACT3_PIPE_CHASE_SEEN`/
+// `ACT3_S5_SEEN`): gates §4.2's first/second-and-later `SIT` split.
+export const ACT3_CHAIR_SAT_TRIED = F('act3_chair_sat_tried');
+
+export const ACT3_CHAIRS = O('act3_chairs');
+export const ACT3_CHAIR_PEDESTAL = O('act3_chair_pedestal');
+export const ACT3_BADGE_HOOKS = O('act3_badge_hooks');
+// Uncounted sub-parts of the rail (same reasoning as `ACT3_CHAIR_PEDESTAL`,
+// above): "NOLAN HOOK"/"NOLAN'S HOOK" and "PEELED HOOK"/"EMPTY HOOK" both
+// need `EXAMINE` text distinct from the bare rail's own (§5.2, §5.3), and
+// bare `hook`/`hooks` must still resolve to the rail — the compound-noun
+// mechanism (v0.14.0) does exactly this: neither sub-part declares a bare
+// "hook" of its own, only the two-word compounds, so a full adjective
+// match on one of them outranks the rail's own bare claim (§39.2).
+export const ACT3_NOLAN_HOOK = O('act3_nolan_hook');
+export const ACT3_PEELED_HOOK = O('act3_peeled_hook');
+export const ACT3_NOLAN_CHAIR = O('act3_nolan_chair');
+export const ACT3_STRAPS = O('act3_straps');
+export const ACT3_UV_LAMP = O('act3_uv_lamp');
+export const ACT3_BAY_CLOCK = O('act3_bay_clock');
+export const ACT3_DISPENSER = O('act3_dispenser');
+export const ACT3_DRAIN = O('act3_drain');
+export const ACT3_COVERALLS = O('act3_coveralls');
+export const ACT3_HUB_DOOR = O('act3_hub_door');
+export const ACT3_CHASE_MOUTH = O('act3_chase_mouth');
+export const ACT3_SLEEPERS = O('act3_sleepers');
+/** Uncounted sub-part (§16.5) — needs a real noun-bearing object since `EXAMINE`'s `'V dobj'` pattern requires a dobj to resolve at all. */
+export const ACT3_FAR_WALL = O('act3_far_wall');
+
+// §5.4 — "SEARCH HOOKS FOR JULES"/"LOOK FOR JULES ON THE RAIL." Bare fixed
+// phrases (same idiom as `V_ACT3_CHECK_TIME`): `SEARCH` ships `'V dobj'`
+// only, so "search hooks for jules" would resolve as one dobj phrase
+// ("hooks for jules") and fail to match any noun at all — a new word,
+// grepped clean.
+export const V_ACT3_SEARCH_RAIL_FOR_JULES = V('act3_search_rail_for_jules');
+
+// §6.4, §8.3-§8.5 — every "X UNDER LAMP"/"SHINE LAMP ON Y" phrasing is its
+// own bare fixed-phrase verb rather than a dobj resolution: `EXAMINE`/`PUT`
+// carry no `preps`, so e.g. "examine arm under lamp" would resolve as one
+// `'V dobj'` phrase whose TAIL word is "lamp" — the object that bare-claims
+// "lamp" (§39.2), never the player's own forearm (`self.ts`'s
+// `SELF_FOREARM`, out of this task's module, and not one of these phrases'
+// intended target anyway for the notebook/badge variants). Four verbs, one
+// per distinct response (§6.4, §8.3, §8.4, §8.5) — a handler only ever
+// knows which VERB matched, not which of a verb's several `words` did, so
+// phrasings needing different text can never share one verb id.
+export const V_ACT3_NOLAN_UNDER_LAMP = V('act3_nolan_under_lamp');
+export const V_ACT3_ARM_UNDER_LAMP = V('act3_arm_under_lamp');
+export const V_ACT3_NOTEBOOK_UNDER_LAMP = V('act3_notebook_under_lamp');
+export const V_ACT3_BADGE_UNDER_LAMP = V('act3_badge_under_lamp');
+
+// §6.6 — "PUT BADGE BACK"/"HANG BADGE ON HOOK." Bare fixed phrase, new word.
+export const V_ACT3_HANG_BADGE = V('act3_hang_badge');
+
+// §7.3 — "UNDO STRAP"/"UNBUCKLE STRAP." New `'V dobj'` verb (grepped
+// clean); "TEST STRAP" (§7.4) reaches `PULL`'s own handler through a new
+// synonym word added to `PULL` in place (`verbs.ts`, same idiom as
+// `V_MEASURE`/`V_CALL`) rather than a second verb claiming "test."
+export const V_ACT3_UNDO = V('act3_undo');
+
+// §9.2 — the Bay's own wall clock script (`act3/scripts.ts`).
+export const ACT3_READ_BAY_CLOCK_SCRIPT = S('act3_read_bay_clock');
+
+// --- D5 task G ---
+// The Archive Hub, its terminal/ledger/graph/queue/gate-frames/root-door,
+// the login prompt, and the Act III boundary (D5 prose doc §21-§31, §39,
+// §40). Room id, flags, clues, questions, puzzle id and memory ids for
+// this task were already declared above by the main session; this task
+// adds its own objects, verbs, and script/prompt ids.
+
+// Objects (§21) — the Hub's six addressable objects, plus one sub-part
+// (the terminal's own screen/burn detail, §22.6 — same "two genuinely
+// different EXAMINE answers need two objects" idiom `ACT3_CHAIR_PEDESTAL`
+// documents above, since the engine can't tell which of an object's own
+// nouns resolved a given verb).
+export const ACT3_HUB_TERMINAL = O('act3_hub_terminal');
+export const ACT3_HUB_TERMINAL_SCREEN = O('act3_hub_terminal_screen');
+export const ACT3_LEDGER = O('act3_ledger');
+export const ACT3_LOAD_GRAPH = O('act3_load_graph');
+export const ACT3_QUEUE = O('act3_queue');
+export const ACT3_GATE_FRAMES = O('act3_gate_frames');
+export const ACT3_ROOT_DOOR = O('act3_root_door');
+
+// §31 — the boundary's one gate object (§36 q10's own ruling: one gate
+// object, two entry points). Id MUST match `/boundary_gate/i`
+// (`tests/world-game.test.ts` counts exits whose `door` matches it).
+export const ACT3_S6_BOUNDARY_GATE = O('act3_s6_boundary_gate');
+
+// §22.2 — the login prompt. `ACT3_HUB_LOGIN_SCRIPT` (the respond script,
+// registered in `PROMPT_SCRIPTS`) is already declared above by the main
+// session; this task adds the open script and both prompt ids. Deliberately
+// NOT the opening room's own script/prompt id (§22.2's own instruction).
+export const ACT3_HUB_LOGIN_OPEN_SCRIPT = S('act3_hub_login_open');
+export const ACT3_HUB_LOGIN_PROMPT_ID = 'act3_hub_login_prompt';
+
+// §23, §39.2's "search" row — the ledger's own bare `SEARCH LEDGER`/`SEARCH`
+// prompt (this task's own mechanism; not named by the plan). One field,
+// routed the same way the fixed name-phrases below are.
+export const ACT3_LEDGER_SEARCH_OPEN_SCRIPT = S('act3_ledger_search_open');
+export const ACT3_LEDGER_SEARCH_RESPOND_SCRIPT = S('act3_ledger_search_respond');
+export const ACT3_LEDGER_SEARCH_PROMPT_ID = 'act3_ledger_search_prompt';
+
+// §23.2-§23.5 — the grammar has no free-text `iobj` (§39's own note), so
+// each outcome group the doc names is its own bare `'V'` fixed-phrase verb,
+// same idiom as `V_ACT3_SEARCH_RAIL_FOR_JULES` above.
+export const V_ACT3_LEDGER_JULES = V('act3_ledger_jules');
+export const V_ACT3_LEDGER_NOLAN = V('act3_ledger_nolan');
+export const V_ACT3_LEDGER_SELF = V('act3_ledger_self');
+export const V_ACT3_LEDGER_OTHER = V('act3_ledger_other');
+// §23.6 — "PRINT LEDGER"/"COPY LEDGER"/"WRITE DOWN LEDGER." No PRINT/COPY
+// verb exists yet (grepped clean) and "write down" is a distinct phrase
+// from `V_WRITE`'s own bare word (act2/ids.ts) — bare fixed phrase, same
+// idiom.
+export const V_ACT3_LEDGER_PRINT = V('act3_ledger_print');
+
+// §24.2 — "CHANGE SCALE"/"LOOK AT AXIS" name no addressable noun of their
+// own; bare fixed phrase (`SEARCH GRAPH` itself reaches the same text
+// through the graph's own `SEARCH` handler, no new verb needed for that
+// phrasing).
+export const V_ACT3_GRAPH_AXIS = V('act3_graph_axis');
+
+// §25.3/§25.4 — "DELETE QUEUE"/"CANCEL JOB"/"EDIT QUEUE"/"REMOVE MY LINE"
+// name no noun the queue declares ("line" isn't one), and "SEARCH QUEUE FOR
+// JULES" has the same free-text-iobj problem as the ledger's own searches
+// above. Bare fixed phrases.
+export const V_ACT3_QUEUE_EDIT = V('act3_queue_edit');
+export const V_ACT3_QUEUE_SEARCH_JULES = V('act3_queue_search_jules');
+
+// §39.4 — "BAY," a bare fixed phrase back to the Maintenance Bay (alongside
+// the ordinary `west` exit). "back" is deliberately NOT wired to this
+// destination: it is already exclusively one of `DIRECTION_VERB_IDS.in`'s
+// own words (`act1/verbs.ts`), and bare `ENTER`/`IN`/`BACK` in the Hub must
+// stay ambiguous per §39.2's own ruling — flagged in this task's report.
+export const V_ACT3_TO_BAY = V('act3_to_bay');
+
+// §21.1 — first-sight gating for the room description. `{ not: { visited }
+// }` cannot do this (`move.ts`'s `renderArrival` marks `visited` before
+// rendering `description`) — same idiom as `ACT3_PIPE_CHASE_SEEN`.
+export const ACT3_HUB_SEEN = F('act3_hub_seen');
+
+// --- integration (v0.15.0 playtest) ---
+/** §7.2's anchor plate — an uncounted sub-part of the straps, so EXAMINE ANCHOR reaches its own text. */
+export const ACT3_STRAP_ANCHOR = O('act3_strap_anchor');
+
+// --- D5 builders append below this line (Edit tool only; one block per task, labelled) ---

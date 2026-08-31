@@ -274,7 +274,7 @@ export const ACT1_FLAGS: WorldDef['flags'] = {
   [FLAG_JACK_GAVE_KEYS]: { default: false, doc: 'set by SHOW WORK ORDER TO JACK / topic_s6 (jack.ts, §9.1) — gates the keyring\'s TAKE handler (built-in take proceeds once true) and its examine\'s tag paragraph' },
   [FLAG_OPENED_BOX_141]: { default: false, doc: 'set by the boxes\' own OPEN/TURN/UNLOCK rule 1 (§9.3, has keyring) — polaroids and claim ticket are granted alongside it' },
   [FLAG_DRAWER_OPEN]: { default: false, doc: 'set by PRY DRAWER (WITH LEG) rule 1 (§10.2) — gates the drawer\'s OPEN/SEARCH handlers back to built-in/generic behavior' },
-  [FLAG_OFFERED_THE_RIDE]: { default: false, doc: 'set by topic_wall_drug / SHOW TICKET TO JACK (jack.ts, §16.1) — gates the one-time END OF BUILD system line' },
+  [FLAG_OFFERED_THE_RIDE]: { default: false, doc: 'set by topic_wall_drug / SHOW TICKET TO JACK (jack.ts, §16.1) — gates Town Edge north\'s §1.2 rule (townEdge.ts, Stage D addenda §1)' },
 };
 
 export const ACT1_CLUES: NonNullable<WorldDef['clues']> = {
