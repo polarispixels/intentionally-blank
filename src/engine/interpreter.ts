@@ -633,17 +633,22 @@ export class DeterministicParser implements IntentInterpreter {
 
   /** Resolves whichever of `dobj`/`iobj`/`npc` the matched pattern declared, in that order, against `view` (§3.2 noun resolution + pronouns). `npc` (the `V npc about topic` slot) resolves into the final `dobj` field — `StructuredAction` has no separate `npc` field (§3.1). */
   private resolveAction(view: ScopeView, action: UnresolvedAction, allTokens: string[]): InterpretOutcome {
-    const miss = (verb: VerbId): InterpretOutcome => ({
+    // `knownNouns` is scoped to the slot that failed (v0.9.0): the rung-3
+    // "you have seen that somewhere" text names a candidate for one of
+    // these words, and naming a candidate for the *other* slot's words is
+    // how "show ticket to jack" once answered "The motel is not here" — the
+    // npc word "jack" matched Main Street's motel-sign scenery.
+    const miss = (verb: VerbId, words: readonly string[] = allTokens): InterpretOutcome => ({
       kind: 'miss',
       raw: action.raw,
       verb,
-      knownNouns: knownNounsIn(view.vocabulary, allTokens),
+      knownNouns: knownNounsIn(view.vocabulary, [...words]),
       reason: 'nounUnresolved',
     });
 
     if (action.npc !== undefined) {
       const result = this.resolvePhrase(view, action.npc, 'npc');
-      if (result.kind === 'none') return miss(action.verb);
+      if (result.kind === 'none') return miss(action.verb, action.npc.words);
       const topic = action.topic !== undefined ? { topic: action.topic } : {};
       if (result.kind === 'ambiguous') {
         return this.disambiguate(view, action.verb, 'dobj', result.candidates, { verb: action.verb, ...topic, raw: action.raw });
@@ -659,7 +664,7 @@ export class DeterministicParser implements IntentInterpreter {
     }
 
     const dobjResult = this.resolvePhrase(view, action.dobj, 'either');
-    if (dobjResult.kind === 'none') return miss(action.verb);
+    if (dobjResult.kind === 'none') return miss(action.verb, action.dobj.words);
 
     if (action.iobj === undefined) {
       if (dobjResult.kind === 'ambiguous') {

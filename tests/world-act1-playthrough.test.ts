@@ -543,17 +543,10 @@ describe('Front Desk & Lobby — CLI playthrough (meeting Marlow)', () => {
 // NOTE (this task's own escalation): the script uses `nw`/`se`/`n` (real
 // compass exits) rather than the literal "GO TO DINER"/"GO TO LIBRARY"
 // phrasing named in this task's brief and in §15.3's own exits table.
-// `interpreter.ts`'s `tryGoTo` recognizes any "go to <phrase>" ahead of
-// grammar matching at all and answers it solely from `ScopeView.travel`'s
-// visited-room BFS — so on a first, not-yet-visited approach, "GO TO
-// DINER"/"GO TO SUNDOWN"/"GO TO LIBRARY"/"GO TO ANNEX" can never reach
-// `diner`'s/`county_library_front`'s own `V_APPROACH` handlers at all:
-// they are intercepted and answered "You don't know the way there yet."
-// instead, regardless of any noun this task adds. This is pre-existing
-// (already true of "GO TO STORE"/"GO TO SHERIFF", wave 2, verified by hand
-// against the shipped content) and out of this task's own module
-// (`interpreter.ts`, not `mainStreet.ts`) — flagged for `game-architect`,
-// not fixed here. "ENTER DINER"/"ENTER LIBRARY", "GO TOWARD GLOW"/"GO
+// (Historical note: `tryGoTo` used to intercept "go to <unvisited room>"
+// before the grammar could reach the storefront scenery handlers; v0.7.0
+// made an unroutable GO TO fall through to the grammar, so the literal
+// phrasings work now — see `tests/world-act1-goto-fallthrough.test.ts`.) "ENTER DINER"/"ENTER LIBRARY", "GO TOWARD GLOW"/"GO
 // TOWARD LIGHTS", "WALK NORTH" and "GO TO BILLBOARD" are all unaffected
 // (none of them is the literal two-token "go"+"to" prefix `tryGoTo`
 // matches on, or a whole string equal to a room alias) and verified by

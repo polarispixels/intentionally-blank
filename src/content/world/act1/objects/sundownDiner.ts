@@ -111,7 +111,10 @@ const dinerCounter: ObjectDefSlice = {
   // desk's guest register — a different room, a different object; in this
   // room "register" is just another word for the till, and it falls
   // through to this object's own EXAMINE, same as "top"/"formica"/etc.
-  nouns: ['counter', 'top', 'formica', 'stool', 'stools', 'seat', 'seats', 'menu', 'card', 'napkin', 'dispenser', 'sugar', 'salt', 'pepper', 'ketchup', 'bottle', 'till', 'register'],
+  // "table" added (wave 5, §8.1's ruling: "the diner's counter" needs a
+  // `table` noun in scope for the table-in-scope check `objects/
+  // closeOut.ts` exports — see that file's own header).
+  nouns: ['counter', 'top', 'formica', 'stool', 'stools', 'seat', 'seats', 'menu', 'card', 'napkin', 'dispenser', 'sugar', 'salt', 'pepper', 'ketchup', 'bottle', 'till', 'register', 'table'],
   handlers: [
     { verbs: [EXAMINE], effects: [{ say: counterExamine }] },
     { verbs: [SIT], effects: [{ say: counterSitText }, { set: [FLAG_SAT_AT_COUNTER, true] }] },

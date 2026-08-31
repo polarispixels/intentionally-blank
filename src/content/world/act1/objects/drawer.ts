@@ -9,7 +9,7 @@
 
 import type { Effect } from '../../../../engine/effects';
 import type { ObjectDefSlice } from '../../../../engine/world';
-import { CLUE_DRAWER_HELD, DESK, DRAWER } from '../ids';
+import { CHAIR_LEG, CLUE_DRAWER_HELD, DESK, DRAWER, FLAG_DRAWER_OPEN } from '../ids';
 import { EXAMINE, KICK, OPEN, PRY, PULL, SEARCH, SHAKE, UNLOCK } from '../verbs';
 
 export const DRAWER_STUCK_TEXT =
@@ -20,13 +20,53 @@ export const DRAWER_PRY_TEXT = [
   'They stop just short of working. Whoever it was gave up on this drawer, and gave up on it last, and did not come back for it.',
 ].join('\n\n');
 
+/**
+ * Wave 5, §10.2 — the successful pry, once the chair leg is in hand. The
+ * shipped `DRAWER_PRY_TEXT` continues to answer PRY when the player does
+ * NOT hold `CHAIR_LEG` (unedited, byte for byte); this is the new rule 1,
+ * gated `{ has: CHAIR_LEG }`. Grammar note: `PRY`'s own `verbs.ts` entry
+ * now also declares `'V dobj prep iobj'` with prep `with` so "PRY DRAWER
+ * WITH LEG" parses at all — but the actual success gate below is `{ has:
+ * CHAIR_LEG }`, not a `withInstrument` match, which is what also lets bare
+ * "PRY DRAWER" (no instrument named) succeed once the leg is simply held,
+ * per the doc's own wiring note.
+ */
+export const DRAWER_PRY_WITH_LEG_TEXT =
+  'You put the taper into the gap the other three went into, and you have one advantage over whoever made them: you do not have to be quiet, and you do not have to be anywhere else afterwards.\n\nIt goes on the fourth. The runner lets go, the drawer front comes with it, and a long splinter stays behind in the desk with the varnish still on one side of it.\n\nEight inches of empty pine, and two things lying in the bottom of it: an envelope, and a book of matches.';
+
 export const DRAWER_KICK_TEXT =
   'You kick it. The desk shifts an inch across the boards, the drawer does not move at all, and two floors down a board takes somebody’s weight and then very deliberately stops.';
 
 export const DRAWER_SHAKE_TEXT = 'Something inside the drawer slides half an inch and stops. Paper does not make that sound.';
 
 const openHandler: Effect[] = [{ say: DRAWER_STUCK_TEXT }];
-const pryHandler: Effect[] = [{ say: DRAWER_PRY_TEXT }, { grantClue: CLUE_DRAWER_HELD }];
+
+/**
+ * Shared with `objects/desk.ts`'s own PRY handler (§10.2's own wiring note:
+ * "same in objects/desk.ts, which routes to it") — one HandlerDef whose
+ * `say` is the two-rule prose (leg held / not) and whose other effects
+ * branch the same way: holding the leg opens the drawer for real
+ * (`FLAG_DRAWER_OPEN`, `setState`), not holding it grants the shipped clue
+ * exactly as before. `cash_envelope`/`matchbook` (`objects/closeOut.ts`)
+ * are declared `location: { in: DRAWER }` from the start, so opening the
+ * container is all that is needed for `TAKE ENVELOPE`/`TAKE MATCHBOOK` to
+ * work — no `move` effect required (`engine/world.ts`'s `inScopeAt`).
+ */
+export const pryHandler: Effect[] = [
+  {
+    say: [
+      { when: { has: CHAIR_LEG }, text: DRAWER_PRY_WITH_LEG_TEXT },
+      { text: DRAWER_PRY_TEXT },
+    ],
+  },
+  {
+    if: {
+      when: { has: CHAIR_LEG },
+      then: [{ set: [FLAG_DRAWER_OPEN, true] }, { setState: [DRAWER, 'open', true] }],
+      else: [{ grantClue: CLUE_DRAWER_HELD }],
+    },
+  },
+];
 
 const drawer: ObjectDefSlice = {
   location: { on: DESK },
@@ -44,7 +84,13 @@ const drawer: ObjectDefSlice = {
         { grantClue: CLUE_DRAWER_HELD },
       ],
     },
-    { verbs: [OPEN, PULL], effects: openHandler },
+    // Wave 5 (§18's wiring table: "OPEN/SEARCH gain a drawer_open rule") —
+    // gated to the pre-open state; once `FLAG_DRAWER_OPEN` is true neither
+    // entry matches, so OPEN falls through to the built-in container
+    // semantics (`open.alreadyOpen`) and SEARCH falls to its own generic
+    // `{name}`-templated default family. Doc gives no new authored text for
+    // either verb post-open — see this task's report.
+    { verbs: [OPEN, PULL], when: { not: { flag: FLAG_DRAWER_OPEN } }, effects: openHandler },
     {
       verbs: [UNLOCK],
       effects: [
@@ -57,6 +103,7 @@ const drawer: ObjectDefSlice = {
     { verbs: [KICK], effects: [{ say: DRAWER_KICK_TEXT }] },
     {
       verbs: [SEARCH],
+      when: { not: { flag: FLAG_DRAWER_OPEN } },
       effects: [
         {
           say: 'You get a finger into the eighth of an inch on offer and feel paper. More than one sheet, and something stiffer behind the paper. That is the entire harvest.',

@@ -188,6 +188,15 @@ describe('matchGrammar — patterns', () => {
     expect(result.kind === 'matched' && result.action.prep).toBe('on');
   });
 
+  it('"ask guide for brother" (FOR as the separator, v0.9.0) matches the same pattern with the same topic', () => {
+    const result = matchGrammar(vocab, ['ask', 'guide', 'for', 'brother'], 'ask guide for brother');
+    expect(result.kind).toBe('matched');
+    if (result.kind !== 'matched') return;
+    expect(result.action.pattern).toBe('V npc about topic');
+    expect(result.action.topic).toBe('brother');
+    expect(result.action.npc?.noun).toBe('guide');
+  });
+
   it('"ask guide about brother" matches V npc about topic, with npc unresolved and topic raw', () => {
     const result = matchGrammar(vocab, ['ask', 'guide', 'about', 'brother'], 'ask guide about brother');
     expect(result).toEqual({

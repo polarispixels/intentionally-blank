@@ -101,9 +101,22 @@ const DARK_VARIANT_1 =
 const DARK_VARIANT_2 =
   'Still dark. The room is out there being a room without your supervision. The rectangle has not moved. Neither, in any meaningful sense, have you.';
 
+// Wave 5, §15 — one clause inserted into the ransack paragraph of every lit,
+// not-yet-searched variant below (the "fallen" pair and the "righted" pair
+// each share one ransack paragraph across their own door-shut/door-open
+// split, so the clause is spliced into both pairs' shared text once each).
+// The doc's own §15 header says "all three lit description variants" and
+// names three constants; this file actually has four (the door-open split,
+// §15.3, postdates that count) — treated as the same class of doc-authoring
+// miscount `jack.ts`'s own header already flags for its topic count, not a
+// cut: the clause goes into every lit ransack paragraph that exists, so no
+// variant is left describing a room whose own canon (02 §2) the object now
+// contradicts. See this task's report.
+const CHAIR_CLAUSE = 'The chair that went with it is on its side against the wall.';
+
 const LIT_LAMP_FALLEN_FIRST_SIGHT_DOOR_SHUT = [
   'The lamp lies on its side and burns anyway, so every shadow in the room goes up the walls instead of across the floor. Nothing here is where a thing should be, and none of it is where its shadow says it is.',
-  'Somebody has gone through this room. The desk is over on its face with its legs in the air; two of its drawers are out and empty on the boards and the third has been worked at and is still shut. Papers cover the floor — not thrown, exactly. Set down. Broken glass catches the light along the baseboard. There is a dark stain on the boards roughly where your head was.',
+  `Somebody has gone through this room. The desk is over on its face with its legs in the air; two of its drawers are out and empty on the boards and the third has been worked at and is still shut. ${CHAIR_CLAUSE} Papers cover the floor — not thrown, exactly. Set down. Broken glass catches the light along the baseboard. There is a dark stain on the boards roughly where your head was.`,
   'An old computer terminal sits on a stand in the corner. Nobody bothered to knock it over. The air smells of scorched dust off the bulb and, underneath that, of a room that has been cold for a while. The door is shut. The window is not curtained.',
 ].join('\n\n');
 
@@ -114,19 +127,19 @@ const LIT_LAMP_FALLEN_FIRST_SIGHT_DOOR_SHUT = [
 // sentence, leaving the rest of each paragraph untouched.
 const LIT_LAMP_FALLEN_FIRST_SIGHT_DOOR_OPEN = [
   'The lamp lies on its side and burns anyway, so every shadow in the room goes up the walls instead of across the floor. Nothing here is where a thing should be, and none of it is where its shadow says it is.',
-  'Somebody has gone through this room. The desk is over on its face with its legs in the air; two of its drawers are out and empty on the boards and the third has been worked at and is still shut. Papers cover the floor — not thrown, exactly. Set down. Broken glass catches the light along the baseboard. There is a dark stain on the boards roughly where your head was.',
+  `Somebody has gone through this room. The desk is over on its face with its legs in the air; two of its drawers are out and empty on the boards and the third has been worked at and is still shut. ${CHAIR_CLAUSE} Papers cover the floor — not thrown, exactly. Set down. Broken glass catches the light along the baseboard. There is a dark stain on the boards roughly where your head was.`,
   'An old computer terminal sits on a stand in the corner. Nobody bothered to knock it over. The air smells of scorched dust off the bulb and, underneath that, of a room that has been cold for a while. The door stands open where you left it, and the landing light lies across the boards in a long pale wedge. The window is not curtained.',
 ].join('\n\n');
 
 const LIT_LAMP_RIGHTED_DOOR_SHUT = [
   "The lamp stands where a lamp stands, and the room's shadows have agreed to go downward again. It is not an improvement, exactly. You can now see the mess plainly rather than dramatically.",
-  'Somebody has gone through this room. The desk lies on its face, two drawers out and empty beside it, the third worked at and still shut. Papers cover the boards, set down rather than thrown. Broken glass along the baseboard. A dark stain where your head was.',
+  `Somebody has gone through this room. The desk lies on its face, two drawers out and empty beside it, the third worked at and still shut. ${CHAIR_CLAUSE} Papers cover the boards, set down rather than thrown. Broken glass along the baseboard. A dark stain where your head was.`,
   'The terminal in the corner has not been touched by anyone, including you. The door is shut. The window is not curtained, and shows a rectangle of street-coloured nothing.',
 ].join('\n\n');
 
 const LIT_LAMP_RIGHTED_DOOR_OPEN = [
   "The lamp stands where a lamp stands, and the room's shadows have agreed to go downward again. It is not an improvement, exactly. You can now see the mess plainly rather than dramatically.",
-  'Somebody has gone through this room. The desk lies on its face, two drawers out and empty beside it, the third worked at and still shut. Papers cover the boards, set down rather than thrown. Broken glass along the baseboard. A dark stain where your head was.',
+  `Somebody has gone through this room. The desk lies on its face, two drawers out and empty beside it, the third worked at and still shut. ${CHAIR_CLAUSE} Papers cover the boards, set down rather than thrown. Broken glass along the baseboard. A dark stain where your head was.`,
   'The terminal in the corner has not been touched by anyone, including you. The door stands open where you left it, and the landing light lies across the boards in a long pale wedge. The window is not curtained, and shows a rectangle of street-coloured nothing.',
 ].join('\n\n');
 

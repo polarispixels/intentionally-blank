@@ -85,3 +85,19 @@ describe('a disambiguation question names objects by their declared `name` (v0.7
     });
   });
 });
+
+describe('a noun miss names only the failing slot (v0.9.0)', () => {
+  it('"show ticket to jack" with no ticket is a miss whose knownNouns are the dobj words, not "jack"', () => {
+    const outcome = parser.interpret('show ticket to jack', {
+      vocabulary: vocab,
+      visible: [],
+      parser: {},
+      portable: new Set(),
+      location: new Map(),
+      travel: { current: MAIN_STREET, passable: new Map([[MAIN_STREET, []]]) },
+    });
+    expect(outcome.kind).toBe('miss');
+    if (outcome.kind !== 'miss') return;
+    expect(outcome.knownNouns).not.toContain('jack');
+  });
+});

@@ -39,6 +39,7 @@ import {
   V_ABOUT,
   V_VERSION,
   V_APPROACH,
+  V_ASSEMBLE,
   V_ATTACK,
   V_CALL,
   V_CHECK_DATE,
@@ -49,6 +50,8 @@ import {
   V_DRINK,
   V_DRIVE,
   V_EAT,
+  V_EAT_PIE,
+  V_EAT_PILL,
   V_FEED,
   V_FIND_MY_NAME,
   V_HELP,
@@ -349,6 +352,19 @@ export const townEdgeThinkText =
   'You stand at the end of the street and give it a minute.\n\nNothing arrives. Whatever is in there is behind the part of your head that hurts, and it is not coming out tonight for a man standing in the wind.';
 
 // ---------------------------------------------------------------------------
+// Nolan's Yard (wave 5) — bare, self-contained phrase (see `ids.ts`'s own
+// comment on `V_EAT_PIE`).
+// ---------------------------------------------------------------------------
+
+/** §5.3's "EAT PIE" (the player). */
+export const eatPieText =
+  'It is as good as the one at the counter was and it is colder, and you are standing in the road eating a stranger\'s pie out of a box at four in the morning, and it is still the best decision you have made tonight.';
+
+/** §7.2's "open bottle"/"take pill"/"eat pill" — shared by `V_EAT_PILL`'s own bare `default` and (via import) `pill_bottle`'s own OPEN/TAKE handlers (`objects/nolansYard.ts`), so the bare-phrase and dobj-based routes never drift into two copies. */
+export const pillBottleOpenText =
+  'You get the cap off — it is the kind that argues — and look at two tablets in the bottom of somebody else\'s bottle for slightly longer than a person with nothing on their mind would.\n\nYou put the cap back on.';
+
+// ---------------------------------------------------------------------------
 // The full table.
 // ---------------------------------------------------------------------------
 
@@ -368,11 +384,13 @@ export const ACT1_VERBS: Record<string, VerbDef> = {
   // try handle") — a general OPEN synonym, not landing-specific vocabulary,
   // since "try the handle" reads naturally on any door.
   // "try" added (main-street-prose §4.4's "TRY DOOR") — a general OPEN synonym, not brick-row-specific vocabulary.
-  [OPEN]: { id: OPEN, words: ['open', 'try handle', 'try'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.open },
+  // "unlatch" added (Nolan's Yard §4.5's "UNLATCH GATE") — a general OPEN synonym, not gate-specific vocabulary.
+  [OPEN]: { id: OPEN, words: ['open', 'try handle', 'try', 'unlatch'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.open },
   [CLOSE]: { id: CLOSE, words: ['close', 'shut'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.close },
   [LOCK]: { id: LOCK, words: ['lock'], patterns: ['V dobj', 'V dobj prep iobj'], preps: ['with'], class: 'direct', default: VERB_DEFAULTS.lock },
   [UNLOCK]: { id: UNLOCK, words: ['unlock'], patterns: ['V dobj', 'V dobj prep iobj'], preps: ['with'], class: 'direct', default: VERB_DEFAULTS.unlock },
-  [PUT_IN]: { id: PUT_IN, words: ['put', 'place', 'insert'], patterns: ['V dobj prep iobj'], preps: ['in', 'into'], class: 'direct', default: VERB_DEFAULTS.put_in },
+  // "through" added (Nolan's Yard §5.3's "PUT PIE THROUGH FENCE") — a general PUT_IN synonym, not fence-specific vocabulary.
+  [PUT_IN]: { id: PUT_IN, words: ['put', 'place', 'insert'], patterns: ['V dobj prep iobj'], preps: ['in', 'into', 'through'], class: 'direct', default: VERB_DEFAULTS.put_in },
   [PUT_ON]: { id: PUT_ON, words: ['put', 'place'], patterns: ['V dobj prep iobj'], preps: ['on'], class: 'direct', default: VERB_DEFAULTS.put_on },
   [WEAR]: { id: WEAR, words: ['wear', 'put on'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.wear },
   [REMOVE]: { id: REMOVE, words: ['remove', 'take off'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.remove },
@@ -402,13 +420,19 @@ export const ACT1_VERBS: Record<string, VerbDef> = {
   [PULL]: { id: PULL, words: ['pull', 'tug', 'yank', 'drag'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.pull },
   // "spin" added (wave-2's General Store §9.1 "SPIN RACK") — a general TURN synonym, not rack-specific vocabulary.
   // "wind" added (County Library §9.1's "WIND REEL") — a general TURN synonym, not reader-specific vocabulary.
-  [TURN]: { id: TURN, words: ['turn', 'rotate', 'twist', 'spin', 'wind'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.turn },
+  // "dial" added (wave 5, §9.3's "DIAL LETTERS") — a general TURN synonym; safe (no bare 'V' pattern on this verb, so no verb-noun-collision cost against `po_boxes`' own noun "dial"). "letters" is added to `po_boxes`' own noun list (`objects/postOffice.ts`) so "DIAL LETTERS" resolves its dobj there.
+  [TURN]: { id: TURN, words: ['turn', 'rotate', 'twist', 'spin', 'wind', 'dial'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.turn },
   [MOVE]: { id: MOVE, words: ['move', 'shift', 'slide', 'reposition'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.move },
   [SHAKE]: { id: SHAKE, words: ['shake', 'rattle', 'jiggle'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.shake },
   // "dust" dropped from the synonym list (validate.ts's verb-noun-collision
   // check against `DUST`'s own noun) — builder's word choice, not doc text.
   [RUB]: { id: RUB, words: ['rub', 'clean', 'wipe', 'polish'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.rub },
-  [PRY]: { id: PRY, words: ['pry', 'lever', 'force', 'wedge'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.pry },
+  // 'V dobj prep iobj' with prep 'with' added (wave 5, §10.2: "PRY DRAWER
+  // WITH LEG") — `objects/closeOut.ts`'s drawer amendment gates on `{ has:
+  // CHAIR_LEG }` rather than on the resolved `iobj`, so this pattern only
+  // needs to exist for the phrase to parse at all; see that file's own
+  // comment.
+  [PRY]: { id: PRY, words: ['pry', 'lever', 'force', 'wedge'], patterns: ['V dobj', 'V dobj prep iobj'], preps: ['with'], class: 'direct', default: VERB_DEFAULTS.pry },
   [BREAK]: { id: BREAK, words: ['break', 'smash', 'destroy', 'hit', 'strike'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.break },
   [KICK]: { id: KICK, words: ['kick', 'stomp'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.kick },
   [CUT]: { id: CUT, words: ['cut', 'slice', 'saw', 'tear', 'rip', 'fold'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.cut },
@@ -433,7 +457,8 @@ export const ACT1_VERBS: Record<string, VerbDef> = {
   [JUMP]: { id: JUMP, words: ['jump', 'hop', 'leap'], patterns: ['V'], class: null, default: jumpDefault },
   [SING]: { id: SING, words: ['sing', 'hum', 'whistle'], patterns: ['V'], class: null, default: singDefault },
   // "greet" added (main-street-prose §4.1's "GREET HORSE") — a general HELLO synonym, not horse-specific vocabulary.
-  [HELLO]: { id: HELLO, words: ['hello', 'hi', 'hey', 'talk to', 'greet'], patterns: ['V', 'V dobj'], class: 'social', default: helloDefault },
+  // "shush"/"quiet"/"wake" added (Nolan's Yard §4.2's "SHUSH DOG"/"QUIET DOG" and §4.3's "WAKE NOLAN") — general HELLO synonyms, not yard-specific vocabulary; none collides with any object noun.
+  [HELLO]: { id: HELLO, words: ['hello', 'hi', 'hey', 'talk to', 'greet', 'shush', 'quiet', 'wake'], patterns: ['V', 'V dobj'], class: 'social', default: helloDefault },
 
   // Front Desk & Lobby's first NPC (front-desk-prose §5) — ASK/TELL/SHOW.
   // SHOW already exists below under this table's own `SHOW` id, which is
@@ -654,6 +679,28 @@ export const ACT1_VERBS: Record<string, VerbDef> = {
   // global prose, same idiom as V_ATTACK/V_FOLLOW above.
   [V_DRIVE]: { id: V_DRIVE, words: ['drive', 'start'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.push },
   [V_PLAY]: { id: V_PLAY, words: ['play'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.touch },
+
+  // Nolan's Yard (wave 5) — bare, self-contained phrases (see `ids.ts`'s own comments on `V_EAT_PIE`/`V_EAT_PILL`).
+  [V_EAT_PIE]: { id: V_EAT_PIE, words: ['eat pie'], patterns: ['V'], class: 'direct', default: eatPieText },
+  [V_EAT_PILL]: { id: V_EAT_PILL, words: ['eat pill'], patterns: ['V'], class: 'direct', default: pillBottleOpenText },
+  // Wave 5 (§8.1's ruling) — "ASSEMBLE STRIPS"/"PIECE TOGETHER STRIPS"/
+  // "REASSEMBLE STRIPS"/"SORT STRIPS"/"PUT TOGETHER STRIPS". Words per the
+  // main-session ruling; the table-in-scope refusal/success texts and the
+  // `TABLE_IN_SCOPE` `Cond` are authored/exported from `objects/closeOut.ts`
+  // (this task's own module). `SHREDDED_STRIPS` itself belongs to the
+  // concurrent Nolan's Yard task's own module (`objects/nolansYard.ts`) —
+  // out of this file list — but that object's own comment explicitly left
+  // its ASSEMBLE/READ wiring for this task to add, so its handler (`{
+  // verbs: [READ, V_ASSEMBLE], when: TABLE_IN_SCOPE, effects:
+  // ASSEMBLE_SUCCESS_EFFECTS }` plus the refusal rule) is wired there
+  // directly, importing this file's exports — a small, targeted edit to
+  // that object's own `handlers` array, not a redesign of the yard; see
+  // this task's report. "READ STRIPS" is NOT one of THIS verb's own
+  // `words` (READ is the reserved built-in verb id and already claims
+  // "read" globally) — it reaches the same behavior via that same handler
+  // instead.
+  [V_ASSEMBLE]: { id: V_ASSEMBLE, words: ['assemble', 'piece together', 'reassemble', 'sort', 'put together'], patterns: ['V dobj'], class: 'analytical', default: VERB_DEFAULTS.touch },
+
   // §8 gap 2: the real reserved `INVENTORY_VERB_ID`, not a room-local id.
   // `default` refs the global `inventory.empty` family — `room.ts`'s own
   // handler overrides it for the empty-hands case (§8.9/§14.4).

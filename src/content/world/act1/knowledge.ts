@@ -15,12 +15,16 @@ import {
   CLUE_BOLT_THROWN,
   CLUE_BOX_141,
   CLUE_CALM_SEARCH,
+  CLUE_CLAIM_TICKET,
+  CLUE_CUSTODIAN_SEEN,
   CLUE_DEAD_CROSS_REFERENCE,
   CLUE_DRAWER_HELD,
   CLUE_FIVE_FACES,
   CLUE_HIRED,
   CLUE_HORIZON_GLOW,
   CLUE_HOUSE_EMPTY,
+  CLUE_INTACT_POLAROIDS,
+  CLUE_J_BOX_141,
   CLUE_JULES,
   CLUE_LETTERS_ANSWERED,
   CLUE_LIGHTS_RESOLVED,
@@ -28,27 +32,39 @@ import {
   CLUE_MUG_SPELLING,
   CLUE_NO_COUNTY_RECORD,
   CLUE_NO_NAME_RECALLED,
+  CLUE_NOLAN_HEADACHES,
+  CLUE_NOLAN_TRASH,
   CLUE_NOTHING_NAMED,
   CLUE_ODD_KEY,
   CLUE_PAGE_INDENTATION,
+  CLUE_PAID_IN_CASH,
   CLUE_POLAROID_FLARE,
   CLUE_RECORD_RANGE,
   CLUE_REGISTER_GAP,
   CLUE_REGISTER_IMPRESSION,
+  CLUE_S6_REVOKED,
   CLUE_SAME_DISTANCE,
   CLUE_TATTOO_GAP,
   CLUE_TERMINAL_BURN,
   CLUE_TERMINAL_NO_CROSSREFS,
   CLUE_VISITOR_UNREMARKABLE,
   CLUE_WINDOW_EXIT,
+  FLAG_ASSEMBLED_STRIPS,
   FLAG_CROSSED_STREET,
   FLAG_DOOR_BOLT_DRAWN,
   FLAG_DRANK_WATER,
+  FLAG_DRAWER_OPEN,
   FLAG_ENTERED_PADDOCK,
   FLAG_HANDLED_MUG,
   FLAG_HAS_STRING,
+  FLAG_ALARM_RAISED,
+  FLAG_ALARM_TURNS,
+  FLAG_DOG_FED,
+  FLAG_DOG_SETTLED,
   FLAG_HEARD_NOLAN_NAME,
   FLAG_HORSE_TOUCHED,
+  FLAG_JACK_COVERING,
+  FLAG_JACK_GAVE_KEYS,
   FLAG_JACK_SAW_PAGE,
   FLAG_LAMP_FIRST_OFF_DONE,
   FLAG_LAMP_FIRST_ON_DONE,
@@ -61,8 +77,11 @@ import {
   FLAG_MET_PEARL,
   FLAG_MET_WHITLOCK,
   FLAG_NOTICED_ODD_KEY,
+  FLAG_OFFERED_THE_RIDE,
+  FLAG_OPENED_BOX_141,
   FLAG_PEARL_NOTICED_YOU,
   FLAG_POCKETS_CHECKED,
+  FLAG_PORCH_LIGHT_ON,
   FLAG_RANG_BELL,
   FLAG_READ_BILLBOARD_SCRATCH,
   FLAG_READ_JACK_LETTERS,
@@ -74,8 +93,10 @@ import {
   FLAG_SAT_AT_COUNTER,
   FLAG_SAT_IN_POST_OFFICE,
   FLAG_SAW_BLANK_RECTANGLE,
+  FLAG_SAW_FOOTPRINTS,
   FLAG_SAW_GRADED_STRIP,
   FLAG_SAW_JACK_TATTOO,
+  FLAG_SEARCHED_TRASH,
   FLAG_SEEN_MAINTENANCE_MAN,
   FLAG_SIGNED_THE_BOOK,
   FLAG_SPARE_KEY_GIVEN,
@@ -90,6 +111,7 @@ import {
   FLAG_VISITED_LIBRARY,
   FLAG_VISITED_MAIN_STREET,
   FLAG_VISITED_MOTEL,
+  FLAG_VISITED_NOLANS_YARD,
   FLAG_VISITED_POST_OFFICE,
   FLAG_VISITED_SHERIFF_OFFICE,
   FLAG_VISITED_TOWN_EDGE,
@@ -105,8 +127,10 @@ import {
   MEM_M3_SOCIAL,
   PUZZLE_LEAVE_YOUR_ROOM,
   PUZZLE_REGISTER,
+  QUESTION_NOTEBOOK,
   QUESTION_OUT_OF_THIS_ROOM,
   QUESTION_THE_RECORD,
+  QUESTION_WALL_DRUG,
   SUNDOWN_DINER,
 } from './ids';
 
@@ -219,6 +243,38 @@ export const ACT1_FLAGS: WorldDef['flags'] = {
   [FLAG_TOLD_JACK_ABOUT_ROOM]: { default: false, doc: 'set by tell_room (jack.ts) — read by greeting rule 2' },
   [FLAG_JACK_SAW_PAGE]: { default: false, doc: 'set by SHOW PAGE TO JACK — read by nothing yet, M14 should read it' },
   [FLAG_HEARD_NOLAN_NAME]: { default: false, doc: 'set by topic_nolan (jack.ts) — read by nothing yet, P6\'s prerequisite' },
+
+  // -------------------------------------------------------------------
+  // Nolan's Yard (wave 5 prose §2's table — this task's own nine; the
+  // close-out's own five flags belong to the concurrent Close-out task)
+  // -------------------------------------------------------------------
+  [FLAG_VISITED_NOLANS_YARD]: { default: false, doc: 'set by nolans_yard\'s own onEnter (first entry) — gates room description rule 2' },
+  [FLAG_SAW_FOOTPRINTS]: { default: false, doc: 'set by EXAMINE ALLEY — read by nothing yet, M15 should read it' },
+  [FLAG_ALARM_RAISED]: { default: false, doc: 'set by the soft fail (SEARCH/EXAMINE/OPEN the bin before a route is open) — never cleared — read by WAIT rule 1 and the alarm_turns increment event' },
+  [FLAG_ALARM_TURNS]: {
+    default: 0,
+    doc:
+      'numeric — turns elapsed since the alarm was raised, incremented by an EventDef while alarm_raised and dog_settled is false; zeroed by the soft fail. See this task\'s report: the increment\'s own `when` is `{ all: [{ flag: alarm_raised }, { not: { flag: dog_settled } }] }`, not the main-session ruling\'s literal `{ flag: porch_light_on }` — the literal condition freezes the counter the instant the light-off event clears porch_light_on, before it can ever reach the dog-settle threshold (worked through turn-by-turn against tick.ts\'s own event order).',
+  },
+  [FLAG_PORCH_LIGHT_ON]: { default: false, doc: 'set by the soft fail; cleared by the light-off EventDef — gates porch_light\'s own examine and the search gate\'s wait-it-out refusal' },
+  [FLAG_DOG_SETTLED]: { default: false, doc: 'set by the dog-settles EventDef — read by the search gate' },
+  [FLAG_DOG_FED]: { default: false, doc: 'set by GIVE PIE TO DOG / FEED DOG / PUT PIE THROUGH FENCE — read by the search gate' },
+  [FLAG_JACK_COVERING]: {
+    default: false,
+    doc:
+      'set by Jack\'s own topic_trash (jack.ts, the concurrent Close-out task) — read by this room\'s description rule 1 and the search gate; cleared silently the first turn the player is not in the yard (this room\'s own EventDef, main-session ruling 3)',
+  },
+  [FLAG_SEARCHED_TRASH]: { default: false, doc: 'set by the yield (§5.5) — read by the bin lid sub-part\'s own examine' },
+
+  // -------------------------------------------------------------------
+  // Wave 5 — the Close-out (this task's own five; the yard's own flags
+  // belong to the concurrent Nolan's Yard task, declared in its own module)
+  // -------------------------------------------------------------------
+  [FLAG_ASSEMBLED_STRIPS]: { default: false, doc: 'set by ASSEMBLE STRIPS (§8.2) — strips move to nowhere, work_order is granted' },
+  [FLAG_JACK_GAVE_KEYS]: { default: false, doc: 'set by SHOW WORK ORDER TO JACK / topic_s6 (jack.ts, §9.1) — gates the keyring\'s TAKE handler (built-in take proceeds once true) and its examine\'s tag paragraph' },
+  [FLAG_OPENED_BOX_141]: { default: false, doc: 'set by the boxes\' own OPEN/TURN/UNLOCK rule 1 (§9.3, has keyring) — polaroids and claim ticket are granted alongside it' },
+  [FLAG_DRAWER_OPEN]: { default: false, doc: 'set by PRY DRAWER (WITH LEG) rule 1 (§10.2) — gates the drawer\'s OPEN/SEARCH handlers back to built-in/generic behavior' },
+  [FLAG_OFFERED_THE_RIDE]: { default: false, doc: 'set by topic_wall_drug / SHOW TICKET TO JACK (jack.ts, §16.1) — gates the one-time END OF BUILD system line' },
 };
 
 export const ACT1_CLUES: NonNullable<WorldDef['clues']> = {
@@ -409,6 +465,52 @@ export const ACT1_CLUES: NonNullable<WorldDef['clues']> = {
     detail:
       "Inside Jack's left forearm, above the wrist: **IV**. All five of them were done the same afternoon, in birth order. Luke is II, Eli III, Jack IV, Sissy V. Jules is I.",
   },
+
+  // -------------------------------------------------------------------
+  // Nolan's Yard (wave 5 prose §2's table — this task's own three; the
+  // close-out's own five clues belong to the concurrent Close-out task)
+  // -------------------------------------------------------------------
+  [CLUE_NOLAN_TRASH]: {
+    title: 'What Nolan threw out',
+    detail:
+      'A souvenir cup from Wall Drug, a prescription bottle in the name NOLAN, R. for headaches, a bundle of cross-cut shredded paper, and a post-office rent notice. All of it went out at the kerb on the same night.',
+  },
+  [CLUE_J_BOX_141]: {
+    title: 'The rent notice',
+    detail:
+      'A post-office notice for box 141, addressed to J. care of Nolan\'s house. Somebody has written across the bottom, in a different hand from the form: returned — not known here. It was never sent back. It went in the bin.',
+  },
+  [CLUE_NOLAN_HEADACHES]: {
+    title: "Nolan's prescription",
+    detail: 'NOLAN, R. Not more than nine in any seven days. Two left in the bottle, and the threads have lost their shine.',
+  },
+
+  // -------------------------------------------------------------------
+  // Wave 5 — the Close-out (§2's table — this task's own five; the yard's
+  // own three clues belong to the concurrent Nolan's Yard task)
+  // -------------------------------------------------------------------
+  [CLUE_S6_REVOKED]: {
+    title: 'The work order',
+    detail:
+      'A facility form, shredded and put back together. What survives: S6 — ACCESS REVOKED — J. Effective immediately. Badge retained at gate. Routing: box 141. The line where somebody has to give a reason was never filled in.',
+  },
+  [CLUE_INTACT_POLAROIDS]: {
+    title: 'The Polaroids in the box',
+    detail:
+      'Two Polaroids, undamaged. The first is the same porch and the same afternoon as the one on Jack\'s table, with nobody burned out of it: an old man, a young man, a girl, two at the right-hand edge — and, at the left, a man in his forties in a short-sleeved shirt with a square-faced watch, one arm along the young man\'s shoulders. The second is a night sky over the same porch roof, out of focus.',
+  },
+  [CLUE_CLAIM_TICKET]: {
+    title: 'The claim ticket',
+    detail: 'WALL DRUG. HOLD FOR PICKUP. A number, no date, no name, and a perforated edge where its twin was torn off.',
+  },
+  [CLUE_PAID_IN_CASH]: {
+    title: 'The envelope in the drawer',
+    detail: 'A brown pay envelope, thick, tucked rather than gummed. Used notes of more than one denomination, sorted the same face up. Nothing written on it anywhere: no name, no hand, no mark.',
+  },
+  [CLUE_CUSTODIAN_SEEN]: {
+    title: 'What Marlow can still describe',
+    detail: 'Grey coveralls, the clean kind. He took nothing, never raised his voice, and wiped his feet on the way in. That is the whole of what stays: a maintenance fella, and nothing else.',
+  },
 };
 
 export const ACT1_MEMORIES: NonNullable<WorldDef['memories']> = {
@@ -503,6 +605,20 @@ export const ACT1_QUESTIONS: NonNullable<WorldDef['questions']> = {
     openWhen: { flag: FLAG_STOOD_UP },
     answerWhen: { visited: LANDING },
     answer: EXIT_TRAVEL_TEXT_LIT,
+  },
+
+  // -------------------------------------------------------------------
+  // §16.3 — the Act I boundary's two hand-offs. Neither is answered in
+  // this build (no `answerWhen`, no `answer`) — the honest state of both,
+  // per the doc's own instruction.
+  // -------------------------------------------------------------------
+  [QUESTION_NOTEBOOK]: {
+    text: 'Where did Jules hide the notebook — and who else is looking for it?',
+    openWhen: { flag: FLAG_TOLD_JACK_ABOUT_ROOM },
+  },
+  [QUESTION_WALL_DRUG]: {
+    text: 'What is waiting at Wall Drug?',
+    openWhen: { clue: CLUE_CLAIM_TICKET },
   },
 };
 

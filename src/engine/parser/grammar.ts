@@ -54,6 +54,7 @@ export type GrammarResult =
 
 /** Literal separator for the `V npc about topic` pattern (spec §2.9) — not a `VerbDef.preps` entry; "about" is the pattern's own grammar, the same way "V dobj prep iobj" bakes in the two-slot shape. */
 const ABOUT = 'about';
+const FOR = 'for';
 
 /**
  * Every verb form whose words are a prefix of `tokens`, at exactly
@@ -110,7 +111,10 @@ function tryPattern(verb: CompiledVerb, pattern: VerbPattern, tokens: string[], 
   // "you didn't finish that thought" family instead of falling all the way
   // to the generic bareVerb rung, which used to be the only place this
   // input could land).
-  const aboutIndex = tokens.indexOf(ABOUT);
+  // "ask pearl FOR pie" (v0.9.0, the Act I playthrough): FOR is accepted
+  // as the separator too — asking someone for a thing is asking about it,
+  // and the topic tables answer it. Whichever comes first wins.
+  const aboutIndex = tokens.findIndex((t) => t === ABOUT || t === FOR);
   if (aboutIndex <= 0) return undefined;
   const npcTokens = tokens.slice(0, aboutIndex);
   const topicTokens = tokens.slice(aboutIndex + 1);

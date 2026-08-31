@@ -19,7 +19,7 @@
 import { T } from '../../../engine/ids';
 import type { NpcDefSlice, ShowResponseDef, TopicDef } from '../../../engine/world';
 import type { ProseRule } from '../../../engine/prose';
-import { FLAG_MET_PEARL, FLAG_PEARL_NOTICED_YOU, FLAG_TOLD_PEARL_ABOUT_ROOM, MUG, PAGE_78, PEARL, SUNDOWN_DINER, V_ATTACK, V_FOLLOW, V_HUG, V_KISS } from './ids';
+import { FLAG_MET_PEARL, FLAG_PEARL_NOTICED_YOU, FLAG_TOLD_PEARL_ABOUT_ROOM, MUG, PAGE_78, PEARL, PIE_BOX, SUNDOWN_DINER, V_ATTACK, V_FOLLOW, V_HUG, V_KISS } from './ids';
 
 // ---------------------------------------------------------------------------
 // §6.3 — unknownTopic
@@ -72,6 +72,8 @@ const TOPIC_WHITLOCK = T('act1_pearl_topic_whitlock');
 // prose.md`, the eighth and last topic, appended after `topic_whitlock`;
 // nothing else in this file changes.
 const TOPIC_JACK = T('act1_pearl_topic_jack');
+// Wave 5 (§12) — the ninth entry, appended after `topic_jack`.
+const TOPIC_PIE_TO_GO = T('act1_pearl_topic_pie_to_go');
 
 const topics: TopicDef[] = [
   {
@@ -121,6 +123,21 @@ const topics: TopicDef[] = [
     words: ['jack', 'truck', 'monster truck', 'the man with the truck', 'motel', 'arrowhead', 'stranger', 'visitor'],
     response:
       '"Jack? He\'s in at six most mornings, and he has the eggs, and he asks people things." She says it exactly the way she says the weather. "Been doing it since the start of last month. He\'s not sleeping and it\'s got into his talk, and there\'s two or three won\'t sit by him now."\n\nA plate goes down somewhere. "He\'s a good boy carrying a thing. I put food in front of him and he eats it. That\'s not nothing."',
+  },
+  {
+    id: TOPIC_PIE_TO_GO,
+    words: ['pie', 'slice', 'box', 'to go', 'takeaway', 'take away', 'wrap', 'for the road', 'rhubarb', 'dessert'],
+    response: [
+      {
+        when: { not: { has: PIE_BOX } },
+        text: '"Take it with you, then." She has a box out of the stack under the counter and folded before you have said which one you wanted, and the slice goes in on its side.\n\nShe writes nothing down. "Bring the box back or don\'t. It\'s a box."',
+      },
+      {
+        text: '"You\'ve got one." She does not look up from the griddle. "It\'s not going to get any older than it already is."',
+      },
+    ] satisfies ProseRule[],
+    // Grants once — a second ask while already carrying one just gets rule 2's text (§12's own instruction).
+    effects: [{ if: { when: { not: { has: PIE_BOX } }, then: [{ move: [PIE_BOX, 'inventory'] }] } }],
   },
 ];
 

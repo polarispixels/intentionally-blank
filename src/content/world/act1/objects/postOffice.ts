@@ -9,11 +9,15 @@ import type { Effect } from '../../../../engine/effects';
 import type { ObjectDefSlice } from '../../../../engine/world';
 import { BREAK, EXAMINE, LOOK_UNDER, OPEN, postLetterText, PRY, PULL, READ, SEARCH, SHAKE, SIT, TAKE, TOUCH, TURN, UNLOCK } from '../verbs';
 import {
+  CLAIM_TICKET,
   CLUE_BLANK_RECTANGLE,
   CLUE_BOX_141,
+  FLAG_OPENED_BOX_141,
   FLAG_RANG_BELL,
   FLAG_SAT_IN_POST_OFFICE,
   FLAG_SAW_BLANK_RECTANGLE,
+  INTACT_POLAROIDS,
+  KEYRING,
   MAIL_DROP,
   MAIL_DROP_FORMS,
   NOTICE_BOARD,
@@ -40,7 +44,33 @@ const boxesExamine =
 const boxesWindowText = 'You go along the wall reading the empty slots. There are nine of them, and eight are dark behind the glass.\n\nThe ninth is 141. Behind its window there is the pale edge of something standing on end, the way mail stands when a box has enough in it to hold it up.';
 const boxesWindowEffects: Effect[] = [{ say: boxesWindowText }, { grantClue: CLUE_BOX_141 }];
 
+/** Wave 5's own rule 2 — unedited, byte for byte (§9.3's own instruction: "the shipped string turns out to have been the instructions"). */
 const boxesOpen = 'The dial turns freely both ways and means nothing without the three letters that go with it. You try the door. It is a small brass door and it is doing its job.';
+
+/**
+ * Wave 5, §9.3 — rule 1, `{ has: KEYRING }`. The tag's three letters are
+ * never printed (§9.2's own discipline, transcribed here too) — this
+ * response pays back `boxesWindowText`'s own "standing on end, the way
+ * mail stands" clause on purpose (that file's own comment, unchanged), the
+ * one deliberate repeated phrase in the wave.
+ */
+const boxesOpenWithKeyText =
+  'You take the tag between finger and thumb, hold it where the lamp can get at it, and turn the dial to the three letters somebody scratched into brass because he did not trust himself to remember them.\n\nThere is no click. The dial does not do anything you can feel. The door simply stops being a door that is shut, and comes a quarter of an inch out of its frame under its own weight.\n\nInside, standing on end the way mail stands: two photographs and a card.';
+
+const boxesOpenEffects: Effect[] = [
+  {
+    say: [
+      { when: { has: KEYRING }, text: boxesOpenWithKeyText },
+      { text: boxesOpen },
+    ],
+  },
+  {
+    if: {
+      when: { has: KEYRING },
+      then: [{ set: [FLAG_OPENED_BOX_141, true] }, { move: [INTACT_POLAROIDS, 'inventory'] }, { move: [CLAIM_TICKET, 'inventory'] }],
+    },
+  },
+];
 
 const boxesForce = "Brass over an oak carcass, set into a wall, with a federal offence attached to it. You could get one open. You would then be a man with no name who has opened a stranger's mail.";
 
@@ -50,13 +80,17 @@ const poBoxes: ObjectDefSlice = {
   location: POST_OFFICE,
   name: 'boxes',
   portable: false,
-  // "window"/"windows"/"glass"/"141"/"one forty one" moved to the sub-part below.
-  nouns: ['box', 'boxes', 'po box', 'pobox', 'brass', 'door', 'doors', 'dial', 'dials', 'mailbox', 'mailboxes', 'pigeonhole', 'pigeonholes', 'number', 'numbers', 'card', 'cards', 'name card', 'slot'],
+  // "window"/"windows"/"glass"/"141"/"one forty one" moved to the sub-part
+  // below. "letters" added (wave 5, §9.3: "DIAL LETTERS" — TURN's own word
+  // list gains "dial", `verbs.ts`; this noun is what "LETTERS" resolves the
+  // dobj to).
+  nouns: ['box', 'boxes', 'po box', 'pobox', 'brass', 'door', 'doors', 'dial', 'dials', 'mailbox', 'mailboxes', 'pigeonhole', 'pigeonholes', 'number', 'numbers', 'card', 'cards', 'name card', 'slot', 'letters'],
   handlers: [
     { verbs: [EXAMINE], effects: [{ say: boxesExamine }] },
     // "look in box" (SEARCH's own word "look in") reaches the clue text via the base object, since "box" stays a base noun.
     { verbs: [SEARCH], effects: boxesWindowEffects },
-    { verbs: [OPEN, TURN, UNLOCK], effects: [{ say: boxesOpen }] },
+    // "OPEN BOX 141"/"OPEN BOX"/"DIAL LETTERS"/"UNLOCK BOX"/"TURN DIAL" (§9.3).
+    { verbs: [OPEN, TURN, UNLOCK], effects: boxesOpenEffects },
     { verbs: [PRY, BREAK, SHAKE], effects: [{ say: boxesForce }] },
     { verbs: [V_COUNT], effects: [{ say: boxesCount }] },
   ],
@@ -67,7 +101,13 @@ const poBoxesWindow: ObjectDefSlice = {
   name: 'window',
   portable: false,
   nouns: ['window', 'windows', 'glass', '141', 'one forty one'],
-  handlers: [{ verbs: [EXAMINE, SEARCH], effects: boxesWindowEffects }],
+  handlers: [
+    { verbs: [EXAMINE, SEARCH], effects: boxesWindowEffects },
+    // "OPEN BOX 141" resolves here ("141" is this sub-part's noun, "box" a
+    // phantom adjective), so the box's own open handler is mirrored — the
+    // v0.9.0 Act I playthrough found it hitting the generic can't-open.
+    { verbs: [OPEN, TURN, UNLOCK], effects: boxesOpenEffects },
+  ],
 };
 
 // ---------------------------------------------------------------------------

@@ -26,6 +26,22 @@ describe('validate — Act I room 1', () => {
     expect(greyWarning!.message).toContain('act1_fedora');
   });
 
+  // Wave 5 (Close-out task): `objects/jacksMotel.ts`'s `keyring` becomes
+  // `portable: true` (§9.1's ruling — TAKE is now gated by `when`, not by
+  // `portable: false`), which newly qualifies it for this same rule: the
+  // Arrowhead Motel's own room description mentions "shed" (the padlock
+  // key's own SHED tag, in the room's ambient prose), and "shed" is also
+  // one of `keyring`'s authored nouns. A second genuine, accepted false
+  // positive, same shape as the grey/FEDORA one above.
+  it('produces the "shed"/KEYRING room-description warning', () => {
+    const warnings = validate(WORLD).filter((f) => f.severity === 'warning');
+    const shedWarning = warnings.find(
+      (f) => f.code === 'room-description-mentions-portable' && f.message.includes('act1_keyring'),
+    );
+    expect(shedWarning).not.toBeUndefined();
+    expect(shedWarning!.message).toContain('"shed"');
+  });
+
   // Front Desk & Lobby task: the description-mentions-portable rule's own
   // warning above is joined by four `verb-noun-collision` warnings, all
   // genuine, all deliberate (see `frontDesk.ts` and `marlow.ts` for the
@@ -90,13 +106,31 @@ describe('validate — Act I room 1', () => {
   // "letter" — `jack_letters`'s own noun (§4.5) is the first object to
   // declare it, colliding with the pre-existing `V_POST_LETTER`'s own
   // "post letter"/"mail letter" words (wave 2, Post Office).
-  it('produces exactly the 24 expected verb-noun-collision warnings, no others', () => {
+  // Wave 5 (Nolan's Yard + Close-out, both concurrent tasks) adds four more.
+  // One is this task's own: `objects/closeOut.ts`'s `work_order` declares
+  // bare "order" among its doc-mandated nouns (§8.3's own noun list), which
+  // is also a token inside the pre-existing bare `act1_eat`'s own phrases
+  // "order food"/"order breakfast" (`checkVocabularyCollisions` checks
+  // every token of a verb's multi-word surface form, not just the whole
+  // phrase). The other three are the concurrent Nolan's Yard task's own:
+  // `act1_eat_pie`/`act1_eat_pill` (Route S's "EAT PIE", §7.2's "EAT PILL")
+  // collide with `pie_box`'s and `pill_bottle`'s own nouns "pie"/"pill";
+  // `act1_help`'s existing word "can" now also collides with
+  // `nolan_bin_lid`'s own noun "can" (§4.1's physical-container sub-part).
+  // This task's own other additions (`act1_assemble`, "dial" on TURN,
+  // `'V dobj prep iobj'` on PRY) add zero further collisions — none of
+  // those is typable bare.
+  it('produces exactly the 28 expected verb-noun-collision warnings, no others', () => {
     const warnings = validate(WORLD).filter((f) => f.severity === 'warning');
     const collisions = warnings.filter((f) => f.code === 'verb-noun-collision');
-    expect(collisions.length).toBe(24);
+    expect(collisions.length).toBe(28);
     expect(collisions.map((f) => f.message).sort()).toEqual(
       [
+        "verb \"act1_eat\" can be typed bare and its word \"order\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act1_eat_pie\" can be typed bare and its word \"pie\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act1_eat_pill\" can be typed bare and its word \"pill\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act1_find_my_name\" can be typed bare and its word \"name\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act1_help\" can be typed bare and its word \"can\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act1_look_for_face\" can be typed bare and its word \"face\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act1_look_out\" can be typed bare and its word \"street\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act1_look_out\" can be typed bare and its word \"window\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
@@ -192,11 +226,12 @@ describe('validate — Act I room 1', () => {
     );
   });
 
-  // RECONCILED (wave-4 Arrowhead Motel task): 1 (grey/FEDORA) + 24
-  // (verb-noun) + 4 (object-noun) = 29 — see the verb-noun test above for
-  // wave 4's own four additions ("name" x3, "letter" x1).
-  it('produces exactly twenty-nine warnings total, no others', () => {
+  // RECONCILED (wave 5, Nolan's Yard + Close-out): 1 (grey/FEDORA) + 1
+  // (shed/KEYRING) + 28 (verb-noun) + 4 (object-noun) = 34 — see the two
+  // room-description tests and the verb-noun test above for what each new
+  // one is and who added it.
+  it('produces exactly thirty-four warnings total, no others', () => {
     const warnings = validate(WORLD).filter((f) => f.severity === 'warning');
-    expect(warnings.length).toBe(29);
+    expect(warnings.length).toBe(34);
   });
 });

@@ -63,6 +63,7 @@
 //    "untie"/"mount"/"buy" added to TAKE).
 
 import type { Effect } from '../../../../engine/effects';
+import type { ProseRule } from '../../../../engine/prose';
 import type { ObjectDefSlice } from '../../../../engine/world';
 import { DIRECTION_VERB_IDS } from '../../../../engine/move';
 import { CLIMB, EXAMINE, OPEN, READ, SEARCH, TAKE } from '../verbs';
@@ -71,6 +72,7 @@ import {
   CLUE_LETTERS_ANSWERED,
   CLUE_ODD_KEY,
   CLUE_POLAROID_FLARE,
+  FLAG_JACK_GAVE_KEYS,
   FLAG_NOTICED_ODD_KEY,
   FLAG_READ_JACK_LETTERS,
   JACK_LETTERS,
@@ -189,6 +191,13 @@ const motelUnit: ObjectDefSlice = {
   // object specifically, rather than falling into the same bare-"door"
   // clarify as plain "OPEN DOOR".
   adjectives: ['screen'],
+  // "table" added (wave 5, §8.1's ruling: "Jack's motel table" needs a
+  // `table` noun in scope for the table-in-scope check `objects/
+  // closeOut.ts` exports — see that file's own header). No object in this
+  // room named the table under the window until now; it joins the unit's
+  // own broad noun list rather than becoming its own sub-part, since no
+  // response text is authored about the table specifically (`unitInteriorText`
+  // already mentions it in passing).
   nouns: [
     'door',
     'screen door',
@@ -197,6 +206,7 @@ const motelUnit: ObjectDefSlice = {
     'four',
     'room',
     'motel',
+    'table',
     'sign',
     'arrowhead',
     'vacancy',
@@ -275,22 +285,50 @@ const polaroidBack: ObjectDefSlice = {
 const keyringExamine =
   "Hanging on a nail by the door, on a split ring, a set of somebody else's keys.\n\nA truck key with the rubber head split. Two house keys cut at different times. A padlock key with a paper tag on it saying SHED, in a hand that is not Jack's.\n\nAnd one more, riding at the back of the ring, that is not shaped like any of them: short, flat, brass, with a number stamped into the bow and a squared bit that has never been near a house door in its life.";
 
-const keyringExamineEffects: Effect[] = [{ say: keyringExamine }, { grantClue: CLUE_ODD_KEY }, { set: [FLAG_NOTICED_ODD_KEY, true] }];
+/**
+ * Wave 5, §9.2 — wave 4 §13's quarantined brass-tag paragraph, placed. The
+ * three letters it names are never printed anywhere in this game (hard
+ * rule 5's own discipline, plus this task's source doc's own repeated
+ * instruction) — see §9.3's box-141 handler (`objects/postOffice.ts`) for
+ * where they matter and are still never spelled out.
+ */
+const keyringTagParagraph =
+  'And, riding at the back of the ring where a fob goes, a flat brass tag worn almost smooth. Three letters have been scratched into one face of it, by hand, hard, by somebody who did not want to be relying on remembering them.';
+
+// Main-session edit at the Act I playthrough: in the player's hand the ring is not hanging on a nail — the opening clause is dropped, nothing added (wave 5 §9.2 says "same text"; a trim, not new prose).
+const keyringExamineWithTag = `${keyringExamine.replace(/^Hanging on a nail by the door, on a split ring/, 'On a split ring')}\n\n${keyringTagParagraph}`;
+
+/** Rule 2 is `keyringExamine`, byte for byte, unchanged (§9.2's own instruction). */
+const keyringExamineText: ProseRule[] = [
+  { when: { has: KEYRING }, text: keyringExamineWithTag },
+  { text: keyringExamine },
+];
+
+const keyringExamineEffects: Effect[] = [{ say: keyringExamineText }, { grantClue: CLUE_ODD_KEY }, { set: [FLAG_NOTICED_ODD_KEY, true] }];
 
 const keyringTakeText =
   '"Leave those," Jack says, and there is nothing sharp in it. "They\'re his."\n\nHe puts a hand up and does not do anything with it. "He left his spares with me when he took the place on the county road. You give your brother your spares and then he\'s got a reason to come round."';
 
 const keyring: ObjectDefSlice = {
-  // Trust-gated, not locked — §14's own wiring summary: "TAKE is refused in
-  // prose — do not make it portable."
+  // Wave 5, §9.1's ruling: `portable: true` now (was trust-gated-not-
+  // locked, §14's old wiring summary) — the gate moves onto the TAKE
+  // handler's own `when` below. While `FLAG_JACK_GAVE_KEYS` is false the
+  // handler matches and the shipped refusal renders, same as before; once
+  // Jack hands them over the handler's `when` fails, `findHandler`
+  // (`engine/actions.ts`) finds no other TAKE handler on this object, and
+  // the built-in TAKE runs for real (`portable: true` lets it succeed) —
+  // see this task's report for why this reads `HandlerDef.when`/
+  // `findHandler` correctly rather than needing a `Cond`-typed `portable`.
   location: JACKS_MOTEL,
   name: 'keyring',
-  portable: false,
+  portable: true,
   nouns: ['keys', 'key', 'keyring', 'key ring', 'ring', 'keychain', 'fob', 'spare', 'spares', 'nail', 'hook', 'shed', 'tag'],
   handlers: [
     { verbs: [EXAMINE], effects: keyringExamineEffects },
-    // "take keys"/"ask for keys"/"borrow keys" (§4.4) share one refusal.
-    { verbs: [TAKE, V_ORDER], effects: [{ say: keyringTakeText }] },
+    // "take keys"/"ask for keys"/"borrow keys" (§4.4) share one refusal —
+    // gated (wave 5, §9.1) so it stops matching once Jack has handed them
+    // over.
+    { verbs: [TAKE, V_ORDER], when: { not: { flag: FLAG_JACK_GAVE_KEYS } }, effects: [{ say: keyringTakeText }] },
   ],
 };
 

@@ -188,7 +188,11 @@ const catalogueTerminal: ObjectDefSlice = {
   location: COUNTY_LIBRARY,
   name: 'catalogue terminal',
   portable: false,
-  nouns: ['terminal', 'computer', 'monitor', 'keyboard', 'keys', 'mouse', 'mat', 'catalogue terminal', 'county catalogue', 'database', 'system', 'box'],
+  // "table" added (wave 5, §8.1's ruling: "the library's reading table" —
+  // the room's own description says "On a table, a terminal, awake"
+  // (`countyLibrary.ts`) and no object here answered to `table` until now;
+  // needed for the table-in-scope check `objects/closeOut.ts` exports).
+  nouns: ['terminal', 'computer', 'monitor', 'keyboard', 'keys', 'mouse', 'mat', 'catalogue terminal', 'county catalogue', 'database', 'system', 'box', 'table'],
   handlers: [
     { verbs: [EXAMINE], effects: [{ say: terminalExamine }] },
     { verbs: [SEARCH, USE_VERB_ID], effects: typeReclamationEffects },

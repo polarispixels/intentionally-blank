@@ -2,8 +2,7 @@
 // drawer" per the doc — reuses `drawer.ts`'s own text/effects rather than
 // duplicating them.
 
-import { CLUE_DRAWER_HELD } from '../ids';
-import { DRAWER_KICK_TEXT, DRAWER_PRY_TEXT, DRAWER_SHAKE_TEXT, DRAWER_STUCK_TEXT } from './drawer';
+import { DRAWER_KICK_TEXT, DRAWER_SHAKE_TEXT, DRAWER_STUCK_TEXT, pryHandler } from './drawer';
 import type { ObjectDefSlice } from '../../../../engine/world';
 import { DESK, YOUR_ROOM } from '../ids';
 import { CLIMB, EXAMINE, KICK, LOOK_BEHIND, LOOK_UNDER, MOVE, OPEN, PRY, PULL, PUSH, SEARCH, SHAKE, SIT } from '../verbs';
@@ -63,7 +62,10 @@ const desk: ObjectDefSlice = {
       ],
     },
     { verbs: [OPEN], effects: [{ say: DRAWER_STUCK_TEXT }] },
-    { verbs: [PRY], effects: [{ say: DRAWER_PRY_TEXT }, { grantClue: CLUE_DRAWER_HELD }] },
+    // Wave 5, §10.2's own wiring note: "same in objects/desk.ts, which
+    // routes to it" — shares `drawer.ts`'s exact PRY handler (rule 2 is the
+    // shipped `DRAWER_PRY_TEXT`, unedited) rather than duplicating it.
+    { verbs: [PRY], effects: pryHandler },
     { verbs: [SHAKE], effects: [{ say: DRAWER_SHAKE_TEXT }] },
     { verbs: [KICK], effects: [{ say: DRAWER_KICK_TEXT }] },
   ],

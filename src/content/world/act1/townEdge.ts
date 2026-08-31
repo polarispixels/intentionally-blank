@@ -21,14 +21,14 @@
 import type { ExitDefSlice, HandlerDef, RoomDefSlice } from '../../../engine/world';
 import type { ProseRule } from '../../../engine/prose';
 import { HELLO, LISTEN, SMELL, WAIT, YELL } from './verbs';
-import { FLAG_VISITED_TOWN_EDGE, MAIN_STREET, TOWN_EDGE, TOWN_EDGE_BOUNDARY_GATE, TOWN_EDGE_NO_EXIT_GATE, V_LOOK_UP } from './ids';
+import { CLAIM_TICKET, FLAG_VISITED_TOWN_EDGE, MAIN_STREET, NOLANS_YARD, TOWN_EDGE, TOWN_EDGE_BOUNDARY_GATE, TOWN_EDGE_NO_EXIT_GATE, V_LOOK_UP } from './ids';
 
 // ---------------------------------------------------------------------------
-// §12.1 — description
+// §12.1 — description (§13.1/§13.2 amend both rules, wave 5)
 // ---------------------------------------------------------------------------
 
 const FIRST_SIGHT = [
-  'The street gives up here. The last building on the east side is a shed with a padlock on it. There is no last building on the west. After them the kerb stops being a kerb and the road goes on north as a paler stripe in the dark.',
+  'The street gives up here. The last building on the east side is a shed with a padlock on it, and behind the shed there is a fence, and behind the fence a house with a yard round it and no lights in any of it. There is no last building on the west. After them the kerb stops being a kerb and the road goes on north as a paler stripe in the dark.',
   'There is a rail fence and a paddock with no horses in it, and a trough with ice on the trough. There is a sign facing the other way, for people arriving.',
   'And there is the billboard, on two legs in the dirt, close enough now that you are standing in what it thinks of as its audience.',
   'North of all of it, the glow. From here it is not a glow. It is a great many separate lights, low and far and arranged, with one red one high up on something you cannot see, going on and off very slowly.',
@@ -36,7 +36,7 @@ const FIRST_SIGHT = [
 ].join('\n\n');
 
 const RETURN_VISIT =
-  'The end of the pavement, the paddock rail, the sign facing away, the billboard. North, the lights. The street behind you goes back to where the buildings are.';
+  'The end of the pavement, the paddock rail, the sign facing away, the billboard. East, past the shed, a fence and a dark house. North, the lights. The street behind you goes back to where the buildings are.';
 
 const description: ProseRule[] = [
   { when: { not: { flag: FLAG_VISITED_TOWN_EDGE } }, text: FIRST_SIGHT },
@@ -82,12 +82,29 @@ const onEnter: RoomDefSlice['onEnter'] = [{ effects: [{ set: [FLAG_VISITED_TOWN_
 export const TOWN_EDGE_BOUNDARY_NORTH_TEXT =
   'END OF BUILD\n\nNorth is the county road, thirty-two miles of it, and what the lights are. None of it is in this version.';
 
+/**
+ * §13.4's rule 1 (wave 5) — the in-world redirect once the player holds the
+ * claim ticket (granted by the concurrent Close-out task's own §9.5). Rule
+ * 2 is `TOWN_EDGE_BOUNDARY_NORTH_TEXT`, unedited.
+ */
+const NORTH_REDIRECT_WITH_TICKET_TEXT =
+  'Thirty-two miles of it, in the dark, on a county road, with a card in your pocket that says HOLD FOR PICKUP and no hour of the day printed on it anywhere.\n\nThe truck is in the motel lot, and the man who owns it has asked you twice where.';
+
+const northBlockedText: ProseRule[] = [
+  { when: { has: CLAIM_TICKET }, text: NORTH_REDIRECT_WITH_TICKET_TEXT },
+  { text: TOWN_EDGE_BOUNDARY_NORTH_TEXT },
+];
+
 const travelTextOut = 'You walk back in among the buildings and the wind stops being a fact about you.';
 
-// §14's "every other direction — in-world, not the build boundary."
+/** §13.3 (wave 5) — Town Edge → Nolan's Yard, east of the street. */
+const travelTextToYard = 'Past the shed, along a fence with nothing on the other side of it for a while, and then there is a gate and a kerb and somebody\'s frontage.';
+
+// §14's "every other direction — in-world, not the build boundary." 'e' is
+// removed (wave 5, §13.3) — it is now a real exit, below.
 const noOtherExitText = 'There is no road that way, and no reason to be the first man out there tonight.';
 
-const otherDirections: ExitDefSlice[] = (['e', 'w', 'ne', 'nw', 'se', 'sw', 'up', 'down'] as const).map((dir) => ({
+const otherDirections: ExitDefSlice[] = (['w', 'ne', 'nw', 'se', 'sw', 'up', 'down'] as const).map((dir) => ({
   dir,
   to: TOWN_EDGE,
   door: TOWN_EDGE_NO_EXIT_GATE,
@@ -122,7 +139,9 @@ export const townEdgeRoom: RoomDefSlice = {
     { dir: 's', to: MAIN_STREET, travelText: travelTextOut },
     { dir: 'out', to: MAIN_STREET, travelText: travelTextOut },
     { dir: 'in', to: MAIN_STREET, travelText: travelTextOut },
-    { dir: 'n', to: TOWN_EDGE, door: TOWN_EDGE_BOUNDARY_GATE, blockedText: TOWN_EDGE_BOUNDARY_NORTH_TEXT },
+    { dir: 'n', to: TOWN_EDGE, door: TOWN_EDGE_BOUNDARY_GATE, blockedText: northBlockedText },
+    // §13.3 (wave 5) — the real east exit, Nolan's Yard.
+    { dir: 'e', to: NOLANS_YARD, travelText: travelTextToYard },
     ...otherDirections,
   ],
   handlers: roomHandlers,

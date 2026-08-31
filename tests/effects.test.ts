@@ -313,6 +313,17 @@ describe('apply(): grantMemory / grantClue', () => {
 });
 
 describe('apply(): openQuestion / answerQuestion', () => {
+  it('openQuestion is idempotent: a second open (or an open after answered) changes nothing and emits no event', () => {
+    const once = apply(FIXTURE_WORLD, baseState(), [{ openQuestion: QUESTION_1 }]);
+    const twice = apply(FIXTURE_WORLD, once.state, [{ openQuestion: QUESTION_1 }]);
+    expect(twice.events).toEqual([]);
+    expect(twice.state).toBe(once.state);
+    const answered = apply(FIXTURE_WORLD, twice.state, [{ answerQuestion: QUESTION_1 }]);
+    const reopened = apply(FIXTURE_WORLD, answered.state, [{ openQuestion: QUESTION_1 }]);
+    expect(reopened.events).toEqual([]);
+    expect(reopened.state.questions[QUESTION_1]).toBe('answered');
+  });
+
   it('opens a question and emits its text', () => {
     const result = apply(FIXTURE_WORLD, baseState(), [{ openQuestion: QUESTION_1 }]);
     expect(result.state.questions[QUESTION_1]).toBe('open');

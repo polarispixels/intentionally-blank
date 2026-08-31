@@ -46,13 +46,16 @@ import type { Effect } from '../../../engine/effects';
 import type { NpcDefSlice, ShowResponseDef, TopicDef } from '../../../engine/world';
 import type { ProseRule } from '../../../engine/prose';
 import {
+  CLUE_CUSTODIAN_SEEN,
   CLUE_HOUSE_EMPTY,
   CLUE_NO_NAME_RECALLED,
+  CLUE_PAID_IN_CASH,
   CLUE_VISITOR_UNREMARKABLE,
   FEDORA,
   FLAG_MARLOW_KNOWS_YOU_KNOW,
   FLAG_MARLOW_PRESSED,
   FLAG_MARLOW_TOLD_ABOUT_ROOM,
+  FLAG_MET_JACK,
   FLAG_MET_MARLOW,
   FLAG_REGISTER_GAP_SEEN,
   FLAG_REGISTER_IMPRESSION_FOUND,
@@ -63,6 +66,7 @@ import {
   ROOM_KEY,
   MARLOW,
 } from './ids';
+import type { Cond } from '../../../engine/cond';
 
 // ---------------------------------------------------------------------------
 // §5.2 — unknownTopic, most load-bearing string in the room. Order matters
@@ -145,6 +149,15 @@ const TOPIC_TIME = T('act1_marlow_topic_time');
 const visitorRule1Effects: Effect[] = [{ grantClue: CLUE_VISITOR_UNREMARKABLE }, { set: [FLAG_MARLOW_PRESSED, true] }];
 const registerRule1Effects: Effect[] = [{ set: [FLAG_MARLOW_KNOWS_YOU_KNOW, true] }];
 
+/**
+ * Wave 5, §11 — P4's small completion. New rule 1, prepended above the two
+ * shipped rules (unedited). Sets `clue_custodian_seen`.
+ */
+const custodianSeenCond: Cond = { all: [{ flag: FLAG_REGISTER_IMPRESSION_FOUND }, { any: [{ clue: CLUE_PAID_IN_CASH }, { flag: FLAG_MET_JACK }] }] };
+
+const custodianSeenText =
+  'This time he gets further, because you have stopped asking what the man looked like and started asking what he did.\n\n"Coveralls. Grey ones, the clean kind." His hands go flat on the counter. "He took nothing. He never raised his voice. He wiped his feet on the way in."\n\nThen: "And that\'s the whole of what stays. Three weeks I\'ve been at it and it comes out the same every time. A maintenance fella, and nothing else stays."';
+
 const topics: TopicDef[] = [
   {
     id: TOPIC_NAME,
@@ -163,6 +176,10 @@ const topics: TopicDef[] = [
     words: ['man', 'visitor', 'caller', 'anyone', 'who came up', 'stairs', 'guest', 'stranger', 'last night'],
     response: [
       {
+        when: custodianSeenCond,
+        text: custodianSeenText,
+      },
+      {
         when: { flag: FLAG_REGISTER_IMPRESSION_FOUND },
         text: 'He looks at the book for longer than he looks at you.\n\n"There was a fella came in for the top floor. Late. Said he was here to see to something." He stops. "That\'s what I\'ve got."\n\nAsk what the man looked like and he starts three times and gets nowhere. The not getting anywhere is plainly worse for him than the question.',
       },
@@ -170,7 +187,10 @@ const topics: TopicDef[] = [
         text: '"Not while I was at the desk." He says it evenly and completely, like a man handing over exact change.\n\nYou wait. He lets you.',
       },
     ] satisfies ProseRule[],
-    effects: [{ if: { when: { flag: FLAG_REGISTER_IMPRESSION_FOUND }, then: visitorRule1Effects } }],
+    effects: [
+      { if: { when: { flag: FLAG_REGISTER_IMPRESSION_FOUND }, then: visitorRule1Effects } },
+      { if: { when: custodianSeenCond, then: [{ grantClue: CLUE_CUSTODIAN_SEEN }] } },
+    ],
   },
   {
     id: TOPIC_REGISTER,

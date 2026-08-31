@@ -12,6 +12,67 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.9.0] - 2026-08-31
+
+**Act I is complete.** Twelve rooms, four characters, P1–P8, R1–R3, and a
+clean-save playthrough from "Darkness." to the truck door
+(`tests/fixtures/playthrough-act1.txt`, 128 commands, replayed by
+`tests/world-act1-complete.test.ts` on every run).
+
+### Added
+
+- **Nolan's Yard and the trash** (Act I wave 5, `narrative-writer`,
+  `docs/superpowers/specs/2026-09-06-act1-wave5-close-out-prose.md`).
+  East of Town Edge, behind the padlocked shed: a bin at the kerb, a dog
+  that likes everybody, a porch light that comes on *at* you. P6 has three
+  routes and no walking dead — feed the dog a slice of Pearl's pie, have
+  Jack idle the truck round the front, or wait out the false alarm — and
+  the auto-sift yields the Wall Drug cup, Nolan's prescription, the
+  shredded work order and a rent notice for box 141 addressed to *J.*
+  care of Nolan's house, marked *returned — not known here* in his hand.
+
+- **The close-out chain.** The chair in Your Room has a loose leg and the
+  leg pries the drawer: a cash envelope (no figure) and the Arrowhead's
+  matchbook. The strips go back together on any table into `S6 ACCESS
+  REVOKED — J.`; shown the form, Jack hands over Jules's keys (*"They're
+  his. Take them."*), and the brass tag on the ring opens box 141: two
+  intact Polaroids — the same porch with nobody burned out of it — and a
+  Wall Drug claim ticket. Marlow, pressed, finally gives the Custodian's
+  description. Two questions open in the questions view and neither is
+  answered. With the ticket held, `ASK JACK ABOUT WALL DRUG` ends the act:
+  *"Get in."*, then `ACT I ENDS HERE`.
+
+### Changed
+
+- **Parser: `ASK <someone> FOR <thing>`** parses as asking about it
+  (`ask pearl for pie` was a miss).
+- **Parser: a noun miss names only the failing slot.** `show ticket to
+  jack` without the ticket answered *"The motel is not here"* — the npc
+  word matched Main Street's motel-sign scenery.
+- **Questions are idempotent**: re-opening an open question announces
+  nothing (examining the claim ticket twice printed "question opened"
+  twice).
+- `OPEN BOX 141` reaches the box (the window sub-part that owns "141" now
+  mirrors the open handler; the rent notice no longer claims "141").
+- The keyring's in-hand examine drops "Hanging on a nail by the door" — a
+  trim, not new prose.
+
+### Decisions (main session, full-game build protocol)
+
+- Register entries **38–46** and entry 36 amended: the yard is east of Town
+  Edge; trash night is tonight, once; the chair leg opens the drawer;
+  NOLAN, R.; the rent notice stays unexplained until Stage D; Jules's face
+  is described once, as a stranger's; the act ends on a system line after
+  Jack's response, not a second boundary gate; Jack never leaves the motel;
+  **tier ceilings are furniture-only** — puzzle machinery is priced
+  separately.
+- The wave shipped whole (+50% on a budget that did not price a three-route
+  puzzle); `SUMATRIPHAN` corrected to the real drug.
+- The Stage D plan is drafted (`docs/superpowers/specs/2026-09-07-stage-d-plan.md`)
+  and reviewed; its rulings land with D0.
+
+1046 tests (from 996).
+
 ## [0.8.0] - 2026-08-30
 
 ### Added

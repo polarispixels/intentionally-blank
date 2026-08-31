@@ -38,6 +38,7 @@ import {
   FLAG_SAW_GRADED_STRIP,
   FLAG_VISITED_TOWN_EDGE,
   MAIN_STREET,
+  NOLANS_YARD,
   TOWN_EDGE,
 } from '../src/content/world/act1/ids';
 
@@ -309,13 +310,22 @@ describe('Town Edge — a real playthrough, teleported in (§12-§14)', () => {
     }
   });
 
-  it('every other direction (east/west/ne/nw/se/sw/up/down) is in-world, not the build boundary', () => {
-    for (const input of ['east', 'west', 'northeast', 'northwest', 'southeast', 'southwest', 'up', 'down']) {
+  // 'east' is no longer in this list — wave 5 (§13.3) makes it a real exit
+  // to Nolan's Yard; see the dedicated test below.
+  it('every other direction (west/ne/nw/se/sw/up/down) is in-world, not the build boundary', () => {
+    for (const input of ['west', 'northeast', 'northwest', 'southeast', 'southwest', 'up', 'down']) {
       const { state: after, text } = feed(fresh(), input);
       expect(after.location).toBe(TOWN_EDGE);
       expect(text).toContain('There is no road that way, and no reason to be the first man out there tonight.');
       expect(text).not.toContain('END OF BUILD');
     }
+  });
+
+  // Wave 5 (§13.3) — 'east' is now Nolan's Yard, not the no-exit gate.
+  it('EAST now travels to Nolan\'s Yard with the exit\'s own travelText', () => {
+    const { state: after, text } = feed(fresh(), 'east');
+    expect(after.location).toBe(NOLANS_YARD);
+    expect(text).toContain('Past the shed, along a fence with nothing on the other side of it for a while');
   });
 
   it('produces no unexpected diagnostics across the whole scripted walk', () => {

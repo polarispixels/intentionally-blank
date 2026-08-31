@@ -210,6 +210,11 @@ function applyOne(world: WorldDef, state: GameState, effect: Effect, ctx: Effect
     const status: 'open' | 'answered' = 'openQuestion' in effect ? 'open' : 'answered';
     const def = world.questions?.[id];
     if (def === undefined) throw new Error(`effects.apply: question "${id}" is not declared in world.questions`);
+    // Idempotent (v0.9.0): re-opening an open or answered question, or
+    // re-answering an answered one, changes nothing and announces nothing —
+    // examining the claim ticket twice used to print "question opened" twice.
+    const current = state.questions[id];
+    if (current === status || (status === 'open' && current === 'answered')) return { state, events: [] };
     return {
       state: { ...state, questions: { ...state.questions, [id]: status } },
       events: [{ type: 'question', id, status, text: def.text }],

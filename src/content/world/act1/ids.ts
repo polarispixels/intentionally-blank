@@ -857,3 +857,143 @@ export const MEM_M3_DIRECT = M('act1_mem_m3_direct');
 // — see `verbs.ts`'s own comment on the consequence for Pearl, and this
 // task's report.
 export const V_HUG = V('act1_hug');
+
+// ---------------------------------------------------------------------------
+// Nolan's Yard (wave 5) —
+// `docs/superpowers/specs/2026-09-06-act1-wave5-close-out-prose.md` PART ONE
+// (§2-§7). Zone 1 room 13, east of Town Edge. P6 — the trash puzzle — lives
+// here; its yield (§5.5) grants the four portable items declared below.
+// ---------------------------------------------------------------------------
+
+export const NOLANS_YARD = R('act1_nolans_yard');
+
+// --- Objects — the six §4 names, plus one sub-part the "which noun word
+// resolved" gap (this file's own header on `FEDORA_BAND`/`DOOR_BOLT`/etc.)
+// requires: §4.1's own EXAMINE prose ("Lid on, handles to the road...") and
+// §5's gate (SEARCH/EXAMINE/OPEN, routing to the yield or the soft fail) are
+// both authored onto the SAME verb (EXAMINE) for the SAME parent object —
+// one handler cannot tell which noun word resolved, so the physical-
+// container reading (can/trashcan/dustbin/lid/kerb) moves to its own
+// sub-part and EXAMINE/SEARCH/OPEN on the parent's own "bin"/"trash"/
+// "garbage"/"rubbish"/"refuse" nouns is uniformly the gate (main-session
+// ruling; see this task's report). Plus the always-closed "every other
+// direction" gate (mirrors `TOWN_EDGE_NO_EXIT_GATE`). ---
+
+export const NOLAN_BIN = O('act1_nolan_bin');
+/** Sub-part — see this block's own header comment: "can"/"trashcan"/"dustbin"/"lid"/"kerb"/"curb" carry §4.1's own physical-container EXAMINE text, distinct from the parent's gate-routed EXAMINE. */
+export const NOLAN_BIN_LID = O('act1_nolan_bin_lid');
+export const NOLAN_DOG = O('act1_nolan_dog');
+export const NOLAN_HOUSE = O('act1_nolan_house');
+export const PORCH_LIGHT = O('act1_porch_light');
+export const YARD_GATE = O('act1_yard_gate');
+export const YARD_ALLEY = O('act1_yard_alley');
+
+/** §6's "every other direction — in-world, not the build boundary" gate. */
+export const NOLANS_YARD_NO_EXIT_GATE = O('act1_nolans_yard_no_exit_gate');
+
+// --- The four yield items (§7) — all `portable: true`, all start
+// `location: 'nowhere'`, granted into inventory by the yield (§5.5). ---
+
+export const WALL_DRUG_CUP = O('act1_wall_drug_cup');
+export const PILL_BOTTLE = O('act1_pill_bottle');
+export const SHREDDED_STRIPS = O('act1_shredded_strips');
+export const PO_BOX_SLIP = O('act1_po_box_slip');
+
+/** §5.3/§12.3 — Pearl's pie to go. Granted by `pearl.ts`'s own `topic_pie_to_go` (the other builder's module, which imports this id from here per the main-session brief); this builder owns the id and the object itself (examine, GIVE/FEED-to-dog, EAT). Starts `location: 'nowhere'`. RECONCILED (this task's report): the concurrent Close-out task's own module briefly declared a fallback copy of this same id under its own "Close-out (wave 5)" heading (its own brief carried the identical "declare it if it isn't there yet" instruction); that copy has since been removed in favor of this one, once both edits were on disk together. */
+export const PIE_BOX = O('act1_pie_box');
+
+// --- Flags (§2's table — nine total). ---
+
+export const FLAG_VISITED_NOLANS_YARD = F('act1_visited_nolans_yard');
+export const FLAG_SAW_FOOTPRINTS = F('act1_saw_footprints');
+export const FLAG_ALARM_RAISED = F('act1_alarm_raised');
+/** Numeric (default 0) — turns elapsed since the alarm was raised; see this task's report for why its incrementing `EventDef`'s own `when` differs from the main-session ruling's literal text. */
+export const FLAG_ALARM_TURNS = F('act1_alarm_turns');
+export const FLAG_PORCH_LIGHT_ON = F('act1_porch_light_on');
+export const FLAG_DOG_SETTLED = F('act1_dog_settled');
+export const FLAG_DOG_FED = F('act1_dog_fed');
+/** Set by Jack's own `topic_trash` (`jack.ts`, the other builder's module) — this builder owns the flag id and the silent-clear `EventDef` (§5.4's wiring note). Same reconciliation note as `PIE_BOX`, above. */
+export const FLAG_JACK_COVERING = F('act1_jack_covering');
+export const FLAG_SEARCHED_TRASH = F('act1_searched_trash');
+
+// --- Clues (§2's table — three of the yard's own eight). ---
+
+export const CLUE_NOLAN_TRASH = C('act1_clue_nolan_trash');
+export const CLUE_J_BOX_141 = C('act1_clue_j_box_141');
+export const CLUE_NOLAN_HEADACHES = C('act1_clue_nolan_headaches');
+
+// --- Events (§5.2, §18 item 1) — `world.events` ids. Declared as plain
+// exported strings (`EventDef.id` is `string`, not a branded id type). ---
+
+export const EVENT_YARD_LIGHT_OFF = 'act1_yard_light_off';
+export const EVENT_YARD_DOG_SETTLES = 'act1_yard_dog_settles';
+export const EVENT_YARD_ALARM_TURNS_INC = 'act1_yard_alarm_turns_inc';
+/** Main-session ruling 3 — clears `jack_covering` silently the first turn the player is not in the yard. */
+export const EVENT_YARD_JACK_COVERING_CLEARS = 'act1_yard_jack_covering_clears';
+
+/**
+ * §5.3's bare "EAT PIE" — a fixed, self-contained phrase (same idiom as
+ * `V_CHECK_DATE`/`V_POST_LETTER`/`V_MEASURE`: no natural object to hang a
+ * dobj-based handler on). NOT wired as a dobj form of the existing `V_EAT`
+ * (Sundown Diner, bare-only): widening that verb to `'V dobj'` would make
+ * "EAT <anything>" anywhere in the game with no handler of its own fall to
+ * `V_EAT`'s diner-specific `default` ("eggs, hash, toast...") — a real
+ * cross-room content regression, not just an unwired edge — so this is a
+ * new, disjoint word ("eat pie", two tokens, never colliding with `V_EAT`'s
+ * own bare "eat") instead. See this task's report.
+ */
+export const V_EAT_PIE = V('act1_eat_pie');
+/** §7.2's "EAT PILL" — same idiom and same reasoning as `V_EAT_PIE`, above (the word "eat" is otherwise exclusively `V_EAT`'s bare word). `OPEN BOTTLE`/`TAKE PILL` reach the identical text via `pill_bottle`'s own OPEN/TAKE handlers (`objects/nolansYard.ts`) instead, since those verbs already take a dobj. */
+export const V_EAT_PILL = V('act1_eat_pill');
+
+// ---------------------------------------------------------------------------
+// Act I Wave 5 — Nolan's Yard, and the Close-Out
+// (`docs/superpowers/specs/2026-09-06-act1-wave5-close-out-prose.md`). Two
+// concurrent builders share this wave: the other owns Nolan's Yard itself
+// (room 13), its objects, the four trash items, `pie_box`/`PIE_BOX`, and
+// Town Edge's amendments. This task (Close-out) owns P7 (the shredded work
+// order), P8 (the keys/tag/box), P2 (the chair/leg/drawer/envelope/
+// matchbook), the Marlow/Pearl amendments, and the Act I boundary.
+//
+// Close-out (wave 5) — objects, flags, clues, questions, one verb.
+// ---------------------------------------------------------------------------
+
+// --- §8's work order (P7), §9's box contents (P8). ---
+export const WORK_ORDER = O('act1_work_order');
+export const INTACT_POLAROIDS = O('act1_intact_polaroids');
+export const CLAIM_TICKET = O('act1_claim_ticket');
+
+// --- §10's chair/leg/drawer contents (P2). ---
+export const ROOM_CHAIR = O('act1_room_chair');
+/** No examine authored (§18's wiring table: "it is a chair leg and the taking response describes it"). */
+export const CHAIR_LEG = O('act1_chair_leg');
+export const CASH_ENVELOPE = O('act1_cash_envelope');
+export const MATCHBOOK = O('act1_matchbook');
+
+// `PIE_BOX` and `FLAG_JACK_COVERING` are the other builder's own ids
+// (Nolan's Yard, above) — this task imports them from there rather than
+// re-declaring a fallback, since the yard's own block already landed by the
+// time this task's edits reached this file.
+
+// --- Flags (this task's own five; the yard's own belong to the concurrent
+// Nolan's Yard task). ---
+export const FLAG_ASSEMBLED_STRIPS = F('act1_assembled_strips');
+export const FLAG_JACK_GAVE_KEYS = F('act1_jack_gave_keys');
+export const FLAG_OPENED_BOX_141 = F('act1_opened_box_141');
+export const FLAG_DRAWER_OPEN = F('act1_drawer_open');
+export const FLAG_OFFERED_THE_RIDE = F('act1_offered_the_ride');
+
+// --- Clues (this task's own five; the yard's own belong to the concurrent
+// Nolan's Yard task). ---
+export const CLUE_S6_REVOKED = C('act1_clue_s6_revoked');
+export const CLUE_INTACT_POLAROIDS = C('act1_clue_intact_polaroids');
+export const CLUE_CLAIM_TICKET = C('act1_clue_claim_ticket');
+export const CLUE_PAID_IN_CASH = C('act1_clue_paid_in_cash');
+export const CLUE_CUSTODIAN_SEEN = C('act1_clue_custodian_seen');
+
+// --- Questions (§16.3 — the Act I boundary's two open hand-offs). ---
+export const QUESTION_NOTEBOOK = Q('act1_q_notebook');
+export const QUESTION_WALL_DRUG = Q('act1_q_wall_drug');
+
+// --- New verb (§8.1's ruling: ASSEMBLE STRIPS). ---
+export const V_ASSEMBLE = V('act1_assemble');

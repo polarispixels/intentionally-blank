@@ -65,16 +65,22 @@ import { T } from '../../../engine/ids';
 import type { Effect } from '../../../engine/effects';
 import type { NpcDefSlice, ShowResponseDef, TopicDef } from '../../../engine/world';
 import type { ProseRule } from '../../../engine/prose';
+import { END_OF_BUILD_SCRIPT } from './scripts';
 import {
+  CLAIM_TICKET,
   CLUE_JULES,
   CLUE_TATTOO_GAP,
   FEDORA,
   FLAG_HEARD_NOLAN_NAME,
+  FLAG_JACK_COVERING,
+  FLAG_JACK_GAVE_KEYS,
   FLAG_JACK_SAW_PAGE,
+  FLAG_OFFERED_THE_RIDE,
   FLAG_SAW_JACK_TATTOO,
   FLAG_TOLD_JACK_ABOUT_ROOM,
   JACK,
   JACKS_MOTEL,
+  KEYRING,
   MEM_M1_HIRING,
   MEM_M3_ANALYTICAL,
   MEM_M3_DIRECT,
@@ -86,6 +92,7 @@ import {
   V_FOLLOW,
   V_HUG,
   V_KISS,
+  WORK_ORDER,
 } from './ids';
 
 // ---------------------------------------------------------------------------
@@ -157,6 +164,10 @@ const TOPIC_NOLAN = T('act1_jack_topic_nolan');
 const TOPIC_PEARL = T('act1_jack_topic_pearl');
 const TOPIC_HEAD = T('act1_jack_topic_head');
 const TOPIC_DAD = T('act1_jack_topic_dad');
+// Wave 5 — the close-out's own three additions (§9.1, §5.4, §16.1).
+const TOPIC_S6 = T('act1_jack_topic_s6');
+const TOPIC_TRASH = T('act1_jack_topic_trash');
+const TOPIC_WALL_DRUG = T('act1_jack_topic_wall_drug');
 
 const jobResponse: ProseRule[] = [
   {
@@ -184,7 +195,91 @@ const tattooResponse: ProseRule[] = [
 
 const tattooEffects = [{ set: [FLAG_SAW_JACK_TATTOO, true] as [typeof FLAG_SAW_JACK_TATTOO, true] }, { grantClue: CLUE_TATTOO_GAP }];
 
+// ---------------------------------------------------------------------------
+// Wave 5 — the close-out's own three additions (`docs/superpowers/specs/
+// 2026-09-06-act1-wave5-close-out-prose.md` §9.1, §5.4, §16.1). Prose
+// transcribed exactly (hard rule 5).
+// ---------------------------------------------------------------------------
+
+/** §9.1 — SHOW WORK ORDER TO JACK / topic_s6, once the player holds it. Sets `jack_gave_keys`; hands over the keyring. */
+const jackHandsOverKeysText =
+  'He reads it twice, and then puts a finger on the first line and reads that on its own.\n\n"Six." He looks up. "He said six to me once. On the telephone. I thought he meant a floor — I said, what, upstairs? — and he laughed and let me carry on thinking it." Nothing moves on his face at all. "That\'s the whole of what I have about six, and I\'ve had five weeks to work on it."\n\nThen he gets up, lifts the ring off its nail, and puts it in your hand.\n\n"They\'re his. Take them. If they open something, open it."';
+
+const jackHandsOverKeysEffects: Effect[] = [{ set: [FLAG_JACK_GAVE_KEYS, true] }, { move: [KEYRING, 'inventory'] }];
+
+/** §5.4 — Route C: Jack idles the truck round at Nolan's, covering for the player's search of the trash. */
+const jackTrashText =
+  '"His bin." Jack gets there a sentence ahead of you and does not look pleased about how fast he got there. "Contractor comes for it in the morning. It\'ll be at the kerb by now."\n\nHe has the keys off the table before he has finished saying it. "I\'ll take the truck round to his front and sit there with it running. Tell him I\'ve come about my brother again. He\'ll come out on that porch and be sorry at me, and he is very good at that, and it takes a while."\n\nAt the door: "Don\'t be anywhere near me when I stop."';
+
+/** §16.1 — ASK JACK ABOUT WALL DRUG / SHOW TICKET TO JACK, once the player holds the claim ticket. Sets `offered_the_ride`; fires the one-time END OF BUILD line. */
+const jackWallDrugText =
+  'He takes it, holds it out at arm\'s length, and reads all four words of it.\n\n"Wall Drug." He says it the way you say a place you have driven past nine hundred times. "He put something in at Wall Drug, and he kept the stub, and the stub was in a box only he could open."\n\nHe puts it back in your hand and goes and finds his boots.\n\n"Thirty-two miles. An hour, the way I drive it, and tonight I am going to drive it worse than that." The screen door goes off its spring behind him. "Get in."\n\nHe is at the driver\'s door with the keys in his fist, and the engine has not started yet.';
+
+/**
+ * §16.2 — the END OF BUILD system line, gated so it fires only the first
+ * time `offered_the_ride` goes true (a repeat ask gets `jackWallDrugText`
+ * again with no notice, per the doc's own instruction).
+ */
+const jackWallDrugEffects: Effect[] = [
+  {
+    if: {
+      when: { not: { flag: FLAG_OFFERED_THE_RIDE } },
+      then: [{ script: { id: END_OF_BUILD_SCRIPT } }, { set: [FLAG_OFFERED_THE_RIDE, true] }],
+    },
+  },
+];
+
+// Wave 5's own three additions, declared as named `TopicDef`s so the SAME
+// object reaches both `topics` (ASK) and `tellTopics` (TELL) without
+// duplicating text (jack.ts's `tellTopics` overrides `topics` entirely for
+// TELL — `npc.ts`'s `topicsFor` — so a topic meant to answer both verbs has
+// to be listed in both arrays explicitly).
+const topicS6: TopicDef = {
+  id: TOPIC_S6,
+  words: ['s6', 'work order', 'six', 'sublevel'],
+  when: { has: WORK_ORDER },
+  response: jackHandsOverKeysText,
+  effects: jackHandsOverKeysEffects,
+};
+
+// "nolan" (bare) is deliberately NOT one of this topic's words, unlike the
+// doc's own "TELL JACK ABOUT NOLAN" phrasing — `topic_nolan` (below)
+// already claims bare "nolan" and is set BY THIS topic's own gate flag
+// (`heard_nolan_name`), so adding it here would make every ASK/TELL ABOUT
+// NOLAN after the first one resolve here instead, permanently burying the
+// shipped `topic_nolan` conversation. Same class of word-collision call
+// this file's own header already documents three of (dropped rather than
+// silently absorbed) — see this task's report.
+const topicTrash: TopicDef = {
+  id: TOPIC_TRASH,
+  words: ['trash', 'garbage', 'bin', "nolan's house", 'nolan house', 'nolans house', 'help'],
+  when: { flag: FLAG_HEARD_NOLAN_NAME },
+  response: jackTrashText,
+  effects: [{ set: [FLAG_JACK_COVERING, true] }],
+};
+
+const topicWallDrug: TopicDef = {
+  id: TOPIC_WALL_DRUG,
+  words: ['wall drug', 'walldrug', 'ticket', 'claim ticket', 'stub'],
+  when: { has: CLAIM_TICKET },
+  response: jackWallDrugText,
+  effects: jackWallDrugEffects,
+};
+
 const topics: TopicDef[] = [
+  // Wave 5's own three additions, declared FIRST (same idiom as this
+  // file's own header note on TOPIC_NAME/TOPIC_JULES): `topic_job`'s bare
+  // word "work" is a single-token match against the raw topic "work
+  // order" (`npc.ts`'s `topicWordsMatch`: a single-token word matches if
+  // it is ANY token of the raw topic, not the whole phrase), and
+  // `topic_keys`'s bare word "house" would win the same way against
+  // "nolan's house" — both would otherwise shadow these three topics
+  // entirely regardless of word list. Each is `when`-gated, so declaring
+  // them first costs nothing when the gate doesn't hold: `findTopic` just
+  // keeps walking to `topic_job`/etc., exactly as before.
+  topicS6,
+  topicTrash,
+  topicWallDrug,
   {
     id: TOPIC_JOB,
     words: ['job', 'work', 'hired', 'hire', 'terms', 'money', 'pay', 'paid', 'cash', 'fee', 'deal', 'arrangement', 'report', 'reports', 'counter'],
@@ -270,6 +365,27 @@ const topics: TopicDef[] = [
     response:
       '"That\'s his writing in the lid." Jack does not pick the box up. "Commissioner, then a senator, then a nuisance. Six years gone." He almost laughs. "He\'d have had this sorted by Thursday and been wrong about all of it."',
   },
+  {
+    id: TOPIC_S6,
+    words: ['s6', 'work order', 'six', 'sublevel'],
+    when: { has: WORK_ORDER },
+    response: jackHandsOverKeysText,
+    effects: jackHandsOverKeysEffects,
+  },
+  {
+    id: TOPIC_TRASH,
+    words: ['trash', 'garbage', 'bin', "nolan's house", 'nolan house', 'nolans house', 'help'],
+    when: { flag: FLAG_HEARD_NOLAN_NAME },
+    response: jackTrashText,
+    effects: [{ set: [FLAG_JACK_COVERING, true] }],
+  },
+  {
+    id: TOPIC_WALL_DRUG,
+    words: ['wall drug', 'walldrug', 'ticket', 'claim ticket', 'stub'],
+    when: { has: CLAIM_TICKET },
+    response: jackWallDrugText,
+    effects: jackWallDrugEffects,
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -293,6 +409,11 @@ const tellTopics: TopicDef[] = [
     response:
       'You tell him you cannot remember your own name.\n\nJack takes a while over it. You can hear the ice machine.\n\n"Doesn\'t change what I\'m paying for," he says. "I never had it anyway." Then, and it is plainly the arithmetic he does not like the shape of: "Does it change what you found?"',
   },
+  // Wave 5 — "TELL JACK ABOUT NOLAN" / "TELL JACK ABOUT TICKET" (§5.4, §16.1)
+  // reach the same two topics ASK does; see this file's own comment above
+  // `topicTrash`/`topicWallDrug` for why they're declared once and shared.
+  topicTrash,
+  topicWallDrug,
 ];
 
 // ---------------------------------------------------------------------------
@@ -317,6 +438,18 @@ const showResponses: ShowResponseDef[] = [
   {
     objects: [ROOM_KEY],
     response: '"Marlow\'s tag." He turns it over once and gives it back. "Five\'s still paid, next door. I\'m not going to keep saying it."',
+  },
+  // Wave 5 — SHOW WORK ORDER TO JACK (§9.1) and SHOW TICKET TO JACK (§16.1)
+  // share their own topics' exact text/effects.
+  {
+    objects: [WORK_ORDER],
+    response: jackHandsOverKeysText,
+    effects: jackHandsOverKeysEffects,
+  },
+  {
+    objects: [CLAIM_TICKET],
+    response: jackWallDrugText,
+    effects: jackWallDrugEffects,
   },
 ];
 
