@@ -54,29 +54,22 @@ describe('validate — Act I room 1', () => {
   // content ambiguity a sentence's position resolves in practice, which is
   // exactly what this warning class exists to flag and let stand — asserted
   // exactly, so a genuinely new, unreviewed warning still fails this test.
-  it('produces exactly the seventeen expected verb-noun-collision warnings, no others', () => {
+  it('produces exactly the 10 expected verb-noun-collision warnings, no others', () => {
     const warnings = validate(WORLD).filter((f) => f.severity === 'warning');
     const collisions = warnings.filter((f) => f.code === 'verb-noun-collision');
-    expect(collisions.length).toBe(17);
+    expect(collisions.length).toBe(10);
     expect(collisions.map((f) => f.message).sort()).toEqual(
       [
-        'verb "act1_type_terminal"\'s word "key" is also an object/NPC noun or adjective — usually fine (sentence position disambiguates), but worth a second look',
-        'verb "act1_look_outside"\'s word "outside" is also an object/NPC noun or adjective — usually fine (sentence position disambiguates), but worth a second look',
-        'verb "cut"\'s word "tear" is also an object/NPC noun or adjective — usually fine (sentence position disambiguates), but worth a second look',
-        'verb "out"\'s word "outside" is also an object/NPC noun or adjective — usually fine (sentence position disambiguates), but worth a second look',
-        'verb "act1_sign"\'s word "sign" is also an object/NPC noun or adjective — usually fine (sentence position disambiguates), but worth a second look',
-        'verb "n"\'s word "north" is also an object/NPC noun or adjective — usually fine (sentence position disambiguates), but worth a second look',
-        'verb "open"\'s word "handle" is also an object/NPC noun or adjective — usually fine (sentence position disambiguates), but worth a second look',
-        'verb "stand"\'s word "stand" is also an object/NPC noun or adjective — usually fine (sentence position disambiguates), but worth a second look',
-        'verb "act1_post_letter"\'s word "post" is also an object/NPC noun or adjective — usually fine (sentence position disambiguates), but worth a second look',
-        'verb "act1_post_letter"\'s word "mail" is also an object/NPC noun or adjective — usually fine (sentence position disambiguates), but worth a second look',
-        'verb "act1_measure"\'s word "map" is also an object/NPC noun or adjective — usually fine (sentence position disambiguates), but worth a second look',
-        'verb "act1_measure"\'s word "scale" is also an object/NPC noun or adjective — usually fine (sentence position disambiguates), but worth a second look',
-        'verb "drop"\'s word "drop" is also an object/NPC noun or adjective — usually fine (sentence position disambiguates), but worth a second look',
-        'verb "lock"\'s word "lock" is also an object/NPC noun or adjective — usually fine (sentence position disambiguates), but worth a second look',
-        'verb "climb"\'s word "scale" is also an object/NPC noun or adjective — usually fine (sentence position disambiguates), but worth a second look',
-        'verb "act1_knock"\'s word "tap" is also an object/NPC noun or adjective — usually fine (sentence position disambiguates), but worth a second look',
-        'verb "act1_drink"\'s word "drink" is also an object/NPC noun or adjective — usually fine (sentence position disambiguates), but worth a second look',
+        "verb \"act1_look_outside\" can be typed bare and its word \"outside\" is also an object/NPC noun \u2014 the single word is ambiguous between a command and a thing",
+        "verb \"act1_measure\" can be typed bare and its word \"map\" is also an object/NPC noun \u2014 the single word is ambiguous between a command and a thing",
+        "verb \"act1_measure\" can be typed bare and its word \"scale\" is also an object/NPC noun \u2014 the single word is ambiguous between a command and a thing",
+        "verb \"act1_post_letter\" can be typed bare and its word \"mail\" is also an object/NPC noun \u2014 the single word is ambiguous between a command and a thing",
+        "verb \"act1_post_letter\" can be typed bare and its word \"post\" is also an object/NPC noun \u2014 the single word is ambiguous between a command and a thing",
+        "verb \"act1_sign\" can be typed bare and its word \"sign\" is also an object/NPC noun \u2014 the single word is ambiguous between a command and a thing",
+        "verb \"act1_type_terminal\" can be typed bare and its word \"key\" is also an object/NPC noun \u2014 the single word is ambiguous between a command and a thing",
+        "verb \"n\" can be typed bare and its word \"north\" is also an object/NPC noun \u2014 the single word is ambiguous between a command and a thing",
+        "verb \"out\" can be typed bare and its word \"outside\" is also an object/NPC noun \u2014 the single word is ambiguous between a command and a thing",
+        "verb \"stand\" can be typed bare and its word \"stand\" is also an object/NPC noun \u2014 the single word is ambiguous between a command and a thing",
       ].sort(),
     );
   });
@@ -126,33 +119,20 @@ describe('validate — Act I room 1', () => {
   //     that still answers to the same word the spool does.
   // Every one accepted, not a bug — asserted exactly, so a genuinely new,
   // unreviewed collision still fails this test.
-  it('produces exactly the fifteen expected object-noun-collision warnings, no others', () => {
+  it('produces exactly the 2 expected object-noun-collision warnings, no others', () => {
     const warnings = validate(WORLD).filter((f) => f.severity === 'warning');
     const collisions = warnings.filter((f) => f.code === 'object-noun-collision');
-    expect(collisions.length).toBe(15);
+    expect(collisions.length).toBe(2);
     expect(collisions.map((f) => f.message).sort()).toEqual(
       [
-        '"act1_billboard" and "act1_boarding_house" can be in scope together and both answer to bare noun "sign" — a plain "sign" alone can never tell them apart (only a full adjective+noun phrase can); verify this is deliberate disambiguation, not an accidental shared word',
-        '"act1_horizon_glow" and "act1_maintenance_man" can be in scope together and both answer to bare noun "light" — a plain "light" alone can never tell them apart (only a full adjective+noun phrase can); verify this is deliberate disambiguation, not an accidental shared word',
-        '"act1_boarding_house" and "act1_brick_row" can be in scope together and both answer to bare noun "building" — a plain "building" alone can never tell them apart (only a full adjective+noun phrase can); verify this is deliberate disambiguation, not an accidental shared word',
-        '"act1_page_78" and "act1_papers" can be in scope together and both answer to bare noun "paper" — a plain "paper" alone can never tell them apart (only a full adjective+noun phrase can); verify this is deliberate disambiguation, not an accidental shared word',
-        '"act1_post_office_front" and "act1_sheriff_office_front" can be in scope together and both answer to bare noun "office" — a plain "office" alone can never tell them apart (only a full adjective+noun phrase can); verify this is deliberate disambiguation, not an accidental shared word',
-        '"act1_po_boxes" and "act1_service_counter" can be in scope together and both answer to bare noun "card" — a plain "card" alone can never tell them apart (only a full adjective+noun phrase can); verify this is deliberate disambiguation, not an accidental shared word',
-        '"act1_mail_drop" and "act1_po_boxes" can be in scope together and both answer to bare noun "slot" — a plain "slot" alone can never tell them apart (only a full adjective+noun phrase can); verify this is deliberate disambiguation, not an accidental shared word',
-        '"act1_lobby_bench" and "act1_service_counter" can be in scope together and both answer to bare noun "window" — a plain "window" alone can never tell them apart (only a full adjective+noun phrase can); verify this is deliberate disambiguation, not an accidental shared word',
-        '"act1_postcard_rack" and "act1_water_crock" can be in scope together and both answer to bare noun "stand" — a plain "stand" alone can never tell them apart (only a full adjective+noun phrase can); verify this is deliberate disambiguation, not an accidental shared word',
-        '"act1_postcard_rack" and "act1_store_door" can be in scope together and both answer to bare noun "card" — a plain "card" alone can never tell them apart (only a full adjective+noun phrase can); verify this is deliberate disambiguation, not an accidental shared word',
-        '"act1_store_door" and "act1_store_window" can be in scope together and both answer to bare noun "glass" — a plain "glass" alone can never tell them apart (only a full adjective+noun phrase can); verify this is deliberate disambiguation, not an accidental shared word',
-        '"act1_store_door" and "act1_water_crock" can be in scope together and both answer to bare noun "sign" — a plain "sign" alone can never tell them apart (only a full adjective+noun phrase can); verify this is deliberate disambiguation, not an accidental shared word',
-        '"act1_mail_drop" and "act1_pen" can be in scope together and both answer to bare noun "pen" — a plain "pen" alone can never tell them apart (only a full adjective+noun phrase can); verify this is deliberate disambiguation, not an accidental shared word',
-        '"act1_pen" and "act1_whitlock_desk" can be in scope together and both answer to bare noun "pen" — a plain "pen" alone can never tell them apart (only a full adjective+noun phrase can); verify this is deliberate disambiguation, not an accidental shared word',
-        '"act1_string" and "act1_twine" can be in scope together and both answer to bare noun "string" — a plain "string" alone can never tell them apart (only a full adjective+noun phrase can); verify this is deliberate disambiguation, not an accidental shared word',
+        "\"act1_mail_drop\" and \"act1_pen\" can be in scope together and both answer to bare noun \"pen\" \u2014 a plain \"pen\" alone can never tell them apart (only a full adjective+noun phrase can); verify this is deliberate disambiguation, not an accidental shared word",
+        "\"act1_pen\" and \"act1_whitlock_desk\" can be in scope together and both answer to bare noun \"pen\" \u2014 a plain \"pen\" alone can never tell them apart (only a full adjective+noun phrase can); verify this is deliberate disambiguation, not an accidental shared word",
       ].sort(),
     );
   });
 
-  it('produces exactly thirty-three warnings total, no others', () => {
+  it('produces exactly thirteen warnings total, no others', () => {
     const warnings = validate(WORLD).filter((f) => f.severity === 'warning');
-    expect(warnings.length).toBe(33);
+    expect(warnings.length).toBe(13);
   });
 });

@@ -12,6 +12,38 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.6.1] - 2026-09-03
+
+### Changed
+
+- **The validator's warning list went from 33 findings to 13**, and the two
+  object-collision warnings that survive are real bugs rather than noise.
+
+  Three rooms landing at once had pushed it to 33 — past the point where
+  anyone finishes reading a warning list, which is the failure mode I said
+  I wanted to avoid when adding these rules. A list nobody reads hides the
+  real findings inside it.
+
+  Both rules now fire only on the case that can actually trap a player:
+
+  - **Verb/noun**: only when the verb can be typed **bare**, so the single
+    word is ambiguous between a command and a thing. A verb that always
+    takes an object is settled by sentence position, and flagging it said
+    "usually fine" in its own message — a rule that admits it is usually
+    wrong will be ignored. 17 → 10.
+  - **Object/object**: only when one of the pair has **no noun of its own**
+    that the other doesn't also claim, so nothing the player types can ever
+    single it out. Two things sharing "sign" is fine when one also answers
+    to "billboard"; that is disambiguation working. 15 → 2.
+
+  I first tried adjectives as the escape hatch for the second rule and it
+  removed one finding of fifteen — the real escape in this content is a
+  distinct noun, not a qualifier.
+
+  The two survivors both involve the pen, which travels with the player and
+  has no unique noun. Same pen already on the backlog for having no listing
+  line: the rule is now pointing at a genuine defect instead of at itself.
+
 ## [0.6.0] - 2026-09-03
 
 Three rooms in one wave — written in a single pass, wired in a single pass.

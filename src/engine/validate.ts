@@ -788,6 +788,7 @@ function isSafelyDisjointByPreposition(defs: VerbDef[]): boolean {
 
 function checkVocabularyCollisions(world: WorldDef, findings: Finding[]): void {
   const vocab = compileVocabulary(world);
+  const verbs = world.verbs ?? {};
 
   // Verb/verb: group by the exact phrase (not per-word) so "turn on" vs.
   // "turn" never collide with each other, only an exact duplicate phrase
@@ -823,6 +824,19 @@ function checkVocabularyCollisions(world: WorldDef, findings: Finding[]): void {
   ]);
   const reported = new Set<string>();
   for (const form of vocab.verbForms) {
+    // Only the genuinely ambiguous case is worth a warning: a verb that can
+    // be typed BARE, whose word is also a noun. Then the single word
+    // `KEY` might be a command or a thing, and only guessing tells them
+    // apart. When the verb always takes an object, sentence position
+    // settles it and there is nothing to look at.
+    //
+    // The rule used to fire on every verb word that was also a noun, and
+    // said so in its own message ("usually fine"). That produced 17
+    // findings against three rooms — and a warning list nobody finishes
+    // reading is worth less than no warning list, because the real ones
+    // are in it somewhere.
+    const canBeTypedBare = (verbs[form.id]?.patterns ?? []).includes('V');
+    if (!canBeTypedBare) continue;
     for (const word of form.words) {
       if (!nounLikeWords.has(word)) continue;
       const key = `${form.id}:${word}`;
@@ -831,7 +845,7 @@ function checkVocabularyCollisions(world: WorldDef, findings: Finding[]): void {
       findings.push(
         warning(
           'verb-noun-collision',
-          `verb "${form.id}"'s word "${word}" is also an object/NPC noun or adjective — usually fine (sentence position disambiguates), but worth a second look`,
+          `verb "${form.id}" can be typed bare and its word "${word}" is also an object/NPC noun — the single word is ambiguous between a command and a thing`,
         ),
       );
     }
@@ -906,7 +920,25 @@ function checkObjectNounCollisions(world: WorldDef, findings: Finding[]): void {
   }
 
   const reported = new Set<string>();
+  const objectsById = world.objects ?? {};
   const flag = (aId: ObjectId, bId: ObjectId, word: string): void => {
+    // A shared noun only traps the player when there is no way out of it.
+    // Two objects sharing "sign" is fine if one also answers to "billboard"
+    // and the other to "poster" — the player has a unique word for each and
+    // the disambiguation has an answer. Warn only when at least one side
+    // has NO noun of its own that the other doesn't also claim, because
+    // then nothing the player can type will ever single it out. That is the
+    // unanswerable question Ryan hit with the key and the key rack.
+    //
+    // Tested against adjectives first, which was the wrong discriminator:
+    // it removed one finding of fifteen, because the real escape hatch in
+    // this content is a distinct noun, not a qualifier.
+    const aNouns = new Set(objectsById[aId]?.nouns ?? []);
+    const bNouns = new Set(objectsById[bId]?.nouns ?? []);
+    const aHasOwn = [...aNouns].some((n) => !bNouns.has(n));
+    const bHasOwn = [...bNouns].some((n) => !aNouns.has(n));
+    if (aHasOwn && bHasOwn) return;
+
     const [x, y] = [aId, bId].sort();
     const key = `${x}:${y}:${word}`;
     if (reported.has(key)) return;

@@ -371,7 +371,32 @@ describe('validate — vocabulary collision report', () => {
     expect(findings).toEqual([]);
   });
 
-  it('a verb word colliding with an object noun/adjective is a WARNING, not an error', () => {
+  // The rule only fires for a verb that can be typed BARE: then the single
+  // word is ambiguous between a command and a thing. A verb that always
+  // takes an object is settled by sentence position and is not reported —
+  // asserted separately below. Flagging both produced 17 findings against
+  // three rooms, and a warning list nobody finishes reading hides the real
+  // ones.
+  it('a bare-typable verb word colliding with an object noun is a WARNING, not an error', () => {
+    const watchVerb = V('fixture_watch_verb');
+    const world: WorldDef = {
+      ...FIXTURE_WORLD,
+      objects: {
+        ...FIXTURE_WORLD.objects,
+        [O('fixture_watch')]: { location: ROOM_A, name: 'wristwatch', nouns: ['watch'] },
+      },
+      verbs: {
+        ...FIXTURE_WORLD.verbs,
+        [watchVerb]: { id: watchVerb, words: ['watch'], patterns: ['V'], class: 'analytical', default: 'Nothing happens.' },
+      },
+    };
+    const findings = validate(world).filter((f) => f.code === 'verb-noun-collision');
+    expect(findings).toHaveLength(1);
+    expect(findings[0]!.severity).toBe('warning');
+    expect(findings[0]!.message).toContain('watch');
+  });
+
+  it('does not warn when the colliding verb always takes an object', () => {
     const watchVerb = V('fixture_watch_verb');
     const world: WorldDef = {
       ...FIXTURE_WORLD,
@@ -384,10 +409,7 @@ describe('validate — vocabulary collision report', () => {
         [watchVerb]: { id: watchVerb, words: ['watch'], patterns: ['V dobj'], class: 'analytical', default: 'Nothing happens.' },
       },
     };
-    const findings = validate(world).filter((f) => f.code === 'verb-noun-collision');
-    expect(findings).toHaveLength(1);
-    expect(findings[0]!.severity).toBe('warning');
-    expect(findings[0]!.message).toContain('watch');
+    expect(validate(world).filter((f) => f.code === 'verb-noun-collision')).toHaveLength(0);
   });
 
   it('two objects sharing a noun with no distinguishing adjective is not reported at all', () => {
