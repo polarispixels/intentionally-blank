@@ -46,9 +46,27 @@
 import type { Effect } from '../../../engine/effects';
 import type { EventDef, NpcDefSlice, ObjectDefSlice, ShowResponseDef, TopicDef } from '../../../engine/world';
 import type { ProseRule } from '../../../engine/prose';
-import { EXAMINE } from '../act1/verbs';
-import { NOLANS_YARD, PO_BOX_SLIP, SUNDOWN_DINER, V_WATCH, WORK_ORDER } from '../act1/ids';
+import { EXAMINE, SHOW } from '../act1/verbs';
+import { USE_VERB_ID } from '../../../engine/move';
+import { NOLANS_YARD, PO_BOX_SLIP, SUNDOWN_DINER, V_FOLLOW, V_WATCH, WORK_ORDER } from '../act1/ids';
 import { POKER_NIGHT } from './calendar';
+// D3, task B — Nolan's `{ at: act3_lobby }` work layer (Stage D plan §4.7;
+// prose doc §8) amends this D2-C file. `act3/ids.ts` is a lower-numbered
+// act's ids.ts importing a HIGHER act's — the one deliberate exception to
+// `act2/ids.ts`'s own "may import act1/ids.ts, never the reverse" rule
+// (that rule governs `ids.ts`-to-`ids.ts` imports, keeping THOSE files
+// cycle-free; this is a room/NPC file importing an id constant, no runtime
+// value, from another act's `ids.ts`, and Nolan is the one NPC the plan
+// explicitly has bridging Acts II and III). `act3/ids.ts` does not import
+// anything from this file, so no cycle exists either way.
+import { ACT3_LOBBY, ACT3_NOLAN_TOPIC_BADGE_WORK, ACT3_NOLAN_TOPIC_HEADACHES_WORK, ACT3_NOLAN_TOPIC_JULES_WORK, ACT3_NOLAN_TOPIC_NIGHTS_WORK, ACT3_NOLAN_TOPIC_SUBLEVEL_WORK, ACT3_PERIMETER_ROAD, ACT3_RODE_FENCE, ACT3_GATE_READER } from '../act3/ids';
+// D3, task A — route (a)'s "USE BADGE"/"SHOW BADGE TO READER" (§5.1) and
+// route (a')'s "FOLLOW NOLAN" at the perimeter (§5.2). Both effects arrays
+// live in `act3/objects/perimeterRoad.ts` (the room this scene plays out
+// in), imported here rather than duplicated — same "own the text once"
+// idiom this file's own `topicBadge.words`/`topicSublevel.words` reuse
+// already follows for task B's `AtWork` variants above.
+import { ROUTE_A_BADGE_EFFECTS, ROUTE_A_PRIME_TAILGATE_EFFECTS } from '../act3/objects/perimeterRoad';
 import {
   ACT2_BADGE_WON,
   ACT2_CLUE_NO_SUBLEVEL_KINDLY,
@@ -281,32 +299,157 @@ const topicUnreachable: TopicDef = {
 const watchNolanText =
   'He does it again on the next street. Badge, quarter turn, let go, and the\nwhole time his face is doing the thing his face does, which is nothing.\n\nHe is not hiding it. Nobody has ever told him about it, so there has never\nbeen anything to hide.';
 
+// =============================================================================
+// D3, task B — Nolan at work, an `{ at: act3_lobby }` layer over the D2
+// rules above (Stage D plan §4.7; prose doc §8). "Every rule below is
+// inserted above the shipped D2 rule of the same name and is gated
+// `{ at: act3_lobby }`. Nothing in D2 is deleted." (§8's own header).
+// =============================================================================
+
+// ---------------------------------------------------------------------------
+// §8.2 — EXAMINE NOLAN at work
+// ---------------------------------------------------------------------------
+
+const examineAtWorkText =
+  'The same man, shaved and buttoned, in the same clothes with a lanyard over\nthem and a pair of safety glasses hooked in the pocket that has the pens in\nit.\n\nHe does not look tired in here.';
+
+// ---------------------------------------------------------------------------
+// §8.3 — greeting at work, and §8.7's fence variant (above everything).
+// ---------------------------------------------------------------------------
+
+const greetingFenceVariantText =
+  'He comes over the terrazzo at a pace he does not use for anything else, and\nstops a yard short, and looks at you, and past you, and at you again.\n\n"There\'s a fence down," he says. "There\'s a fence down and here you are."\n\nHe waits. You can watch him decide, and what he decides is the thing he has\ndecided about everybody for eleven years.\n\n"Right. Well." The folder goes under the other arm. "Stay off the plant floor,\nbe out before the last office light, and I\'ll have to write it up." A beat.\n"I\'ll write it up Monday."';
+
+const greetingWorkFirstText =
+  'He sees you and stops, and there is about half a second in which he is\ndeciding something, and then he is pleased, because that is what he does with\nhalf-seconds.\n\n"Now then." He does not put the folder down. "You\'ll want signing in."';
+
+const greetingWorkRotationText: string[] = [
+  '"Two minutes," he says, and gives you them, standing.',
+  '"You\'re still here." It is not a complaint. He checks the clock over the desk\nwhile he says it.',
+];
+
+// ---------------------------------------------------------------------------
+// §8.4 — topic_sublevel at work. The constant is unchanged and now used in
+// a fourth place (home first hearing, home repeat, the poker-table loan,
+// and here); the counter is the same one (`ACT2_NOLAN_SUBLEVEL_COUNT`), so
+// a hearing at work and a hearing at home both count toward the same
+// ≥2-hearings silent clue grant.
+// ---------------------------------------------------------------------------
+
+const sublevelAtWorkText = `He looks at the inner doors behind you before he answers, which he did not do\nin his own yard.\n\n"${NOLAN_SUBLEVEL_LINE}"\n\n"Come out to the house and I'll draw it for you on the step. Not in here."`;
+
+const topicSublevelAtWork: TopicDef = {
+  id: ACT3_NOLAN_TOPIC_SUBLEVEL_WORK,
+  words: topicSublevel.words,
+  when: { at: ACT3_LOBBY },
+  response: sublevelAtWorkText,
+  effects: [
+    { inc: ACT2_NOLAN_SUBLEVEL_COUNT },
+    { if: { when: { flag: ACT2_NOLAN_SUBLEVEL_COUNT, atLeast: 2 }, then: [{ grantClue: ACT2_CLUE_VERBATIM }] } },
+  ],
+};
+
+// ---------------------------------------------------------------------------
+// §8.5 — the other five topics at work (shorter, warier variants).
+// ---------------------------------------------------------------------------
+
+const topicBadgeAtWork: TopicDef = {
+  id: ACT3_NOLAN_TOPIC_BADGE_WORK,
+  words: topicBadge.words,
+  when: { at: ACT3_LOBBY },
+  response: [
+    { when: { has: ACT2_NOLAN_BADGE }, text: '"You\'ve got mine," he says, with no change in his face at all, and does not\nask when he is getting it back.' },
+    { text: '"It opens what it opens." He taps the folder against his leg. "Gate, lobby,\nhalls, lift. Not the plant floor. You want the plant floor, you want me and a\nkey."' },
+  ] satisfies ProseRule[],
+};
+
+const topicJulesAtWork: TopicDef = {
+  id: ACT3_NOLAN_TOPIC_JULES_WORK,
+  words: topicJules.words,
+  when: { at: ACT3_LOBBY },
+  response: '"Not in here." He says it gently and it is still no. "That\'s a thing with a\nfile on it and I\'m on the floor. Come out to the house."',
+};
+
+const topicHeadachesAtWork: TopicDef = {
+  id: ACT3_NOLAN_TOPIC_HEADACHES_WORK,
+  words: topicHeadaches.words,
+  when: { at: ACT3_LOBBY },
+  response:
+    '"Better in the building, if you\'ll credit it." He is faintly delighted by\nthis, the way he was in his own yard. "It\'s the mornings at home that get me.\nIn here I\'ve things to be doing."',
+};
+
+const topicNightsAtWork: TopicDef = {
+  id: ACT3_NOLAN_TOPIC_NIGHTS_WORK,
+  words: topicNights.words,
+  when: { at: ACT3_LOBBY },
+  response:
+    '"Maintenance has it." He is already half turned. "Last office light to first\nshift. I\'ve never been in it while they\'ve got it and I\'ve never wanted to\nbe — ask me something about the plant, go on, I\'m good on the plant."',
+};
+
+// ---------------------------------------------------------------------------
+// §8.5 — unknownTopic at work (2 variants), merged with the home rotation
+// (§17.12) into one `ProseRule[]` — `NpcDefSlice.unknownTopic` is a single
+// `Prose` slot, so the work/home split lives inside it rather than as two
+// separate arrays (same mechanism `prose.ts`'s own `ProseRule.text`
+// rotation already gives each matched rule its own independent counter).
+// ---------------------------------------------------------------------------
+
+const unknownTopicAtWork: string[] = ['"On the floor I\'m no use for anything but the floor."', '"Put that one to me Friday and I\'ll have thought about it."'];
+
+// ---------------------------------------------------------------------------
+// §8.6 — FOLLOW NOLAN inside, after the lobby (the perimeter's own FOLLOW,
+// route (a′), is task A's — a different room, a different effect).
+// ---------------------------------------------------------------------------
+
+const followInsideText =
+  '"You\'ll want to stay this side of the turnstile, or with me, and I\'m going to\nthe plant floor." He is already going. "There\'s a kettle behind the desk and\nnobody minds."';
+
 export const nolan: NpcDefSlice = {
-  // Poker night takes priority over the evening-at-home rule (both would
-  // otherwise match a Friday evening) — this task's ruling 1: "poker night
-  // → diner; evening → Nolan's Yard; otherwise offstage." The plant-by-day
-  // post (Lobby, D3) is not this wave's to add.
+  // Poker night and the evening-at-home rule stay (this task's ruling 1,
+  // unchanged); the D3 retarget (plan §4.7 / this task's ruling 2) adds two
+  // rules after them: the tailgate window (07:00–07:30, the raw-minute
+  // `clock` arm) puts him at the perimeter, then the rest of morning and
+  // all of afternoon puts him in the Lobby. Night still falls through to
+  // the final `offstage` fallback, unchanged.
   schedule: [
     { when: { all: [{ flag: ACT2_STARTED }, POKER_NIGHT] }, room: SUNDOWN_DINER },
     { when: { all: [{ flag: ACT2_STARTED }, { clockPhase: 'evening' }] }, room: NOLANS_YARD },
+    { when: { all: [{ flag: ACT2_STARTED }, { clockPhase: 'morning' }, { clock: { after: 420, before: 450 } }] }, room: ACT3_PERIMETER_ROAD },
+    { when: { all: [{ flag: ACT2_STARTED }, { any: [{ clockPhase: 'morning' }, { clockPhase: 'afternoon' }] }] }, room: ACT3_LOBBY },
     { room: 'offstage' },
   ],
   nouns: ['nolan', 'man', 'manager', 'neighbour'],
   pronoun: 'he',
-  greeting,
-  topics: [topicBadgeLoan, topicSublevel, topicJules, topicBadge, topicHeadaches, topicTrash, topicPoker, topicNights, topicUnreachable],
-  unknownTopic,
+  greeting: [
+    { when: { all: [{ at: ACT3_LOBBY }, { flag: ACT3_RODE_FENCE }] }, text: greetingFenceVariantText },
+    { when: { all: [{ at: ACT3_LOBBY }, { not: { met: ACT2_NOLAN } }] }, text: greetingWorkFirstText },
+    { when: { at: ACT3_LOBBY }, text: greetingWorkRotationText },
+    ...greeting,
+  ] satisfies ProseRule[],
+  topics: [topicSublevelAtWork, topicBadgeAtWork, topicJulesAtWork, topicHeadachesAtWork, topicNightsAtWork, topicBadgeLoan, topicSublevel, topicJules, topicBadge, topicHeadaches, topicTrash, topicPoker, topicNights, topicUnreachable],
+  unknownTopic: [{ when: { at: ACT3_LOBBY }, text: unknownTopicAtWork }, { text: unknownTopic }] satisfies ProseRule[],
   showResponses: [
     { objects: [WORK_ORDER], response: trashResponse, effects: trashEffects },
     { objects: [PO_BOX_SLIP], response: rentNoticeResponse },
   ] satisfies ShowResponseDef[],
   handlers: [
+    { verbs: [EXAMINE], when: { at: ACT3_LOBBY }, effects: [{ say: examineAtWorkText }] },
     { verbs: [EXAMINE], effects: [{ say: examineText }] },
     {
       verbs: [V_WATCH],
       when: { all: [{ flag: ACT2_POKER_IN_PROGRESS }, { flag: ACT2_POKER_HAND, is: 1 }] },
       effects: [{ say: watchNolanText }, { set: [ACT2_TELL_NOLAN, true] }],
     },
+    { verbs: [V_FOLLOW], when: { at: ACT3_LOBBY }, effects: [{ say: followInsideText }] },
+    // D3, task A — route (a'), the tailgate (§5.2). "FOLLOW NOLAN" at the
+    // perimeter, gated on his own schedule already having him there (the
+    // parser never resolves an NPC as `dobj` outside its own room —
+    // `cli/scope.ts`'s `visibleNpcs` — so this handler is reachable only
+    // when he is, in fact, standing in `act3_perimeter_road`; the doc's own
+    // "FOLLOW NOLAN when he is not here" refusal text has no reachable
+    // trigger under this engine and is not wired — flagged in this task's
+    // report).
+    { verbs: [V_FOLLOW], when: { at: ACT3_PERIMETER_ROAD }, effects: ROUTE_A_PRIME_TAILGATE_EFFECTS },
   ],
 };
 
@@ -329,4 +472,11 @@ export const nolanBadge: ObjectDefSlice = {
   portable: true,
   // No examine text is authored (§16.7's own ruling) — the built-in stands.
   nouns: ['badge', "nolan's badge", 'lanyard'],
+  // D3, task A — route (a), "USE BADGE" / "SHOW BADGE TO READER" (§5.1).
+  // Gated `{ at: act3_perimeter_road }` so the badge does nothing special
+  // anywhere else it might be shown/used.
+  handlers: [
+    { verbs: [USE_VERB_ID], when: { at: ACT3_PERIMETER_ROAD }, effects: ROUTE_A_BADGE_EFFECTS },
+    { verbs: [SHOW], withInstrument: [ACT3_GATE_READER], effects: ROUTE_A_BADGE_EFFECTS },
+  ],
 };

@@ -363,7 +363,92 @@ inventory
 out
 look
 go to motel
-out
+wait until morning
+go to motel
+drive to plant
+look
+x fence
+x gatehouse
+read paperback
+x reader
+push turnstile
+x light
+watch light
+x apron
+x country
+look west
+ask jack about fence
+use badge
+look
+x plaque
+read names
+x model
+count levels
+x figures
+x brochures
+take brochure
+read card
+ring bell
+x staging door
+open staging door
+listen
 north
 look
+listen
+listen
+x racks
+read card
+x sign
+look down aisle
+x curtain
+east
+look
+x manifolds
+read tags
+touch return a
+touch return b
+x drawing
+compare drawing with returns
+x hatch
+open hatch
+pry hatch with leg
+x hatch
+south
+north
+look
+x plan
+compare plan with notebook
+pace corridor
+pace corridor
+pace corridor
+x notebook
+x panel
+remove panel
+x stencil
+use badge
+use badge
+x far door
+call elevator
+enter lift
+x button panel
+press blank
+unscrew blank
+read certificate
+press s5
+look
+south
+south
+out
+out
+look
+drive truck
+look
+wait until night
+go to motel
+drive to plant
+look
+show notebook to jack
+ram fence
+look
 version
+

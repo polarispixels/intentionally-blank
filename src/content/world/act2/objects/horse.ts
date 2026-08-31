@@ -36,6 +36,9 @@ import type { ObjectDefSlice } from '../../../../engine/world';
 import { EXAMINE, TAKE } from '../../act1/verbs';
 import { MAIN_STREET, V_SLIDE_DOWN } from '../../act1/ids';
 import { ACT2_HORSE, ACT2_HORSE_BORROWED, ACT2_TRAVEL_SCRIPT, ACT2_WALL_DRUG_EMPORIUM } from '../ids';
+// D3, task A — the horse's own return leg from the perimeter (§3.5). `args`
+// uses `from`, not `to` — see `act2/travel.ts`'s own header note on why.
+import { ACT3_PERIMETER_ROAD } from '../../act3/ids';
 
 const horseExamine =
   'The near one. Sixteen hands of entirely uninterested brown, standing hipshot\nwith one ear back on the conversation and the rest of it asleep.\n\nSomebody has tied it to the rail with a knot that exists to keep an animal\nstanding where it was put, and not for one moment to stop anybody taking it.';
@@ -61,6 +64,11 @@ const horse: ObjectDefSlice = {
     // §16.3's return trip — `RIDE HORSE` at Wall Drug, once the horse has
     // carried the player there. No entry line of its own (§3 only gives one
     // for the outbound ride); the script's own return beats (§4.6) frame it.
+    {
+      verbs: [V_SLIDE_DOWN],
+      when: { at: ACT3_PERIMETER_ROAD },
+      effects: [{ script: { id: ACT2_TRAVEL_SCRIPT, args: { mode: 'horse', from: 'perimeter' } } }],
+    },
     {
       verbs: [V_SLIDE_DOWN],
       when: { at: ACT2_WALL_DRUG_EMPORIUM },

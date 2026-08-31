@@ -198,7 +198,6 @@ look
 ride horse
 look
 go to motel
-drive to plant
 out
 in
 up

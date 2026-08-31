@@ -29,7 +29,7 @@ import { apply } from '../../../engine/effects';
 import { flag } from '../../../engine/cond';
 import { phase } from '../../../engine/clock';
 import type { Effect } from '../../../engine/effects';
-import type { GameEvent, ScriptFn } from '../../../engine/world';
+import type { GameEvent, GameState, ScriptFn, WorldDef } from '../../../engine/world';
 import type { WorldSlice } from '../game';
 import { JACK, JACKS_MOTEL, MAIN_STREET, MAINTENANCE_MAN, MONSTER_TRUCK } from '../act1/ids';
 import {
@@ -40,9 +40,9 @@ import {
   ACT2_STARTED,
   ACT2_WALL_DRUG_EMPORIUM,
 } from './ids';
+import { ACT3_AT_PERIMETER, ACT3_HORSE_TIED, ACT3_PERIMETER_ROAD } from '../act3/ids';
 
 export type TravelMode = 'truck' | 'horse';
-/** `'perimeter'` is D3's — unreachable in D1; this script only ever receives `'wall_drug'`/`'town'` today (a stray `'perimeter'` arg falls through `destinationFor` to `'town'`'s own room, flagged loudly rather than silently mis-routing — see that function). */
 export type TravelDestination = 'wall_drug' | 'town' | 'perimeter';
 
 // ---------------------------------------------------------------------------
@@ -110,6 +110,48 @@ const HORSE_RETURN_BEATS: string[] = [
 ];
 
 // ---------------------------------------------------------------------------
+// D3, task A amendment — travel to the perimeter (D3 prose doc §3; plan §2
+// D3's own "truck 30 / horse 60 + the walk"). `to: 'perimeter'` is the
+// outbound leg (either mode, from wherever the vehicle starts); `from:
+// 'perimeter'` is the return leg — a SEPARATE arg key from `to`, because
+// unlike the wall_drug/town pair (both keyed by `to`, disambiguated by
+// `destinationFor`'s own vehicle-home lookup) the perimeter's return beats
+// are wholly distinct text from the wall_drug return's, and `to: 'town'`
+// alone carries no way to tell which trip is ending. `act3_at_perimeter`
+// gates the TRUCK's own first/again split (§3.1 vs §3.4 — "have you EVER
+// been to the perimeter, by any mode"); `act3_horse_tied` gates the
+// HORSE's own first/again split independently (§3.3 vs §3.4 — "have you
+// tied the horse there before"), exactly as the doc's own two `when`
+// clauses state; see this task's report on the resulting asymmetry (a
+// truck ride after an earlier horse ride gets the truck's "thereafter"
+// beats on what is, for the truck, its own first outing).
+// ---------------------------------------------------------------------------
+
+const PERIMETER_TRUCK_FIRST_BEATS: string[] = [
+  'Out over the cattle guard and north, and this time nobody is going to Wall\nDrug.\n\nThe fence arrives on the right a long while before anything it is fencing.\nOnce it is there it does not stop being there, and it does not go over a rise\nor round a draw the way the county\'s own fences do — it takes them.',
+  'Then the road does its wide thing, east, and holds it, and the building comes\nround on the right in its own light with the steam going up off the plant end\nand away sideways.\n\nHalfway round the bend a road comes off it to the left, made up, with a white\nline painted on it that nobody needed. Jack takes it without slowing and\nwithout being asked.',
+  'He stops well short of the gate, on the verge, and turns the truck round to\nface the way out before he touches the handbrake.\n\n"I\'ll be here." He puts the brake on with the heel of his hand. "I\'m no use to\nyou past that wire and my plates are a name on a list. Go on."',
+];
+
+const PERIMETER_TRUCK_RETURN_BEATS: string[] = [
+  'He has the engine going before you have the door shut. Nothing gets said until\nthe cattle guard, which he takes at a walking pace, the way you take a thing\nyou intend to still be there.\n\nThen: "Well?"',
+];
+
+const PERIMETER_HORSE_FIRST_BEATS: string[] = [
+  'You go out on the horse because nobody anywhere keeps a list of horses, and\nfor the better part of an hour that is the best idea you have had all week.\n\nThe perimeter road when you meet it is a made road across grazing that never\nasked for one, and you ride the grass beside it rather than the surface, which\nis what the grass is there for.',
+  'A mile short of the gate the perimeter road crosses a cattle guard, and the\nhorse stops at it.\n\nIt is not a shy and it is not a refusal. It walks up to the pipes, puts its\nhead down, and stands. You get off and lead it, and it comes as far as the\npipes and no further, and stands again with its ears going and its weight back\noff its front feet.\n\nYou tie it at the corner post where the grass is, and it lets you, and it\nwatches you walk away with its head out over the wire.',
+  'The last mile is on your own feet, on somebody else\'s surface, with a fence on\nyour right and no verge worth the name, and it takes exactly as long as a mile\ntakes.',
+];
+
+const PERIMETER_TRUCK_AGAIN_BEATS: string[] = ['Out, round, and off on the made road. Jack stops in the same place and turns\nround in it.'];
+
+const PERIMETER_HORSE_AGAIN_BEATS: string[] = ['The grass, the road, the corner post. The horse stops where it stopped before\nand you walk the last of it again.'];
+
+const PERIMETER_HORSE_RETURN_BEATS: string[] = [
+  'It is where you left it and it has not settled. It does not settle when you\nuntie it and it does not settle when you are up.\n\nIt settles about a hundred yards south of the pipes, all at once, like\nsomething being put down.',
+];
+
+// ---------------------------------------------------------------------------
 // Beat selection (plan §2 D1 item 1's own order).
 // ---------------------------------------------------------------------------
 
@@ -124,30 +166,46 @@ function beatsFor(mode: TravelMode, to: TravelDestination, rodeNorth: boolean, n
   return to === 'wall_drug' ? HORSE_FIRST_BEATS : HORSE_RETURN_BEATS;
 }
 
+function perimeterOutboundBeats(mode: TravelMode, atPerimeterAlready: boolean, horseTiedAlready: boolean): string[] {
+  if (mode === 'truck') return atPerimeterAlready ? PERIMETER_TRUCK_AGAIN_BEATS : PERIMETER_TRUCK_FIRST_BEATS;
+  return horseTiedAlready ? PERIMETER_HORSE_AGAIN_BEATS : PERIMETER_HORSE_FIRST_BEATS;
+}
+
+function perimeterReturnBeats(mode: TravelMode): string[] {
+  return mode === 'truck' ? PERIMETER_TRUCK_RETURN_BEATS : PERIMETER_HORSE_RETURN_BEATS;
+}
+
 /** `'wall_drug'` always lands at the Emporium; `'town'` lands wherever the vehicle's own home is (the motel for the truck, Main Street for the horse) — §4.2's "the map draws the highway as a permanently closed door," not a real multi-stop route. */
 function destinationFor(mode: TravelMode, to: TravelDestination) {
   if (to === 'wall_drug') return ACT2_WALL_DRUG_EMPORIUM;
+  if (to === 'perimeter') return ACT3_PERIMETER_ROAD;
   return mode === 'truck' ? JACKS_MOTEL : MAIN_STREET;
 }
 
 /**
  * `act2_travel` — the whole of §4.2's script contract: beats, `advanceClock`
- * (truck 45 / horse 240 — both directions; the plan states each destination's
- * one-way time and nothing asks for an asymmetric return), the vehicle move,
+ * (truck 45 / horse 240 to Wall Drug, both directions; truck 30 / horse 60
+ * to the perimeter, both directions — D3 prose doc §3), the vehicle move,
  * Jack's pin (truck only — "Jack rides only in the truck"), the first-ride
- * flags/clue, retiring the Act I ladder man, and `goto`.
+ * flags/clue (Wall Drug only — the perimeter is reachable only once
+ * `act2_started`, so none of that first-ride bookkeeping applies there),
+ * retiring the Act I ladder man, and `goto`.
  */
 export const act2Travel: ScriptFn = (world, state, args) => {
   const mode = args?.mode as TravelMode;
-  const to = args?.to as TravelDestination;
+  const to = args?.to as TravelDestination | undefined;
+  const from = args?.from as TravelDestination | undefined;
+
+  if (to === 'perimeter' || from === 'perimeter') return act2TravelPerimeter(world, state, mode, to);
+
   const rodeNorth = flag(world, state, ACT2_RODE_NORTH) === true;
   const isFirstRide = to === 'wall_drug' && !rodeNorth;
   const night = phase(world.meta, state.clock) === 'night';
 
-  const beats = beatsFor(mode, to, rodeNorth, night);
+  const beats = beatsFor(mode, to as TravelDestination, rodeNorth, night);
   const beatEvents: GameEvent[] = beats.map((text) => ({ type: 'line', kind: 'beat', text }));
 
-  const dest = destinationFor(mode, to);
+  const dest = destinationFor(mode, to as TravelDestination);
   const minutes = mode === 'truck' ? 45 : 240;
   const vehicle = mode === 'truck' ? MONSTER_TRUCK : ACT2_HORSE;
 
@@ -178,6 +236,42 @@ export const act2Travel: ScriptFn = (world, state, args) => {
   const applied = apply(world, state, effects, { path: 'script.act2_travel' });
   return { state: applied.state, events: [...beatEvents, ...applied.events] };
 };
+
+/**
+ * D3, task A — the perimeter's own leg, split out of `act2Travel` above
+ * rather than threaded through its wall_drug/town branches (the two
+ * destinations share nothing but the vehicle-move/Jack-pin shape; sharing
+ * more than that produced harder-to-read conditionals in review).
+ */
+function act2TravelPerimeter(world: WorldDef, state: GameState, mode: TravelMode, to: TravelDestination | undefined): { state: GameState; events: GameEvent[] } {
+  const outbound = to === 'perimeter';
+  const atPerimeterAlready = flag(world, state, ACT3_AT_PERIMETER) === true;
+  const horseTiedAlready = flag(world, state, ACT3_HORSE_TIED) === true;
+
+  const beats = outbound ? perimeterOutboundBeats(mode, atPerimeterAlready, horseTiedAlready) : perimeterReturnBeats(mode);
+  const beatEvents: GameEvent[] = beats.map((text) => ({ type: 'line', kind: 'beat', text }));
+
+  const minutes = mode === 'truck' ? 30 : 60;
+  const vehicle = mode === 'truck' ? MONSTER_TRUCK : ACT2_HORSE;
+  const dest = outbound ? ACT3_PERIMETER_ROAD : destinationFor(mode, 'town');
+
+  const effects: Effect[] = [{ advanceClock: minutes }, { move: [vehicle, dest] }];
+
+  if (mode === 'truck') {
+    if (outbound) effects.push({ moveNpc: [JACK, ACT3_PERIMETER_ROAD] }, { set: [ACT2_JACK_AWAY, true] });
+    else effects.push({ moveNpc: [JACK, 'schedule'] }, { set: [ACT2_JACK_AWAY, false] });
+  }
+
+  if (outbound) {
+    effects.push({ set: [ACT3_AT_PERIMETER, true] });
+    if (mode === 'horse' && !horseTiedAlready) effects.push({ set: [ACT3_HORSE_TIED, true] });
+  }
+
+  effects.push({ goto: dest });
+
+  const applied = apply(world, state, effects, { path: 'script.act2_travel' });
+  return { state: applied.state, events: [...beatEvents, ...applied.events] };
+}
 
 // ---------------------------------------------------------------------------
 // L10's payoff clue (§4.1 beat 6 / §4.5 beat 3's own note).

@@ -200,7 +200,8 @@ export const ACT2_VERBS: Record<string, VerbDef> = {
     words: ['drive to plant', 'drive to the plant', 'go to plant', 'go to the plant', 'drive north to plant'],
     patterns: ['V'],
     class: 'direct',
-    default: ACT2_DRIVE_TO_PLANT_TEXT,
+    // Bare-safe default (v0.13.0): typed away from the truck/horse this must not narrate a ride. The rooms with a vehicle answer it.
+    default: VERB_DEFAULTS.wait,
   },
   // D2-A — the general store's honor box (§4.2), a bare verb (no dobj to
   // hang it on — the box takes money, not an object handler). "pay" is

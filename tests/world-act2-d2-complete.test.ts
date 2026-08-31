@@ -36,10 +36,12 @@ describe('Stage D2 — the town in daylight on a clean save', () => {
       '◆ clue noted: The same sentence, twice',
       '◆ clue noted: The Tuesday convoy',
       '"Go see for yourself. There is no Sublevel 6. Bring it back Monday."',
-      'END OF BUILD',
+      // The fixture stops at Town Edge: the drive north and everything past
+      // the fence is D3's own playthrough (`world-act3-d3-complete.test.ts`).
     ]) {
       expect(stdout).toContain(beat);
     }
+    expect(stdout).not.toContain('END OF BUILD');
   });
 
   it('produces no diagnostics, raw ids, or unfilled templates', () => {

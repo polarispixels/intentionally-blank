@@ -19,6 +19,7 @@ import type { ObjectDefSlice } from '../../../../engine/world';
 import type { ProseRule } from '../../../../engine/prose';
 import { PAGE_78 } from '../../act1/ids';
 import { BURN, CUT, EXAMINE, OPEN, PUT_IN, READ } from '../../act1/verbs';
+import { ACT3_B4_MEASURED } from '../../act3/ids';
 import {
   ACT2_CLUE_CREDENTIALS,
   ACT2_CLUE_PAGE_FITS,
@@ -38,8 +39,19 @@ import {
 // §13.1 — examine
 // ---------------------------------------------------------------------------
 
-const notebookExamine =
+const notebookExamineShipped =
   'Hard covers in black cloth, the size of a hand, the corners gone round and soft. A rubber band round it that died some time ago and has taken the permanent shape of the job.\n\nThe spine has a shine on it where the pencil rides. The fore-edge is grey with handling for the first two thirds and clean for the last third, and the clean part is where a man stopped.';
+
+// D3 task C amendment (§11.8) — a new rule 1, `{ flag: act3_b4_measured }`,
+// above the shipped examine (reproduced verbatim above, unedited) so R8
+// re-scores the whole notebook as true the moment Corridor B4 is measured.
+const notebookExamineReScored =
+  'Hard covers in black cloth, the size of a hand, the corners gone round and soft. A rubber band round it that died some time ago and has taken the permanent shape of the job.\n\nThe spine has a shine on it where the pencil rides. The fore-edge is grey with handling for the first two thirds and clean for the last third, and the clean part is where a man stopped.\n\nEverything in it is true. You have walked one of them.';
+
+const notebookExamine: ProseRule[] = [
+  { when: { flag: ACT3_B4_MEASURED }, text: notebookExamineReScored },
+  { text: notebookExamineShipped },
+];
 
 // ---------------------------------------------------------------------------
 // §13.2 — read/open, the three layers (rule order: decoded -> M5 -> opaque)
@@ -153,7 +165,7 @@ const marginText =
 const notebookMargin: ObjectDefSlice = {
   location: { on: ACT2_NOTEBOOK },
   name: 'doodle',
-  nouns: ['doodle', 'margin', 'drawing', 'scribble', 'word'],
+  nouns: ['doodle', 'margin', 'scribble', 'word'], // 'drawing' dropped v0.13.0: it shadowed the plant's framed drawing
   portable: false,
   handlers: [{ verbs: [EXAMINE, READ], effects: [{ say: marginText }, { set: [ACT2_READ_NOTEBOOK_MARGIN, true] }] }],
 };

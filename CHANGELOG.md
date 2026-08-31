@@ -12,6 +12,70 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.13.0] - 2026-08-31
+
+**Stage D3 — the facility surface.** Act III opens: everything north of the
+cattle guard down to the bottom of the freight lift
+(`docs/superpowers/specs/2026-09-11-stage-d3-prose.md`).
+
+### Added
+
+- **The drive north**, both directions, as one travel script — Jack takes
+  the cattle guard at a walking pace and waits at the fence ("I'll be
+  here"); the perimeter road, the gate hut and its reader, the turnstile,
+  the apron, the building with the steam coming off it. Nolan's badge gets
+  you in; the hut's own log gets you a clue (*The gate, watched a while*).
+- **Inside.** The Lobby (the plaque — *Commissioned 2030*; Nolan crossing
+  the terrazzo on his own schedule), Data Hall A (*Five, and a lot of
+  rock*; *A slow thing in the noise*), and the Cooling Plant: the
+  manifolds and their tags, Return A cold and Return B warm, the plant's
+  own drawing that shows one return where the wall has two (*Return B is
+  warm*, and a question opened), the floor hatch with its eight bolts —
+  and Jack's toolbox in the truck, so both hatch routes ship.
+- **Corridor B4.** Two hundred and twenty-one paces against a plan that
+  says less — string, the origami ruler, or your own feet (M7, *Corridor
+  B4 doesn't match its own drawing*, a second question); the framed
+  life-safety plan; the reader at the far end with a mind of its own; the
+  access panel, and behind it, in stencil, INSPECTED NOV 1983.
+- **The freight lift.** Its certificate, its button panel with one blank
+  where a button was, L / S1 / S5 — and S5 is this version's boundary:
+  "The car settles. The leaves start."
+- **The fence.** Back at the truck with the notebook, Jack reads it twice,
+  and then does not do it fast (*"Huh," says Jack.*; M20-D). The yard door
+  at the plant end is not locked from this side in any way that matters.
+  Two sentences of alertness, never a meter.
+
+### Fixed
+
+Found by the clean-save playthrough (`tests/fixtures/playthrough-d3.txt`,
+`tests/world-act3-d3-complete.test.ts`):
+
+- `READ PAPERBACK` on the perimeter road had no text.
+- A bare `DRIVE TO PLANT` / `RIDE TO PLANT` typed away from the truck or
+  the horse narrated the whole ride from wherever you stood; both now
+  fall to the bare-verb default and only the rooms with a vehicle answer.
+- Corridor B4 could only be left by `WEST` though the hall enters it
+  going north; `SOUTH` and `OUT` lead home too.
+- A bare `PANEL` in B4 clarified against the lift's button panel, which
+  hangs on the lift door and so is always in scope there; the B4 lift
+  keeps *button panel* and yields the bare word to the wall.
+- `REMOVE PANEL` reached the clothing verb ("You are not wearing the access
+  panel"); `REMOVE`, `UNSCREW`, and `LOOK BEHIND` are the panel's now, and
+  the stencil is revealed when it comes off (it was flagged, never shown).
+- `COMPARE DRAWING WITH RETURNS` — the doc's own phrasing — had no word
+  *returns*; the manifolds carry it and count as the instrument.
+- The notebook doodle answered to *drawing*, colliding with the plant's.
+- The D2 fixture now ends at Town Edge; its last `NORTHWEST` had begun
+  walking into D3's tunnel in the dark.
+
+### Decisions
+
+Canon register 66–72 (D3 rulings: B4 is 221 tiles against a plan that says
+less; a borrowed badge logs as its owner; the surface is unstaffed above
+S5; the lift's stops are L, S1, S5 and one blank; the narrator counts twice
+in the whole game; the horse stops at the cattle guard; Nolan managed Jules
+nine years).
+
 ## [0.12.0] - 2026-08-31
 
 **Stage D2 — the town in daylight.** No new rooms; the largest wave by

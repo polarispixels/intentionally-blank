@@ -92,6 +92,11 @@ import {
   V_TURN_OVER,
 } from '../ids';
 import { ACT2_TRAVEL_SCRIPT, ACT2_WALL_DRUG_EMPORIUM } from '../../act2/ids';
+// D3, task A — the truck's return leg from the perimeter (§3.2). Same idiom
+// as the Wall Drug return leg just below: `{ at: ... }`, checked by the
+// player's own location, since the truck object itself carries no stable
+// "home" a `when` could read.
+import { ACT3_PERIMETER_ROAD } from '../../act3/ids';
 
 // ---------------------------------------------------------------------------
 // §4.1 — The truck
@@ -123,6 +128,8 @@ const driveTruckEntryText =
   'He is in it before you are. The engine comes up out of that lot like\nsomething being woken on purpose, and takes the quiet with it.';
 
 const returnTripEffects: Effect[] = [{ script: { id: ACT2_TRAVEL_SCRIPT, args: { mode: 'truck', to: 'town' } } }];
+/** D3, task A — the perimeter's own return leg (§3.2), a distinct `args` shape (`from`, not `to`) from the Wall Drug return above — see `act2/travel.ts`'s own header note on why. */
+const perimeterReturnTripEffects: Effect[] = [{ script: { id: ACT2_TRAVEL_SCRIPT, args: { mode: 'truck', from: 'perimeter' } } }];
 const outboundRideEffects: Effect[] = [{ say: driveTruckEntryText }, { script: { id: ACT2_TRAVEL_SCRIPT, args: { mode: 'truck', to: 'wall_drug' } } }];
 
 const monsterTruck: ObjectDefSlice = {
@@ -176,6 +183,7 @@ const monsterTruck: ObjectDefSlice = {
     // (§19's own instruction): the return trip first (more specific — the
     // player is standing at the Emporium with the truck), then the
     // outbound ride once Jack has offered it.
+    { verbs: [V_DRIVE, DIRECTION_VERB_IDS.in], when: { at: ACT3_PERIMETER_ROAD }, effects: perimeterReturnTripEffects },
     { verbs: [V_DRIVE, DIRECTION_VERB_IDS.in], when: { at: ACT2_WALL_DRUG_EMPORIUM }, effects: returnTripEffects },
     { verbs: [V_DRIVE, DIRECTION_VERB_IDS.in], when: { flag: FLAG_OFFERED_THE_RIDE }, effects: outboundRideEffects },
     // "drive truck"/"start truck"/"get in truck"/"take truck"/"open door"

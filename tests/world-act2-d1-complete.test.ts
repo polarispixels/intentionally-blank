@@ -40,10 +40,19 @@ describe('Stage D1 — the ride and Wall Drug on a clean save', () => {
       '◆ clue noted: The page fits',
       '◆ clue noted: The login in the back cover',
       '? question answered: What did Jules leave at that counter',
-      'END OF BUILD',
     ]) {
       expect(stdout).toContain(beat);
     }
+    // D3, task A supersession (Stage D plan §2 D3; D3 prose doc §21.1):
+    // "DRIVE TO PLANT is retired entirely: it is §3's travel script with
+    // to: 'perimeter'" — this fixture's own mid-game `drive to plant`
+    // probe (which used to render END OF BUILD harmlessly, with no state
+    // change) is removed rather than left to strand the player at the
+    // perimeter with no way back to Your Room for the terminal boot that
+    // follows; full coverage of the new travel behavior lives in
+    // `tests/world-act3-entry.test.ts` and `tests/world-act2-d2-complete.
+    // test.ts`.
+    expect(stdout).not.toContain('END OF BUILD');
     // the hat, M1, one M3, M5, M6, M14, M12, M18-A or not, and one M2
     expect((stdout.match(/── MEMORY RECOVERED ──/g) ?? []).length).toBeGreaterThanOrEqual(8);
   });

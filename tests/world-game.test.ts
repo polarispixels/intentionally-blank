@@ -76,15 +76,27 @@ describe('assemble', () => {
 // "boundary_gate" (not "tunnel_gate"): it marks the SAME edge-of-built-
 // content as the other two, just reached a different way (learning about
 // the tunnel, rather than walking north or south of the highway).
+//
+// UPDATED AGAIN (Stage D3, task C — the Cooling Plant/Corridor B4/the
+// elevator/the boundary): the count is now exactly four. The Cooling
+// Plant's own chase hatch gains a `down` exit, gated `{ flag:
+// act3_hatch_open }`, referencing a new, separate gate object
+// (`ACT3_BOUNDARY_GATE`) that never opens — the wave's own D3 prose doc §15
+// boundary, reached this way (an exit) or, without a fourth gate object, via
+// two `{ script }` effects that need no exit at all: "ENTER HATCH" (an
+// object handler on the hatch itself) and the elevator's S1/S5 buttons
+// (`act3/elevator.ts`). Those two routes are not exits and so don't count
+// here, by the same logic the tunnel-mouth note above already states for
+// this counter (`exit.door`, not "every way to reach the boundary").
 describe('system.buildBoundary', () => {
-  it('exactly three exits reference a build-boundary gate (Town Edge north, Emporium south, Town Edge nw — two gate objects)', () => {
+  it('exactly four exits reference a build-boundary gate (Town Edge north, Emporium south, Town Edge nw, the Cooling Plant hatch down — three gate objects)', () => {
     let count = 0;
     for (const room of Object.values(WORLD.rooms ?? {})) {
       for (const exit of room.exits ?? []) {
         if (exit.door && /boundary_gate/i.test(exit.door)) count++;
       }
     }
-    expect(count).toBe(3);
+    expect(count).toBe(4);
   });
 });
 

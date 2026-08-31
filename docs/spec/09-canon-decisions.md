@@ -1,6 +1,6 @@
 # 09 - Canon Decisions Register
 
-**Spec version:** `0.11.0`
+**Spec version:** `0.13.0`
 
 During the full-game build (see `docs/DEVELOPMENT.md`, "Full-game build
 protocol") the main session is authorized to resolve `WORKING IDEA` and
@@ -85,6 +85,13 @@ consistent), what it forecloses, and where it now lives in the spec.
 | 70 | 2026-08-31 | May the narrator count? | **Twice in the whole game — `COUNT LEVELS` at the model and the paces in B4 — because in both the count *is* the discrepancy. A third must be argued for.** | The arithmetic rule is the game's most load-bearing prose discipline. | Any other narrator count. | D3 prose §7.3, §11.3 |
 | 71 | 2026-08-31 | L7 in Act III | **The horse stops at the perimeter cattle guard and is led no further; nothing says why; this is L7's only Act III appearance.** | One instance is evidence; two is a mascot. | A horse reaction inside the fence; any NPC remarking on it. | D3 prose §3.3 |
 | 72 | 2026-08-31 | How long did Nolan manage Jules? (wave 4's Jack: "near enough nine years"; D2's Nolan said four) | **Nine years.** Jack's shipped line stands; Nolan's two lines and Jules's M7 corrected to nine. | The shipped line wins; Nolan's memory being managed is not a licence for arithmetic errors. | "Four years" anywhere. | wave 4 §6.5; D2 §17.5; D3 §12 |
+| 73 | 2026-08-31 | The gauge wall's figures (S5) | **`GEN 905`, `HALL A 460`, `FDR 3 445` by day; `GEN 868`, `HALL A 460`, `FDR 3 408` between one and four in the morning. No units anywhere; the narrator never subtracts.** | They match Eli's shipped audit exactly (entry 64); the night dip washes out of a monthly average, as it must. | Any other figures; a unit; a printed difference. | D4 prose §9.3 |
+| 74 | 2026-08-31 | The night window | **One to four in the morning — `{ clock: { after: 60, before: 240 } }`.** | The plan's 02:30–04:00 punished an early arrival with nothing; one-to-four contains three. | The plan's window. | D4 prose §9.3 |
+| 75 | 2026-08-31 | The S6 door's refusal | **The pad accepts the notebook credentials, returns `ACCESS LEVEL: MAINTENANCE / DENIED`, and does not open. The same credentials open the Hub ledger (D5) and the root console (Act V).** | The joke rehearses without making the journey pointless: the words are not wrong, only shallow. | The credentials failing outright; a different pair anywhere. | D4 prose §9.8 |
+| 76 | 2026-08-31 | The 1983 stencil in the Service Tunnel (architecture §3 room 31) | **Dropped.** B4's panel is the game's instance. | Entry 16's artifacts work because they are rare; two marks in two waves is a decorating scheme. | A second 1983 before Act IV. | D3 prose §11.7 |
+| 77 | 2026-08-31 | Does the tunnel route satisfy P16 and set `act3_inside`? | **Yes, both, on first entry to S1.** | Otherwise route (b) silently fails a puzzle and disables the underground pass-time refusal. | A four-route puzzle with one route that does not count. | D4 prose §21.1 |
+| 78 | 2026-08-31 | Deaths and callbacks | **A death teaches a mechanism and is never referred to again by any NPC, response or narrator line.** | Deaths are cheap and undoable (04 §18); a callback makes a scar and turns undo into a lie. | Any "last time you tried that". | D4 prose §10 |
+| 79 | 2026-08-31 | The tunnel after D4 | **Once the construction door is open, the tunnel is a permanent two-way route between the county road and Sublevel 1, unwatched, and nothing ever remarks on it.** | P19 and Stage E's root leg both pass through it. | An NPC or narrator praising or closing the route. | D4 prose §7, §21 |
 
 ## Stage A promotion (entries 3–17)
 

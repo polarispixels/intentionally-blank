@@ -22,8 +22,10 @@ import type { ExitDefSlice, HandlerDef, RoomDefSlice } from '../../../engine/wor
 import type { ProseRule } from '../../../engine/prose';
 import { HELLO, LISTEN, SMELL, WAIT, YELL } from './verbs';
 import { CLAIM_TICKET, FLAG_VISITED_TOWN_EDGE, MAIN_STREET, MONSTER_TRUCK, NOLANS_YARD, TOWN_EDGE, TOWN_EDGE_BOUNDARY_GATE, TOWN_EDGE_NO_EXIT_GATE, TOWN_EDGE_TUNNEL_BOUNDARY_GATE, V_LOOK_UP } from './ids';
-import { ACT2_KNOWS_TUNNEL_MOUTH, ACT2_MEM_M15, ACT2_STARTED, ACT2_WALL_DRUG_EMPORIUM, V_ACT2_DRIVE_TO_PLANT } from '../act2/ids';
+import { ACT2_HORSE_BORROWED, ACT2_KNOWS_TUNNEL_MOUTH, ACT2_MEM_M15, ACT2_STARTED, ACT2_TRAVEL_SCRIPT, ACT2_WALL_DRUG_EMPORIUM, V_ACT2_DRIVE_TO_PLANT } from '../act2/ids';
 import { ACT2_DRIVE_TO_PLANT_EFFECTS } from '../act2/scripts';
+// D3, task A — "RIDE TO PLANT" (§3, ruling 1), mirroring "DRIVE TO PLANT" just below.
+import { V_ACT3_RIDE_TO_PLANT } from '../act3/ids';
 
 // ---------------------------------------------------------------------------
 // §12.1 — description (§13.1/§13.2 amend both rules, wave 5)
@@ -78,6 +80,12 @@ const roomHandlers: HandlerDef[] = [
   { verbs: [YELL, HELLO], effects: [{ say: shoutText }] },
   // D1 amendment — the boundary's second route (§21), with the truck present. Never reachable in D1 (the travel script never parks the truck here) — wired per the ruling's own text, forward-compatible with a later wave.
   { verbs: [V_ACT2_DRIVE_TO_PLANT], when: { objectAt: [MONSTER_TRUCK, TOWN_EDGE] }, effects: ACT2_DRIVE_TO_PLANT_EFFECTS },
+  // D3, task A — "RIDE TO PLANT," the horse's own boundary door (§3, ruling 1).
+  {
+    verbs: [V_ACT3_RIDE_TO_PLANT],
+    when: { flag: ACT2_HORSE_BORROWED },
+    effects: [{ script: { id: ACT2_TRAVEL_SCRIPT, args: { mode: 'horse', to: 'perimeter' } } }],
+  },
 ];
 
 const onEnter: RoomDefSlice['onEnter'] = [{ effects: [{ set: [FLAG_VISITED_TOWN_EDGE, true] }] }];
@@ -138,8 +146,24 @@ export const northBlockedText: ProseRule[] = [
 // 'prose'`, never the doc's own instructed `kind: 'system'`): the country
 // line and the system line are concatenated into one string rather than
 // split across two `GameEvent` kinds.
+//
+// D3 task C amendment (D3 prose doc §15/§21.1) — "D2's boundary text is
+// retired in the same change... All three [the fence, the gatehouse, and
+// what a borrowed badge opens] are now in this version." The in-world
+// cedar-post preamble is kept byte-for-byte; only the system line changes,
+// to §15's own (`act3/scripts.ts`'s `ACT3_BOUNDARY_TEXT`, transcribed here
+// rather than imported — this file already carries its own copy of this
+// exact "ENGINE GAP" concatenation idiom, and importing a cross-act string
+// constant into Act I for one shared literal would be the wrong direction
+// for very little gain). `act2/scripts.ts`'s own `ACT2_BOUNDARY_SCRIPT`/
+// `ACT2_BOUNDARY_TEXT` are deliberately NOT deleted in this change — see
+// this task's own report: they are still load-bearing for the shipped
+// `DRIVE TO PLANT` handlers (`jacksMotel.ts`, this file's own `north`
+// amendment) until task A's own plan-directed retirement of that verb
+// lands; deleting them here would break those handlers outside this
+// task's module.
 const NW_TUNNEL_BLOCKED_TEXT =
-  'You go out over the grazing with the last of the town behind you and the line\nof cedar posts on your left, and the posts carry no wire and never have, and\nthey run north as straight as anything in this county.\n\nEND OF BUILD\n\nAct II continues past this point. The fence, the gatehouse, and what a\nborrowed badge opens are not in this version.';
+  'You go out over the grazing with the last of the town behind you and the line\nof cedar posts on your left, and the posts carry no wire and never have, and\nthey run north as straight as anything in this county.\n\nEND OF BUILD\n\nAct III continues below this floor. Sublevel 1, Sublevel 5, the service tunnel and the pipe chase are not in this version.';
 
 const travelTextOut = 'You walk back in among the buildings and the wind stops being a fact about you.';
 

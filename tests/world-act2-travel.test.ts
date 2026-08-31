@@ -31,6 +31,7 @@ import {
   ACT2_USB,
   ACT2_WALL_DRUG_EMPORIUM,
 } from '../src/content/world/act2/ids';
+import { ACT3_PERIMETER_ROAD } from '../src/content/world/act3/ids';
 
 const TEST_WORLD: WorldDef = WORLD;
 const vocab = compileVocabulary(TEST_WORLD);
@@ -252,14 +253,23 @@ describe('The boundary', () => {
   // D2-C amendment (Stage D plan §2 D2 §23; §29.1): D1's own
   // `jackPlantLineText` ("The plant," Jack says...) is superseded by §23's
   // truck line — updated here rather than left checking retired text.
-  it('DRIVE TO PLANT at the motel, with the truck present, renders the boundary', () => {
+  //
+  // D3, task A supersession (Stage D plan §2 D3; D3 prose doc §21.1's own
+  // "DRIVE TO PLANT is retired entirely: it is §3's travel script with
+  // to: 'perimeter'"): the system.buildBoundary emission this test used to
+  // check for is gone — DRIVE TO PLANT now really travels. Full coverage
+  // of the new behavior lives in `tests/world-act3-entry.test.ts`; this is
+  // now a one-line regression guard that the OLD boundary route stays gone.
+  it('DRIVE TO PLANT at the motel, with the truck present, travels to the perimeter (D3 — the D2 boundary is retired)', () => {
     const store = new MemoryStore();
     const session = withState({ location: JACKS_MOTEL });
-    const { events } = say(session, 'drive to plant', store);
+    const { events, session: after } = say(session, 'drive to plant', store);
     const system = events.filter((e): e is Extract<GameEvent, { type: 'line' }> => e.type === 'line' && e.kind === 'system');
-    expect(system).toHaveLength(1);
-    expect(system[0]!.text).toContain('END OF BUILD');
+    expect(system).toHaveLength(0);
+    expect(text(events)).not.toContain('END OF BUILD');
     expect(text(events)).toContain('Jack takes the cattle guard at a walking pace');
+    expect(text(events)).toContain('I\'ll be here');
+    expect(after.state.location).toBe(ACT3_PERIMETER_ROAD);
   });
 });
 

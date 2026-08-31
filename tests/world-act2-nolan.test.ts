@@ -2,7 +2,15 @@
 // Drives the real session/turn pipeline, same idiom as
 // `tests/world-act2-poker.test.ts`. Evening in the yard: greeting, M8
 // fires, `topic_sublevel` twice → the clue silently, the two shows,
-// `unknownTopic`; offstage at noon.
+// `unknownTopic`.
+//
+// D3, task B amendment: the "offstage at noon" case below was true only
+// through D2 — the D3 schedule retarget (`act2/nolan.ts`, this task's own
+// amendment; prose doc §8) puts Nolan in the Lobby for the rest of morning
+// and all of afternoon once `act2_started`. Updated here rather than left
+// red; the full retarget (the 07:00–07:30 tailgate window, the fence
+// variant, the work-layer topics) is exercised in its own file,
+// `tests/world-act3-nolan-work.test.ts`.
 
 import { describe, expect, it } from 'vitest';
 import { WORLD } from '../src/content/world/act1/world';
@@ -16,6 +24,7 @@ import { npcRoom } from '../src/engine/cond';
 import type { GameEvent, GameState, WorldDef } from '../src/engine/world';
 import { NOLANS_YARD, PO_BOX_SLIP, WORK_ORDER } from '../src/content/world/act1/ids';
 import { ACT2_CLUE_VERBATIM, ACT2_NOLAN, ACT2_NOLAN_SUBLEVEL_COUNT, ACT2_STARTED } from '../src/content/world/act2/ids';
+import { ACT3_LOBBY } from '../src/content/world/act3/ids';
 
 const TEST_WORLD: WorldDef = WORLD;
 const vocab = compileVocabulary(TEST_WORLD);
@@ -59,9 +68,9 @@ describe('Nolan — schedule', () => {
     expect(npcRoom(TEST_WORLD, session.state, ACT2_NOLAN)).toBe(NOLANS_YARD);
   });
 
-  it('is offstage at noon', () => {
+  it('is in the Lobby at noon, once the D3 schedule retarget lands (was offstage through D2)', () => {
     const session = withState({ clock: { day: 1, minute: 720 }, flags: { [ACT2_STARTED]: true } }); // afternoon
-    expect(npcRoom(TEST_WORLD, session.state, ACT2_NOLAN)).toBe('offstage');
+    expect(npcRoom(TEST_WORLD, session.state, ACT2_NOLAN)).toBe(ACT3_LOBBY);
   });
 
   it('is offstage entirely before act2_started', () => {

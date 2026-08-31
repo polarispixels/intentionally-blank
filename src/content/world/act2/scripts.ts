@@ -17,7 +17,7 @@
 import type { Effect } from '../../../engine/effects';
 import type { ScriptId } from '../../../engine/ids';
 import type { ScriptFn } from '../../../engine/world';
-import { ACT2_BOUNDARY_SCRIPT } from './ids';
+import { ACT2_BOUNDARY_SCRIPT, ACT2_TRAVEL_SCRIPT } from './ids';
 
 export { ACT2_BOUNDARY_SCRIPT };
 
@@ -49,4 +49,18 @@ const truckAtTheCattleGuardText =
 /** Also this verb's own `default` (`act2/verbs.ts`) — the room-level handlers below are what a player actually reaches; see that file's own comment on the idiom (`V_CHECK_DATE`/`V_FIND_MY_NAME`). */
 export const ACT2_DRIVE_TO_PLANT_TEXT = truckAtTheCattleGuardText;
 
-export const ACT2_DRIVE_TO_PLANT_EFFECTS: Effect[] = [{ say: truckAtTheCattleGuardText }, { script: { id: ACT2_BOUNDARY_SCRIPT } }];
+// ---------------------------------------------------------------------------
+// D3, task A amendment (Stage D plan §2 D3; D3 prose doc §21.1's own "D2
+// §23's boundary ... DRIVE TO PLANT is retired entirely: it is §3's travel
+// script with to: 'perimeter'"). The in-world lead-in line is kept
+// unchanged (only "its boundary emission" — the `{ script:
+// { id: ACT2_BOUNDARY_SCRIPT } }` call — is retired, per that ruling's own
+// wording); `system.buildBoundary`'s single remaining emission moves to
+// D3's own three doors (`act3/perimeterRoad.ts`'s exits, the elevator, the
+// chase hatch — task C's own module for the latter two).
+// ---------------------------------------------------------------------------
+
+export const ACT2_DRIVE_TO_PLANT_EFFECTS: Effect[] = [
+  { say: truckAtTheCattleGuardText },
+  { script: { id: ACT2_TRAVEL_SCRIPT, args: { mode: 'truck', to: 'perimeter' } } },
+];

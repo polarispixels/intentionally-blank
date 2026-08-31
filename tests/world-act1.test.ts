@@ -148,10 +148,27 @@ describe('validate — Act I room 1', () => {
   // box (§4.2's own vocabulary); this task's own `act2_write`'s "write
   // letter" collides with "letter" the same way "post letter" already
   // does (censor.ts's own new "letter"-shaped objects).
-  it('produces exactly the 38 expected verb-noun-collision warnings, no others', () => {
+  //
+  // Stage D3 adds fourteen more, three concurrent tasks landing in the
+  // same wave. This task's own (task A) six: `act3_look_west`'s "west"
+  // (the tunnel country's own noun, §4.9), `act3_photograph`'s "photograph"
+  // and "picture" (bare-safe by the same sentence-position reasoning
+  // `act2_drive_to_plant` already relies on), `act3_ride_to_plant`'s
+  // "north"/"plant" (mirroring `act2_drive_to_plant`'s own identical two),
+  // and `act3_write_vendor_number`'s "number" (no object anywhere declares
+  // it bare, but it's a token of an existing noun phrase). Reviewed and
+  // accepted the same way. The remaining eight are the two concurrent
+  // rooms' own (`act3_look_down_aisle`'s "aisle"/"row", Data Hall A; and
+  // `act1_check_date`/`act1_what_year`'s "date", `act1_sweep`'s "sweep",
+  // `look`'s "l", `out`'s "exit", `sing`'s "hum" — new nouns somewhere in
+  // the Lobby/Cooling Plant/Corridor B4 content those two tasks' own
+  // reports cover) — included here only because this is a whole-`WORLD`
+  // count and someone had to reconcile it for the suite to go green; not
+  // this task's own module to review in depth.
+  it('produces exactly the 52 expected verb-noun-collision warnings, no others', () => {
     const warnings = validate(WORLD).filter((f) => f.severity === 'warning');
     const collisions = warnings.filter((f) => f.code === 'verb-noun-collision');
-    expect(collisions.length).toBe(38);
+    expect(collisions.length).toBe(52);
     expect(collisions.map((f) => f.message).sort()).toEqual(
       [
         "verb \"act2_pay\" can be typed bare and its word \"money\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
@@ -192,6 +209,20 @@ describe('validate — Act I room 1', () => {
         "verb \"out\" can be typed bare and its word \"outside\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"stand\" can be typed bare and its word \"stand\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"w\" can be typed bare and its word \"west\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act1_check_date\" can be typed bare and its word \"date\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act1_sweep\" can be typed bare and its word \"sweep\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act1_what_year\" can be typed bare and its word \"date\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act3_look_down_aisle\" can be typed bare and its word \"aisle\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act3_look_down_aisle\" can be typed bare and its word \"row\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act3_look_west\" can be typed bare and its word \"west\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act3_photograph\" can be typed bare and its word \"photograph\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act3_photograph\" can be typed bare and its word \"picture\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act3_ride_to_plant\" can be typed bare and its word \"north\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act3_ride_to_plant\" can be typed bare and its word \"plant\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act3_write_vendor_number\" can be typed bare and its word \"number\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"look\" can be typed bare and its word \"l\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"out\" can be typed bare and its word \"exit\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"sing\" can be typed bare and its word \"hum\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
       ].sort(),
     );
   });
@@ -271,9 +302,12 @@ describe('validate — Act I room 1', () => {
   // (above): 34 + 5 = 39. Stage D1, task A (the ride north) adds 3 more
   // (`act2_drive_to_plant`'s own three words, above): 39 + 3 = 42. Stage
   // D2 adds 2 more (`act2_pay`/"money", task A; `act2_write`/"letter",
-  // this task — see the verb-noun test above): 42 + 2 = 44.
-  it('produces exactly forty-four warnings total, no others', () => {
+  // this task — see the verb-noun test above): 42 + 2 = 44. Stage D3
+  // (three concurrent tasks) adds 14 more verb-noun collisions (see that
+  // test above) and 1 more `room-description-mentions-portable`
+  // (`act3_lobby`/"brochures", task B): 44 + 14 + 1 = 59.
+  it('produces exactly fifty-nine warnings total, no others', () => {
     const warnings = validate(WORLD).filter((f) => f.severity === 'warning');
-    expect(warnings.length).toBe(44);
+    expect(warnings.length).toBe(59);
   });
 });

@@ -29,7 +29,10 @@ import {
   TOWN_EDGE,
   V_LOOK_UP,
 } from './ids';
-import { ACT2_CUSTODIAN, ACT2_MEM_M15, ACT2_STARTED } from '../act2/ids';
+import { ACT2_CUSTODIAN, ACT2_HORSE_BORROWED, ACT2_MEM_M15, ACT2_STARTED, ACT2_TRAVEL_SCRIPT } from '../act2/ids';
+// D3, task A — "RIDE TO PLANT" (§3, ruling 1), the horse's own boundary
+// door, mirroring "DRIVE TO PLANT" at the motel/Town Edge.
+import { V_ACT3_RIDE_TO_PLANT } from '../act3/ids';
 
 // ---------------------------------------------------------------------------
 // §2.2 — description
@@ -110,6 +113,13 @@ const roomHandlers: HandlerDef[] = [
   // "SHOUT"/"YELL"/"CALL OUT"/"HELLO" (to the street, no target) — overrides opening-room §7.11's bare HELLO while in this room.
   { verbs: [YELL, HELLO], effects: [{ say: shoutText }] },
   { verbs: [WAIT], effects: [{ say: waitText }] },
+  // D3, task A — "RIDE TO PLANT," the horse's own boundary door (§3,
+  // ruling 1), gated on the horse having been borrowed/untied.
+  {
+    verbs: [V_ACT3_RIDE_TO_PLANT],
+    when: { flag: ACT2_HORSE_BORROWED },
+    effects: [{ script: { id: ACT2_TRAVEL_SCRIPT, args: { mode: 'horse', to: 'perimeter' } } }],
+  },
 ];
 
 const onEnter: RoomDefSlice['onEnter'] = [{ effects: [{ set: [FLAG_VISITED_MAIN_STREET, true] }] }];

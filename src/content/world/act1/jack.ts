@@ -84,6 +84,7 @@ import {
   MEM_M3_ANALYTICAL,
   MEM_M3_DIRECT,
   MEM_M3_SOCIAL,
+  MONSTER_TRUCK,
   MUG,
   PAGE_78,
   ROOM_KEY,
@@ -94,7 +95,14 @@ import {
   V_KISS,
   WORK_ORDER,
 } from './ids';
-import { ACT2_DAD_BOOTED, ACT2_JACK_AWAY, ACT2_LUKE_REFERENCED, ACT2_RIG, ACT2_STARTED, ACT2_TRAVEL_SCRIPT } from '../act2/ids';
+import { ACT2_DAD_BOOTED, ACT2_HAS_AUDIT, ACT2_JACK_AWAY, ACT2_LUKE_REFERENCED, ACT2_NOTEBOOK, ACT2_REPLY_AUDIT, ACT2_RIG, ACT2_SHORTHAND_DECODED, ACT2_STARTED, ACT2_TRAVEL_SCRIPT } from '../act2/ids';
+// D3, task A — §4.10's "ASK JACK ABOUT FENCE" and §5.4's persuasion
+// (`SHOW NOTEBOOK/AUDIT TO JACK`). `act1/ids.ts` may not import a later
+// act's `ids.ts` (that rule governs `ids.ts`-to-`ids.ts` imports only —
+// see `act2/nolan.ts`'s own header note on the identical exception); this
+// room/NPC file importing an id constant from `act3/ids.ts` creates no
+// cycle either way.
+import { ACT3_JACK_TOPIC_FENCE, ACT3_JACK_WILL_RAM, ACT3_PERIMETER_ROAD } from '../act3/ids';
 
 // ---------------------------------------------------------------------------
 // §6.3 — unknownTopic
@@ -335,7 +343,27 @@ const topicPlant: TopicDef = {
     '"Two hundred jobs and a fence." He says it like a line he has said before.\n"Nolan\'s the one you\'d ask. Nolan\'s all right — Nolan\'s better than all right,\nhe came to our mother\'s funeral and he stayed for the washing up."\n\n"He\'ll tell you anything you ask him. That\'s the trouble with asking him."',
 };
 
+// ---------------------------------------------------------------------------
+// D3, task A — §4.10's "ASK JACK ABOUT FENCE," at the perimeter, truck
+// present, before persuasion. Shadows `topicPlant`'s own bare "fence" word
+// (declared FIRST below, same idiom this file's own header note on
+// `topicEli`/wave 5's three additions already documents) while its `when`
+// holds; falls through to `topicPlant`'s ordinary response the rest of the
+// time (`ASK JACK ABOUT FENCE` anywhere else, or once persuaded).
+// ---------------------------------------------------------------------------
+
+const topicFence: TopicDef = {
+  id: ACT3_JACK_TOPIC_FENCE,
+  words: ['fence', 'wire', 'mesh'],
+  when: { all: [{ at: ACT3_PERIMETER_ROAD }, { objectAt: [MONSTER_TRUCK, ACT3_PERIMETER_ROAD] }, { not: { flag: ACT3_JACK_WILL_RAM } }] },
+  response:
+    'He looks at it the way a man looks at a job.\n\n"Eight foot. Posts at eight foot, set in about two and a half by the look of\nthe spoil they never took away." He is not boasting; he is estimating. "It\'d\ngo. It\'d cost me a bumper and a headlamp and I\'d not do it for a maybe."',
+};
+
 const topics: TopicDef[] = [
+  // D3, task A — declared first; shadows `topicPlant`'s own bare "fence"
+  // word while its own `when` holds (see `topicFence`'s own comment above).
+  topicFence,
   // D2 amendment (task A) — declared first for the same reason wave 5's own
   // three additions are (below): `topicEli`'s words shadow `topic_family`'s
   // bare "eli" and `topic_letters`'s bare "letter" (see `topicEli`'s own
@@ -501,6 +529,14 @@ const tellTopics: TopicDef[] = [
 ];
 
 // ---------------------------------------------------------------------------
+// D3, task A — §5.4's persuasion text, shared by both accepted objects
+// (the decoded notebook, the audit reply).
+// ---------------------------------------------------------------------------
+
+const persuadeJackText =
+  'He reads it with the interior light on and the engine off, and he takes his\ntime, and he goes back up the page twice.\n\nThen he puts it on the seat between you and looks out through the windscreen\nat eight feet of somebody else\'s mesh.\n\n"Five weeks," he says. "Five weeks of being the crank. Sheriff\'s got a file\nwith my name on it and it\'s a file about *me*."\n\nHe turns the key. "Say the word and I\'ll put a hole in it. I\'d like that on\npaper somewhere, that it was me that said it."';
+
+// ---------------------------------------------------------------------------
 // §6.7 — showResponses (four)
 // ---------------------------------------------------------------------------
 
@@ -534,6 +570,23 @@ const showResponses: ShowResponseDef[] = [
     objects: [CLAIM_TICKET],
     response: jackWallDrugText,
     effects: jackWallDrugEffects,
+  },
+  // D3, task A — §5.4's persuasion. Both accepted (D2's two channels
+  // arriving at the same door); gated `{ at: act3_perimeter_road }` — see
+  // this task's report on that location gate (not explicit in the doc's
+  // own §5.4 header, a builder decision for narrative consistency with the
+  // scene's own "eight feet of somebody else's mesh" framing).
+  {
+    objects: [ACT2_NOTEBOOK],
+    when: { all: [{ at: ACT3_PERIMETER_ROAD }, { flag: ACT2_SHORTHAND_DECODED }] },
+    response: persuadeJackText,
+    effects: [{ set: [ACT3_JACK_WILL_RAM, true] }],
+  },
+  {
+    objects: [ACT2_REPLY_AUDIT],
+    when: { all: [{ at: ACT3_PERIMETER_ROAD }, { flag: ACT2_HAS_AUDIT }] },
+    response: persuadeJackText,
+    effects: [{ set: [ACT3_JACK_WILL_RAM, true] }],
   },
 ];
 
