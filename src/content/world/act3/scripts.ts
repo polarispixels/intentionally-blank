@@ -19,8 +19,19 @@
 import { apply } from '../../../engine/effects';
 import type { Effect } from '../../../engine/effects';
 import type { GameEvent, ScriptFn } from '../../../engine/world';
+import type { RoomId } from '../../../engine/ids';
 import { ACT2_Q_INSIDE_THE_PLANT } from '../act2/ids';
-import { ACT3_ALERTNESS, ACT3_COOLING_PLANT, ACT3_GATE_DOOR, ACT3_INSIDE, ACT3_MEM_M20D, ACT3_RODE_FENCE } from './ids';
+import {
+  ACT3_ALERTNESS,
+  ACT3_COOLING_PLANT,
+  ACT3_GATE_DOOR,
+  ACT3_INSIDE,
+  ACT3_MEM_M20D,
+  ACT3_RODE_FENCE,
+  // D4 task B (§12.1) — the ride script's own real destinations.
+  ACT3_S1_MECHANICAL_GALLERY,
+  ACT3_S5_REACTOR_INTERFACE,
+} from './ids';
 
 const BEAT_1 =
   'Jack does not say anything clever. He backs the truck up the perimeter road\nabout two hundred yards, which is further than he needs, and it is the\ndistance of a man who has thought about this in bed.\n\n"Wire\'ll go," he says. "It\'s the posts you feel. Hold the handle above the\ndoor and don\'t hold the dash."';
@@ -72,37 +83,67 @@ export const act3RamFence: ScriptFn = (world, state) => {
 // `applyOne`).
 // ---------------------------------------------------------------------------
 
-import { ACT3_BOUNDARY_SCRIPT, ACT3_ELEVATOR_RIDE_SCRIPT } from './ids';
+import { ACT3_ELEVATOR_RIDE_SCRIPT } from './ids';
 
+// D4 task D note: this D3 system line (naming Sublevel 1, Sublevel 5, the
+// service tunnel and the pipe chase as not-yet-built) and the `act3Boundary`
+// script below are RETIRED for the chase hatch's own `down`/"ENTER HATCH"
+// route (`objects/coolingPlant.ts`'s own D4 amendment no longer calls this
+// script — it `goto`s the real Pipe Chase now, per D4 §12.3/§21.1). D4's
+// own single surviving boundary lives at the Pipe Chase's own `down` exit
+// instead (`pipeChase.ts`'s own `CHASE_BOUNDARY_TEXT`, D4 §13), reached
+// through `ExitDefSlice.blockedText` rather than this script (bare "DOWN"
+// there can never reach a `{ script }` effect at all — see that file's own
+// header). NOT deleted here: the lift's S1/S5 ride (`act3ElevatorRide`,
+// below) and Town Edge's country exit may still call this mid-wave, pending
+// those builders' own D4 amendments (§21.1: the lift's beats/Town Edge's
+// `nw` both need to stop calling this too, once their own destinations are
+// real rooms). Flagged in this task's report; the main session removes
+// this once nothing references it.
+//
 // §15's system line — reached from the chase hatch's `down`/"ENTER HATCH"
 // (an object handler, `objects/coolingPlant.ts` — a real `{ script }`
 // effect there), the lift's S1/S5 (below), and Town Edge's country exit
 // (`act1/objects/townEdge.ts`, this task's own amendment — the same "ENGINE
 // GAP" approximation this file's own header documents for exits).
-export const ACT3_BOUNDARY_TEXT =
-  'END OF BUILD\n\nAct III continues below this floor. Sublevel 1, Sublevel 5, the service tunnel and the pipe chase are not in this version.';
-
-export const act3Boundary: ScriptFn = (_world, state) => ({
-  state,
-  events: [{ type: 'line', kind: 'system', text: ACT3_BOUNDARY_TEXT }],
-});
-
 // §13.8 — three beats (the MVP prologue's/`act2_travel`'s own idiom: hand-
 // built `kind: 'beat'` events, since `say` cannot produce them), `advanceClock:
-// 3`, then the boundary. No `goto` (§13.8's own text: "the player is returned
-// to the room he called it from; no additional text" — i.e. never actually
-// moved in the first place).
+// 3`, unchanged from D3.
 const RIDE_BEATS: string[] = [
   'The leaves take their time about closing. The car takes its time about\nstarting.',
   'It goes down the way freight goes down, without any interest in whether you\nare enjoying it, and the bulb behind its cage shakes very slightly the whole\nway.\n\nThere is time to read the inspection certificate. There is then time to read\nit again.',
   'And then there is time to notice that a building with five floors under it and\na plant deck on top is not a building that ought to take this long to get to\nthe bottom of — and to arrive at *it is only a slow lift*, and to be very\nnearly satisfied with that.\n\nThe car settles. The leaves start.',
 ];
 
-export const act3ElevatorRide: ScriptFn = (world, state) => {
+// D4 task B, §12.1/§21.1: D3's own boundary tail (`act3Boundary`, above) is
+// retired for this script — each destination now really moves the player
+// (`{ goto }`), and S1/S5 each add their own beat 4 first. `args.dest` is
+// the destination room, passed by `elevator.ts`'s own per-floor button
+// handlers (`FLOOR_ROOM`); a destination not in `BEAT4_BY_DEST` (the L
+// stop) gets no beat 4, matching the doc's own "each destination [S1/S5]
+// adds beat 4" — L had no boundary in D3 and gains no new beat here either.
+// This task's own report flags that `act3Boundary`/`ACT3_BOUNDARY_TEXT`/
+// `ACT3_BOUNDARY_SCRIPT` are deliberately NOT deleted from this file: Town
+// Edge's `nw` exit (task A) and the chase hatch's `DOWN` (task D) may still
+// reference them — retiring those call sites is those tasks' own work.
+const S1_BEAT_4 =
+  'The leaves go back on a gallery lit like an office, with pumps down one wall\nand a mesh crib down the other and cool air that smells of nothing.';
+const S5_BEAT_4 =
+  'The leaves go back on quiet.\n\nNot silence — there is a note in it, low, that you get in the back of the jaw\nbefore the ear — but after the hall and the plant it reads as quiet, and the\ngallery in front of you is lit and long and nobody is standing in it.';
+
+const BEAT4_BY_DEST: Partial<Record<string, string>> = {
+  [ACT3_S1_MECHANICAL_GALLERY]: S1_BEAT_4,
+  [ACT3_S5_REACTOR_INTERFACE]: S5_BEAT_4,
+};
+
+export const act3ElevatorRide: ScriptFn = (world, state, args) => {
+  const dest = (args?.dest as RoomId | undefined) ?? ACT3_COOLING_PLANT;
   const beatEvents: GameEvent[] = RIDE_BEATS.map((text) => ({ type: 'line', kind: 'beat', text }));
-  const applied = apply(world, state, [{ advanceClock: 3 }], { path: 'script.act3_elevator_ride' });
-  const boundary = act3Boundary(world, applied.state);
-  return { state: boundary.state, events: [...beatEvents, ...applied.events, ...boundary.events] };
+  const advanced = apply(world, state, [{ advanceClock: 3 }], { path: 'script.act3_elevator_ride' });
+  const beat4 = BEAT4_BY_DEST[dest];
+  const beat4Events: GameEvent[] = beat4 !== undefined ? [{ type: 'line', kind: 'beat', text: beat4 }] : [];
+  const moved = apply(world, advanced.state, [{ goto: dest }], { path: 'script.act3_elevator_ride.goto' });
+  return { state: moved.state, events: [...beatEvents, ...advanced.events, ...beat4Events, ...moved.events] };
 };
 
 // §11.6 — reader B4's rotation. `Cond` has no modulo primitive (`engine/
@@ -127,4 +168,72 @@ export const act3ReaderB4: ScriptFn = (world, state) => {
   return { state: said.state, events: [...incremented.events, ...said.events] };
 };
 
-export { ACT3_BOUNDARY_SCRIPT, ACT3_ELEVATOR_RIDE_SCRIPT, ACT3_READER_B4_SCRIPT };
+export { ACT3_ELEVATOR_RIDE_SCRIPT, ACT3_READER_B4_SCRIPT };
+
+// ---------------------------------------------------------------------------
+// D4 task C — S5 Reactor Interface, the interlock death, and the checkpoint
+// (D4 prose doc §9.9, §10.2-§10.3, §21.3). Own heading; every export above
+// is a sibling task's, untouched.
+// ---------------------------------------------------------------------------
+
+import { INTERLOCK_BEATS, INTERLOCK_DEATH_TEXT } from './objects/s5ReactorInterface';
+import { ACT3_DEATH_REACTOR, ACT3_DIED_REACTOR, ACT3_INTERLOCK_DEATH_SCRIPT, ACT3_READ_CLOCK_SCRIPT, ACT3_READ_GAUGES_NIGHT } from './ids';
+import { clockInWords } from './time';
+
+/**
+ * §10.2/§10.3 — the game's first death. §0's own convention: fenced blocks
+ * under a "Beat n" heading are `kind: 'beat'` events (the three beats,
+ * `INTERLOCK_BEATS`, `objects/s5ReactorInterface.ts`); the death paragraph
+ * itself is not under a "Beat n" heading, so it renders as an ordinary
+ * `say`, followed by `{ die }` and `{ set: [act3_died_reactor, true] }` —
+ * the prologue's own idiom (`content/scenes/mvp-prologue.ts`'s own THE
+ * ARREST: beats, then `apply(..., [{ say }, { die }], ...)`).
+ */
+export const act3InterlockDeath: ScriptFn = (world, state) => {
+  const beat = (text: string): GameEvent => ({ type: 'line', kind: 'beat', text });
+  const result = apply(
+    world,
+    state,
+    [{ say: INTERLOCK_DEATH_TEXT }, { die: ACT3_DEATH_REACTOR }, { set: [ACT3_DIED_REACTOR, true] }],
+    { path: 'script.act3_interlock_death' },
+  );
+  return { state: result.state, events: [...INTERLOCK_BEATS.map(beat), ...result.events] };
+};
+
+/**
+ * §9.9 — `READ CLOCK`/`WHAT TIME IS IT`/`CHECK TIME`: the frame (computed
+ * from the live clock — no static `Prose` can hold this), the rotating
+ * second line (`say`'s own `string[]` rotation, `state.counters`-backed, so
+ * it genuinely rotates "in order" across turns), and the added final line,
+ * once, in the window, before the gauges have been read at night.
+ */
+const CLOCK_ROTATING_LINES: string[] = [
+  'The second hand goes round.',
+  'It is the same clock as the one in the diner and the one over the sheriff\'s\ndoor, which is to say it is a clock.',
+  'Nothing else in the room agrees to have an opinion about that.',
+];
+
+const CLOCK_WINDOW_LINE =
+  'Which is a time at which a man with a job would be asleep, and a wall of\ngauges would be doing whatever it does when nobody is looking at it.';
+
+export const act3ReadClock: ScriptFn = (world, state) => {
+  const frameText = `The hands say ${clockInWords(state.clock.minute)}.`;
+  const result = apply(
+    world,
+    state,
+    [
+      { say: frameText },
+      { say: CLOCK_ROTATING_LINES },
+      {
+        if: {
+          when: { all: [{ clock: { after: 60, before: 240 } }, { not: { flag: ACT3_READ_GAUGES_NIGHT } }] },
+          then: [{ say: CLOCK_WINDOW_LINE }],
+        },
+      },
+    ],
+    { path: 'script.act3_read_clock' },
+  );
+  return result;
+};
+
+export { ACT3_INTERLOCK_DEATH_SCRIPT, ACT3_READ_CLOCK_SCRIPT };

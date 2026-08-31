@@ -51,6 +51,23 @@
 // topic" (this wave's own ruling 1). `jack.ts`'s `topic_family` sets only
 // `ACT2_LUKE_REFERENCED` (no generic "heard the family topic" flag exists)
 // — per the ruling's own fallback, gated on `{ met: JACK }` instead.
+//
+// D4 TASK E — three more topics (`docs/superpowers/specs/2026-09-12-
+// stage-d4-prose.md` §14, §17, §21.1's `act2_dad` row, §21.3), inserted
+// above the shipped fifteen (§21.1: "gains three topics inserted above the
+// shipped rules; none deleted"): `topic_seal` (`when: { flag:
+// ACT3_SAW_SEAL }`), `topic_rails` (`when: { flag: ACT3_WALKED_TUNNEL }`),
+// `topic_interlock` (`when: { flag: ACT3_BYPASS_SEEN }`). All three are
+// location-agnostic (canon 53) and none has a repeat/"block" rule — the
+// doc writes one response each, no second-asking variant. Hard rule 5:
+// the doc's own status line trims Dad's "four hundred thousand dollars"
+// to "a great deal" (entry 37) — transcribed verbatim as it now reads.
+// `../act3/ids` is imported here (not from `./ids`) for the three flags —
+// `act2/nolan.ts` and `act2/travel.ts` already import from `../act3/ids`,
+// so this is not a new precedent; `act3/ids.ts` imports `act2/ids.ts`, so
+// only the reverse (an `ids.ts` file importing another act's `ids.ts`
+// "up" the layer it doesn't already depend on) would cycle, and this is a
+// non-ids module importing an `ids.ts` file, which is fine.
 
 import type { Effect } from '../../../engine/effects';
 import { apply } from '../../../engine/effects';
@@ -61,6 +78,7 @@ import type { ProseRule } from '../../../engine/prose';
 import type { Cond } from '../../../engine/cond';
 import { INTACT_POLAROIDS, JACK, TERMINAL, V_ATTACK, V_HUG, V_KISS, YOUR_ROOM } from '../act1/ids';
 import { TOUCH } from '../act1/verbs';
+import { ACT3_BYPASS_SEEN, ACT3_SAW_SEAL, ACT3_WALKED_TUNNEL } from '../act3/ids';
 import {
   ACT2_CACHE_POLAROID,
   ACT2_CLUE_DAD_BOOTS,
@@ -79,11 +97,14 @@ import {
   ACT2_DAD_TOPIC_FACILITY as TOPIC_FACILITY,
   ACT2_DAD_TOPIC_HEADACHES as TOPIC_HEADACHES,
   ACT2_DAD_TOPIC_HEARING as TOPIC_HEARING,
+  ACT2_DAD_TOPIC_INTERLOCK as TOPIC_INTERLOCK,
   ACT2_DAD_TOPIC_JACK as TOPIC_JACK,
   ACT2_DAD_TOPIC_JULES as TOPIC_JULES,
   ACT2_DAD_TOPIC_LABEL as TOPIC_LABEL,
   ACT2_DAD_TOPIC_LUKE as TOPIC_LUKE,
   ACT2_DAD_TOPIC_POKER as TOPIC_POKER,
+  ACT2_DAD_TOPIC_RAILS as TOPIC_RAILS,
+  ACT2_DAD_TOPIC_SEAL as TOPIC_SEAL,
   ACT2_DAD_TOPIC_SELF as TOPIC_SELF,
   ACT2_DAD_TOPIC_SISSY as TOPIC_SISSY,
   ACT2_DAD_TOPIC_SUBLEVEL as TOPIC_SUBLEVEL,
@@ -151,6 +172,30 @@ export const ACT2_DAD_MANNERISM_EVENT: EventDef = {
 const cutoffIfHeardFamily: Effect = { if: { when: { met: JACK }, then: [{ grantClue: ACT2_CLUE_DAD_CUTOFF }] } };
 
 const topics: TopicDef[] = [
+  // D4 task E (§14) — inserted above the shipped fifteen (§21.1: "none
+  // deleted"). Location-agnostic (canon 53); no repeat/"block" rule — the
+  // doc writes one response each.
+  {
+    id: TOPIC_SEAL,
+    words: ['seal', 'plug', 'hole'],
+    when: { flag: ACT3_SAW_SEAL },
+    response:
+      '"Cut? From the works side?"\n\nThe speed goes out of him for a moment and comes back not quite the same\nspeed.\n\n"Well. Somebody wanted a way out that was not a door. Which happens on a job —\nyou seal a bore and then you find you have sealed a great deal of hire plant on the wrong side of it, and a contractor with a\ndeadline will go through a yard of concrete rather than write that letter."\n\n"That is the answer I would give a reporter and it is probably the true one.\nI will tell you the other thing and then I will stop, because after that I\nwould be making it up. The reason you seal a thing instead of filling it is\nthat sealing is cheaper and filling is permanent, and every man in that room\nknew the difference and voted for the cheap one."\n\nA pause about the length of a breath taken in before a name.\n\n"Take a lamp, kiddo."',
+  },
+  {
+    id: TOPIC_RAILS,
+    words: ['rails', 'track'],
+    when: { flag: ACT3_WALKED_TUNNEL },
+    response:
+      '"Rails! Of course rails." He is delighted and does not notice being delighted.\n"Narrow gauge, battery loco, a man walking beside it at four miles an hour\nbecause you are not going to let a thing like that get away from you\nunderground."\n\n"You cannot put a hundred thousand yards of spoil on a county road, kiddo. The\ncounty road was my road. I had to drive on it."',
+  },
+  {
+    id: TOPIC_INTERLOCK,
+    words: ['interlock', 'bypass', 'shield door'],
+    when: { flag: ACT3_BYPASS_SEEN },
+    response:
+      '"An interlock is the part of a machine that has read the accident report."\n\n"They fit them after somebody has already been hurt somewhere else. And then\na fellow who is behind on his shift puts a key in it and turns it, and the\nwhole of that history leaves the building for the afternoon, and he means to\nturn it back."\n\nA short sound that is not quite a laugh.\n\n"I sat on a committee about that once. Different plant. Same key."',
+  },
   {
     id: TOPIC_SELF,
     words: ['self', 'who are you', 'who am i', 'name', 'yourself', 'you', 'identity'],

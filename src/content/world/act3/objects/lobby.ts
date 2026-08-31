@@ -158,7 +158,10 @@ const brochureTake = 'You take one off the front. The pile does not go down; the
 const brochures: ObjectDefSlice = {
   location: ACT3_LOBBY,
   name: 'brochure',
-  nouns: ['brochure', 'brochures', 'leaflet', 'leaflets', 'pamphlet', 'rack', 'tour', 'tours', 'card'],
+  // v0.14.0: "card" only as compounds — alone in the Lobby a bare "card"
+  // still reaches it (compound fallback), but once carried it no longer ties
+  // S1's checkout card, which lists the bare word.
+  nouns: ['brochure', 'brochures', 'leaflet', 'leaflets', 'pamphlet', 'rack', 'tour', 'tours', 'tour card', 'rack card'],
   portable: true,
   handlers: [
     { verbs: [EXAMINE], effects: [{ say: brochureExamine }] },

@@ -30,6 +30,19 @@ export interface CompiledVocabulary {
   objectNouns: Map<string, ObjectId[]>;
   objectAdjectives: Map<string, ObjectId[]>;
   /**
+   * Compound nouns (v0.14.0): a declared noun with a space in it ("button
+   * panel", "far door", "shield door") is indexed here by its HEAD word, and
+   * its leading words are indexed as the object's adjectives. The grammar
+   * splits a phrase into adjectives + head word, so a whole-string key in
+   * `objectNouns` was never consulted; before this map, "x far door" in
+   * Corridor B4 reached whichever object listed a bare "door". A compound
+   * claim ranks BELOW a bare-noun claim (`resolver.ts`): "panel" alone in B4
+   * is the wall panel, which lists it, not the lift's "button panel".
+   */
+  objectCompoundHeads: Map<string, ObjectId[]>;
+  /** The leading words of compound nouns, by object — an adjective only for the compound path (`resolver.ts`), never upgrading a bare-noun claim. */
+  objectCompoundAdjectives: Map<string, ObjectId[]>;
+  /**
    * `ObjectDefSlice.name` by id (v0.7.0) — what a disambiguation question
    * calls an object ("the billboard or the town limits sign?") instead of
    * the first indexed noun the vocabulary happens to hold for it, which
@@ -39,6 +52,9 @@ export interface CompiledVocabulary {
   objectNames: Map<ObjectId, string>;
   npcNouns: Map<string, NpcId[]>;
   npcAdjectives: Map<string, NpcId[]>;
+  /** As `objectCompoundHeads`, for NPC nouns ("front desk clerk"). */
+  npcCompoundHeads: Map<string, NpcId[]>;
+  npcCompoundAdjectives: Map<string, NpcId[]>;
   /**
    * `NpcDefSlice.pronoun` (§2.6/§3.4), reindexed by id for the parser's
    * `him`/`her`/`them` resolution (task 10) — the fallback-in-scope and
@@ -91,31 +107,50 @@ function compileVerbForms(world: WorldDef): CompiledVerb[] {
 
 function compileObjectVocabulary(
   world: WorldDef,
-): Pick<CompiledVocabulary, 'objectNouns' | 'objectAdjectives' | 'objectNames'> {
+): Pick<CompiledVocabulary, 'objectNouns' | 'objectAdjectives' | 'objectCompoundHeads' | 'objectCompoundAdjectives' | 'objectNames'> {
   const objectNouns = new Map<string, ObjectId[]>();
   const objectAdjectives = new Map<string, ObjectId[]>();
+  const objectCompoundHeads = new Map<string, ObjectId[]>();
+  const objectCompoundAdjectives = new Map<string, ObjectId[]>();
   const objectNames = new Map<ObjectId, string>();
   for (const [id, def] of Object.entries(world.objects ?? {})) {
     const objId = id as ObjectId;
-    for (const noun of def!.nouns ?? []) addTo(objectNouns, noun, objId);
+    for (const noun of def!.nouns ?? []) indexNoun(noun, objId, objectNouns, objectCompoundAdjectives, objectCompoundHeads);
     for (const adj of def!.adjectives ?? []) addTo(objectAdjectives, adj, objId);
     const name = def!.name?.toLowerCase().trim();
     if (name) objectNames.set(objId, name);
   }
-  return { objectNouns, objectAdjectives, objectNames };
+  return { objectNouns, objectAdjectives, objectCompoundHeads, objectCompoundAdjectives, objectNames };
 }
 
-function compileNpcVocabulary(world: WorldDef): Pick<CompiledVocabulary, 'npcNouns' | 'npcAdjectives' | 'npcPronouns'> {
+/**
+ * One declared noun into the three maps: a single word is a bare noun; a
+ * compound ("button panel") keeps its whole-string key in `nouns` (other
+ * consumers still see it), indexes its head word under `compoundHeads`, and
+ * its leading words under `compoundAdjectives` — see `CompiledVocabulary.objectCompoundHeads`.
+ */
+function indexNoun<Id>(noun: string, id: Id, nouns: Map<string, Id[]>, adjectives: Map<string, Id[]>, compoundHeads: Map<string, Id[]>): void {
+  const words = noun.split(' ').filter((w) => w.length > 0);
+  addTo(nouns, noun, id);
+  if (words.length < 2) return;
+  const head = words[words.length - 1]!;
+  if (!(compoundHeads.get(head) ?? []).includes(id)) addTo(compoundHeads, head, id);
+  for (const adj of words.slice(0, -1)) if (!(adjectives.get(adj) ?? []).includes(id)) addTo(adjectives, adj, id);
+}
+
+function compileNpcVocabulary(world: WorldDef): Pick<CompiledVocabulary, 'npcNouns' | 'npcAdjectives' | 'npcCompoundHeads' | 'npcCompoundAdjectives' | 'npcPronouns'> {
   const npcNouns = new Map<string, NpcId[]>();
   const npcAdjectives = new Map<string, NpcId[]>();
+  const npcCompoundHeads = new Map<string, NpcId[]>();
+  const npcCompoundAdjectives = new Map<string, NpcId[]>();
   const npcPronouns = new Map<NpcId, 'he' | 'she' | 'they'>();
   for (const [id, def] of Object.entries(world.npcs ?? {})) {
     const npcId = id as NpcId;
-    for (const noun of def!.nouns ?? []) addTo(npcNouns, noun, npcId);
+    for (const noun of def!.nouns ?? []) indexNoun(noun, npcId, npcNouns, npcCompoundAdjectives, npcCompoundHeads);
     for (const adj of def!.adjectives ?? []) addTo(npcAdjectives, adj, npcId);
     if (def!.pronoun !== undefined) npcPronouns.set(npcId, def!.pronoun);
   }
-  return { npcNouns, npcAdjectives, npcPronouns };
+  return { npcNouns, npcAdjectives, npcCompoundHeads, npcCompoundAdjectives, npcPronouns };
 }
 
 /** §8 task 14: indexes every `topics`/`tellTopics` word, across every NPC, to the `TopicId`(s) it reaches. */

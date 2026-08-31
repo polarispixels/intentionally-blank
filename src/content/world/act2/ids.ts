@@ -402,6 +402,11 @@ export const ACT2_DAD_TOPIC_HEADACHES = T('act2_dad_topic_headaches');
 /** §30 item 1 — the fifteenth. */
 export const ACT2_DAD_TOPIC_SUBLEVEL = T('act2_dad_topic_sublevel');
 
+/** D4 task E — three more topics (`act2/dad.ts`), inserted above the shipped fifteen (D4 prose doc §14, §21.1: "none deleted"). Declared here for the same directory-scan reason as the fifteen just above. */
+export const ACT2_DAD_TOPIC_SEAL = T('act2_dad_topic_seal');
+export const ACT2_DAD_TOPIC_RAILS = T('act2_dad_topic_rails');
+export const ACT2_DAD_TOPIC_INTERLOCK = T('act2_dad_topic_interlock');
+
 // ---------------------------------------------------------------------------
 // D2-C — the Friday table, Nolan, the Custodian's town post, Main Street by
 // day, the buzz, four memories, and the moved boundary (Stage D plan §2 D2

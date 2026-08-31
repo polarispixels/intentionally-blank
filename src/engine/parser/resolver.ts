@@ -50,9 +50,24 @@ function idsForNoun(vocab: CompiledVocabulary, noun: string, role: ResolveRole):
   return ids;
 }
 
+/** The ids whose claim on `noun` is only as the head of a compound noun (`vocabulary.ts` `objectCompoundHeads`). */
+function idsForCompoundHead(vocab: CompiledVocabulary, noun: string, role: ResolveRole): (ObjectId | NpcId)[] {
+  const ids: (ObjectId | NpcId)[] = [];
+  if (role === 'either') ids.push(...(vocab.objectCompoundHeads.get(noun) ?? []));
+  ids.push(...(vocab.npcCompoundHeads.get(noun) ?? []));
+  return ids;
+}
+
 function hasAdjective(vocab: CompiledVocabulary, id: ObjectId | NpcId, adjective: string): boolean {
   return (vocab.objectAdjectives.get(adjective) ?? []).includes(id as ObjectId) ||
     (vocab.npcAdjectives.get(adjective) ?? []).includes(id as NpcId);
+}
+
+/** A declared adjective, or a leading word of one of the id's own compound nouns ("far" for "far door"). */
+function hasCompoundAdjective(vocab: CompiledVocabulary, id: ObjectId | NpcId, adjective: string): boolean {
+  return hasAdjective(vocab, id, adjective) ||
+    (vocab.objectCompoundAdjectives.get(adjective) ?? []).includes(id as ObjectId) ||
+    (vocab.npcCompoundAdjectives.get(adjective) ?? []).includes(id as NpcId);
 }
 
 /** Every word (noun or adjective) the vocabulary indexes `id` under, object or npc — used by disambiguation-answer matching (`interpreter.ts`), which is forgiving about which word class an answer word belongs to. */
@@ -63,6 +78,7 @@ export function knownWordsFor(vocab: CompiledVocabulary, id: ObjectId | NpcId): 
   for (const w of (vocab.objectNames.get(id as ObjectId) ?? '').split(/\s+/)) if (w) words.add(w);
   for (const [word, ids] of vocab.objectNouns) if (ids.includes(id as ObjectId)) words.add(word);
   for (const [word, ids] of vocab.objectAdjectives) if (ids.includes(id as ObjectId)) words.add(word);
+  for (const [word, ids] of vocab.objectCompoundAdjectives) if (ids.includes(id as ObjectId)) words.add(word);
   for (const [word, ids] of vocab.npcNouns) if (ids.includes(id as NpcId)) words.add(word);
   for (const [word, ids] of vocab.npcAdjectives) if (ids.includes(id as NpcId)) words.add(word);
   return words;
@@ -81,12 +97,23 @@ export function resolveNounPhrase(
   role: ResolveRole,
   location?: ReadonlyMap<ObjectId, PlaceId>,
 ): ResolveResult {
-  const nounIds = [...new Set(idsForNoun(vocab, phrase.noun, role))].filter((id) => visible.includes(id));
-  if (nounIds.length === 0) return { kind: 'none' };
-  let pool = nounIds;
+  const bareIds = [...new Set(idsForNoun(vocab, phrase.noun, role))].filter((id) => visible.includes(id));
+  // Compound-only claims (v0.14.0): "button panel" makes the lift's panel a
+  // candidate for "panel" — but only behind anything that lists the bare
+  // word, and only ahead of nothing at all.
+  const compoundIds = [...new Set(idsForCompoundHead(vocab, phrase.noun, role))].filter((id) => visible.includes(id));
+  const compoundOnly = compoundIds.filter((id) => !bareIds.includes(id));
+  if (bareIds.length === 0 && compoundOnly.length === 0) return { kind: 'none' };
+  let pool = bareIds.length > 0 ? bareIds : compoundOnly;
   if (phrase.adjectives.length > 0) {
-    const fullMatches = nounIds.filter((id) => phrase.adjectives.every((adj) => hasAdjective(vocab, id, adj)));
-    if (fullMatches.length > 0) pool = fullMatches;
+    // Full adjective matches: bare claimants on their DECLARED adjectives
+    // first ("junk drawer" is the drawer, which declares "junk", not the shop
+    // window that merely lists the phrase); then compound claimants on the
+    // leading words of their own compounds ("far door" is the lift door).
+    const fullBare = bareIds.filter((id) => phrase.adjectives.every((adj) => hasAdjective(vocab, id, adj)));
+    const fullCompound = fullBare.length > 0 ? [] : compoundIds.filter((id) => phrase.adjectives.every((adj) => hasCompoundAdjective(vocab, id, adj)));
+    if (fullBare.length > 0) pool = fullBare;
+    else if (fullCompound.length > 0) pool = fullCompound;
   }
   pool = preferHeld(pool, location);
   return pool.length === 1 ? { kind: 'resolved', id: pool[0]! } : { kind: 'ambiguous', candidates: pool };

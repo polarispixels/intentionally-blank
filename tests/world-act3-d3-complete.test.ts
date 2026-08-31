@@ -2,7 +2,7 @@
 // north — the drive to the perimeter, the gate hut, the badge at the reader,
 // the lobby and Nolan, Data Hall A, the cooling plant and its warm return,
 // Corridor B4 paced twice, the wall panel and its stencil, the lift to S5
-// (this version's boundary), and the way back out: the ride to the motel, a
+// (real since v0.14.0), and the way back out: the ride to the motel, a
 // night, the drive north again, Jack and the notebook, the fence, M20-D.
 
 import { spawnSync } from 'node:child_process';
@@ -28,7 +28,7 @@ describe('Stage D3 — the fence and the corridor on a clean save', () => {
     expect(result.status).toBe(0);
   });
 
-  it('drives north, gets inside, paces B4, and rides the lift to the boundary', () => {
+  it('drives north, gets inside, paces B4, and rides the lift to S5 and back', () => {
     for (const beat of [
       // D2's own last beat, still intact
       '"Go see for yourself. There is no Sublevel 6. Bring it back Monday."',
@@ -49,9 +49,8 @@ describe('Stage D3 — the fence and the corridor on a clean save', () => {
       '    INSPECTED\n    NOV 1983',
       '◆ clue noted: Inspected, Nov 1983',
       'Stencilled, not printed',
-      // the lift — this version's boundary
+      // the lift — S5 is real since v0.14.0; the ride down and back up
       'The car settles. The leaves start.',
-      'END OF BUILD',
       // the way back out and the fence (M20-D)
       'Five weeks of being the crank',
       '"Huh," says Jack.',

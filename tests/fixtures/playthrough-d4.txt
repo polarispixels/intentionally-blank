@@ -456,4 +456,103 @@ show notebook to jack
 ram fence
 look
 version
-
+x headlamp
+x hatch
+unbolt hatch
+open hatch
+down
+look
+x crawl
+x return b
+touch return b
+x condensation
+listen
+shout
+down
+look
+out
+look
+x gauges
+read gauges
+x clock
+read clock
+x dial
+open dial
+x s6 door
+x pad
+type credentials
+use badge
+x logbook
+read logbook
+compare audit with gauges
+x interlock
+x red lamp
+x tag
+open shield door
+restart encounter
+look
+turn keyswitch to normal
+x interlock
+open shield door
+x opening
+look down shaft
+count gauges
+up
+look
+x pumps
+x crib
+open crib
+x rack
+x card
+take checkout card
+compare card with notebook
+x door
+open door
+x stair
+x sign
+press l
+look
+south
+out
+out
+look
+drive truck
+look
+sleep
+look
+go to town edge
+look
+nw
+look
+x hatch
+open hatch
+down
+unlock hatch
+x hatch
+down
+turn on lamp
+down
+look
+x rails
+follow rails
+x seal
+touch seal
+x door
+knock on door
+open door
+north
+look
+x door
+south
+look
+turn off lamp
+look
+turn on lamp
+up
+look
+out
+look
+ask dad about the seal
+ask dad about the rails
+ask dad about the interlock
+version

@@ -15,6 +15,23 @@ import { MONSTER_TRUCK, WORK_ORDER } from '../act1/ids';
 import { ACT2_NOLAN, ACT2_NOLAN_BADGE, ACT2_Q_INSIDE_THE_PLANT } from '../act2/ids';
 import { DELIVERY_MORNING } from '../act2/calendar';
 import {
+  ACT3_AT_TUNNEL_MOUTH,
+  ACT3_BASELINE_MATCHED,
+  ACT3_BYPASS_SEEN,
+  ACT3_CONSTRUCTION_DOOR_OPEN,
+  ACT3_DIED_REACTOR,
+  ACT3_HEADLAMP_ON,
+  ACT3_INTERLOCK_NORMAL,
+  ACT3_MATCH_BURNING,
+  ACT3_MATCH_TURNS,
+  ACT3_PIPE_CHASE,
+  ACT3_Q_WHEN_UNWATCHED,
+  ACT3_READ_GAUGES_NIGHT,
+  ACT3_S6_PAD_TRIED,
+  ACT3_SAW_SEAL,
+  ACT3_TUNNEL_BELOW,
+  ACT3_TUNNEL_UNLOCKED,
+  ACT3_WALKED_TUNNEL,
   ACT3_ALERTNESS,
   ACT3_AT_PERIMETER,
   ACT3_CLUE_GATE_RHYTHM,
@@ -69,12 +86,23 @@ export const ACT3_CLUES: WorldSlice['clues'] = {
 
 const ROUTE_C_TRUCK_PRESENT: Cond = { objectAt: [MONSTER_TRUCK, ACT3_PERIMETER_ROAD] };
 
+// D4 task B's own single addition to this puzzle's `solvedWhen` (§21.1) —
+// imported right where it's used rather than threading it through task A's
+// own big shared import block above.
+import { ACT3_S1_MECHANICAL_GALLERY } from './ids';
+
 export const ACT3_PUZZLES: WorldSlice['puzzles'] = {
   [ACT3_P16_ENTRY]: {
     id: ACT3_P16_ENTRY,
     name: 'Getting inside the plant',
     question: ACT2_Q_INSIDE_THE_PLANT,
-    solvedWhen: { any: [{ visited: ACT3_LOBBY }, { visited: ACT3_COOLING_PLANT }] },
+    // D4 task B amendment (§21.1): route (b), the service tunnel, never
+    // passes through the Lobby or the Cooling Plant — without S1 in this
+    // list, P16 never solves and `act2_q_inside_the_plant` is never
+    // answered for a tunnel player. Out-of-module edit to task A's own
+    // puzzle def, made because §21.1 names it explicitly as this wave's
+    // required wiring; flagged in this task's report.
+    solvedWhen: { any: [{ visited: ACT3_LOBBY }, { visited: ACT3_COOLING_PLANT }, { visited: ACT3_S1_MECHANICAL_GALLERY }] },
     solutions: [
       {
         id: 'badge',
@@ -225,7 +253,13 @@ export const ACT3_D3C_QUESTIONS: NonNullable<WorldSlice['questions']> = {
   [ACT3_Q_SECOND_RETURN]: {
     text: "Return B is warm and is not on the plant's own drawing. Warm from what, and where does it actually go?",
     openWhen: { clue: ACT3_CLUE_WARM_RETURN },
-    // No answerWhen in this build — answered in D4/D5 per the prose doc's own state table.
+    // D4 task C — answered at the chase bottom (§9.6, §21.1's own instruction
+    // to edit this in place). `answer` is two consecutive sentences
+    // transcribed verbatim from §9.6's own EXAMINE text (hard rule 5) —
+    // composed from the granting section's own words only, no number, no
+    // *town*.
+    answerWhen: { visited: ACT3_PIPE_CHASE },
+    answer: 'Return B goes past the flange and keeps going.\n\nSo does the ladder.',
   },
 };
 
@@ -259,3 +293,157 @@ export const ACT3_D3C_MEMORIES: NonNullable<WorldSlice['memories']> = {
     trigger: { when: { visited: ACT3_CORRIDOR_B4 } },
   },
 };
+
+// ---------------------------------------------------------------------------
+// Wave D4 shared — the descent (D4 prose doc §2). Written by the main session
+// before the builders ran. Builders add their own CLUE definitions (title and
+// detail composed only from their own section's sentences) and PUZZLE edits
+// in their own labelled block below the anchor, with the Edit tool.
+// ---------------------------------------------------------------------------
+
+export const ACT3_D4_FLAGS: WorldSlice['flags'] = {
+  [ACT3_AT_TUNNEL_MOUTH]: { default: false, doc: 'set by the mouth room\'s own onEnter (register 90: the mouth is its own room now; Town Edge\'s own short-form-return selection uses `visited` instead, but this is still set for anything else that wants it)' },
+  [ACT3_TUNNEL_UNLOCKED]: { default: false, doc: 'set by UNLOCK HATCH (§4.2) or PRY HATCH (§4.3); read by the hatch DOWN and the mouth description' },
+  [ACT3_TUNNEL_BELOW]: { default: false, doc: 'register 90: driven by onEnter now, not a move effect — true on entering the Service Tunnel (below), false on entering the mouth; kept only so Conds already written against it (the matchbook\'s CURRENTLY_DARK) keep working. The two rooms\' own dark/description rules no longer read it — being in one room or the other already says which' },
+  [ACT3_HEADLAMP_ON]: { default: false, doc: 'set by TURN ON LAMP (§5.1); the headlamp object is `on` while set' },
+  [ACT3_MATCH_BURNING]: { default: false, doc: 'set by LIGHT MATCH (§5.2); cleared when act3_match_turns reaches 0' },
+  [ACT3_MATCH_TURNS]: { default: 0, doc: 'turns of match-light left (§5.2): set to 2 by LIGHT MATCH, decremented each tick by the tunnel event; light while atLeast 1' },
+  [ACT3_WALKED_TUNNEL]: { default: false, doc: 'set by the Service Tunnel room\'s own onEnter, once (register 90); the walk short forms and Dad topic_rails' },
+  [ACT3_CONSTRUCTION_DOOR_OPEN]: { default: false, doc: 'set by OPEN DOOR from the tunnel side (§7.2); the S1<->tunnel exit both ways and the door plant-side rules' },
+  [ACT3_SAW_SEAL]: { default: false, doc: 'set by EXAMINE SEAL (§6.5); Dad topic_seal gate (§14.1)' },
+  [ACT3_READ_GAUGES_NIGHT]: { default: false, doc: 'set by READ GAUGES inside the night window (§9.3); the second-reading rule and P19 hint rung 2' },
+  [ACT3_BASELINE_MATCHED]: { default: false, doc: 'set by COMPARE AUDIT WITH GAUGES (§9.4); P20 prerequisite ledger (D5)' },
+  [ACT3_BYPASS_SEEN]: { default: false, doc: 'set by EXAMINE INTERLOCK (§10.1); the death availability and Dad topic_interlock gate' },
+  [ACT3_INTERLOCK_NORMAL]: { default: false, doc: 'set by TURN KEYSWITCH TO NORMAL (§10.1); with it set the death is unreachable and §10.5 renders (§21.3)' },
+  [ACT3_DIED_REACTOR]: { default: false, doc: 'set by the death (§10.3); read by nothing in D4 — D5 may read it' },
+  [ACT3_S6_PAD_TRIED]: { default: false, doc: 'set by TYPE CREDENTIALS at the S6 pad (§9.8); the pad second-attempt rule' },
+};
+
+export const ACT3_D4_QUESTIONS: NonNullable<WorldSlice['questions']> = {
+  [ACT3_Q_WHEN_UNWATCHED]: {
+    text: 'Somebody uses the bottom of this building. When?',
+    openWhen: { visited: ACT3_PIPE_CHASE },
+    // Not answerable in D4 — its floor is D5's (§2 "Puzzles closed and opened", P19).
+  },
+};
+
+// ---------------------------------------------------------------------------
+// D4 task D — P18, solved on arrival in the Pipe Chase (§2, §9.6, §21.1).
+// §9.6's own answer to `act3_q_second_return` is task C's own object (the
+// chase bottom, in S5) — this puzzle's `solvedWhen` is this task's own, per
+// the main session's own instruction, copying `ACT3_D3C_PUZZLES`' shape.
+// ---------------------------------------------------------------------------
+
+import { ACT3_P18_SECOND_RETURN, ACT3_PIPE_CHASE_SEEN } from './ids';
+
+// `ACT3_PIPE_CHASE_SEEN`'s own flag — see `ids.ts`'s own doc comment for why
+// this exists instead of the `{ not: { visited: ACT3_PIPE_CHASE } }` idiom
+// every other D3 room's own "first sight" `ProseRule` uses.
+export const ACT3_D4_TASK_D_FLAGS: WorldSlice['flags'] = {
+  [ACT3_PIPE_CHASE_SEEN]: { default: false, doc: "set true by the room's own onEnter, the turn after its first-sight description (§11.1 rule 1) has already rendered — read by that same description's own ProseRule" },
+};
+
+export const ACT3_D4_PUZZLES: NonNullable<WorldSlice['puzzles']> = {
+  [ACT3_P18_SECOND_RETURN]: {
+    id: ACT3_P18_SECOND_RETURN,
+    name: 'The second return, followed down',
+    question: ACT3_Q_SECOND_RETURN,
+    solvedWhen: { visited: ACT3_PIPE_CHASE },
+    solutions: [
+      {
+        id: 'chase',
+        class: 'direct',
+        note: 'DOWN through the chase hatch (Cooling Plant) or sideways from S5, into the Pipe Chase, where Return B runs bare, warm, and down past the last floor there is.',
+        route: { visited: ACT3_PIPE_CHASE },
+      },
+    ],
+    hints: [],
+  },
+};
+
+// ---------------------------------------------------------------------------
+// D4 task B — S1's checkout-card clue (§8.6) and, if D3 did not already
+// grant it, the lift's own "no lower" clue (§12.2). Titles are short
+// paraphrases; details are composed only from each section's own sentences
+// (hard rule 5) — see this task's report for exactly which sentences.
+// ---------------------------------------------------------------------------
+
+import { ACT3_CLUE_J_HAND, ACT3_CLUE_NO_LOWER } from './ids';
+import { ACT3_CLUE_SEAL_FROM_INSIDE, ACT3_HEADLAMP_TAKEN } from './ids';
+
+export const ACT3_D4_TASK_A_FLAGS: WorldSlice['flags'] = {
+  [ACT3_HEADLAMP_TAKEN]: { default: false, doc: 'set by the first TAKE LAMP at the truck (§5.1) — gates that one-time line' },
+};
+
+export const ACT3_D4B_CLUES: NonNullable<WorldSlice['clues']> = {
+  [ACT3_CLUE_J_HAND]: {
+    title: 'The card, in the same hand as the notebook',
+    detail:
+      'The same pressure. The same small fast letters leaning the same way. The full\nstop after the J is put down hard enough to be a decision, and there is one\nexactly like it after every abbreviation in the book. He took a tape out of\nthis rack and did not bring it back.',
+  },
+  [ACT3_CLUE_NO_LOWER]: {
+    title: 'More polish on the blank than on S5',
+    detail:
+      'The polish on it is deeper than the polish on S5, and S5 is the button that\ntakes a man to the bottom of his own building.',
+  },
+};
+
+// ---------------------------------------------------------------------------
+// D4 task C — S5 Reactor Interface, the interlock death, and the checkpoint
+// (D4 prose doc §9, §10, §21, §22). Two builder-added flags beyond §2's own
+// table (`act3/ids.ts`'s own header comment on each); three clues, titles
+// and details composed only from their own granting section's sentences
+// (hard rule 5) — no number-subtraction, no *town*, no *second facility*.
+// ---------------------------------------------------------------------------
+
+import { ACT3_DEMAND_DIAL_TURNED, ACT3_S5_SEEN } from './ids';
+import { ACT3_CLUE_BASELINE_MATCHES_AUDIT, ACT3_CLUE_S6_DOOR_REFUSES, ACT3_CLUE_THREE_AM_DIP } from './ids';
+
+export const ACT3_D4C_FLAGS: WorldSlice['flags'] = {
+  [ACT3_S5_SEEN]: { default: false, doc: 'set by S5\'s own onEnter, first visit only — gates the description\'s "first sight" rule (§9.1 rule 1); `{ not: { visited } }` cannot do this (`move.ts`\'s `renderArrival` marks `visited` before rendering `description`)' },
+  [ACT3_DEMAND_DIAL_TURNED]: { default: false, doc: 'set by the demand dial\'s first TURN/OPEN COVER/SET DEMAND (§9.5) — gates the second-attempt text' },
+};
+
+export const ACT3_D4C_CLUES: NonNullable<WorldSlice['clues']> = {
+  // §9.3 rule 1 — the night-window reading. Composed from that rule's own
+  // sentences only; the wall's three numbers print in the room's own
+  // response, not repeated here as a subtraction.
+  [ACT3_CLUE_THREE_AM_DIP]: {
+    title: 'FDR 3, down at three in the morning',
+    detail:
+      'FDR 3 has moved. It is down, and it has been down long enough that the\nneedle is sitting rather than settling.\n\nLow on the glass of FDR 3\'s bezel, inside it, where you would have to have\ntaken the bezel off to do it, there is a pencil line. It is not dated and it\nis not initialled and it is not on any other gauge in the room.',
+  },
+  // §9.4 — verbatim, the whole block (the doc's own note calls it "the
+  // single most important block in the wave" and it does no arithmetic,
+  // names no place, and draws no conclusion — safe to keep intact).
+  [ACT3_CLUE_BASELINE_MATCHES_AUDIT]: {
+    title: 'The DIFFERENCE column, met on the wall',
+    detail:
+      "His FILED column and the tag that says HALL A are the same number.\n\nHis TAKEN column and the big face on the generation side are the same\nnumber, give or take whichever month you put your thumb on.\n\nAnd the third column — the one he ruled himself, and headed DIFFERENCE, and\nsat with for four days before he would put it in an envelope — that one is\nnot a subtraction down here.\n\nIt is a gauge. It has a bezel and a brass tag and a red line painted on the\nglass, and somebody comes along this wall every morning to make sure it is\nwhere it was.",
+  },
+  // §9.8 — the pad's own words, verbatim.
+  [ACT3_CLUE_S6_DOOR_REFUSES]: {
+    title: 'ACCESS LEVEL: MAINTENANCE, and still DENIED',
+    detail:
+      'The pad did not refuse the words. It read them, agreed with them, and\ndeclined to open.\n\nWhich means the words are not wrong. They are only shallow.',
+  },
+};
+
+// ---------------------------------------------------------------------------
+// D4 task A — the seal's clue (§6.5). `ACT3_P16_ENTRY.solvedWhen` already
+// carries this task's own required amendment (task B added it above, at
+// line ~105, before this task landed) — nothing further to edit there.
+// Title/detail composed only from §6.5's own sentences (hard rule 5): the
+// `examine` rule's second/third paragraphs and the `touch seal`/`touch
+// hole` response, verbatim.
+// ---------------------------------------------------------------------------
+
+export const ACT3_D4_TASK_A_CLUES: NonNullable<WorldSlice['clues']> = {
+  [ACT3_CLUE_SEAL_FROM_INSIDE]: {
+    title: 'The cutting went in from the far side',
+    detail:
+      'Through the middle of the plug there is a hole. It is not a crack and it is\nnot a failure. It is about two feet by three, and its edges were cut, and\nthe cutting went in from the far side: every broken edge on this face is\nturned towards you, and every spall on this face has fallen this way, at\nyour feet.\n\nThe cut edges are not sharp. Somebody went round them afterwards with\nsomething, the way you do when a thing is going to be used more than once.',
+  },
+};
+
+// --- D4 builders append below this line (Edit tool only; one block per task, labelled) ---

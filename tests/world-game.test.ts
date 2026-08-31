@@ -78,25 +78,35 @@ describe('assemble', () => {
 // the tunnel, rather than walking north or south of the highway).
 //
 // UPDATED AGAIN (Stage D3, task C — the Cooling Plant/Corridor B4/the
-// elevator/the boundary): the count is now exactly four. The Cooling
-// Plant's own chase hatch gains a `down` exit, gated `{ flag:
+// elevator/the boundary): the count was four for that wave. The Cooling
+// Plant's own chase hatch gained a `down` exit, gated `{ flag:
 // act3_hatch_open }`, referencing a new, separate gate object
-// (`ACT3_BOUNDARY_GATE`) that never opens — the wave's own D3 prose doc §15
+// (`ACT3_BOUNDARY_GATE`) that never opened — the wave's own D3 prose doc §15
 // boundary, reached this way (an exit) or, without a fourth gate object, via
 // two `{ script }` effects that need no exit at all: "ENTER HATCH" (an
 // object handler on the hatch itself) and the elevator's S1/S5 buttons
 // (`act3/elevator.ts`). Those two routes are not exits and so don't count
 // here, by the same logic the tunnel-mouth note above already states for
 // this counter (`exit.door`, not "every way to reach the boundary").
+//
+// UPDATED AGAIN (Stage D4: task A, task D — the descent): the count is back
+// down to three. Town Edge's `nw` exit "became real" (D4 prose doc §3,
+// §21.1) — it now runs the county-road walk to the Service Tunnel, gated by
+// a NEW, non-boundary door (`ACT3_TUNNEL_APPROACH_GATE`, §3.4's own block,
+// which does not match `/boundary_gate/i`), so it no longer counts here. The
+// Cooling Plant's chase hatch also "became real" (task D), now going
+// straight to the Pipe Chase with no gate at all. `system.buildBoundary`'s
+// one remaining gate moved to the Pipe Chase's own `down` exit (§13,
+// `ACT3_BOUNDARY_GATE`, unchanged id) — Sublevel 6 is the build's new edge.
 describe('system.buildBoundary', () => {
-  it('exactly four exits reference a build-boundary gate (Town Edge north, Emporium south, Town Edge nw, the Cooling Plant hatch down — three gate objects)', () => {
+  it('exactly three exits reference a build-boundary gate (Town Edge north, Emporium south, the Pipe Chase down — two gate objects)', () => {
     let count = 0;
     for (const room of Object.values(WORLD.rooms ?? {})) {
       for (const exit of room.exits ?? []) {
         if (exit.door && /boundary_gate/i.test(exit.door)) count++;
       }
     }
-    expect(count).toBe(4);
+    expect(count).toBe(3);
   });
 });
 

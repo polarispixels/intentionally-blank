@@ -21,11 +21,13 @@
 import type { ExitDefSlice, HandlerDef, RoomDefSlice } from '../../../engine/world';
 import type { ProseRule } from '../../../engine/prose';
 import { HELLO, LISTEN, SMELL, WAIT, YELL } from './verbs';
-import { CLAIM_TICKET, FLAG_VISITED_TOWN_EDGE, MAIN_STREET, MONSTER_TRUCK, NOLANS_YARD, TOWN_EDGE, TOWN_EDGE_BOUNDARY_GATE, TOWN_EDGE_NO_EXIT_GATE, TOWN_EDGE_TUNNEL_BOUNDARY_GATE, V_LOOK_UP } from './ids';
+import { CLAIM_TICKET, FLAG_VISITED_TOWN_EDGE, MAIN_STREET, MONSTER_TRUCK, NOLANS_YARD, TOWN_EDGE, TOWN_EDGE_BOUNDARY_GATE, TOWN_EDGE_NO_EXIT_GATE, V_LOOK_UP } from './ids';
 import { ACT2_HORSE_BORROWED, ACT2_KNOWS_TUNNEL_MOUTH, ACT2_MEM_M15, ACT2_STARTED, ACT2_TRAVEL_SCRIPT, ACT2_WALL_DRUG_EMPORIUM, V_ACT2_DRIVE_TO_PLANT } from '../act2/ids';
 import { ACT2_DRIVE_TO_PLANT_EFFECTS } from '../act2/scripts';
 // D3, task A — "RIDE TO PLANT" (§3, ruling 1), mirroring "DRIVE TO PLANT" just below.
 import { V_ACT3_RIDE_TO_PLANT } from '../act3/ids';
+// D4 task A — the county-road walk's real destination and its two gates.
+import { ACT3_TUNNEL_APPROACH_GATE, ACT3_TUNNEL_MOUTH } from '../act3/ids';
 
 // ---------------------------------------------------------------------------
 // §12.1 — description (§13.1/§13.2 amend both rules, wave 5)
@@ -140,30 +142,60 @@ export const northBlockedText: ProseRule[] = [
   { text: TOWN_EDGE_BOUNDARY_NORTH_TEXT },
 ];
 
-// D2-C amendment (§23) — the tunnel's town-side country exit. Same
-// "ENGINE GAP" approximation this file's own header already documents for
-// `TOWN_EDGE_BOUNDARY_NORTH_TEXT` (`blockedText` only ever renders `kind:
-// 'prose'`, never the doc's own instructed `kind: 'system'`): the country
-// line and the system line are concatenated into one string rather than
-// split across two `GameEvent` kinds.
+// D4 task A amendment (D4 prose doc §3, §12.4, §21.1) — D3's boundary on
+// this exit "becomes real": `nw` now runs the county-road walk to the
+// Service Tunnel's mouth instead of ending in `system.buildBoundary`. §3.1
+// beat 1 is D2 §23's shipped preamble, reused verbatim (exported below, not
+// duplicated) — it is not rewritten and not quoted twice (§21.1's own
+// instruction). D3's system line (`ACT3_BOUNDARY_TEXT`, formerly
+// concatenated onto this same constant) is deleted in this same change —
+// Sublevel 1, the service tunnel and the pipe chase all exist now.
 //
-// D3 task C amendment (D3 prose doc §15/§21.1) — "D2's boundary text is
-// retired in the same change... All three [the fence, the gatehouse, and
-// what a borrowed badge opens] are now in this version." The in-world
-// cedar-post preamble is kept byte-for-byte; only the system line changes,
-// to §15's own (`act3/scripts.ts`'s `ACT3_BOUNDARY_TEXT`, transcribed here
-// rather than imported — this file already carries its own copy of this
-// exact "ENGINE GAP" concatenation idiom, and importing a cross-act string
-// constant into Act I for one shared literal would be the wrong direction
-// for very little gain). `act2/scripts.ts`'s own `ACT2_BOUNDARY_SCRIPT`/
-// `ACT2_BOUNDARY_TEXT` are deliberately NOT deleted in this change — see
-// this task's own report: they are still load-bearing for the shipped
-// `DRIVE TO PLANT` handlers (`jacksMotel.ts`, this file's own `north`
-// amendment) until task A's own plan-directed retirement of that verb
-// lands; deleting them here would break those handlers outside this
-// task's module.
-const NW_TUNNEL_BLOCKED_TEXT =
-  'You go out over the grazing with the last of the town behind you and the line\nof cedar posts on your left, and the posts carry no wire and never have, and\nthey run north as straight as anything in this county.\n\nEND OF BUILD\n\nAct III continues below this floor. Sublevel 1, Sublevel 5, the service tunnel and the pipe chase are not in this version.';
+// Exported so nothing else in this wave re-quotes beat 1 — there is nowhere
+// else in this build that needs it, so it stays local to this file rather
+// than moving to `act2/`; see this task's report on why the doc's own "find
+// it in act2/" instruction doesn't match where D3 actually landed this
+// string (D3 task C's own amendment inlined it here, not into an act2 file).
+export const TUNNEL_COUNTRY_PREAMBLE_TEXT =
+  'You go out over the grazing with the last of the town behind you and the line\nof cedar posts on your left, and the posts carry no wire and never have, and\nthey run north as straight as anything in this county.';
+
+const tunnelApproachBeat2 =
+  'An hour of it. The ground gives an inch and comes back, and the draws have to\nbe gone round, and the posts do not go round anything at all — they take the\nrises head on, one after another, at an angle that has nothing to do with the\nfences that are still up.\n\nOff to your right the county road keeps you company without ever getting\ncloser. It is doing the same thing the posts are doing, in its own way and for\nits own reasons, and neither of them will admit to the other.';
+
+const tunnelApproachBeat3 = 'Then the road makes its bend, and the posts come down off the last rise, and\nstop.';
+
+/** §3.1 — first time out. */
+const TUNNEL_APPROACH_FIRST_TIME_TEXT = `${TUNNEL_COUNTRY_PREAMBLE_TEXT}\n\n${tunnelApproachBeat2}\n\n${tunnelApproachBeat3}`;
+
+/** §3.3 — out again, after the first time, short form. */
+const TUNNEL_APPROACH_SHORT_FORM_TEXT = 'The grazing, the posts, the bend. It is an hour whether you are looking\nforward to it or not.';
+
+const tunnelApproachTravelText: ProseRule[] = [
+  // register 90: the mouth is its own room now, with real `visited` tracking
+  // — no need for this task's own `act3_at_tunnel_mouth` flag to select
+  // first-time vs. short-form (the flag is still set, harmlessly, by the
+  // mouth's own `onEnter`, `tunnelMouth.ts`, in case anything else wants it).
+  { when: { not: { visited: ACT3_TUNNEL_MOUTH } }, text: TUNNEL_APPROACH_FIRST_TIME_TEXT },
+  { text: TUNNEL_APPROACH_SHORT_FORM_TEXT },
+];
+
+/**
+ * §3.4 — going out with nothing that will open it. Blocks the exit outright
+ * (`ExitDefSlice.door`, `ACT3_TUNNEL_APPROACH_GATE` — kept in sync every
+ * tick by `objects/serviceTunnel.ts`'s own reactive `EventDef`, since
+ * nothing that could flip this condition is a dedicated action this
+ * content can hook) rather than relocating the player and walking them
+ * back, matching the doc's own "the player stays at Town Edge."
+ *
+ * KNOWN GAP, disclosed in this task's report: `ExitDefSlice.blockedText`
+ * has no way to attach its own `advanceClock` — only a passable exit's
+ * `minutes` does that (`move.ts`'s `applyExitTraversal`/`renderBlocked`).
+ * The doc's own `advanceClock: 120` for this specific block cannot be
+ * applied through this mechanism; the turn costs only the ordinary
+ * per-turn default instead of the full two hours.
+ */
+const TUNNEL_APPROACH_GATE_BLOCKED_TEXT =
+  'An hour out along the posts, and the bend, and the hardstand, and a steel plate\nlying in a concrete kerb with a keyhole in it and two lifting eyes.\n\nYou put your hands on it, which is what hands are for and is the whole of what\nthey can do here, and then you spend the second hour of the afternoon walking\nback for something that will turn or something that will lever.';
 
 const travelTextOut = 'You walk back in among the buildings and the wind stops being a fact about you.';
 
@@ -222,15 +254,22 @@ export const townEdgeRoom: RoomDefSlice = {
     { dir: 'n', to: ACT2_WALL_DRUG_EMPORIUM, door: TOWN_EDGE_BOUNDARY_GATE, blockedText: northBlockedText },
     // §13.3 (wave 5) — the real east exit, Nolan's Yard.
     { dir: 'e', to: NOLANS_YARD, travelText: travelTextToYard },
-    // D2-C amendment (§23) — the tunnel's town-side country exit. Only
-    // "exists" once the player has learned the tunnel is there; `to` is a
-    // self-loop (same idiom as `TOWN_EDGE_BOUNDARY_GATE`'s own `n` exit
-    // before D1 pointed it at a real room) since no tunnel room exists in
-    // this build. Removed from `otherDirections` below so the two don't
-    // collide (a room's `exits` array may not declare the same `dir` twice
-    // — `nw`'s own generic "no exit that way" text no longer applies once
-    // `act2_knows_tunnel_mouth` is set).
-    { dir: 'nw', to: TOWN_EDGE, when: { flag: ACT2_KNOWS_TUNNEL_MOUTH }, door: TOWN_EDGE_TUNNEL_BOUNDARY_GATE, blockedText: NW_TUNNEL_BLOCKED_TEXT },
+    // D4 task A amendment (§3, §21.1, §21.4; register 90) — the tunnel's
+    // town-side country exit, now real: `to: ACT3_TUNNEL_MOUTH` (the
+    // mouth, its own room — register 90 revises the tunnel into two rooms),
+    // gated on `act2_knows_tunnel_mouth` AND `act2_started` (ADR 0011 rule
+    // 3), 60 minutes. `TOWN_EDGE_TUNNEL_BOUNDARY_GATE` (D3's own
+    // permanently-closed stand-in) is retired in this same change —
+    // `ACT3_TUNNEL_APPROACH_GATE` is the real gate now, §3.4's own block.
+    {
+      dir: 'nw',
+      to: ACT3_TUNNEL_MOUTH,
+      when: { all: [{ flag: ACT2_KNOWS_TUNNEL_MOUTH }, { flag: ACT2_STARTED }] },
+      door: ACT3_TUNNEL_APPROACH_GATE,
+      blockedText: TUNNEL_APPROACH_GATE_BLOCKED_TEXT,
+      travelText: tunnelApproachTravelText,
+      minutes: 60,
+    },
     ...otherDirections,
   ],
   handlers: roomHandlers,

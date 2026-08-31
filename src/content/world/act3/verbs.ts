@@ -17,8 +17,17 @@ import { ACT1_VERBS } from '../act1/verbs';
 import { V_CALL, V_MEASURE } from '../act1/ids';
 import { ACT2_DRIVE_TO_PLANT_TEXT } from '../act2/scripts';
 import { V_LOOK_DOWN_AISLE, V_PACE, V_UNBOLT } from './ids';
-import { V_ACT3_LOOK_WEST, V_ACT3_PHOTOGRAPH, V_ACT3_RAM, V_ACT3_RIDE_TO_PLANT, V_ACT3_WRITE_VENDOR_NUMBER } from './ids';
+import { V_ACT3_LOOK_WEST, V_ACT3_PHOTOGRAPH, V_ACT3_RAM, V_ACT3_RIDE_TO_PLANT, V_ACT3_SIDEWAYS, V_ACT3_WRITE_VENDOR_NUMBER } from './ids';
 import { MANIFEST_ABSENT_TEXT, PHOTOGRAPH_TEXT } from './objects/perimeterRoad';
+import { USE_VERB_ID } from '../../../engine/move';
+import { V_ACT3_LIGHT } from './ids';
+import {
+  V_ACT3_BADGE,
+  V_ACT3_CHECK_TIME,
+  V_ACT3_LOOK_DOWN_SHAFT,
+  V_ACT3_TURN_TO_NORMAL,
+  V_ACT3_TYPE_PAD,
+} from './ids';
 
 export const LOOK_DOWN_AISLE_TEXT =
   'You put your eye down the aisle and the rows run until they stop being rows.\n\nSomewhere along there the two sides meet. There is no door in that end wall,\nbecause that end wall is a good way past the point at which you stopped being\nable to see one.';
@@ -142,5 +151,140 @@ export const ACT3_VERBS: Record<string, VerbDef> = {
     patterns: ['V', 'V dobj'],
     class: 'analytical',
     default: PHOTOGRAPH_TEXT,
+  },
+
+  // -------------------------------------------------------------------------
+  // D4 task D — the Pipe Chase (§21.4's own "s5 / sideways / out" exit
+  // name). This task's own single addition to this file.
+  // -------------------------------------------------------------------------
+
+  // "S5"/"SIDEWAYS" — a bare fixed phrase reaching the chase's own opening
+  // to S5 (`pipeChase.ts`'s own room-level handler does the actual `goto`);
+  // `default` is a bare-safe fallback for use anywhere else in the game
+  // (same reasoning as `V_ACT3_RIDE_TO_PLANT`'s own bare-safe default,
+  // above): nothing outside the chase gives this verb a handler, so it
+  // must never narrate a move.
+  [V_ACT3_SIDEWAYS]: {
+    id: V_ACT3_SIDEWAYS,
+    // v0.14.0: not "s5" — that is the lift button's own noun.
+    words: ['sideways'],
+    patterns: ['V'],
+    class: 'direct',
+    default: VERB_DEFAULTS.wait,
+  },
+
+  // -------------------------------------------------------------------------
+  // D4 task C — S5 Reactor Interface, the interlock death, and the
+  // checkpoint (§9.5, §9.6, §9.8, §9.9, §10.1). This task's own four verbs;
+  // the entries above are siblings', untouched.
+  // -------------------------------------------------------------------------
+
+  // §10.1 — "TURN KEYSWITCH TO NORMAL"/"TURN KEY TO NORMAL"/"TURN SWITCH TO
+  // NORMAL." Bare fixed phrase; see `ids.ts`'s own doc comment on why this
+  // can't be `'V dobj prep iobj'` (no object anywhere carries a noun
+  // "normal" for the iobj to resolve against).
+  [V_ACT3_TURN_TO_NORMAL]: {
+    id: V_ACT3_TURN_TO_NORMAL,
+    words: ['turn keyswitch to normal', 'turn key to normal', 'turn switch to normal'],
+    patterns: ['V'],
+    class: 'direct',
+    default: VERB_DEFAULTS.touch,
+  },
+  // §9.8 — "TYPE CREDENTIALS"/"ENTER CREDENTIALS"/"TYPE ADMIN"/"TYPE
+  // PASSWORD." Bare fixed phrases, grepped clean: bare "type" is already
+  // exclusively `V_TYPE_TERMINAL`'s (`act1/ids.ts`) and bare "enter" is
+  // already exclusively `DIRECTION_VERB_IDS.in`'s (`engine/move.ts`) — these
+  // four multi-word phrases are distinct strings from both, no collision.
+  [V_ACT3_TYPE_PAD]: {
+    id: V_ACT3_TYPE_PAD,
+    words: ['type credentials', 'enter credentials', 'type admin', 'type password'],
+    patterns: ['V'],
+    class: 'analytical',
+    default: VERB_DEFAULTS.touch,
+  },
+  // §9.8 — "BADGE DOOR." New one-word verb, grepped clean.
+  [V_ACT3_BADGE]: {
+    id: V_ACT3_BADGE,
+    words: ['badge'],
+    patterns: ['V dobj'],
+    class: 'direct',
+    default: VERB_DEFAULTS.touch,
+  },
+  // §9.9 — "WHAT TIME IS IT"/"WHAT'S THE TIME"/"CHECK TIME." Bare fixed
+  // phrases; bare "check" is already exclusively `V_ACT2_CHECK`'s
+  // (`act2/ids.ts`, pattern `'V'` only) — these three multi-word phrases
+  // are distinct strings, no collision.
+  [V_ACT3_CHECK_TIME]: {
+    id: V_ACT3_CHECK_TIME,
+    words: ['what time is it', "what's the time", 'check time'],
+    patterns: ['V'],
+    class: 'analytical',
+    default: VERB_DEFAULTS.touch,
+  },
+  // §9.6 — "LOOK DOWN OPENING"/"LOOK DOWN SHAFT." Bare fixed phrases, same
+  // idiom as `V_LOOK_DOWN_AISLE` above.
+  [V_ACT3_LOOK_DOWN_SHAFT]: {
+    id: V_ACT3_LOOK_DOWN_SHAFT,
+    words: ['look down opening', 'look down shaft'],
+    patterns: ['V'],
+    class: 'analytical',
+    default: VERB_DEFAULTS.touch,
+  },
+};
+
+// §9.8 — "USE NOTEBOOK ON PAD" needs `USE_VERB_ID` (`engine/move.ts`,
+// registered bare-`'V dobj'`-only in `act1/verbs.ts`) to also carry `'V dobj
+// prep iobj'` with prep "on" — same idempotent in-place mutation idiom this
+// file already uses above for `V_MEASURE`/`V_CALL`. Every existing bare
+// "USE X" elsewhere in the game is unaffected (that pattern is additive,
+// not replaced).
+if (!ACT1_VERBS[USE_VERB_ID]!.patterns.includes('V dobj prep iobj')) {
+  ACT1_VERBS[USE_VERB_ID] = {
+    ...ACT1_VERBS[USE_VERB_ID]!,
+    patterns: [...ACT1_VERBS[USE_VERB_ID]!.patterns, 'V dobj prep iobj'],
+    preps: [...(ACT1_VERBS[USE_VERB_ID]!.preps ?? []), 'on'],
+  };
+}
+
+// -----------------------------------------------------------------------------
+// D4 task A — the way under (§3-§7). `OPEN` gains `'V dobj prep iobj'` so
+// "OPEN HATCH WITH KEY"/"OPEN HATCH WITH CHAIR LEG" (§4.2, §4.3) parse at
+// all — it shipped `'V dobj'`-only.
+//
+// REVERTED (register 90 — the tunnel is now two rooms, the mouth and the
+// below): the mouth<->below transition is a real cross-room `goto` now, so
+// bare "DOWN"/"UP" work as ordinary exits and no longer need a `dobj` to
+// reach an object handler — the `DIRECTION_VERB_IDS.down`/`.up` in-place
+// mutation this task's own report originally flagged is removed. "ENTER
+// HATCH" (`IN`, already `'V dobj'`) and "CLIMB LADDER" (`CLIMB`, already
+// `'V dobj'`) still work unaided, as plain-goto niceties on the hatch's/
+// ladder's own objects.
+// -----------------------------------------------------------------------------
+
+import { OPEN } from '../act1/verbs';
+if (!ACT1_VERBS[OPEN]!.patterns.includes('V dobj prep iobj')) {
+  ACT1_VERBS[OPEN] = {
+    ...ACT1_VERBS[OPEN]!,
+    patterns: [...ACT1_VERBS[OPEN]!.patterns, 'V dobj prep iobj'],
+    preps: [...(ACT1_VERBS[OPEN]!.preps ?? []), 'with'],
+  };
+}
+
+// "LIGHT MATCH"/"LIGHT MATCHBOOK" (§5.2). "STRIKE MATCH" is dropped — see
+// `ids.ts`'s own doc comment on `V_ACT3_LIGHT` (collides with `BREAK`'s own
+// "strike").
+export const ACT3_D4_TASK_A_VERBS: Record<string, VerbDef> = {
+  // Bare "light" only — pattern `'V dobj'` already resolves "LIGHT MATCH"/
+  // "LIGHT MATCHBOOK" via ordinary noun matching. Multi-word phrases like
+  // "light match" in this same verb's own `words` were tried FIRST (longest
+  // match) and swallowed the noun entirely, leaving nothing for `'V dobj'`
+  // to resolve as a dobj — confirmed by this task's own test run ("You have
+  // a verb, light, and nothing to aim it at"); fixed by dropping them.
+  [V_ACT3_LIGHT]: {
+    id: V_ACT3_LIGHT,
+    words: ['light'],
+    patterns: ['V dobj'],
+    class: 'direct',
+    default: VERB_DEFAULTS.touch,
   },
 };

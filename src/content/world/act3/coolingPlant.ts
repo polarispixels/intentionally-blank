@@ -1,19 +1,18 @@
 // Act III, Stage D3 task C — the Cooling Plant room (D3 prose doc §10).
 //
-// ENGINE GAP (same one `act1/townEdge.ts`'s header already documents):
-// `ExitDefSlice.blockedText` always renders `kind: 'prose'`, never
-// `kind: 'system'` — a content-only approximation. The hatch's `down` exit
-// below concatenates the in-world ladder text with §15's system line into
-// one string for exactly that reason; "ENTER HATCH" (an object handler on
-// the hatch itself, `objects/coolingPlant.ts`) gets the real thing via a
-// `{ script }` effect instead.
+// D4 task D amendment (D4 prose doc §12.3, §21.1): the hatch's `down` exit
+// is a real exit now, to the Pipe Chase — D3's own boundary wiring on this
+// exit (a self-loop through `ACT3_BOUNDARY_GATE`, D3's system line
+// concatenated onto the in-world ladder text) is retired for this route.
+// The wave's one surviving `system.buildBoundary` moved one floor down, to
+// the Pipe Chase's own `down` (`pipeChase.ts`, this task's own file) —
+// §21.1's "the one-gate invariant holds; the gate moves one floor."
 
 import type { ExitDefSlice, RoomDefSlice } from '../../../engine/world';
 import type { ProseRule } from '../../../engine/prose';
 import { LISTEN, READ, SIT, SMELL, TOUCH } from '../act1/verbs';
-import { ACT3_BOUNDARY_GATE, ACT3_COOLING_PLANT, ACT3_DATA_HALL_A, ACT3_HATCH_OPEN, ACT3_PERIMETER_ROAD, ACT3_RODE_FENCE } from './ids';
+import { ACT3_COOLING_PLANT, ACT3_DATA_HALL_A, ACT3_HATCH_OPEN, ACT3_PERIMETER_ROAD, ACT3_PIPE_CHASE, ACT3_RODE_FENCE } from './ids';
 import { HATCH_DOWN_TEXT, YARD_DOOR_OUT_TEXT } from './objects/coolingPlant';
-import { ACT3_BOUNDARY_TEXT } from './scripts';
 
 // ---------------------------------------------------------------------------
 // §10.1 — description.
@@ -52,17 +51,18 @@ const smellText =
   'Hot metal, warm paint, and glycol, which smells faintly sweet and faintly\nwrong and is the smell of every plant room in the world.\n\nAt the back, where the hatch is, there is wet concrete under it.';
 
 // ---------------------------------------------------------------------------
-// §15 — the hatch's `down` exit, gated on `act3_hatch_open`, through the
-// wave's one boundary gate. Bare "down" (no dobj) is this exit's job; "ENTER
-// HATCH" (dobj = hatch) is the hatch object's own handler.
+// D4 §12.3/§21.1/§21.4 — the hatch's `down` exit, gated on `act3_hatch_open`,
+// now a real exit to the Pipe Chase (10 minutes). Bare "down" (no dobj) is
+// this exit's job; "ENTER HATCH" (dobj = hatch) is the hatch object's own
+// handler (`objects/coolingPlant.ts`'s own D4 amendment, this task's).
 // ---------------------------------------------------------------------------
 
 const hatchDownExit: ExitDefSlice = {
   dir: 'down',
-  to: ACT3_COOLING_PLANT, // self-loop — the gate never opens (`ACT3_BOUNDARY_GATE`, always closed).
+  to: ACT3_PIPE_CHASE,
   when: { flag: ACT3_HATCH_OPEN },
-  door: ACT3_BOUNDARY_GATE,
-  blockedText: `${HATCH_DOWN_TEXT}\n\n${ACT3_BOUNDARY_TEXT}`,
+  travelText: HATCH_DOWN_TEXT,
+  minutes: 10,
 };
 
 export const coolingPlantRoom: RoomDefSlice = {

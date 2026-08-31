@@ -1,6 +1,6 @@
 # Act III Wave D5 — Sublevel 6
 
-**Status:** draft for main-session voice review · **Author:** `narrative-writer`
+**Status (main session, 2026-08-31):** accepted whole for wiring as v0.15.0 — no cuts (§42.1 declined: the Bay's overrun is the mandated night state, and tier ceilings are furniture-only, entry 46); §36 rulings: q1–q12 as recommended (register 80–88; q5 `act3_ev_passed` is wired; q10 one gate object, two effects; q12 Nolan's night post from `act2_started`); §38 none wired; §24.3's spoken *Four hundred and sixty* ruled a reading, not a count (89). Original: draft for main-session voice review · **Author:** `narrative-writer`
 · **Date:** 2026-09-13
 **Covers:** the end of Act III and the end of Stage D — the **S6 Maintenance
 Bay** (hero, 12 objects), the **S6 Archive Hub** (standard, 6 objects plus the
@@ -38,8 +38,9 @@ topics + one push)}`, `world.events.act3_ev_spotted_{bay,hub,s5,chase}`,
 `act3/coolingPlant.ts`** (the alarm, §20) and **the retirement of D4's
 boundary** (§31, §39.1).
 
-Every string below is final prose. Nothing here is a placeholder. **One block
-is quarantined** (§38) and it is marked.
+Every string below is final prose. Nothing here is a placeholder. **Three
+blocks are quarantined** (§38) and all three are marked; I recommend wiring
+none of them.
 
 ---
 
@@ -2106,11 +2107,18 @@ only technology in this building that has been reliable all week.
 > ***Nobody took him anywhere.*** is the architecture's *not kidnapped. Deleted
 > — and filed.* with both technical words removed.
 >
-> **The word *deprecated* appears twice in this document, in the same fenced
-> block, on a screen.** It is in no narrator line, no clue detail sentence that
-> is not a quotation, no Dad topic, no question text, and no memory. §35 makes
-> this a standing rule for the rest of the game: **the system's vocabulary is
-> only ever spoken by the system.**
+> **The word *deprecated* appears three times in this document: twice on the
+> ledger screen, and once in the player's own verbatim note of it.** It is in no
+> narrator line, no Dad topic, no question text, and no memory, and the clue
+> detail is a transcription rather than a paraphrase — the player writes down
+> what the screen said. §41 proposal 84 makes it a standing rule for the rest of
+> the game: **the system's vocabulary is only ever spoken by the system.**
+>
+> **§23.1's prompt reads `ENTER SURNAME OR NUMERAL`, and §25.1 prints `JACK
+> IV`.** That is the machine explaining, in a field label, why the family's
+> numerals render the way they do — and **the game does not connect the label to
+> the ink on anybody's forearm**, here or in §8.3, which is L6's whole design.
+> A player who puts it together has put it together himself.
 >
 > **§23.4 is L4's third and last movement.** Turn one: `USER NOT RECOGNIZED`,
 > for a name, a word, or nothing at all. Here: a search field, and a man with
@@ -2847,3 +2855,536 @@ the end of this room, are the next version.
 > question **answered**. If the graph was never compared, the Act IV question
 > is not open and **the boundary is still reachable** — that is intended; R11 is
 > not a gate, and a player who walks past the detonation gets the same door.
+
+---
+
+# PART FIVE — NOTES, WIRING, BUDGET
+
+## 32. Setups planted (constitution §30)
+
+| Setup | Where | Pays off |
+|---|---|---|
+| Headrest stems worn to individual marks; a hollow in every cushion | §4.1, §4.2 | **Act IV / V.** How long this has been running |
+| Conduits from every pedestal going under the wall the chairs face | §4.6, §16.5 | **Stage E.** Where the chairs go |
+| A hook whose tape has been peeled, with the chair opposite it still set | §5.3 | **Act IV / V.** Whose it was, and that nobody reset it |
+| Sheepskin linings sewn on by hand and replaced on a rota | §7.1 | **Unassigned.** Somebody's job is to be kind to the restraints |
+| A stamped anchor plate — a die, cut for a production run | §7.2 | **Act V.** How many of these rooms there are |
+| One upright stroke, closed top and bottom, on the inside of the left forearm | §8.3 | **P21, Stage E.** L6, and R13 |
+| A dispenser whose instruction is *on rising* and whose limits are a doctor's | §10.1 | **Act IV.** Who wrote the town's prescriptions |
+| A drain, a fall in the floor, and a hose coiled by a professional | §11.1 | **Unassigned, and I recommend it stay unassigned** |
+| A spare set of coveralls with nobody's shape in them | §12.1, §12.4 | **Stage E.** How many there have been |
+| A floor with no readers on it | §13.1 | **Stage E.** Nothing arrives here that is not already here |
+| Return B going into the slab and not coming back out | §14.1 | **Stage E.** The root shaft is cooled |
+| A pair of doors, opening and closing, past the far wall, a few at a time | §16.1 | **D3's blank lift button, retroactively.** How the town gets here |
+| A path worn into cord carpet: door, bench, frames, well | §30.3 | **Stage E.** Somebody's actual job |
+| `SNAPSHOT: ARCHIVED / ROOT` | §23.2 | **P27.** Where Jules is, and that he is retrievable |
+| `JACK IV — MEMORY RECONCILIATION`, pending | §25.1 | **Act IV.** The client's clock starts |
+| Legend strips over impossible frames, made on the same machine as a bypass tag | §27.4 | **Act IV.** The workshop that furnishes both |
+| A reader beside the root door that was never switched on | §28.2 | **Act V.** How that door is actually opened |
+| Warmth on the face at the root door, and water under it | §28.6 | **Act V.** What the reactor is for |
+
+## 33. Second readings (constitution §31)
+
+| Object | First reading, and it holds | Second reading, later, unprompted |
+|---|---|---|
+| The stems at their own marks (§4.1) | A shared facility where people keep their settings | These are the same people every night, and have been for years |
+| The sheepskin (§7.1) | Somebody is decent about the hardware | Somebody had to think about how this would feel |
+| The peeled hook, chair still set (§5.3) | An employee left | The chair was never reassigned because there is nobody to reassign it to |
+| Nolan's boots side by side (§6.1) | A tidy man | He walked down here, undressed to the point he undresses at his own door, and got in |
+| `NOT MORE THAN NINE IN ANY SEVEN DAYS` (§10.1) | The county has a lot of migraines | The county's doctor is downstream of a machine on a wall |
+| The clock behind the rows (§9.1) | Clocks go over doors | Nothing in a chair is ever going to want to know the time |
+| No burn on the Hub's phosphor (§22.6) | This machine gets used | **L4.** The one in his room was left asking for years, by nobody |
+| `ACCESS LEVEL: MAINTENANCE` (§22.3, §28.3) | My password only goes so far | The password was never the thing being measured |
+| `ASSOCIATIONS: RECONCILED` (§23.2) | His records were tidied | Nolan cannot describe a face he sat across from for nine years |
+| `Maintenance, it said.` (§25.3) | A low-privilege login | **R13's floor.** That is the whole of what you are |
+| A machine's `IV` after a name (§25.1) | The system numbers siblings | **L6.** The tattoos are copies |
+| Doors opening and closing past the wall (§16.1) | Plant running at night | The lift's blank button is a floor, and it is this one |
+| The path in the carpet (§30.3) | A well-used room | One man, for a very long time, alone |
+
+## 34. What this wave re-scores (guide §12)
+
+The plan's own note is that D5 re-scores the whole town. It does, and here is
+the list, so that a reviewer can check that **none of it is re-scored by a
+narrator line**:
+
+| Shipped, Act I–II | What D5 makes it mean, without saying so |
+|---|---|
+| Nolan: *There is no Sublevel 6*, said kindly, twice | He is asleep on it, four rows in, with his boots off |
+| Nolan: *I sleep like a stone… you come back tidy* | His wife was describing the arrangement |
+| Nolan's prescription in a bin | It comes out of a lever on a wall down here |
+| The whole town's headaches (D2 §6.14, Pearl, Dot) | Canon 8 rule 3, and the dispenser is where the rule is administered |
+| `USER NOT RECOGNIZED`, for a name, a word, or nothing | §23.4: a search field, and nothing to type |
+| `USER:` burned into the opening room's phosphor | §22.6: this one has no burn, because this one gets used |
+| The lift's blank button, more polished than S5 | §16.1: a pair of doors, a few at a time, all night |
+| Marlow: *Top floor, back. Three weeks, you've had it.* | §25.1: the address on a work order |
+| Marlow: *He wiped his feet on the way in.* | §26.2: the player's own memory of the same fact |
+| Jack's `IV`, inside the left forearm, above the wrist | §25.1's `JACK IV`, and §8.3's arm, and the game says nothing |
+| Eli: *it does not go away at night… it is a thing that is on* | §24.3: the part that does go away at night is the other part |
+| Eli: *about the size of a second one of these* | The second one of these is the room the player just walked out of |
+| The horses shying from the Custodian (L7) | Unremarked, as canon 71 requires, and now explicable |
+
+## 35. The anti-repetition register — extends D4 §17
+
+Twenty-three rooms, eight NPCs, two travel scenes, a card game, a death and a
+mile of dark are shipped or written. All prior rows stand. These are D5's, and
+the four outright deletions are marked **CUT**.
+
+| Device | Already spent | This wave |
+|---|---|---|
+| **A narrator who does the arithmetic** | CUT twice in wave 5, three in D1, five in D2, four in D3, three in D4 | **The one exception in the entire game is §24.3 and it is R11.** The narrator lays a ruler on a graph, names what is under the line and what is over it, and stops one sentence short. Everywhere else the row holds: §16.1 does not say *lift*; §23.2 does not say *erased*; §25.1 does not say *they are coming for you*; §5.3 does not say *Jules*. **If an editor completes any of those four, the wave stops working** |
+| **Counting** | Canon 70's two permitted counts both spent in D3 | **None, and there is an authored refusal** (§4.5). The rows, the hooks, the sleepers and the ledger all decline. Quantities that print are dimensions (two inches of webbing, a quarter inch in a yard, eight inches of clock face, three steps), one duration (eleven minutes), and one figure off a sheet of paper (460). **§7.2 says the scale by naming a die** |
+| **The narrator telling the player what he is like** | Once, ever, in D3's bell | **CUT twice in drafting** — §4.2 nearly ended on *a man who has been in a chair like this*, and §16.4 nearly ended on *and you are not going to be one of them*. Both cut. **§7.3's *you could not tell anybody why* is the one near-miss I have allowed** and §36 q9 offers it for cutting. The move is still spent exactly once and Act IV still has it |
+| **A blank somebody declined to fill in** | Sheriff, Library, Jack's name, wave 5's REASON, D2 §21.2, D3's three, D4's one | **Two, and both are fittings rather than gestures**: the peeled tape (§5.3), which is an *erasure* — the gum is still there and takes a print — and the empty legend slots (§27.1), which are a strip that has not been made yet. **The coveralls with nothing written on them (§12.1) is the third and it is the closest to the line**; it survives because it is a list of absent *markings*, not an absent *entry*. **Hard stop. No more blanks in Act III** |
+| **Handwriting as evidence** | Four in D2, two in D3, one `COMPARE` in D4 | **None. Zero.** There is no handwriting anywhere on this floor: the labels are machine tape, the legends are engraved, the ledger is a screen, the dispenser card is printed. **The next instance is Act IV's evidence bag and it should be the last** |
+| **An old terminal** | Five stations; D3 had none inside the fence; D4's S6 pad was *a lock, not a terminal* | **Station three, and it is the last one before Act V's root console.** §22 repeats D1's three clauses verbatim in structure because the recognition is the content, and then does the one new thing: **it is on, and it has no burn.** No other machine appears on this floor |
+| **Death** | One, D4's interlock; `act3_died_reactor` read by nothing | **None, and none is possible.** The Custodian never kills; the gates are a boundary; the root door is a door. Canon-proposal 78 holds: **nothing in this document refers to the death**, including Dad, who was on the rig for it |
+| **A price / the year, refused** | Refused in nine rooms | **CUT, both.** No date, no year, no price, no unit, no clock number prints anywhere in this document. Canon 16's impossible-date artifacts do **not** appear here and should not: the ledger is a live system, and a wrong date on it would be a different reveal than the one this room is making |
+| **A man who finishes a job completely** | D1's paint, D2's cloth and two stones — closed at two; held cut in D3 and D4 | **Still cut in the narrator's voice, and paid four times in objects with nobody attached:** the tile cut round the drain, the hose coiled by a professional, the greased lamp joints, the paint cut in at the alarm box. **The Custodian is on-screen four times and is never described as thorough.** He is described doing four different jobs |
+| **A building with an opinion** | D3's three mechanical clauses; D4's two, both instrumentation | **One, and it is a machine being patient**: *that is the one thing this machine has always been good at* (§23.4). It does not watch, want, or wait *for* anything. **§16.1's rule 2 — a room that does not hum — is a negative and is the nearest thing to atmosphere the Bay is allowed** |
+| **Somebody being kind and being wrong** | Nolan, and nobody else, ever | **Paid, and he is asleep for it.** §6 is the device's last movement in Act III and it contains no kindness and no wrongness, because it contains no speech. **The device is now finished**; anything after this is a callback |
+| **Stars / the sky** | Main Street, Town Edge, a photograph; CUT in D0–D4 | **CUT, a sixth wave running**, in a document that never goes outdoors |
+| **A pipe that proves something** | D3's warm return, D4's four proofs | **Two, and both are one sentence**: §14.1's *it does not come back out anywhere in this room* and §28.6's water under a door. **The motif is finished. Stage E's shaft may not re-argue it** |
+| **The Custodian speaking** | Never, in four waves | **Four words, once, in a memory of the night he hit you** (§26). **He does not speak in the present tense in this game and must not be given a line in Stage E's town.** This is now a standing rule |
+
+## 36. Canon questions for the main session
+
+1. **The Act IV question's wording** (§2). Written as the architecture's own
+   hand-off: *What are these people — and what am I?*, opened on R11. The
+   alternative is an R11-only half (*What are these people?*) amended by R12,
+   which the engine cannot do without two question objects. **Recommend the
+   architecture's sentence.**
+2. **Printing other names on the badge rail** (§5.1). Canon 54 says *a dozen
+   names the player does not know*; I have printed only NOLAN, because every
+   invented surname becomes a canon townsperson. **Recommend as written.** If
+   the main session wants names on the rail, §38.2 holds a shippable block.
+3. **How legible is the mark under the UV lamp?** (§8.3). Written as *one
+   upright stroke, closed top and bottom* — legible to a player who wants it,
+   a scar to a player who does not. **Recommend as written.** The softer
+   version cuts the middle sentence and leaves *something does not go white*;
+   the stronger version is not offered.
+4. **Whose are the coveralls?** (§12). Unresolved on purpose: a spare set on a
+   hook in a workplace. **Recommend leaving it open.** There is no reading in
+   which the player wears the antagonist's clothes and no response invites one.
+5. **`act3_ev_passed`, the nod** (§18.6). Proposed, not planned: one beat,
+   once ever, no state, when the Custodian and a coveralled player share a
+   room. **Recommend wiring it.** Without it the game's one stealth item pays
+   out in nothing happening.
+6. **Does the chiller trip have consequences?** (§20). In Stage D it costs
+   nothing and nobody mentions it. **Recommend it stays free in Stage D** and
+   that Stage E decides whether a plant with a tripped chiller is a thing Nolan
+   has a bad morning about.
+7. **`Maintenance, it said. That is the whole of what you are.`** (§25.3). It
+   is R13's floor arriving in a joke, one act early. **Recommend keeping**; it
+   is unglossed, it reads completely as a remark about a login, and §38.1 holds
+   the version that goes further and is quarantined. The clean cut is the last
+   two sentences and the response ends on *a man who is allowed to look at it*.
+8. **`It goes back in your pocket.`** (§29.2). The narrator moving the player's
+   hand. **Recommend keeping** — it is the shortest honest end to a refusal
+   whose alternative is a paragraph — but it is a liberty and I am flagging it.
+9. **`You could not tell anybody why, and you do it back up.`** (§7.3). The one
+   near-miss on the D3-bell device. **Recommend keeping.** The clean cut is the
+   sentence entire.
+10. **Two entry points, one boundary** (§31). `ENTER GATE` and the well's
+    `DOWN` both emit the same `system.buildBoundary` string. The world test
+    counts **gates**, not call sites. **Recommend one gate object referenced by
+    two effects**; if the test counts call sites, put the gate on `ENTER GATE`
+    only and give the well's `DOWN` §31.2 followed by the same effect id.
+11. **Is there a lift door on Sublevel 6?** §16.1 hears a pair of doors past
+    the far wall and nothing in the Bay or the Hub is a lift. **Recommend
+    heard, never seen, for the whole of Stage D**, and that Stage E decide
+    whether the car's blank button is ever pressed by the player.
+12. **Nolan's night post** replaces D2's `offstage` night rule. He is therefore
+    in the Bay every night from `act2_started`, including nights before the
+    player can reach S6. **Recommend it**: nothing observes him there until D5,
+    and the alternative is a flag-gated schedule that means the same thing.
+
+## 37. Assumptions (`ASSUMPTION` — none of these is canon)
+
+- **`ASSUMPTION`: the Bay's floor is hospital tile with a fall to a drain, and
+  the chairs are on hydraulic pedestals.** Invented. Architecture §3 room 32
+  fixes *rows of reclining chairs, badge hooks, the UV lamp, the night
+  murmur*; everything else in §3–§16 is furniture I have chosen.
+- **`ASSUMPTION`: each hook is opposite one chair, one to one** (§5.2 rule 2).
+  Invented, and it is what makes `act3_nolan_chair` addressable by day and the
+  peeled hook's chair legible at all.
+- **`ASSUMPTION`: the dispenser's card reads `ONE ON RISING`.** Nolan's shipped
+  bottle reads `ONE AT ONSET`; the difference is the point and it is mine.
+  The drug, the strength and the *nine in any seven days* are shipped canon.
+- **`ASSUMPTION`: the Hub has a cord-tile carpet and a bolted steel bench.**
+  Invented. The path worn into the carpet is §30.3's clue and depends on it.
+- **`ASSUMPTION`: the root door is at the bottom of a three-step tiled well
+  with a drain in it.** Invented. Architecture §3 room 33 says *the descending
+  door*; a well is my reading of *descending*.
+- **`ASSUMPTION`: the queue's address format is `MAIN ST / TOP FLOOR REAR`.**
+  The building has no name in shipped content (Pearl: *since the Hendricks had
+  the building*), and Marlow's *top floor, back* is the phrase the player
+  knows. **If C-5 ever names the building, this line changes and nothing else
+  does.**
+- **`ASSUMPTION`: the ledger's fields are STATUS / RECORDS / ASSOCIATIONS /
+  SNAPSHOT.** Invented. `DEPRECATED` and `ARCHIVED / ROOT` are canon
+  (architecture §1, spec 03 §4); the other three field names are mine and
+  `ASSOCIATIONS: RECONCILED` is the one doing story work.
+- **`ASSUMPTION`: `act2_reply_audit`, `act2_nolan_badge`, `act2_notebook`,
+  `act2_dad_usb`, `act2_rig`, `act1_chair_leg` are the ids.** D1–D4 name them;
+  builders grep before wiring.
+- **`ASSUMPTION`: `act2_q_what_happened_to_jules` exists and is open.** The
+  plan says D1 opened it. If C-5 declared an Act I question about Jules
+  instead, R10 answers that one and this changes a question id, nothing else.
+
+## 38. Quarantined — **do not wire without sign-off**
+
+### 38.1 The queue, with the sentence finished
+
+**The problem.** §25.3 ends on *Maintenance, it said. That is the whole of what
+you are.* The version below adds the clause that converts a joke about a login
+into R13, one act early. It is final prose and it is not a placeholder.
+
+```text
+Maintenance, it said. That is the whole of what you are, and it is not a
+description of your job.
+```
+
+> **Recommendation: do not wire it.** The shipped version is a remark about
+> access levels that a player will re-read in Stage E and go cold about. The
+> quarantined version spends R13 in a parenthesis, in Act III, at the bottom of
+> a refusal response, where nobody will be ready for it.
+
+### 38.2 The badge rail, with names on it
+
+**The problem.** §5.1 prints only NOLAN, on the argument in its note. If the
+main session would rather the player read a rail rather than be told about
+one, this block replaces §5.1's third and fourth paragraphs. **Every surname
+in it becomes canon the day it ships.**
+
+```text
+You read along them.
+
+    HENDRICKS      OKONKWO       BREWER
+    SALAZAR        FINN          ANDERSSON
+    MAUDE          PRZYBYLSKI    OKONKWO, R
+    CASTELLANO     DELACROIX     HOLT
+
+Twelve surnames and two of them are the same surname. Not one of them is
+anybody you have met, in a county where you have been introduced to everybody
+twice.
+
+Then, at about the middle, in the same pressed tape:
+
+    NOLAN
+```
+
+> **Recommendation: do not wire it**, and if it is wired, cut `HENDRICKS`
+> first — Pearl has already said the Hendricks had the building, and a shipped
+> name on this rail turns an atmosphere into a plot point I have not been
+> asked to write. **The block also breaks canon 70** — it counts to twelve —
+> and would need the count removed, at which point the list is doing less than
+> the sentence it replaces.
+
+### 38.3 Nolan, with a line
+
+**The problem.** He says nothing in this wave. This is the one thing he could
+say, if the main session wants the scene to speak. It fires once, on the second
+`WAKE NOLAN`, and then never again.
+
+```text
+He says something. Not to you — the way a sleeping man says something, out of
+whatever he is in the middle of, at the volume of a man in a chair.
+
+"Five," he says. "And the plant floor above them."
+
+Then nothing, at the rate he was breathing at before.
+```
+
+> **Recommendation: do not wire it.** It is the best line I did not use and it
+> is a scene-stealer in a scene that should not have one. Canon 58 makes his
+> sentence a constant; putting a fragment of it in his mouth while he is
+> strapped into the thing he denies is one turn of the screw past what guide §5
+> permits. **If it ships, it must fire exactly once in the whole game.**
+
+## 39. Wiring summary for the builder
+
+### 39.1 What supersedes what
+
+| Shipped or D4-written | Becomes |
+|---|---|
+| **D4 §13's boundary — the Pipe Chase's `DOWN`** | **A real exit.** `DOWN` → `act3_s6_maintenance_bay`, `advanceClock: 1`. D4's in-world block (*the ladder goes on…*) is **kept verbatim** as the descent text and the system line that followed it is **deleted in the same change** |
+| D4 §13's system text (*"Act III continues below this floor. Sublevel 6 is not in this version."*) | **Deleted.** Sublevel 6 now exists. The single `system.buildBoundary` moves to the Archive Hub (§31) |
+| `act2_nolan`'s D2 schedule rule `{ clockPhase: 'night' } → offstage` | **`→ act3_s6_maintenance_bay`.** No other schedule rule changes; the Yard evening post and the D3 Lobby day post both stand |
+| `act2_custodian`'s schedule | **gains the five night rules from the plan's D5 table, plus the `act3_alarm_pulled` `offstage` rule above them.** The Act II morning/afternoon posts are unchanged |
+| `act2_dad` (D2 §6, D4 §14) | **gains four topics and one `once` push** (§19), inserted above D4's three, which are above D2's shipped rules. **Nothing is deleted** |
+| `act3_cooling_plant` (D3 §10) | **gains `act3_chiller_alarm`** (§20) and its handler. The room description is **not** re-authored; the alarm box is addressable without being listed, as D3's certificate is |
+| `act3_pipe_chase` (D4 §11) | gains `act3_ev_spotted_chase`; its `DOWN` becomes an exit |
+| `act3_s5_reactor_interface` (D4 §9) | gains `act3_ev_spotted_s5` and Dad's §19.1 push on first entry. **Its wall clock is unchanged** and `clockInWords` is reused, not duplicated |
+| `act3_p19_night_schedule` | `solvedWhen: { visited: act3_s6_maintenance_bay }`; four routes (§2) |
+| `act3_p20_ledger` | `solvedWhen: { clue: act3_clue_jules_deprecated }`; R11 and R12 are **not** part of the gate |
+| `act2_nolan_badge` | gains a second acquisition site (§6.5). **Its shipped examine is untouched** |
+| `act1_chair_leg` | gains one refusal (§28.5) that names its own history. **No new capability** |
+| `act3_pressed_blank` (D3 §13.5, D4 §12.2) | **read by nothing here, and deliberately.** §16.1 does not check it; the sound is the same for a player who never pressed the button |
+
+**The nineteen agreements with earlier documents**, for a reviewer to spot-check:
+§5.1 / canon 54 · §6.1 / D2 §17.2 · §6.3 / D2 §17.11 · §6.5 / D2 §17.6 ·
+§8.3 / opening room §4.12 · §8.3 / wave 4 §6.2 (**by silence**) · §9 / D4 §9.9 ·
+§10.1 / wave 5's bottle · §13.1 / canon 68 · §14.2 / D3 §10.4 · §16.1 / D3 §13.5
++ D4 §12.2 · §22.1 / D1 §11.5 · §22.6 / opening room §4.9 · §23.2 / spec 03 §4 ·
+§24.3 / D2 §13.3 · §25.1 / `marlow.ts` `TOPIC_ROOM` · §26.2 / wave 5's
+`custodianSeenText` · §28.3 / D4 §9.8 · §29.1 / canon 53.
+
+### 39.2 Parser collisions — named, with the recommendation
+
+| Word | Collides with | Recommendation |
+|---|---|---|
+| `chair` | `act3_chairs` (the rows) vs. `act3_nolan_chair` vs. `act1_chair_leg` (held) | **`CHAIR` resolves to the rows; `NOLAN'S CHAIR`, `HIS CHAIR` and, at night, `NOLAN` resolve to his.** The leg is `LEG` / `CHAIR LEG` and already is |
+| `nolan` | the object `act3_nolan_chair` vs. the NPC `act2_nolan`, who is *in* it | **At night they are the same target.** `EXAMINE NOLAN` → §6.1; `WAKE`/`TALK TO`/`ASK NOLAN` → §6.3. **No topic on this floor resolves** |
+| `door` | Hub door, root door, gate frames, and D4's four | **room-scoped; every one has a qualified noun.** In the Hub a bare `DOOR` is ambiguous — **recommend a `whichOne`**, and `ROOT DOOR` / `HEAVY DOOR` / `BOTTOM DOOR` all resolve to §28 |
+| `lamp` | `act3_uv_lamp` vs. `act3_headlamp` (held) vs. D3's perimeter light | **held resolves to the headlamp; `UV LAMP`, `INSPECTION LAMP`, `SHADE` and `ARM` take the UV** — and `ARM` collides with the player's own forearm, so **`ARM` must prefer the body part** and the lamp takes `LAMP ARM` |
+| `clock` | `act3_bay_clock` vs. D4's `act3_wall_clock` on S5 | **different rooms, never in scope together.** `READ CLOCK` must not fall through to S5's rotation |
+| `drain` | the Bay's (§11) vs. the well's (§28.7) | **different rooms.** The well's takes `WELL DRAIN` |
+| `hook` / `hooks` | the rail (§5) vs. the coveralls' hook vs. the hose hook | **`HOOKS`, `RAIL`, `NAMES` → §5. `COVERALLS` is its own object.** The hose hook is not addressable |
+| `strap` | `act3_straps` (all of them) vs. the one across Nolan | **the object is all of them.** `UNDO STRAP` at night acts on the nearest sleeper's, which is §7.3 |
+| `search` | `SEARCH LEDGER FOR X` (a typed argument) vs. `SEARCH BENCH` (the verb) | **`SEARCH <object> FOR <text>` must parse on the ledger and the queue only**, and `SEARCH LEDGER` alone should prompt rather than fail |
+| `type` | D4's `TYPE CREDENTIALS` at the S6 pad vs. the Hub login script | **the Hub takes typed input only through the prompt script.** `TYPE` in the Hub with no session open should open the session |
+| `read` | ledger, graph, queue, clock, all in two rooms | all room-scoped and all named; **no bare `READ` default** |
+| `enter` | `ENTER GATE` (the boundary) vs. `ENTER CREDENTIALS` vs. `ENTER` as movement | **`ENTER GATE` / `ENTER FRAME` / `GO THROUGH GATE` are the boundary.** `ENTER` bare in the Hub must ask |
+| `wear` | the coveralls — the game's first `wearable` | **`WEAR` / `PUT ON` must exist as verbs.** Nothing else in the game is wearable yet; the fedora is Act I and is carried |
+| `people` | `act3_sleepers` (night only) vs. nothing by day | **by day, `EXAMINE PEOPLE` gets §15.5**, which is a room with nobody in it, and that is the correct answer |
+
+### 39.3 Things a builder will look for and not find
+
+- **`act3_ev_passed`** (§18.6) — proposed, not in the plan. Wire it or do not;
+  nothing else depends on it.
+- **`wearable` / `worn`** — the coveralls need a worn location and the four
+  spotted events test `{ not: { flag: act3_wearing_coveralls } }`. **The plan's
+  cond reads `{ objectAt: [act3_coveralls, 'worn'] }`; either is fine, one must
+  be chosen, and the flag is simpler to test.**
+- **The prompt script `act3_hub_login`** — two fields, `user` then `password`,
+  case-insensitive compare, `session.respondToPrompt`, exported through the
+  CLI's `PROMPT_SCRIPTS` map. **It is not the opening room's script** and the
+  two must not share an id or a handler.
+- **Object reveal on login** — `act3_ledger`, `act3_load_graph` and
+  `act3_queue` must not be addressable, listed, or referred to before
+  `act3_hub_logged_in`. A player who types `READ LEDGER` first should get the
+  parser's ordinary unknown-noun response, **not** a teasing refusal.
+- **`clockInWords(minute)`** — D4's helper in `act3/time.ts`, reused. **Do not
+  write a second one.**
+- **M16's selection** — the highest action-class counter at trigger time, one
+  variant, and the other two are never reachable in that playthrough. **The
+  memory index must show only the one that fired.**
+- **`{ checkpoint: 'act3_s6' }`** on the Bay's first `onEnter`, **no text**.
+- **Order of events on the first entry to the Bay**: description → clue →
+  question answered → flag → **M9**. M9 is last and is its own turn's output.
+- **Order on `READ QUEUE`**: the screen block and the narrator's four
+  paragraphs are one response; **M16 is the next event**, not appended.
+
+### 39.4 Exits and the map
+
+| Room | Exit | Goes to | Gate |
+|---|---|---|---|
+| `act3_pipe_chase` | `down` | `act3_s6_maintenance_bay` | none; 1 min; D4 §13's text kept |
+| `act3_s6_maintenance_bay` | `up` / chase / steps | `act3_pipe_chase` | none; 1 min; §14.3 |
+| | `east` / door / archive | `act3_s6_archive_hub` | none; §13.2 |
+| `act3_s6_archive_hub` | `west` / back / bay | `act3_s6_maintenance_bay` | none |
+| | `enter gate` | — | **the boundary** (§31) |
+| | `down` / the well | — | **the boundary** (§31), after §28's refusals |
+
+**Nothing on this floor can strand the player and nothing on it is locked.**
+The Bay reaches two rooms, the Hub reaches one and two boundaries, and the way
+out is the way in. **A retreat never moves the player somewhere he cannot leave
+from**, and the chase retreat lands him in the Cooling Plant, which is inside
+the fence and has four exits.
+
+## 40. Suggested extra responses the engine should support
+
+Verbs players will actually try, in rough order of certainty.
+
+1. **`WAKE NOLAN` at the third, fourth and fifth attempt.** Written twice
+   (§6.3). A player will do it more than twice. **The rotation should stop
+   rotating and repeat the second line**, and it must never become a joke.
+2. **`SEARCH LEDGER FOR NOLAN` and then `OPEN RECORD`** — §23.3 declines to
+   open it. A player will insist. **The honest response is that he opens it and
+   the fields say CURRENT, RECONCILED and nothing else**, and it is unwritten
+   because it makes Nolan's file a document instead of a decision.
+3. `TAKE CHAIR`, `MOVE CHAIR`, `TIP CHAIR`, `PULL LEVER ON CHAIR` — a player
+   will try to make one recline.
+4. `CARRY NOLAN OUT`, `PICK UP NOLAN`, `DRAG NOLAN` — **the most predictable
+   unwritten action in the wave** and the one I most want the main session to
+   rule on. It must fail, it must not be funny, and it must not be a lecture.
+5. `PUT COVERALLS ON NOLAN`, `TAKE NOLAN'S CARDIGAN`, `COVER HIM UP`.
+6. `SHOW BADGE TO SLEEPER`, `SHOW POLAROID TO SLEEPERS`, `LOOK FOR JULES IN THE
+   CHAIRS` — the last one is close to §5.4 and wants its own answer.
+7. `TURN OFF LAMP AND LOOK AT ARM`, `PUT ARM UNDER LAMP` before turning it on.
+8. `PHOTOGRAPH SCREEN`, `TAKE TERMINAL`, `PULL CORD OUT OF WALL`.
+9. `SEARCH LEDGER FOR SISSY` / `LUKE` / `ELI` — three siblings who do not live
+   in this county, and the honest answer is **0 RESULTS**, which is a bigger
+   fact than the player will realise. **Unwritten on purpose; §36 has no
+   question for it because I think it should wait for Stage E.**
+10. `WAIT UNTIL NIGHT` in the Bay — refused by D3 §14.3's pass-time rule, which
+    means the player has to leave the building and come back, which is P19.
+11. `HIDE`, `HIDE BEHIND CHAIRS`, `HIDE IN CHAIR` — a player who has been
+    spotted once will try all three.
+12. `FOLLOW CUSTODIAN` after a retreat.
+13. `PUT TABLET IN POCKET` and `SHOW TABLET TO NOLAN` in Act IV.
+14. `SMELL SLEEPERS`, `LISTEN TO NOLAN`, `TAKE HIS PULSE` — §15.3 covers the
+    class; Nolan should have his own.
+15. `COUNT HOOKS`, `COUNT SLEEPERS`, `COUNT FRAMES` — **all three must refuse**,
+    and §4.5 is the model.
+
+## 41. Register proposals (`docs/spec/09`, column format; proposals only)
+
+Numbered from **80** (D4's proposals were recorded as entries 73–79).
+
+| # | Question | Proposed decision | Why | Forecloses |
+|---|---|---|---|---|
+| 80 | What the Maintenance Bay contains, physically | **Hospital tile with a fall to a brass drain; reclining chairs on hydraulic pedestals in rows, each set to an individual person, facing a blank wall with the pedestal conduits running under it; a rail of named hooks opposite the rows, one hook per chair; hand-lined sheepskin restraints; a UV inspection lamp at the head of the first chair only; a wall clock over the door; a bulk tablet dispenser; a hose bib; a spare set of unmarked grey coveralls** | The room has to be believed before any of R9–R12 can land, and belief comes from trade detail rather than atmosphere. Every item is a thing a real facility would need if the fiction were true | A clinical or laboratory reading; any furniture that explains the process |
+| 81 | May any other name print on the badge rail? | **No. NOLAN and the peeled hook are the only labels the game ever prints** | Canon 54's *names the player does not know* is an effect, not a list; each invented surname would become a canon townsperson at zero narrative benefit | A named roster of Sublevel 6; any second recognisable name |
+| 82 | What the UV lamp shows on the player's forearm in Stage D | **One upright stroke, closed top and bottom, inside the left forearm above the wrist, darker than the surrounding skin, invisible in ordinary light. Described, never named. No response compares it to anybody's arm** | Spec 03 §1 and wave 4 §6.2 built a two-year fuse on the anatomy; this lights it without spending Stage E's R13 | Naming the mark as a numeral before Stage E; any narrator comparison to Jack |
+| 83 | The archive ledger's record shape | **`STATUS / RECORDS / ASSOCIATIONS / SNAPSHOT`, four fields, fixed-width, no adjective. Jules's reads `DEPRECATED / RECONCILED / RECONCILED / ARCHIVED / ROOT`, and `NO FURTHER ACTION`** | `ASSOCIATIONS: RECONCILED` explains, in one word nobody comments on, why the whole county's memory of him is wrong; `SNAPSHOT: ARCHIVED / ROOT` is P27's address | A ledger with prose in it; any field the narrator paraphrases |
+| 84 | The word *deprecated* | **Appears in the whole game only on the ledger screen (§23.2) and in the player's verbatim transcription of that screen, and is never spoken by a narrator, an NPC, a paraphrasing clue sentence, a question or a memory** | The system's vocabulary is only ever spoken by the system; a narrator who uses the word has joined it | Any character or narrator line using it, in any act |
+| 85 | How R11 is delivered | **As an ASCII figure: a notched load block, with Eli's `460` laid across it as a ruled line, so that everything below the line is solid and every notch is above it. The narrator names what is above and below and stops one sentence short. The word *town* is never printed** | Canon 7 and 02 §15 require a graph rather than a monologue; the figure is the argument and the last sentence is the player's | Any prose statement of the conclusion; a unit on the axis |
+| 86 | Where the system names the player | **Once, in the reconciliation queue, as `SUBJECT [UNRESOLVED] — RE-ACQUIRE`, with the last-known address `MAIN ST / TOP FLOOR REAR`. No narrator line says *that is you*** | The address is the identification and it is in the player's own hand from Act I (Marlow's *top floor, back*); a narrator gloss would be the game explaining its best beat | Any second place the system names him before Stage E; the word *profile* in Act III |
+| 87 | Does anyone below speak? | **Only Dad, on the rig, and the terminal. Nolan is asleep and silent; the sleepers are scenery; the Custodian's only four words in the game are inside M16** | Canon 67 and architecture §4 item 5; the antagonist's silence is the character, and the apology only works if it is the only thing he has ever said | A Custodian line anywhere in the present tense, in any act |
+| 88 | The Act III boundary's system text | **`END OF BUILD` / `Act III ends here. What is through the frames, and what is under the door at the end of this room, are the next version.`** — the only system line in the game that names an act | It is the act boundary and the acceptance check for the Act IV hand-off; naming the act is the one piece of information the system voice has that the fiction does not | The plan's draft, which refers to the player's emotional state and to an internal stage name |
+
+## 42. Word count against budget
+
+Player-visible words only: fenced `text` blocks, counted with a script, not
+estimated. Authoring notes, tables, headings and wiring notes excluded.
+**Text reused verbatim from a shipped or earlier document is not counted** —
+D4 §13's descent block at §39.1 (56 words) and D2 §9.4's rig boot at §29.3 (34
+words) are reused and appear nowhere in this document's fenced blocks. The
+quarantine (§38, 129 words) is **not** counted; it does not ship without a
+ruling.
+
+**Canon 46 governs this table:** density ceilings are *furniture only*, and
+puzzle machinery is priced separately. The split is mechanical — every block
+reached by a puzzle verb, a route, a memory, an event, a reveal-bearing screen
+or a boundary gate is machinery or terminal text; everything a player gets by
+looking at the room is furniture.
+
+### Furniture — against the tier ceilings
+
+| Room | Tier | Target | Actual | |
+|---|---|---|---|---|
+| S6 Maintenance Bay (§3.1, §4, §5, §6.1–§6.4, §6.6, §7, §8.1–§8.2, §8.4–§8.5, §9–§11, §12.1, §12.3–§12.5, §13–§16) | **hero** | **3,000** | **3,964** | +32% |
+| S6 Archive Hub (§21.1, §22.1, §22.5–§22.6, §27.1–§27.4, §28.1, §28.4–§28.7, §30) | standard | **1,200** | **1,339** | +12% |
+| **Furniture total** | | **4,200** | **5,303** | **+26%** |
+
+### Terminal text — the plan's separate line
+
+| Piece | Actual |
+|---|---|
+| The login, both outcomes (§22.2–§22.4) | **71** |
+| The ledger — browse, **R10**, and four searches (§23) | **407** |
+| The graph — the curve, the axis, **R11**, and two extras (§24) | **441** |
+| The queue — **R12** and three extras (§25) | **267** |
+| The root door's reader and the third `MAINTENANCE / DENIED` (§28.2–§28.3) | **171** |
+| **Terminal text total** | **1,357** (brief: 800) |
+
+### Machinery — priced separately (canon 46)
+
+| Piece | Actual |
+|---|---|
+| Clue detail text, three clues written out (§2) | **97** |
+| The Act IV question's text (§2) | **9** |
+| **P19's St routes** — the badge off the hook (§6.5), the coveralls worn (§12.2) | **133** |
+| **P21's seed** — the arm under the lamp (§8.3) | **175** |
+| **M9** (§17) | **127** |
+| The Custodian — four retreats, twelve beats (§18.1–§18.4) | **397** |
+| The nod, if wired (§18.6) | **44** |
+| Dad — one push and three topics (§19) | **529** |
+| The alarm — five responses (§20) | **282** |
+| **M16 ×3** (§26) | **327** |
+| Dad refuses the dock (§29) | **179** |
+| The boundary, two in-world blocks and one system line (§31) | **100** |
+| **Machinery total** | **2,399** |
+
+### The wave
+
+| | Brief | Actual | |
+|---|---|---|---|
+| **WAVE TOTAL (shipping)** | **~4,900** | **9,059** | **+85%** |
+| *(reused verbatim, not counted)* | — | *(90)* | §39.1, §29.3 |
+| *(quarantined, not shipped)* | — | *(129)* | §38 |
+
+### 42.1 What the number says, and the eight cuts I recommend
+
+**The brief's 4,900 prices two rooms, a schedule and a sleeping man.** It
+allocates Bay 3,000, Hub 1,200, terminal 800, rounds 200, Nolan 100 — and it
+prices none of the machinery canon 46 says is priced separately: **two P19
+routes, the P21 seed, four memory fragments, four multi-beat events, a
+four-rule Dad topic with a push in front of it, a five-response diversion
+object, a refusal that teaches the air-gap rule, and a boundary.** Against the
+same accounting D4 used, this wave is **5,303 furniture** and **2,399
+machinery**, plus a terminal-text line the brief already priced separately and
+which came in at 1,357 against 800.
+
+**The furniture overrun is one room and it is the hero room.** 3,964 against
+3,000 is +32%, and I will make the case and then hand over the knife. The Bay
+carries **twelve objects with a mandated night state**, which means the two
+biggest — the chairs and the hooks — are effectively written twice, and it
+carries the only description in the game that has to make a player believe
+something impossible on sight. It is also the room the scope cut names as one
+of four heroes precisely because *R9–R12 land on it and the player must believe
+the room*. **At 3,000 it can hold the twelve objects or it can hold the night
+state, and not both.**
+
+**What I would take, 694 words, in order:**
+
+1. **§16.2 `SMELL`, §16.3 `WAIT`, §16.6 `SHOUT`, and §30.2, §30.4, §30.6 —
+   170 words.** Six completeness responses across two rooms, none carrying a
+   clue or a joke. Both rooms keep `LISTEN`, which is the one that matters in
+   each. **Take it.** This is the biggest honest cut in the document.
+2. **§10.4 `OPEN CABINET` — 72 words.** A §14 acknowledgement with a joke on
+   the end. The dispenser keeps its examine, its lever and the tablet. **Take
+   it.**
+3. **§12.4 `SEARCH COVERALLS` — 41 words.** It says what §12.5 says, by a
+   different sense. **Keep §12.5**, which is the better of the two. **Take it.**
+4. **§24.5 and §25.2 — the two *again* responses on the graph and the queue,
+   84 words.** Both re-render a screen the player has just read. **Take them.**
+5. **§5.5 `TAKE TAPE` and §8.5 the badge under the lamp — 98 words.** Two
+   §14 acknowledgements at objects that have already paid. **Take them.**
+6. **§22.5 `TURN OFF TERMINAL` — 75 words.** It is a good response and it is
+   the most obvious thing a person does to a machine. **Take it if the Hub has
+   to come down**, and I would rather it did not.
+7. **§28.7 the well drain — 60 words.** The wave's fourth drain-adjacent block.
+   **Take it.**
+8. **§19.3 `topic_how_do_you_know` — 94 words.** Dad's method is already shown
+   in §19.2's rules 2 and 4, in the doing. **I am naming it because the task
+   asked for cuts and I would argue against it:** it is the only place in the
+   game where the man explains what being blind in a building is like, and he
+   is not sad about it.
+
+That is **525 confidently** (cuts 1–5 and 7), **694 if all eight are taken**,
+which brings the Bay to 3,656 (+22%), the Hub to 1,131 (**under** ceiling), the
+terminal line to 1,273, and the wave to 8,365.
+
+**If the main session needs more than that, the lever is the night state, not
+the objects.** §3.1 rules 2 and 3 are 216 words of a room the player has
+already seen by day; collapsing them into a night *prefix* on rules 1 and 4
+(three sentences: the chairs are full, the straps are done up, nobody looks up)
+is about **150 words** and it costs the room the single best paragraph in the
+wave. **I do not recommend it and I am naming it because it is the only place
+left where a number that size lives.**
+
+**What I would not cut, in any circumstance:** §3.1, §4.1–§4.2, §5.1, §5.3,
+§6.1, §6.3, §7.1, §8.3, §16.1, §17, §23.2, §24.3, §25.1, §26, §28.4, §28.6,
+§31. Those are R9, R10, R11, R12, the two memories, the game's two hardest
+refusals and the act boundary, and between them they are 2,698 words and the
+entire reason Stage D exists.
+
+### 42.2 For Ryan
+
+The pieces most likely to be claimed `ryan-authored`, in the order I would
+claim them:
+
+- **§6.3** — Nolan, and the strap that was never what kept him here.
+- **§24.3** — the graph, the ruled line, and the sentence that stops short.
+- **§25.1** — the queue, and *Top floor, back. Three weeks, you've had it.*
+- **§8.3** — the arm under the lamp.
+- **§23.2** — *He is here. He has been here the whole time, in a field, with a
+  word in it.*
+- **§26** — the three tellings of the attack, and the four words in all of them.
+- **§28.4** — the knock that makes a smaller noise than a hand.
+- **§22.6** — no burn on the phosphor.
+
+Every one of them is written, none of them is a placeholder, and every one is
+replaceable without touching a flag, a clue, an exit or an event.

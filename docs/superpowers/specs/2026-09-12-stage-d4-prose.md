@@ -1,6 +1,6 @@
 # Act III Wave D4 — The Descent
 
-**Status (main session, 2026-08-31):** accepted whole for wiring as v0.14.0 — no cuts; §18 rulings as recommended (register 73–79); §20 not wired; Dad's "four hundred thousand dollars" trimmed to "a great deal" (entry 37). Original: draft for main-session voice review · **Author:** `narrative-writer`
+**Status (main session, 2026-08-31):** **wired and shipped v0.14.0**; accepted whole — no cuts; q6 revised at integration to two rooms (register 90); §18 rulings as recommended (register 73–79); §20 not wired; Dad's "four hundred thousand dollars" trimmed to "a great deal" (entry 37). Original: draft for main-session voice review · **Author:** `narrative-writer`
 · **Date:** 2026-09-12
 **Covers:** the way under and the way down — the **county-road walk** and the
 **Service Tunnel** (light), **S1 Mechanical Gallery** (standard),

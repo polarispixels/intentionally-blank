@@ -26,13 +26,13 @@ import { EXAMINE, LOOK_BEHIND, OPEN, PRY, READ, SIT, SMELL, TAKE, TOUCH } from '
 import { V_FIT } from '../../act2/ids';
 import {
   ACT3_BOUNDARY_GATE,
-  ACT3_BOUNDARY_SCRIPT,
   ACT3_CHASE_HATCH,
   ACT3_CLUE_WARM_RETURN,
   ACT3_COOLING_PLANT,
   ACT3_HATCH_OPEN,
   ACT3_MANIFOLDS,
   ACT3_PERIMETER_ROAD,
+  ACT3_PIPE_CHASE,
   ACT3_PLANT_DRAWING,
   ACT3_PLANT_FLOOR,
   ACT3_PLANT_STEP,
@@ -214,19 +214,23 @@ const pryHatchEffects: Effect[] = [
   },
 ];
 
-// §15 — "DOWN"/"ENTER HATCH" once open. Bare "down" (no dobj) is the room's
-// own exit (`coolingPlant.ts`, the room file) — this handler answers "ENTER
-// HATCH"/"GO DOWN HATCH" (dobj = the hatch), which resolves through
-// `DIRECTION_VERB_IDS.in` and would otherwise reach `traverseDoor` (there is
-// no exit whose `door` is the hatch itself — see `elevator.ts`'s own header
-// on why object handlers for a resolved dobj take priority over that
-// dispatch). A real `{ script }` effect here (unlike the exit's own
-// `blockedText`, which can only approximate `kind: 'system'` as prose — see
-// `coolingPlant.ts`'s header) gives this route the true system event.
+// §15/D4 §12.3 — "DOWN"/"ENTER HATCH" once open. Bare "down" (no dobj) is
+// the room's own exit (`coolingPlant.ts`, the room file) — this handler
+// answers "ENTER HATCH"/"GO DOWN HATCH" (dobj = the hatch), which resolves
+// through `DIRECTION_VERB_IDS.in` and would otherwise reach `traverseDoor`
+// (there is no exit whose `door` is the hatch itself — see `elevator.ts`'s
+// own header on why object handlers for a resolved dobj take priority over
+// that dispatch).
+//
+// D4 task D amendment: D3's in-world text is kept verbatim (§12.3's own
+// ruling) but now leads somewhere real — the boundary script this handler
+// used to invoke (`ACT3_BOUNDARY_SCRIPT`/`act3Boundary`, `../scripts.ts`) is
+// retired for this route; see that file's own header for why it is not
+// deleted outright.
 export const HATCH_DOWN_TEXT =
   'The ladder goes down the near side of the hole, and it is a proper ladder,\nbolted through the slab, with the rungs worn on top and not on the sides.\n\nThe air coming up past you is warmer than the room and it is moving.';
 
-const hatchDownEffects: Effect[] = [{ say: HATCH_DOWN_TEXT }, { script: { id: ACT3_BOUNDARY_SCRIPT } }];
+const hatchDownEffects: Effect[] = [{ say: HATCH_DOWN_TEXT }, { advanceClock: 10 }, { goto: ACT3_PIPE_CHASE }];
 
 const hatch: ObjectDefSlice = {
   location: ACT3_COOLING_PLANT,
@@ -293,10 +297,16 @@ export const ACT3_COOLING_PLANT_OBJECTS: Record<string, ObjectDefSlice> = {
   [ACT3_YARD_DOOR]: yardDoor,
 };
 
-// §15's boundary gate — mechanism-only, never named/examinable (no `nouns`),
-// same idiom as `TOWN_EDGE_TUNNEL_BOUNDARY_GATE` (`act1/objects/townEdge.
-// ts`). Never opens (no `container` at all), so the hatch's `down` exit
-// (`coolingPlant.ts`) can never actually traverse it.
+// D3 §15's boundary gate — mechanism-only, never named/examinable (no
+// `nouns`), same idiom as `TOWN_EDGE_TUNNEL_BOUNDARY_GATE` (`act1/objects/
+// townEdge.ts`). Never opens (no `container` at all). No longer used by
+// this room's own hatch `down` exit (D4 §12.3/§21.1 — that exit is real
+// now), but reused as-is, unmodified, as the wave's one surviving
+// `system.buildBoundary` door at the Pipe Chase's own `down` exit
+// (`pipeChase.ts`, D4 task D's own file) — "one door", per that task's
+// briefing. `location` is inert for a door check (`resolve.ts`'s
+// `objectState` looks the id up directly, never by room), so leaving it
+// declared here rather than moving it costs nothing.
 const boundaryGate: ObjectDefSlice = { location: ACT3_COOLING_PLANT };
 
 // OVERLAY (owned by task A — the truck's toolbox/wrench, `ACT3_WRENCH` is

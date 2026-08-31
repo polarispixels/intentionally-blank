@@ -12,6 +12,77 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.14.0] - 2026-08-31
+
+**Stage D4 — the descent.** Everything under the building down to the
+bottom of the Pipe Chase, and the way under from the county road
+(`docs/superpowers/specs/2026-09-12-stage-d4-prose.md`).
+
+### Added
+
+- **The way under.** Town Edge's country exit is real: an hour over the
+  grazing along the cedar posts to a hardstand with a steel plate in it;
+  the hatch (the odd key on Jack's ring fits it, or the chair leg does);
+  the headlamp in Jack's toolbox and a matchbook that buys two turns; the
+  Service Tunnel — the ladder, the mile, the rails, the seal cut from the
+  far side (*The cutting went in from the far side*) — and the
+  construction door that opens without a sound onto the back of a rank of
+  pumps. The tunnel counts for P16 and sets `act3_inside` like any other
+  route in.
+- **S1 Mechanical Gallery.** Pumps on rubber pads, the tool crib with every
+  tool in its outline, the tape rack with one tape out and a checkout card
+  signed in a hand you have seen before (*The card, in the same hand as
+  the notebook*), the stair down, and the painted-over door that is not a
+  door from this side.
+- **S5 Reactor Interface.** The gauge wall — `GEN 905`, `HALL A 460`,
+  `FDR 3 445` by day and the dip between one and four in the morning; the
+  logbook; Eli's audit held up against the wall (*The DIFFERENCE column,
+  met on the wall*); the demand dial under its perspex; the wall clock
+  that speaks only in words; the S6 door with a reader and a pad that
+  accepts the credentials and still says `DENIED`; the opening the ladder
+  goes on down; and **the interlock — the game's first death**, a
+  checkpoint on arrival, and `RESTART ENCOUNTER` to come back. Turning the
+  keyswitch to NORMAL quietly makes it impossible.
+- **The Pipe Chase** — the crawl, Return B below, the condensation; up to
+  the plant, sideways to S5, and down to this version's one boundary.
+- **The lift's real stops.** S1 and S5 each get their own arrival beat;
+  `PRESS BLANK` gains its last sentence once S5 has been stood on.
+- **Dad** on the seal, the rails, and the interlock.
+
+### Changed
+
+- **Compound nouns resolve** (parser). A noun with a space in it ("button
+  panel", "far door", "shield door") was compiled as a whole-string key the
+  grammar never looked up — `X FAR DOOR` in B4 reached the reader. Compounds
+  now index their head word with their leading words as adjectives, and a
+  compound-only claim ranks below a bare noun: bare `PANEL` in B4 is the
+  wall panel, `BUTTON PANEL` the lift's; `JUNK DRAWER` is the drawer, not
+  the window that lists the phrase. (`tests/parser-compound-nouns.test.ts`)
+- **A room's first-sight rule fires on arrival** (engine). `renderArrival`
+  marked `visited` before rendering the description, so every Act III
+  room's `{ not: { visited: <itself> } }` rule was dead prose on a real
+  entry; the mark now follows the render.
+- **The Service Tunnel is two rooms** — the mouth and below — not one room
+  with a position flag (register 90): a bare `DOWN` at the mouth walks the
+  mile and renders the dark.
+- Noun trims found by the playthrough: the headlamp no longer claims bare
+  `lamp`/`light` (it tied the perimeter's pole light for `WATCH LIGHT`, the
+  hut's clue); the lift's `pad`, the brochure's and the certificate's
+  `card`, the keyring's `tag`, and S5's `wall` become compounds so the S6
+  pad, the checkout card, the interlock tag and the gauge wall win the bare
+  word; `S5` is no longer a word of the chase's SIDEWAYS verb.
+- S1's construction-door gate syncs on every entry (`onEnter` rules default
+  to once-ever, and the first entry is usually by lift with the door shut).
+- The D3 fixture rides the lift to S5 and back; D3's boundary script is
+  gone.
+
+### Decisions
+
+Canon register 73–79 (D4 rulings: the gauge figures, the one-to-four
+window, the S6 door's `MAINTENANCE / DENIED`, no 1983 in the tunnel, the
+tunnel route counts, deaths get no callback, the tunnel stays open) and
+80–90 (D5 prose accepted; the tunnel in two rooms).
+
 ## [0.13.0] - 2026-08-31
 
 **Stage D3 — the facility surface.** Act III opens: everything north of the

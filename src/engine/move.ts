@@ -413,7 +413,25 @@ export function renderArrival(world: WorldDef, state: GameState): { state: GameS
   let current = state;
   const events: GameEvent[] = [];
 
-  if (current.visited[roomId] === undefined) {
+  const firstEntry = current.visited[roomId] === undefined;
+  if (firstEntry && def.firstVisit !== undefined) {
+    const rendered = render(world, current, `room.${roomId}.firstVisit`, def.firstVisit);
+    current = rendered.state;
+    events.push({ type: 'line', kind: 'prose', text: rendered.text });
+  }
+
+  if (def.description === undefined) {
+    throw new Error(`move: room "${roomId}" has no description to render`);
+  }
+  // The description renders BEFORE `visited` is marked (v0.14.0): a room's
+  // own `{ not: { visited: <itself> } }` first-sight rule must be true on the
+  // arrival that introduces it — every Act III room is authored that way,
+  // and marking first made all of them dead prose on a real arrival.
+  const rendered = render(world, current, `room.${roomId}.description`, def.description);
+  current = rendered.state;
+  events.push({ type: 'line', kind: 'prose', text: rendered.text });
+
+  if (firstEntry) {
     // "turn of first entry" (gamestate.ts's own gloss): the turn count as
     // this command started, matching `initialState`'s `visited[startRoom] =
     // 0` alongside `turn: 0` — nothing in the engine reads this value as
@@ -421,19 +439,7 @@ export function renderArrival(world: WorldDef, state: GameState): { state: GameS
     // arm, respond.ts's hasSeen*), so the exact number only has to be
     // consistent with that seeding convention, not perfectly "post-turn".
     current = { ...current, visited: { ...current.visited, [roomId]: current.turn } };
-    if (def.firstVisit !== undefined) {
-      const rendered = render(world, current, `room.${roomId}.firstVisit`, def.firstVisit);
-      current = rendered.state;
-      events.push({ type: 'line', kind: 'prose', text: rendered.text });
-    }
   }
-
-  if (def.description === undefined) {
-    throw new Error(`move: room "${roomId}" has no description to render`);
-  }
-  const rendered = render(world, current, `room.${roomId}.description`, def.description);
-  current = rendered.state;
-  events.push({ type: 'line', kind: 'prose', text: rendered.text });
 
   const listing = renderRoomListing(world, current, roomId);
   current = listing.state;

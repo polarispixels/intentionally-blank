@@ -355,7 +355,7 @@ const keyring: ObjectDefSlice = {
   location: JACKS_MOTEL,
   name: 'keyring',
   portable: true,
-  nouns: ['keys', 'key', 'keyring', 'key ring', 'ring', 'keychain', 'fob', 'spare', 'spares', 'nail', 'hook', 'shed', 'tag'],
+  nouns: ['keys', 'key', 'keyring', 'key ring', 'ring', 'keychain', 'fob', 'spare', 'spares', 'nail', 'hook', 'shed', 'brass tag'],
   handlers: [
     { verbs: [EXAMINE], effects: keyringExamineEffects },
     // "take keys"/"ask for keys"/"borrow keys" (§4.4) share one refusal —

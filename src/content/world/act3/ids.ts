@@ -287,8 +287,6 @@ export const ACT3_P17_B4 = P('act3_p17_b4');
 export const ACT3_MEM_M7 = M('act3_mem_m7');
 
 // --- Scripts ---
-/** §15 — the one `system.buildBoundary` emission, reached from the hatch's `down`, the lift's S1/S5, and Town Edge's country exit. */
-export const ACT3_BOUNDARY_SCRIPT = S('act3_boundary');
 /** The lift's S1/S5 ride (§13.8): three beats, `advanceClock: 3`, then the boundary. */
 export const ACT3_ELEVATOR_RIDE_SCRIPT = S('act3_elevator_ride');
 /** Reader B4's rotation-parity resolution (§11.6) — `Cond` has no modulo primitive, so this is a script, not a declarative `when`. */
@@ -297,3 +295,303 @@ export const ACT3_READER_B4_SCRIPT = S('act3_reader_b4');
 // --- New verbs (§11.3, §10.6/§11.7/§13.6) — see `verbs.ts` for the words/patterns and the in-place amendments to the shipped `V_MEASURE`/`V_CALL`. ---
 export const V_PACE = V('act3_pace');
 export const V_UNBOLT = V('act3_unbolt');
+
+// ---------------------------------------------------------------------------
+// Wave D4 shared — the descent (`docs/superpowers/specs/2026-09-12-stage-d4-
+// prose.md` §2, §21.3). Written by the main session before the D4 builders
+// ran so that no two of them declare the same state. Builders ADD their own
+// room/object/verb ids below the anchor at the end of this file, with the
+// Edit tool, never Write.
+// ---------------------------------------------------------------------------
+
+// Rooms (§21.4)
+// register 90 (main session ruling, revising §18 q6): the tunnel is TWO rooms — the mouth (arrival, the hatch) and the below (the walk, rails/seal/construction door). `ACT3_SERVICE_TUNNEL` is now specifically "below."
+export const ACT3_TUNNEL_MOUTH = R('act3_tunnel_mouth');
+export const ACT3_SERVICE_TUNNEL = R('act3_service_tunnel');
+export const ACT3_S1_MECHANICAL_GALLERY = R('act3_s1_mechanical_gallery');
+export const ACT3_S5_REACTOR_INTERFACE = R('act3_s5_reactor_interface');
+export const ACT3_PIPE_CHASE = R('act3_pipe_chase');
+
+// Flags (§2, §21.3)
+export const ACT3_AT_TUNNEL_MOUTH = F('act3_at_tunnel_mouth');
+export const ACT3_TUNNEL_UNLOCKED = F('act3_tunnel_unlocked');
+export const ACT3_TUNNEL_BELOW = F('act3_tunnel_below');
+export const ACT3_HEADLAMP_ON = F('act3_headlamp_on');
+export const ACT3_MATCH_BURNING = F('act3_match_burning');
+/** Turns of light left in a struck match (§5.2) — a numeric flag the tunnel's per-tick event decrements; `{ flag, atLeast: 1 }` is the light. */
+export const ACT3_MATCH_TURNS = F('act3_match_turns');
+export const ACT3_WALKED_TUNNEL = F('act3_walked_tunnel');
+export const ACT3_CONSTRUCTION_DOOR_OPEN = F('act3_construction_door_open');
+export const ACT3_SAW_SEAL = F('act3_saw_seal');
+export const ACT3_READ_GAUGES_NIGHT = F('act3_read_gauges_night');
+export const ACT3_BASELINE_MATCHED = F('act3_baseline_matched');
+export const ACT3_BYPASS_SEEN = F('act3_bypass_seen');
+export const ACT3_INTERLOCK_NORMAL = F('act3_interlock_normal');
+export const ACT3_DIED_REACTOR = F('act3_died_reactor');
+export const ACT3_S6_PAD_TRIED = F('act3_s6_pad_tried');
+
+// Clues (§2)
+export const ACT3_CLUE_SEAL_FROM_INSIDE = C('act3_clue_seal_from_inside');
+export const ACT3_CLUE_J_HAND = C('act3_clue_j_hand');
+export const ACT3_CLUE_THREE_AM_DIP = C('act3_clue_three_am_dip');
+export const ACT3_CLUE_BASELINE_MATCHES_AUDIT = C('act3_clue_baseline_matches_audit');
+export const ACT3_CLUE_S6_DOOR_REFUSES = C('act3_clue_s6_door_refuses');
+export const ACT3_CLUE_NO_LOWER = C('act3_clue_no_lower');
+
+// Questions (§2) — P19
+export const ACT3_Q_WHEN_UNWATCHED = Q('act3_q_when_unwatched');
+
+// Puzzle (§2) — P18, the second return
+export const ACT3_P18_SECOND_RETURN = P('act3_p18_second_return');
+
+// Checkpoint and death ids (§10.3, §10.4, §21.3) — plain strings for `{ checkpoint }` / `{ die }`.
+export const ACT3_CHECKPOINT_S5 = 'act3_s5';
+export const ACT3_DEATH_REACTOR = 'act3_reactor';
+
+// --- D4 task D — the Pipe Chase, the chase hatch's DOWN, and the boundary
+// (D4 prose doc §11-§13, §21). `ACT3_PIPE_CHASE`/`ACT3_HATCH_OPEN`/
+// `ACT3_Q_WHEN_UNWATCHED`/`ACT3_P18_SECOND_RETURN`/`ACT3_BOUNDARY_GATE` are
+// declared above (wave-D4-shared) or in this file's D3-C section
+// (`ACT3_HATCH_OPEN`, `ACT3_BOUNDARY_GATE`) — reused, never redeclared. ---
+
+// --- Objects: the Pipe Chase's three (§11.2-§11.4) ---
+export const ACT3_CRAWL = O('act3_crawl');
+export const ACT3_RETURN_B_LOWER = O('act3_return_b_lower');
+export const ACT3_CONDENSATION = O('act3_condensation');
+
+/**
+ * "S5"/"SIDEWAYS" (§21.4's own three-way exit name: "s5 / sideways / out")
+ * reaching the chase's own opening back to S5. Not a canonical `Direction`
+ * (`engine/ids.ts`'s `Direction` union has no such member, and the shared
+ * `out` verb's own word list belongs to every room in the game, not just
+ * this one) — so this is a new bare-phrase verb, wired as a room-level
+ * handler in `pipeChase.ts` mirroring the real `out` exit's own effects.
+ * Same idiom as `V_ACT3_LOOK_WEST` above. Builder addition (not in the
+ * pre-approved id list); flagged in this task's report.
+ */
+export const V_ACT3_SIDEWAYS = V('act3_sideways');
+
+/**
+ * Builder addition, flagged in this task's report: a dedicated "has this
+ * room's own first-sight text already rendered" flag, set `true` by the
+ * room's own `onEnter` (`pipeChase.ts`). NOT gated on `{ not: { visited:
+ * act3_pipe_chase } }` the way every other D3 room's own "first sight"
+ * `ProseRule` is (`lobby.ts`, `dataHallA.ts`, `perimeterRoad.ts`,
+ * `corridorB4.ts`, `coolingPlant.ts`) — `move.ts`'s own `renderArrival`
+ * marks `state.visited[roomId]` BEFORE it renders `description` (not
+ * after), so a `{ not: { visited: OWN_ROOM } }` cond inside that same
+ * room's own `description` can never observe "not yet visited": by the
+ * time `description` evaluates, the room is already marked visited. That
+ * makes the "Rule 1 — first sight" branch in all five of those rooms
+ * unreachable on a genuine arrival (confirmed empirically, this task's own
+ * report) — a `RoomDefSlice.onEnter` effect runs strictly after
+ * `description` renders (`renderArrival`'s own doc comment: "... then
+ * onEnter"), so gating on a flag this room's own `onEnter` sets, instead of
+ * `visited`, actually works: the flag reads `false` for the render that
+ * matters (the first one) and `true` for every one after.
+ */
+export const ACT3_PIPE_CHASE_SEEN = F('act3_pipe_chase_seen');
+
+// ---------------------------------------------------------------------------
+// D4 task B — S1 Mechanical Gallery and the lift's real S1/S5 stops
+// (`docs/superpowers/specs/2026-09-12-stage-d4-prose.md` §7.3, §8, §12).
+// Rooms/flags/clues/questions/puzzle already declared above (shared block)
+// are reused, not redeclared.
+// ---------------------------------------------------------------------------
+
+// §7.3: the construction door is "one object, two rooms" (the D3 §10.8/
+// elevator idiom — two `ObjectDefSlice`s, one per room, not one object
+// magically in two places). The tunnel-side instance and its `OPEN DOOR`
+// that sets `ACT3_CONSTRUCTION_DOOR_OPEN` (§7.1 rule 1, §7.2, §7.4) are
+// task A's own (`objects/serviceTunnel.ts`), which had not landed as of
+// this edit — this is this task's own id for the S1-side instance only
+// (§7.1 rules 2/3's examine text is task A's to add to this same object,
+// by appending to its `handlers`, once their file exists; only the §7.3
+// `OPEN DOOR` "before" rule below is this task's own). Flagged in this
+// task's report.
+export const ACT3_CONSTRUCTION_DOOR_S1 = O('act3_construction_door_s1');
+/**
+ * Mechanism-only, never named/examinable (no `nouns`) — same idiom as
+ * `ACT3_GATE_DOOR`/`TOWN_EDGE_TUNNEL_BOUNDARY_GATE`: the `south` exit's own
+ * `door` reference, so a still-shut door renders §7.3's specific refusal
+ * (`ExitDefSlice.blockedText`) rather than the generic "no exit that way"
+ * (`when` would only give the generic family — `move.ts`'s own
+ * `exitCurrentlyExists`/`exitIsOpen` split). Synced to
+ * `ACT3_CONSTRUCTION_DOOR_OPEN` on every entry to S1 (`s1MechanicalGallery.
+ * ts`'s own `onEnter`) rather than depending on task A's own tunnel-side
+ * effects setting a second object's state — the player can only ever be
+ * standing in S1 *after* leaving it and re-entering once the door (which
+ * only opens from the tunnel side) is open, so an entry-time sync can never
+ * miss a state change. Builder addition, flagged in this task's report.
+ */
+export const ACT3_CONSTRUCTION_DOOR_GATE = O('act3_construction_door_gate');
+
+// --- S1's six objects (§8) ---
+export const ACT3_PUMPS = O('act3_pumps');
+export const ACT3_TOOL_CRIB = O('act3_tool_crib');
+export const ACT3_TAPE_RACK = O('act3_tape_rack');
+export const ACT3_STAIRS_DOWN = O('act3_stairs_down');
+// (the construction door and the lift door, S1's other two of six, are
+// `ACT3_CONSTRUCTION_DOOR_S1` above and the elevator's `_GALLERY` instance
+// below.)
+
+// --- Uncounted sub-parts of the crib (§8.3) and the rack (§8.5's card) ---
+export const ACT3_CRIB_CUP = O('act3_crib_cup');
+export const ACT3_CRIB_BOARD = O('act3_crib_board');
+export const ACT3_CHECKOUT_CARD = O('act3_checkout_card');
+/** Uncounted — the room's own `TOUCH FLOOR`/`LOOK AT FLOOR` (§8.8) needs a noun to resolve against, same idiom as `ACT3_PLANT_FLOOR`/`ACT3_PLANT_STEP`. */
+export const ACT3_S1_FLOOR = O('act3_s1_floor');
+
+// --- §12.1: the lift gains two more physical instances (same "one object,
+// several rooms, shared handler-building function" idiom `elevator.ts`
+// already uses for the Cooling Plant/Corridor B4 pair) — one landing in
+// S1 (this task's own room) and one in S5 (task C's room; placed here by
+// id only, per this task's brief — task C builds `act3_s5_reactor_
+// interface`'s own six-ish objects, not this one). ---
+export const ACT3_ELEVATOR_DOOR_GALLERY = O('act3_elevator_door_gallery');
+export const ACT3_ELEVATOR_PANEL_GALLERY = O('act3_elevator_panel_gallery');
+export const ACT3_ELEVATOR_BLANK_GALLERY = O('act3_elevator_blank_gallery');
+export const ACT3_ELEVATOR_BUTTON_L_GALLERY = O('act3_elevator_button_l_gallery');
+export const ACT3_ELEVATOR_BUTTON_S1_GALLERY = O('act3_elevator_button_s1_gallery');
+export const ACT3_ELEVATOR_BUTTON_S5_GALLERY = O('act3_elevator_button_s5_gallery');
+export const ACT3_ELEVATOR_CERTIFICATE_GALLERY = O('act3_elevator_certificate_gallery');
+export const ACT3_ELEVATOR_DOOR_REACTOR = O('act3_elevator_door_reactor');
+export const ACT3_ELEVATOR_PANEL_REACTOR = O('act3_elevator_panel_reactor');
+export const ACT3_ELEVATOR_BLANK_REACTOR = O('act3_elevator_blank_reactor');
+export const ACT3_ELEVATOR_BUTTON_L_REACTOR = O('act3_elevator_button_l_reactor');
+export const ACT3_ELEVATOR_BUTTON_S1_REACTOR = O('act3_elevator_button_s1_reactor');
+export const ACT3_ELEVATOR_BUTTON_S5_REACTOR = O('act3_elevator_button_s5_reactor');
+export const ACT3_ELEVATOR_CERTIFICATE_REACTOR = O('act3_elevator_certificate_reactor');
+
+// ---------------------------------------------------------------------------
+// D4 task C — S5 Reactor Interface, the interlock death, and the checkpoint
+// (D4 prose doc §9, §10, §17, §21, §22). `ACT3_S5_REACTOR_INTERFACE`/
+// `ACT3_PIPE_CHASE`/`ACT3_S1_MECHANICAL_GALLERY`/every flag, clue-id,
+// question, and the checkpoint/death string ids are declared above
+// (wave-D4-shared) or by task B/D above — reused, never redeclared. This
+// task's own objects/flags/verbs/scripts only.
+// ---------------------------------------------------------------------------
+
+// --- Objects (§9.2, §9.5, §9.6, §9.7, §9.9, §9.10, §10) ---
+export const ACT3_GAUGES = O('act3_gauges');
+export const ACT3_DEMAND_DIAL = O('act3_demand_dial');
+export const ACT3_INTERLOCK = O('act3_interlock');
+/** Sub-part — `EXAMINE TAG` (§10.1) needs its own noun-bearing object, same idiom as `ACT3_LOBBY_BENCH`/the elevator's per-room button instances (a single `ObjectDefSlice` can't tell which of its own several nouns resolved an `EXAMINE`). */
+export const ACT3_INTERLOCK_TAG = O('act3_interlock_tag');
+/** Sub-part — `EXAMINE LAMP` (§10.1). Nouns deliberately exclude bare "lamp" (§21.2: held `act3_headlamp` wins that word; this takes `red lamp`/`lens`/`indicator` only). */
+export const ACT3_INTERLOCK_LAMP = O('act3_interlock_lamp');
+/** Sub-part — `EXAMINE KEYSWITCH`/`EXAMINE KEY`, `TURN KEYSWITCH`, `TAKE KEY` (§10.1). Nouns are `keyswitch`/`switch`/`key` — never `keyring` — so `TURN KEYSWITCH` always resolves here without a clarify even though bare `key` is genuinely ambiguous against the held `act1_keyring` (§21.2's own recommendation). */
+export const ACT3_INTERLOCK_KEYSWITCH = O('act3_interlock_keyswitch');
+/** Sub-part — the panel's green/red buttons (§10.1's own dedicated "press green/red button" text, distinct from `OPEN`/`TURN`/`PULL` on the door itself). */
+export const ACT3_INTERLOCK_BUTTONS = O('act3_interlock_buttons');
+export const ACT3_CHASE_BOTTOM = O('act3_chase_bottom');
+export const ACT3_S6_DOOR = O('act3_s6_door');
+export const ACT3_WALL_CLOCK = O('act3_wall_clock');
+/** Uncounted sub-part (§9.10's own `SEARCH BENCH`/`LOOK UNDER BENCH` needs a noun, same idiom as `ACT3_PLANT_FLOOR`/`ACT3_PLANT_STEP`) — also carries the logbook's own discovery text. */
+export const ACT3_S5_BENCH = O('act3_s5_bench');
+/** Uncounted sub-part — the logbook found under the bench (§9.10); not one of the room's own six, same reasoning as `ACT3_S5_BENCH`. */
+export const ACT3_LOGBOOK = O('act3_logbook');
+/** Uncounted sub-part — `TOUCH WALL`/`TOUCH LEFT WALL` (§9.10) needs a noun to resolve against; the gauge wall/interlock/S6 door are the room's real six objects, not this. */
+export const ACT3_S5_TOUCH_WALL = O('act3_s5_touch_wall');
+
+// --- Flags — builder additions beyond §2's own table, flagged in this
+// task's report. ---
+/** Gates the description's own "first sight" rule (§9.1 rule 1) — set by `onEnter`, checked (not `{ not: { visited } }`) because `move.ts`'s `renderArrival` marks `visited` BEFORE rendering `description`, the same reason `act3_pipe_chase_seen` exists (`pipeChase.ts`'s own header). */
+export const ACT3_S5_SEEN = F('act3_s5_seen');
+/** Set by the demand dial's SECOND `TURN`/`OPEN COVER`/`SET DEMAND` (§9.5) — gates the first-attempt vs. second-attempt text; not in §2's own table because the dial's own state (not a puzzle/clue) needs nothing else to read it. */
+export const ACT3_DEMAND_DIAL_TURNED = F('act3_demand_dial_turned');
+
+// --- Verbs (§9.5, §9.8, §9.9, §10.1) ---
+/** "TURN KEYSWITCH TO NORMAL"/"TURN KEY TO NORMAL"/"TURN SWITCH TO NORMAL" (§10.1) — bare fixed phrase, same idiom as `V_ACT3_RIDE_TO_PLANT`: "normal" is a state word, not a noun any object carries, so `'V dobj prep iobj'` could never resolve an `iobj` for it. Bare `TURN KEYSWITCH`/`TURN KEY`/`TAKE KEY` (no "to normal") reach the same result through the ordinary `TURN`/`TAKE` verbs on `ACT3_INTERLOCK_KEYSWITCH` instead — this verb only exists for the longer phrasing. */
+export const V_ACT3_TURN_TO_NORMAL = V('act3_turn_to_normal');
+/** "TYPE CREDENTIALS"/"ENTER CREDENTIALS"/"TYPE ADMIN"/"TYPE PASSWORD" (§9.8) — bare fixed phrases, room-level (S5 only). Deliberately NOT bare "type"/"enter": both words are already exclusively claimed (`V_TYPE_TERMINAL`, `act1/ids.ts`; `DIRECTION_VERB_IDS.in`, `engine/move.ts`) — a second verb claiming either alone is a `verb-word-collision` error. These four multi-word phrases are distinct strings from both, so no collision. "USE NOTEBOOK ON PAD" reaches the same result through `USE_VERB_ID` (mutated in place, `objects/s5ReactorInterface.ts`'s own header) rather than this verb. */
+export const V_ACT3_TYPE_PAD = V('act3_type_pad');
+/** "BADGE DOOR" (§9.8) — a new one-word verb; "badge" is not claimed anywhere else (grepped clean). "USE BADGE"/"SHOW BADGE TO READER" reach the S6 door through the already-shipped `USE_VERB_ID`/`SHOW`, mutated onto the badge object in place (same idiom `corridorB4.ts` already uses for reader B4). */
+export const V_ACT3_BADGE = V('act3_badge');
+/** "WHAT TIME IS IT"/"WHAT'S THE TIME"/"CHECK TIME" (§9.9) — bare fixed phrases, room-level. "CHECK" alone is already exclusively `V_ACT2_CHECK`'s (`act2/ids.ts`, pattern `'V'` only) — these three multi-word phrases are distinct strings, no collision. `READ CLOCK` reaches the same result through the already-shipped `READ` verb on `ACT3_WALL_CLOCK`. */
+export const V_ACT3_CHECK_TIME = V('act3_check_time');
+/** "LOOK DOWN OPENING"/"LOOK DOWN SHAFT" (§9.6) — bare fixed phrases, same idiom as `V_LOOK_DOWN_AISLE` (`act3/ids.ts`, D3 task B): no bare "look down" verb exists to hang a dobj off, so this is its own literal phrase pair. */
+export const V_ACT3_LOOK_DOWN_SHAFT = V('act3_look_down_shaft');
+
+// --- Scripts (§10.3, §9.9) ---
+/** The interlock death: three `kind: 'beat'` events (§10.2's own Beat 1/2/3 headings), then the death paragraph, `{ die }`, `{ set: [act3_died_reactor, true] }` — the prologue's own idiom (`content/scenes/mvp-prologue.ts`). Wired into `world.scripts` under this exact id per the doc's own "Wires into" header. */
+export const ACT3_INTERLOCK_DEATH_SCRIPT = S('act3_interlock_death');
+/** `READ CLOCK`/`WHAT TIME IS IT`/etc. (§9.9) — computes `clockInWords(state.clock.minute)` (a live value no static `Prose` can hold) and renders the frame, the rotating second line, and (once, in the window) the added final line. */
+export const ACT3_READ_CLOCK_SCRIPT = S('act3_read_clock');
+
+// --- D4 task A — the way under: the county-road walk, the hatch, light (the
+// headlamp and the two-turn match), the Service Tunnel, the construction
+// door's tunnel-side instance, and Town Edge's country exit (D4 prose doc
+// §3-§7, §12.4, §17, §21, §22). `ACT3_SERVICE_TUNNEL`/every D4-shared flag/
+// clue/question above are reused, never redeclared. `ACT3_CONSTRUCTION_
+// DOOR_S1`/`ACT3_CONSTRUCTION_DOOR_GATE` (task B, above) are that task's own
+// S1-side door instance — this task's tunnel-side instance is a separate id
+// below (the elevator-door "one object, two rooms, two ids" idiom); see this
+// task's report for the S1-side EXAMINE text (§7.1 rules 2/3) it could not
+// safely wire into task B's own file. ---
+
+// Objects (§4, §6.4, §6.5, §7): the hatch, the rails, the seal, the
+// tunnel-side construction door instance, and the ladder (an uncounted
+// sub-part — the mouth's descent needs a noun distinct from the hatch once
+// the hatch is lying open in the grass, §6.1 rule 2/§6.6's "rectangle of
+// night with the ladder in it").
+export const ACT3_TUNNEL_HATCH = O('act3_tunnel_hatch');
+export const ACT3_RAILS = O('act3_rails');
+export const ACT3_TUNNEL_SEAL = O('act3_tunnel_seal');
+export const ACT3_CONSTRUCTION_DOOR_TUNNEL = O('act3_construction_door_tunnel');
+export const ACT3_LADDER = O('act3_ladder');
+/** Uncounted sub-parts — `EXAMINE PLATE`/`READ PLATE` and `EXAMINE HINGES` (§7.4) need their own noun-bearing objects, same idiom as `ACT3_LOBBY_BENCH`/the elevator's per-room buttons. */
+export const ACT3_DOOR_PLATE = O('act3_door_plate');
+export const ACT3_DOOR_HINGES = O('act3_door_hinges');
+
+// The headlamp (§5.1) — lives in the truck's toolbox (`objects/truck.ts`),
+// declared here alongside this task's other D4 ids.
+export const ACT3_HEADLAMP = O('act3_headlamp');
+/** Builder addition — gates §5.1's "first time" `TAKE LAMP` line so it prints once, not on every subsequent take/drop. */
+export const ACT3_HEADLAMP_TAKEN = F('act3_headlamp_taken');
+
+// The two-turn match (§5.2) — a real, always-declared object (`location:
+// 'nowhere'` until struck, then `inventory`), not something the engine can
+// spawn ad hoc; `lightSource: true`, `on` while `act3_match_burning`.
+export const ACT3_LIT_MATCH = O('act3_lit_match');
+
+/**
+ * Mechanism-only gate (no `nouns`, same idiom as `ACT3_BOUNDARY_GATE`/
+ * `TOWN_EDGE_TUNNEL_BOUNDARY_GATE`) for Town Edge's `nw` exit — closed
+ * exactly when neither `act1_keyring` nor `act1_chair_leg` is held and the
+ * hatch isn't already unlocked (§3.4), open otherwise. Kept in sync every
+ * tick by a reactive `EventDef` pair (`index.ts`'s `events:` map) rather
+ * than a discrete `set` effect, because nothing that could flip the
+ * underlying condition (dropping/taking the keyring or chair leg) is a
+ * dedicated action this content can hook — see this task's report on
+ * `ExitDefSlice` carrying no `effects` field, the engine constraint this
+ * gate works around.
+ */
+export const ACT3_TUNNEL_APPROACH_GATE = O('act3_tunnel_approach_gate');
+
+/**
+ * "LIGHT MATCH"/"LIGHT MATCHBOOK" (§5.2). "STRIKE MATCH," also named in the
+ * doc, is dropped: `strike` is already `BREAK`'s own word (`act1/verbs.ts`,
+ * `words: [..., 'hit', 'strike']`) and `validate.ts` rejects a second verb
+ * claiming it outright (`verb-word-collision`) — flagged in this task's
+ * report as a register/vocabulary gap.
+ */
+export const V_ACT3_LIGHT = V('act3_light');
+
+/**
+ * Mechanism-only gate (no `nouns`) for the mouth's own `down`/`in` exit
+ * (register 90's two-room split, §6.2/§6.3) — closed while `act3_tunnel_
+ * unlocked` is false OR there is no light (`act3_headlamp_on`/`act3_match_
+ * burning` both false), open otherwise. Declared `container: { open: false
+ * }` (the common case before the player has unlocked *and* lit anything),
+ * kept in sync every tick by its own reactive `EventDef`, same idiom as
+ * `ACT3_TUNNEL_APPROACH_GATE` above.
+ */
+export const ACT3_TUNNEL_DESCENT_GATE = O('act3_tunnel_descent_gate');
+
+// --- Event ids (plain strings, `world.events`'s own keying — same idiom as `EVENT_ACT3_LOBBY_READER_OPENS` above). ---
+export const EVENT_ACT3_TUNNEL_APPROACH_GATE_SYNC = 'act3_ev_tunnel_approach_gate_sync';
+export const EVENT_ACT3_MATCH_TICK = 'act3_ev_match_tick';
+export const EVENT_ACT3_TUNNEL_DESCENT_GATE_SYNC = 'act3_ev_tunnel_descent_gate_sync';
+
+// --- D4 builders append below this line (Edit tool only; one block per task, labelled) ---

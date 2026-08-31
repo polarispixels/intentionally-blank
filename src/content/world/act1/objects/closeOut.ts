@@ -49,6 +49,7 @@ import {
   DRAWER,
   FLAG_ASSEMBLED_STRIPS,
   FLAG_MET_JACK,
+  FLOOR_LAMP,
   INTACT_POLAROIDS,
   JACKS_MOTEL,
   MATCHBOOK,
@@ -59,6 +60,12 @@ import {
   WORK_ORDER,
   YOUR_ROOM,
 } from '../ids';
+// D4 task A amendment (D4 prose doc §5.2) — "LIGHT MATCH"'s own darkness
+// check needs to know about the tunnel too; Act I content already imports
+// `act3/ids` elsewhere in this codebase (`jack.ts`, `townEdge.ts`) for the
+// same "later act's flag/room ids are just string constants" reason — no
+// content-module cycle, just ids.
+import { ACT3_HEADLAMP_ON, ACT3_LIT_MATCH, ACT3_MATCH_BURNING, ACT3_MATCH_TURNS, ACT3_TUNNEL_BELOW, V_ACT3_LIGHT } from '../../act3/ids';
 
 // ---------------------------------------------------------------------------
 // §8 — ASSEMBLE STRIPS' table-in-scope check, and its two responses. See
@@ -207,12 +214,66 @@ const cashEnvelope: ObjectDefSlice = {
 const matchbookText =
   'A book of matches, the cover folded back and creased flat the way people do when they are thinking about something else.\n\n    THE ARROWHEAD\n    MOTEL\n    VACANCY\n\nThe matches are all still in it. The striker on the back has been used exactly once, at one corner, by somebody who then did not light anything.';
 
+// D4 task A amendment (§5.2) — "LIGHT MATCH"/"LIGHT MATCHBOOK", a two-turn
+// light. The shipped `examine`/`read` above is untouched (§21.1's own
+// instruction). "STRIKE MATCH" is not one of `V_ACT3_LIGHT`'s words — see
+// `act3/ids.ts`'s own doc comment (collides with `BREAK`'s "strike").
+//
+// `CURRENTLY_DARK` mirrors, by hand, the two rooms in this build with their
+// own `dark` baseline (`your_room`'s `dark: true` defeated by the floor
+// lamp; the Service Tunnel's own Cond, `act3/serviceTunnel.ts`) — the engine
+// has no generic "is the current room dark" `Cond` arm (every room that
+// needs one hand-rolls its own, `act1/objects/common.ts`'s `ROOM_DARK` is
+// the same idiom), so a room-agnostic object like the matchbook must name
+// both explicitly.
+const CURRENTLY_DARK: Cond = {
+  any: [
+    { all: [{ at: YOUR_ROOM }, { not: { objectState: [FLOOR_LAMP, 'on', true] } }] },
+    { all: [{ flag: ACT3_TUNNEL_BELOW }, { not: { flag: ACT3_HEADLAMP_ON } }, { not: { flag: ACT3_MATCH_BURNING } }] },
+  ],
+};
+
+const lightMatchStrikeText =
+  'The striker takes it on the second go. The tunnel comes as far forward as a\nmatch will bring it — a length of wall, the tops of the rails, your own hand\nenormous and orange — and everything past that becomes considerably darker\nthan it was.';
+
+const lightMatchNotDarkText = 'You strike one, look at it, and put it out, and the room is exactly as well lit as it was.';
+
+// `ACT3_MATCH_TURNS` is set to 3, not the doc's literal 2 (`act3/ids.ts`'s
+// own doc comment on this constant) — `tick()` runs once per turn inside
+// the SAME `step()` that ran this very handler (`turn.ts`: `respond()` then
+// `tick()`, both before this command returns), so the first decrement is
+// "free," absorbed the instant the match is struck; starting at 3 makes the
+// warning land on the player's next turn and the extinguish on the one
+// after that — the doc's three separate beats, not two of them collapsed
+// into the strike's own output. Flagged in this task's report.
+const lightMatchEffects: Effect[] = [
+  { say: lightMatchStrikeText },
+  { set: [ACT3_MATCH_TURNS, 3] },
+  { set: [ACT3_MATCH_BURNING, true] },
+  { move: [ACT3_LIT_MATCH, 'inventory'] },
+  { setState: [ACT3_LIT_MATCH, 'on', true] },
+];
+
 const matchbook: ObjectDefSlice = {
   location: { in: DRAWER },
   name: 'matchbook',
   portable: true,
   nouns: ['matchbook', 'matches', 'match', 'book of matches', 'matchbox', 'striker', 'cover'],
-  handlers: [{ verbs: [EXAMINE, READ], effects: [{ say: matchbookText }] }],
+  handlers: [
+    { verbs: [EXAMINE, READ], effects: [{ say: matchbookText }] },
+    { verbs: [V_ACT3_LIGHT], when: CURRENTLY_DARK, effects: lightMatchEffects },
+    { verbs: [V_ACT3_LIGHT], effects: [{ say: lightMatchNotDarkText }] },
+  ],
+};
+
+// The struck match itself (§5.2) — a real, always-declared object
+// (`location: 'nowhere'` until lit), not something the engine spawns ad hoc.
+const litMatch: ObjectDefSlice = {
+  location: 'nowhere',
+  name: 'match',
+  portable: true,
+  lightSource: true,
+  nouns: ['match', 'lit match', 'burning match'],
 };
 
 export const CLOSE_OUT_OBJECTS: Record<string, ObjectDefSlice> = {
@@ -223,4 +284,5 @@ export const CLOSE_OUT_OBJECTS: Record<string, ObjectDefSlice> = {
   [CHAIR_LEG]: chairLeg,
   [CASH_ENVELOPE]: cashEnvelope,
   [MATCHBOOK]: matchbook,
+  [ACT3_LIT_MATCH]: litMatch,
 } satisfies Record<string, ObjectDefSlice>;

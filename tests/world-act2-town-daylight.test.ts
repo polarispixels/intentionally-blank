@@ -24,6 +24,7 @@ import {
   ACT2_STARTED,
   ACT2_WALL_DRUG_EMPORIUM,
 } from '../src/content/world/act2/ids';
+import { ACT3_TUNNEL_MOUTH } from '../src/content/world/act3/ids';
 
 const TEST_WORLD: WorldDef = WORLD;
 const vocab = compileVocabulary(TEST_WORLD);
@@ -188,12 +189,18 @@ describe('the moved boundary', () => {
     expect(textOf(events)).not.toContain('cedar posts');
   });
 
-  it('Town Edge\'s nw exit renders the country line and the boundary once the flag is set', () => {
+  // D4 task A amendment (D4 prose doc §3, §21.1): this exit "becomes real"
+  // — it now runs the county-road walk to the Service Tunnel's mouth
+  // instead of ending in `system.buildBoundary`, so 'END OF BUILD' no
+  // longer prints here at all. ADR 0011 rule 3 also gates the exit on
+  // `act2_started`, not just `act2_knows_tunnel_mouth` — both are set here.
+  it("Town Edge's nw exit renders the country line and reaches the tunnel mouth once both flags are set", () => {
     const store = new MemoryStore();
-    const session = withState({ location: TOWN_EDGE, flags: { [ACT2_KNOWS_TUNNEL_MOUTH]: true } });
-    const { events } = say(session, 'northwest', store);
+    const session = withState({ location: TOWN_EDGE, flags: { [ACT2_KNOWS_TUNNEL_MOUTH]: true, [ACT2_STARTED]: true } });
+    const { session: after, events } = say(session, 'northwest', store);
     expect(textOf(events)).toContain('the line');
     expect(textOf(events)).toContain('cedar posts');
-    expect(textOf(events)).toContain('END OF BUILD');
+    expect(textOf(events)).not.toContain('END OF BUILD');
+    expect(after.state.location).toBe(ACT3_TUNNEL_MOUTH);
   });
 });

@@ -165,22 +165,13 @@ describe('validate — Act I room 1', () => {
   // reports cover) — included here only because this is a whole-`WORLD`
   // count and someone had to reconcile it for the suite to go green; not
   // this task's own module to review in depth.
-  it('produces exactly the 52 expected verb-noun-collision warnings, no others', () => {
+  it('produces exactly the 59 expected verb-noun-collision warnings, no others', () => {
     const warnings = validate(WORLD).filter((f) => f.severity === 'warning');
     const collisions = warnings.filter((f) => f.code === 'verb-noun-collision');
-    expect(collisions.length).toBe(52);
+    expect(collisions.length).toBe(59);
     expect(collisions.map((f) => f.message).sort()).toEqual(
       [
-        "verb \"act2_pay\" can be typed bare and its word \"money\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
-        "verb \"act2_write\" can be typed bare and its word \"letter\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
-        "verb \"act2_drive_to_plant\" can be typed bare and its word \"drive\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
-        "verb \"act2_drive_to_plant\" can be typed bare and its word \"north\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
-        "verb \"act2_drive_to_plant\" can be typed bare and its word \"plant\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
-        "verb \"act2_wait_until_afternoon\" can be typed bare and its word \"till\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
-        "verb \"act2_wait_until_evening\" can be typed bare and its word \"till\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
-        "verb \"act2_wait_until_morning\" can be typed bare and its word \"till\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
-        "verb \"act2_wait_until_night\" can be typed bare and its word \"night\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
-        "verb \"act2_wait_until_night\" can be typed bare and its word \"till\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act1_check_date\" can be typed bare and its word \"date\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act1_eat\" can be typed bare and its word \"order\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act1_eat_pie\" can be typed bare and its word \"pie\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act1_eat_pill\" can be typed bare and its word \"pill\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
@@ -200,29 +191,45 @@ describe('validate — Act I room 1', () => {
         "verb \"act1_post_letter\" can be typed bare and its word \"post\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act1_sign\" can be typed bare and its word \"name\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act1_sign\" can be typed bare and its word \"sign\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act1_sweep\" can be typed bare and its word \"sweep\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act1_type_terminal\" can be typed bare and its word \"key\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act1_type_terminal\" can be typed bare and its word \"log\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act1_what_year\" can be typed bare and its word \"date\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act1_whoami\" can be typed bare and its word \"myself\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act1_whoami\" can be typed bare and its word \"name\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
-        "verb \"e\" can be typed bare and its word \"east\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
-        "verb \"in\" can be typed bare and its word \"back\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
-        "verb \"n\" can be typed bare and its word \"north\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
-        "verb \"out\" can be typed bare and its word \"outside\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
-        "verb \"stand\" can be typed bare and its word \"stand\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
-        "verb \"w\" can be typed bare and its word \"west\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
-        "verb \"act1_check_date\" can be typed bare and its word \"date\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
-        "verb \"act1_sweep\" can be typed bare and its word \"sweep\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
-        "verb \"act1_what_year\" can be typed bare and its word \"date\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act2_drive_to_plant\" can be typed bare and its word \"drive\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act2_drive_to_plant\" can be typed bare and its word \"north\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act2_drive_to_plant\" can be typed bare and its word \"plant\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act2_pay\" can be typed bare and its word \"money\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act2_wait_until_afternoon\" can be typed bare and its word \"till\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act2_wait_until_evening\" can be typed bare and its word \"till\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act2_wait_until_morning\" can be typed bare and its word \"till\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act2_wait_until_night\" can be typed bare and its word \"night\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act2_wait_until_night\" can be typed bare and its word \"till\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act2_write\" can be typed bare and its word \"letter\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act3_check_time\" can be typed bare and its word \"time\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act3_look_down_aisle\" can be typed bare and its word \"aisle\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act3_look_down_aisle\" can be typed bare and its word \"row\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act3_look_down_shaft\" can be typed bare and its word \"opening\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act3_look_down_shaft\" can be typed bare and its word \"shaft\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act3_look_west\" can be typed bare and its word \"west\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act3_photograph\" can be typed bare and its word \"photograph\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act3_photograph\" can be typed bare and its word \"picture\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act3_ride_to_plant\" can be typed bare and its word \"north\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act3_ride_to_plant\" can be typed bare and its word \"plant\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act3_turn_to_normal\" can be typed bare and its word \"key\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act3_turn_to_normal\" can be typed bare and its word \"keyswitch\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act3_turn_to_normal\" can be typed bare and its word \"switch\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act3_write_vendor_number\" can be typed bare and its word \"number\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"e\" can be typed bare and its word \"east\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"in\" can be typed bare and its word \"back\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"look\" can be typed bare and its word \"l\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"n\" can be typed bare and its word \"north\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"out\" can be typed bare and its word \"exit\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"out\" can be typed bare and its word \"outside\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"sing\" can be typed bare and its word \"hum\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"stand\" can be typed bare and its word \"stand\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"w\" can be typed bare and its word \"west\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
       ].sort(),
     );
   });
@@ -287,10 +294,10 @@ describe('validate — Act I room 1', () => {
     expect(collisions.length).toBe(4);
     expect(collisions.map((f) => f.message).sort()).toEqual(
       [
-        "\"act1_mail_drop\" and \"act1_pen\" can be in scope together and both answer to bare noun \"pen\" \u2014 a plain \"pen\" alone can never tell them apart (only a full adjective+noun phrase can); verify this is deliberate disambiguation, not an accidental shared word",
-        "\"act1_paddock\" and \"act1_pen\" can be in scope together and both answer to bare noun \"pen\" \u2014 a plain \"pen\" alone can never tell them apart (only a full adjective+noun phrase can); verify this is deliberate disambiguation, not an accidental shared word",
-        "\"act1_pen\" and \"act1_sign_in_book\" can be in scope together and both answer to bare noun \"pen\" \u2014 a plain \"pen\" alone can never tell them apart (only a full adjective+noun phrase can); verify this is deliberate disambiguation, not an accidental shared word",
-        "\"act1_pen\" and \"act1_whitlock_desk\" can be in scope together and both answer to bare noun \"pen\" \u2014 a plain \"pen\" alone can never tell them apart (only a full adjective+noun phrase can); verify this is deliberate disambiguation, not an accidental shared word",
+        "\"act1_mail_drop\" and \"act1_pen\" can be in scope together and both answer to bare noun \"pen\" — a plain \"pen\" alone can never tell them apart (only a full adjective+noun phrase can); verify this is deliberate disambiguation, not an accidental shared word",
+        "\"act1_paddock\" and \"act1_pen\" can be in scope together and both answer to bare noun \"pen\" — a plain \"pen\" alone can never tell them apart (only a full adjective+noun phrase can); verify this is deliberate disambiguation, not an accidental shared word",
+        "\"act1_pen\" and \"act1_sign_in_book\" can be in scope together and both answer to bare noun \"pen\" — a plain \"pen\" alone can never tell them apart (only a full adjective+noun phrase can); verify this is deliberate disambiguation, not an accidental shared word",
+        "\"act1_pen\" and \"act1_whitlock_desk\" can be in scope together and both answer to bare noun \"pen\" — a plain \"pen\" alone can never tell them apart (only a full adjective+noun phrase can); verify this is deliberate disambiguation, not an accidental shared word",
       ].sort(),
     );
   });
@@ -306,8 +313,8 @@ describe('validate — Act I room 1', () => {
   // (three concurrent tasks) adds 14 more verb-noun collisions (see that
   // test above) and 1 more `room-description-mentions-portable`
   // (`act3_lobby`/"brochures", task B): 44 + 14 + 1 = 59.
-  it('produces exactly fifty-nine warnings total, no others', () => {
+  it('produces exactly sixty-six warnings total, no others', () => {
     const warnings = validate(WORLD).filter((f) => f.severity === 'warning');
-    expect(warnings.length).toBe(59);
+    expect(warnings.length).toBe(66);
   });
 });

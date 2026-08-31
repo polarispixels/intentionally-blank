@@ -20,8 +20,11 @@ import {
   ACT3_COOLING_PLANT,
   ACT3_ELEVATOR_CALLED,
   ACT3_HATCH_OPEN,
+  ACT3_PIPE_CHASE,
   ACT3_PRESSED_BLANK,
   ACT3_Q_SECOND_RETURN,
+  ACT3_S1_MECHANICAL_GALLERY,
+  ACT3_S5_REACTOR_INTERFACE,
   ACT3_WRENCH,
 } from '../src/content/world/act3/ids';
 
@@ -107,28 +110,32 @@ describe('Cooling Plant — the chase hatch', () => {
     expect(result.session.state.flags[ACT3_HATCH_OPEN]).toBe(true);
   });
 
-  it('DOWN, once open, renders the boundary text and does not move the player (exit blockedText — approximated kind: prose, ENGINE GAP)', () => {
+  // D4 task D amendment (D4 prose doc §12.3/§21.1): D3's own boundary on
+  // this exit is retired — DOWN/ENTER HATCH now really lead to the Pipe
+  // Chase, keeping D3's in-world ladder text verbatim. These two tests
+  // updated to match (they asserted the old boundary behaviour); the wave's
+  // one surviving boundary is exercised in `tests/world-act3-d4-chase.test.ts`.
+  it('DOWN, once open, prints D3\'s kept-verbatim ladder text and arrives in the Pipe Chase', () => {
     const store = new MemoryStore();
     const session = atPlant({ flags: { [ACT3_HATCH_OPEN]: true } });
     const result = say(session, 'down', store);
-    expect(text(result.events)).toMatch(/END OF BUILD/);
-    expect(result.session.state.location).toBe(ACT3_COOLING_PLANT);
+    expect(text(result.events)).toMatch(/The ladder goes down the near side of the hole/);
+    expect(result.session.state.location).toBe(ACT3_PIPE_CHASE);
   });
 
-  it('ENTER HATCH, once open, renders the boundary as a true system event and does not move the player', () => {
+  it('ENTER HATCH, once open, does the same', () => {
     const store = new MemoryStore();
     const session = atPlant({ flags: { [ACT3_HATCH_OPEN]: true } });
     const result = say(session, 'enter hatch', store);
-    expect(lineKinds(result.events)).toContain('system');
-    expect(text(result.events)).toMatch(/END OF BUILD/);
-    expect(result.session.state.location).toBe(ACT3_COOLING_PLANT);
+    expect(text(result.events)).toMatch(/The ladder goes down the near side of the hole/);
+    expect(result.session.state.location).toBe(ACT3_PIPE_CHASE);
   });
 
-  it('DOWN before the hatch is open does not reach the boundary', () => {
+  it('DOWN before the hatch is open does not reach the Pipe Chase', () => {
     const store = new MemoryStore();
     const session = atPlant();
     const result = say(session, 'down', store);
-    expect(text(result.events)).not.toMatch(/END OF BUILD/);
+    expect(result.session.state.location).toBe(ACT3_COOLING_PLANT);
   });
 });
 
@@ -171,23 +178,26 @@ describe('The freight elevator (§13)', () => {
     expect(result.session.state.flags[ACT3_PRESSED_BLANK]).toBe(true);
   });
 
-  it('PRESS S1 plays three beats, advances the clock by 3, renders the boundary, and does not move the player', () => {
+  // D4 task B amendment (D4 prose doc §12.1/§21.1): S1 and S5 are real
+  // destinations now, each with its own beat 4 — D3's boundary tail is
+  // retired for this script (`act3/scripts.ts`'s `act3ElevatorRide`).
+  it('PRESS S1 plays three beats plus its own beat 4, advances the clock by 3, and actually moves the player to S1', () => {
     const store = new MemoryStore();
     const session = atPlant();
     const before = session.state.clock.minute;
     const result = say(session, 'press s1', store);
-    expect(lineKinds(result.events).filter((k) => k === 'beat')).toHaveLength(3);
-    expect(lineKinds(result.events)).toContain('system');
-    expect(text(result.events)).toMatch(/END OF BUILD/);
-    expect(result.session.state.location).toBe(ACT3_COOLING_PLANT);
+    expect(lineKinds(result.events).filter((k) => k === 'beat')).toHaveLength(4);
+    expect(text(result.events)).toMatch(/gallery lit like an office/);
+    expect(result.session.state.location).toBe(ACT3_S1_MECHANICAL_GALLERY);
     expect(result.session.state.clock.minute - before).toBeGreaterThanOrEqual(3);
   });
 
-  it('PRESS S5 also plays the ride and renders the boundary', () => {
+  it('PRESS S5 also plays the ride plus its own beat 4, and actually moves the player to S5', () => {
     const store = new MemoryStore();
     const session = atPlant();
     const result = say(session, 'press s5', store);
-    expect(lineKinds(result.events)).toContain('system');
+    expect(text(result.events)).toMatch(/leaves go back on quiet/);
+    expect(result.session.state.location).toBe(ACT3_S5_REACTOR_INTERFACE);
   });
 
   it('PRESS L is polite about already being at L', () => {

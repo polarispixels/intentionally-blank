@@ -20,7 +20,7 @@ Maintenance rules:
 | A | Story + engine architecture: five-act causal spine, puzzle network, room list, NPC agendas, memory system, save/undo design; canon decisions registered in `docs/spec/09` | docs site | ✅ **complete v0.2.9** — story architecture (41 rooms, 28 puzzles, 5 acts) + engine v2 architecture + ADRs 0008–0010; 15 canon decisions promoted (register entries 3–17) |
 | B | Engine v2 (world model, parser v2, save/undo/autosave, map + open-questions UI) + the opening room (M1) | 0.3.0 | ✅ **shipped v0.3.0** — 23 tasks, 729 tests; the live URL is now the real game |
 | C | Act I: town, client, missing sibling, notebook trail (M2–M4) | 0.4–0.9 | ✅ **shipped v0.9.0** — 12 rooms, 4 NPCs, P1–P8, R1–R3, M1/M3; clean-save playthrough fixture `tests/fixtures/playthrough-act1.txt` is the act's regression gate |
-| D | Acts II–III: data center, underground, Dad on the USB, contradictions | 0.10–0.15 | 🚧 in progress — D0 v0.10.0, D1 v0.11.0, D2 v0.12.0 (Dad, the censor, poker, Nolan), D3 v0.13.0 (the facility surface: the fence, B4, the lift); plan: `docs/superpowers/specs/2026-09-07-stage-d-plan.md`; D4 (the descent) next, prose reviewed |
+| D | Acts II–III: data center, underground, Dad on the USB, contradictions | 0.10–0.15 | 🚧 in progress — D0 v0.10.0, D1 v0.11.0, D2 v0.12.0 (Dad, the censor, poker, Nolan), D3 v0.13.0 (the facility surface: the fence, B4, the lift), D4 v0.14.0 (the descent: the tunnel, S1, S5, the chase); plan: `docs/superpowers/specs/2026-09-07-stage-d-plan.md`; D5 (Sublevel 6) next, prose accepted (`2026-09-13-stage-d5-prose.md`) |
 | E | Acts IV–V: reality travel, identity, the recursive ending | 0.16–0.18 | queued |
 | F | Hints, playtester sweeps, replay content, polish | 1.0.0 | queued |
 

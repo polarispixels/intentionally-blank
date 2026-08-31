@@ -201,7 +201,7 @@ const claimWindowCard: ObjectDefSlice = {
   // resolves to the room keyring/room key elsewhere); "card"/"numbering"/
   // "scheme"/"chart"/"list" carry it instead, plus the qualified "numbering
   // key" itself.
-  nouns: ['card', 'numbering', 'numbering key', 'scheme', 'list', 'chart'],
+  nouns: ['numbering card', 'numbering', 'numbering key', 'scheme', 'list', 'chart'],
   portable: false,
   handlers: [{ verbs: [EXAMINE, READ], effects: readNumberingEffects }],
 };
