@@ -12,6 +12,29 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.15.2] - 2026-08-31
+
+Docs only: the endgame integrity review and its rulings.
+
+### Added
+
+- `docs/superpowers/specs/2026-09-15-endgame-integrity-review.md` — the
+  setup ledger (37 unpaid, 8 of them given homes; 4 unplanted; 2 spent by
+  decision), the reveal ladder R1–R12 as shipped and R13+ to come, the
+  recontextualization audit, the memory strata, the recursive ending's
+  engine needs, and a four-wave first cut of Stage E (E0–E3, v0.16–v0.19).
+  No spoiler leaks found in the shipped text.
+
+### Decisions
+
+Canon register 94–103: the timeline seam reconciled; the creation record's
+one suppressed exception; what Jules's film shows; Whitlock's notebook as
+the route to the evidence bag; the numerals as a working idea, never
+printed; nothing crosses the hand-off (and an `'ending'` save slot);
+movement verbs are profile-neutral; the three dark frames; Jack is never
+shown reconciled; the record's environment and condition fields. The D5
+doc's "last terminal" line corrected (five stations).
+
 ## [0.15.1] - 2026-08-31
 
 Hygiene after Stage D.
