@@ -207,7 +207,13 @@ const otherDoorsListen =
  */
 const landingDoors: ObjectDefSlice = {
   location: LANDING,
-  name: 'the other doors',
+  // "the other doors" (Stage F sweep, item 5 of the wave-B punch list —
+  // found by the act5 builder, fixed here since the object lives in act1)
+  // renders a doubled article through templates that prepend their own
+  // "the" (e.g. "You look for the {name}..." → "the the other doors").
+  // Dropping the leading article is the fix; nothing else about this
+  // object's own three nouns changes.
+  name: 'other doors',
   nouns: ['doors', 'neighbours', 'neighbors'],
   handlers: [
     { verbs: [EXAMINE], effects: [{ say: otherDoorsExamine }] },

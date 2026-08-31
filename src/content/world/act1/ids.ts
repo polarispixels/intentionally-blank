@@ -448,6 +448,11 @@ export const WHITLOCK_DESK = O('act1_whitlock_desk');
 /** Sub-part — "form"/"forms"/"paper"/"papers" need EXAMINE/READ text distinct from plain "desk". */
 export const WHITLOCK_DESK_FORM = O('act1_whitlock_desk_form');
 export const SHERIFF_CELL = O('act1_sheriff_cell');
+// F2 prose (`docs/superpowers/specs/2026-09-21-stage-f2-prose.md` §1–§3,
+// §8.3) — the two public-side objects the room's own first-sight prose has
+// named since wave 2 with nothing behind them.
+export const SHERIFF_OFFICE_PAMPHLET_RACK = O('act1_sheriff_office_pamphlet_rack');
+export const SHERIFF_OFFICE_CHAIRS = O('act1_sheriff_office_chairs');
 
 // --- Main Street amendments (§13) — three new street-facing scenery
 // objects, so "ENTER STORE"/"FIND SHERIFF"/etc. resolve on first visit

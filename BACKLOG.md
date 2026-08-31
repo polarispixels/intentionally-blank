@@ -22,7 +22,7 @@ Maintenance rules:
 | C | Act I: town, client, missing sibling, notebook trail (M2–M4) | 0.4–0.9 | ✅ **shipped v0.9.0** — 12 rooms, 4 NPCs, P1–P8, R1–R3, M1/M3; clean-save playthrough fixture `tests/fixtures/playthrough-act1.txt` is the act's regression gate |
 | D | Acts II–III: data center, underground, Dad on the USB, contradictions | 0.10–0.15 | ✅ **v0.15.0** — D0 v0.10.0, D1 v0.11.0, D2 v0.12.0 (Dad, the censor, poker, Nolan), D3 v0.13.0 (the facility surface), D4 v0.14.0 (the descent), D5 v0.15.0 (Sublevel 6: the Bay, the Hub, R9–R12, M9/M16, the Act III boundary; addenda `2026-09-14-stage-d-addenda-prose.md`); plan: `docs/superpowers/specs/2026-09-07-stage-d-plan.md`; clean-save fixture `tests/fixtures/playthrough-d5.txt` |
 | E | Acts IV–V: reality travel, identity, the recursive ending | 0.16–0.19 | ✅ **shipped v0.19.0** — E0 v0.16.0 (ADR 0012, R13/R14, the town before the visit), E1 v0.17.0 (the visit), E2 v0.18.0 (the archive), E3 v0.19.0 (root: the shaft, the antechamber, the Blank Room, R18–R21, M17, the cache, the hand-off into the opening room, the boundary retired); plan: `docs/superpowers/specs/2026-09-16-stage-e-plan.md`; wayfinding v0.17.1; clean-save fixture `tests/fixtures/playthrough-e3.txt` runs the whole game and the hand-off |
-| F | Hints, playtester sweeps, replay content, polish | 1.0.0 | queued |
+| F | Hints, playtester sweeps, replay content, polish | 1.0.0 | ✅ **shipped v1.0.0** — M21–M24 replay fragments, seven ledger answers, the F2 batch (rack/chairs/telephone/Dad), ADR 0013 trailing particles, the READ-crash class fix, ~30 sweep findings across five acts; `playtester` agent added; plan `docs/superpowers/specs/2026-09-21-stage-f-plan.md` |
 
 Each stage: spec → plan → build → deploy. Ryan plays the live URL at his
 discretion and may interrupt; a reset resumes from the last deployed stage.
@@ -34,7 +34,7 @@ board above is the plan. This table is what is *left*.
 
 | # | Remaining | Type |
 |---|---|---|
-| F | 1.0 polish: `playtester` agent sweeps, replay content (M21–M24 read `act5_opening_login_seen`), the E3 gap list (FOLLOW LUKE's named form; the hab Galley's bare OUT; hab terminal TYPE phrasings; locker contents not listed by LOOK IN; E1 §20's third escort trigger) | Content + process |
+| post-1.0 | `CALL <name>` dobj forms; `SISSY, HELLO` npc-address grammar; per-route answer variants (`ProseRule[]` on `QuestionDef.answer`); the spec-07 expansion queue (DC/Rushmore/PR/station, Catan) | Engine + content |
 
 **Ryan's to decide, blocking nothing:** the town still has no name. Wave 3
 dodges it with a `TOWN LIMITS / POP. 412` marker that carries no name, which

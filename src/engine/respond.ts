@@ -437,7 +437,7 @@ function respondToMiss(world: WorldDef, state: GameState, vocab: CompiledVocabul
       // (v0.12.0 — FOLD at the poker table) is an action, not a half-formed
       // one: run it through `performAction` so the room handler fires.
       if (roomAnswersBare(world, state, outcome.verb)) return respondToBareVerb(world, state, outcome.verb);
-      return respondToBareNonBuiltinVerb(world, state, outcome.verb);
+      return respondToBareNonBuiltinVerb(world, state, outcome.verb, outcome.verbWord);
     }
     return respondToNounMiss(world, state, vocab, outcome.verb, outcome.knownNouns);
   }
@@ -474,16 +474,18 @@ function roomAnswersBare(world: WorldDef, state: GameState, verb: VerbId): boole
  * which for a non-built-in verb IS `{name}`-templated (§6) and has no
  * object to fill it. `bareVerb` (response-families doc §7) is the one
  * global family authored specifically for this shape, `{verb}`-templated
- * on the verb's own canonical word (`VerbDef.words[0]` — the parser only
- * hands this function a resolved `VerbId`, not which synonym the player
- * typed, and `words[0]` is this codebase's usual "the" word for a verb
- * when one is needed, e.g. `verbDefaultPath`). Tagged `defaultResponse`,
- * same as the built-in bare case — `bareVerb` is a generic stand-in, not a
- * designed complete answer, so the diag keeps meaning what it always means.
+ * on the surface form the player actually typed (`typedWord`, carried on
+ * the miss outcome since the Stage F sweep — "sweep glass" echoes "sweep",
+ * not the canonical "feel around") with the verb's own canonical word
+ * (`VerbDef.words[0]`, this codebase's usual "the" word for a verb, e.g.
+ * `verbDefaultPath`) as the fallback for older miss shapes that don't
+ * carry it. Tagged `defaultResponse`, same as the built-in bare case —
+ * `bareVerb` is a generic stand-in, not a designed complete answer, so the
+ * diag keeps meaning what it always means.
  */
-function respondToBareNonBuiltinVerb(world: WorldDef, state: GameState, verb: VerbId): RespondResult {
+function respondToBareNonBuiltinVerb(world: WorldDef, state: GameState, verb: VerbId, typedWord?: string): RespondResult {
   const verbDef = world.verbs?.[verb];
-  const verbWord = verbDef?.words[0] ?? verb;
+  const verbWord = typedWord ?? verbDef?.words[0] ?? verb;
   const rendered = render(world, state, 'bareVerb', family(world, 'bareVerb'), { verb: verbWord });
   return {
     state: rendered.state,

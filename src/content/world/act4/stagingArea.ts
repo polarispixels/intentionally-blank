@@ -17,7 +17,7 @@ import { LISTEN, SHOW, SMELL } from '../act1/verbs';
 import { V_FOLLOW } from '../act1/ids';
 import { ACT3_LOBBY } from '../act3/ids';
 import { ACT4_DETAIL, ACT4_LUKE, ACT4_LUKE_GONE, ACT4_LUKE_MET, ACT4_STAGING_AREA } from './ids';
-import { SHOW_TO_DETAIL_EFFECTS } from './objects/stagingArea';
+import { FOLLOW_LUKE_GONE_TEXT, SHOW_TO_DETAIL_EFFECTS } from './objects/stagingArea';
 // E1 task M (`docs/superpowers/specs/2026-09-18-stage-e1-prose.md` §23's own
 // alternate arm — explicitly this task's own, per its own instructions,
 // even though the room it renders in is task L's). One rule, prepended
@@ -63,11 +63,16 @@ const description: ProseRule[] = [
 // noun resolution to `ScopeView.visible`, i.e. the current room), so this is
 // room-scoped rather than NPC-scoped, per the addendum's own wiring note.
 // `act3/lobby.ts` reuses this exact string (hard rule 5 — one text, owned
-// once), the other room the addendum names.
+// once), the other room the addendum names. `FOLLOW_LUKE_GONE_TEXT` itself
+// now lives in `./objects/stagingArea.ts` (Stage F1 — moved there, imported
+// above, so that file's own `lukeGoneMarker` object, added to close the
+// "`FOLLOW LUKE` by name" gap, could reuse it without a circular import
+// back into this room file, which already imports FROM
+// `./objects/stagingArea`); re-exported here too so `act3/lobby.ts`'s
+// existing import path keeps working unchanged.
 // ---------------------------------------------------------------------------
 
-export const FOLLOW_LUKE_GONE_TEXT =
-  'He left the way men like him leave, which is out of a door somebody else is\nholding, into a car somebody else is driving.\n\nWhat is in that lot now is tape on the asphalt, a coned lane nobody needs, and\na county man taking the cones up in no particular hurry.';
+export { FOLLOW_LUKE_GONE_TEXT };
 
 // ---------------------------------------------------------------------------
 // §3.4 — room-level senses

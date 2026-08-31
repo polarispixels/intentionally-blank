@@ -7,8 +7,8 @@
 import type { Cond } from '../../../engine/cond';
 import type { ExitDefSlice, HandlerDef, RoomDefSlice } from '../../../engine/world';
 import type { ProseRule } from '../../../engine/prose';
-import { LISTEN, SLEEP, SMELL, WAIT } from './verbs';
-import { cellSleepText } from './objects/sheriffOffice';
+import { LISTEN, SIT, SLEEP, SMELL, WAIT } from './verbs';
+import { cellSleepText, chairsSitText } from './objects/sheriffOffice';
 import {
   FLAG_MET_WHITLOCK,
   FLAG_VISITED_SHERIFF_OFFICE,
@@ -103,6 +103,10 @@ const roomHandlers: HandlerDef[] = [
   { verbs: [V_TYPE_TERMINAL], effects: [{ say: useTerminalText }] },
   // §12.3.5's bare "sleep"/"lie down" — see `objects/sheriffOffice.ts`'s own note on why this can't be a dobj-based object handler.
   { verbs: [SLEEP], effects: [{ say: cellSleepText }] },
+  // F2 prose §8.2 (register 151) — bare "sit" (no dobj — same gap as bare
+  // SLEEP above); "sit on chairs"/"sit down" (with a dobj) reach the
+  // identical text via the chairs object's own handler (`objects/sheriffOffice.ts`).
+  { verbs: [SIT], effects: [{ say: chairsSitText }] },
 ];
 
 // Both flags set on first entry — `met_whitlock` this way rather than via

@@ -355,7 +355,13 @@ const keyring: ObjectDefSlice = {
   location: JACKS_MOTEL,
   name: 'keyring',
   portable: true,
-  nouns: ['keys', 'key', 'keyring', 'key ring', 'ring', 'keychain', 'fob', 'spare', 'spares', 'nail', 'hook', 'shed', 'brass tag'],
+  // "hook" removed (Stage F sweep) — this portable object travels with the
+  // player into every room, and Act III's Maintenance Bay has a real badge
+  // hook rail whose own noun list also claims bare "hook"; the keyring's own
+  // EXAMINE text only ever says "nail" (already its own noun), so nothing
+  // player-visible depended on "hook" resolving here, and the Bay's rail now
+  // wins that word in its own room.
+  nouns: ['keys', 'key', 'keyring', 'key ring', 'ring', 'keychain', 'fob', 'spare', 'spares', 'nail', 'shed', 'brass tag'],
   handlers: [
     { verbs: [EXAMINE], effects: keyringExamineEffects },
     // "take keys"/"ask for keys"/"borrow keys" (§4.4) share one refusal —

@@ -2,8 +2,9 @@
 
 import { describe, expect, it } from 'vitest';
 import { isDark } from '../src/engine/world';
-import type { GameEvent, GameState } from '../src/engine/world';
+import type { GameEvent, GameState, WorldDef } from '../src/engine/world';
 import { BUILTIN_VERB_IDS, performAction } from '../src/engine/actions';
+import { V } from '../src/engine/ids';
 import {
   BOX,
   CHEST,
@@ -613,5 +614,59 @@ describe('implicit take (task 11)', () => {
     // ever get a chance to run.
     const result = performAction(FIXTURE_WORLD, state, { verb: BUILTIN_VERB_IDS.putIn, dobj: BOX, iobj: CHEST });
     expect(lineText(result.events)).toBe("You can't take the wooden box.");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// READ — graceful degrade when the object has neither `text` nor
+// `description` (Stage F sweep: this used to throw a raw [error] into the
+// player's transcript on five shipped objects across three acts)
+// ---------------------------------------------------------------------------
+
+describe('READ fallback (no text, no description — never a throw)', () => {
+  const EXAMINE_ID = V('examine');
+  const EXAMINE_DEF = {
+    id: EXAMINE_ID,
+    words: ['examine'],
+    patterns: ['V dobj'],
+    class: 'analytical',
+    default: 'You look closely at the {name}.',
+  } as const;
+
+  it('falls to the READ default family in a world with no EXAMINE verb, instead of throwing', () => {
+    // HAT declares neither `text` nor `description`, and FIXTURE_WORLD
+    // declares no V('examine') verb — the deepest fallback rung.
+    const result = performAction(FIXTURE_WORLD, baseState(), { verb: BUILTIN_VERB_IDS.read, dobj: HAT });
+    expect(lineText(result.events)).toBe("You can't do that.");
+    expect(result.ok).toBe(false);
+  });
+
+  it('routes to the object EXAMINE handler chain when one matches — reading it is looking at it', () => {
+    const world: WorldDef = {
+      ...FIXTURE_WORLD,
+      verbs: { ...FIXTURE_WORLD.verbs, [EXAMINE_ID]: EXAMINE_DEF },
+      objects: {
+        ...FIXTURE_WORLD.objects,
+        [HAT]: { ...FIXTURE_WORLD.objects![HAT]!, handlers: [{ verbs: [EXAMINE_ID], effects: [{ say: 'A hat, regarded closely.' }] }] },
+      },
+    };
+    const result = performAction(world, baseState(), { verb: BUILTIN_VERB_IDS.read, dobj: HAT });
+    expect(lineText(result.events)).toBe('A hat, regarded closely.');
+    expect(result.ok).toBe(true);
+  });
+
+  it('falls to the EXAMINE default family, {name}-templated, when no handler matches', () => {
+    const world: WorldDef = {
+      ...FIXTURE_WORLD,
+      verbs: { ...FIXTURE_WORLD.verbs, [EXAMINE_ID]: EXAMINE_DEF },
+    };
+    const result = performAction(world, baseState(), { verb: BUILTIN_VERB_IDS.read, dobj: HAT });
+    expect(lineText(result.events)).toBe('You look closely at the wool hat.');
+    expect(result.ok).toBe(false);
+  });
+
+  it('still renders `text` when present (unchanged behavior)', () => {
+    const result = performAction(FIXTURE_WORLD, baseState(), { verb: BUILTIN_VERB_IDS.read, dobj: LETTER });
+    expect(lineText(result.events)).toBe('Meet me at noon. -M');
   });
 });

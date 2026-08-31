@@ -267,7 +267,9 @@ const chaseBottom: ObjectDefSlice = {
   location: ACT3_S5_REACTOR_INTERFACE,
   name: 'chase bottom',
   portable: false,
-  nouns: ['opening', 'hole', 'ladder', 'shaft', 'chase', 'pipe chase', 'returns', 'return', 'pipes', 'bends', 'flange', 'valve'],
+  // "chase bottom" added (Stage F sweep — the object's own canonical `name`
+  // was missing from its own `nouns` list).
+  nouns: ['opening', 'hole', 'ladder', 'shaft', 'chase', 'pipe chase', 'chase bottom', 'returns', 'return', 'pipes', 'bends', 'flange', 'valve'],
   handlers: [
     { verbs: [EXAMINE], effects: [{ say: chaseBottomExamine }] },
     { verbs: [TOUCH], effects: [{ say: chaseBottomTouchReturnB }] },

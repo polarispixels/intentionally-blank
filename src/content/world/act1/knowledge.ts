@@ -135,6 +135,7 @@ import {
   QUESTION_THE_DRAWER,
   PUZZLE_DRAWER,
 } from './ids';
+import { ACT2_CACHE_FOUND } from '../act2/ids';
 
 /**
  * Shared verbatim (hard rule 5) between `CLUE_REGISTER_IMPRESSION`'s
@@ -624,10 +625,16 @@ export const ACT1_QUESTIONS: NonNullable<WorldDef['questions']> = {
   [QUESTION_NOTEBOOK]: {
     text: 'Where did Jules hide the notebook — and who else is looking for it?',
     openWhen: { flag: FLAG_TOLD_JACK_ABOUT_ROOM },
+    // F0 (register 150) — settles at the Wall Drug cache.
+    answerWhen: { flag: ACT2_CACHE_FOUND },
+    answer: 'In a claim box at Wall Drug, on a hold under a numbering scheme the counter\nstopped using before the present clerk started — where nothing is indexed, and\nnobody currently living had any reason to look it up.\n\nAnd the other party had already been through my room before I woke up in it:\nunhurried, quiet, wiping his feet on the way in, and taking nothing at all,\nwhich is what a man does when the one thing worth taking is the one thing that\nis not there.',
   },
   [QUESTION_WALL_DRUG]: {
     text: 'What is waiting at Wall Drug?',
     openWhen: { clue: CLUE_CLAIM_TICKET },
+    // F0 (register 150) — same flag, different answer, on purpose (F0 §9).
+    answerWhen: { flag: ACT2_CACHE_FOUND },
+    answer: 'Free ice water, as advertised. A woman at the counter who remembers a grey hat\nand can tell you nothing whatsoever about the face under it. And behind her, in\na corridor of shelving run on a scheme nobody currently working there was ever\ntaught: bay E, and a box on a hold that nobody had asked after in months.\n\nA hard-backed notebook with a pencil under a dead rubber band. A memory stick\nlabelled by hand. A canister of exposed film with nothing written on it. And a\nletter that was sent, refused, and kept anyway.',
   },
 };
 

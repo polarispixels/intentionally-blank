@@ -29,7 +29,7 @@ import type { ProseRule } from '../../../engine/prose';
 import { LISTEN, SLEEP, SMELL } from '../act1/verbs';
 import { V_FOLLOW, V_LOOK_UP } from '../act1/ids';
 import { ACT2_NOLAN } from '../act2/ids';
-import { ACT3_ALERTNESS, ACT3_DATA_HALL_A, ACT3_LOBBY, ACT3_LOBBY_READER, ACT3_PERIMETER_ROAD } from './ids';
+import { ACT3_ALERTNESS, ACT3_DATA_HALL_A, ACT3_LOBBY, ACT3_LOBBY_READER, ACT3_PERIMETER_ROAD, V_ACT3_JUMP_TURNSTILE } from './ids';
 import { PUSH_TURNSTILE_WITHOUT_BADGE_TEXT } from './objects/lobby';
 // E1 task L (§3, §34 q8, §37.1, §37.4) — the west exit to the Staging Area,
 // gated on the door actually being open; the room itself is that task's own
@@ -101,6 +101,10 @@ const roomHandlers: HandlerDef[] = [
   // text (hard rule 5 — one text, owned once) and on the "FOLLOW LUKE" by
   // name gap this handler does not close.
   { verbs: [V_FOLLOW], when: { flag: ACT4_LUKE_GONE }, effects: [{ say: FOLLOW_LUKE_GONE_TEXT }] },
+  // Stage F sweep — bare "JUMP TURNSTILE," routing to the turnstile's own
+  // shipped refusal, unconditionally (jumping it is never the correct
+  // method, badge or no badge — see `ids.ts`'s own comment on this verb).
+  { verbs: [V_ACT3_JUMP_TURNSTILE], effects: [{ say: PUSH_TURNSTILE_WITHOUT_BADGE_TEXT }] },
 ];
 
 // ---------------------------------------------------------------------------

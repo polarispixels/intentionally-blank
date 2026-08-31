@@ -5,21 +5,32 @@
 // `area: 'act4'`. Only one real exit each way (`up`/`down` between the two
 // rooms) — the hab's way OUT entirely is `act4_airlock_door`'s own object
 // handlers (`./objects/hab.ts`), not an exit; see that file's own header
-// for the confirmed engine gap on the bare "OUT" phrasing. No `travelText`
-// on either exit (§56.3's own "a builder will look for one and not find
-// it" — the ladder is a ladder, both ends already describe the climb).
+// for the (now-closed, Stage F1) engine gap on the bare "OUT" phrasing —
+// `galleyHandlers`, below, claims the bare direction verb the way
+// `act1/objects/sheriffOffice.ts` claims bare `V_TYPE_TERMINAL`, and
+// `engine/move.ts`'s `traverseDirection` now consults a room's own
+// `handlers` before rendering the generic "no exit that way" family. No
+// `travelText` on either real exit (§56.3's own "a builder will look for
+// one and not find it" — the ladder is a ladder, both ends already
+// describe the climb).
 
 import type { HandlerDef, RoomDefSlice } from '../../../engine/world';
 import type { ProseRule } from '../../../engine/prose';
 import { LISTEN, SMELL } from '../act1/verbs';
 import { V_LOOK_UP, V_TYPE_TERMINAL } from '../act1/ids';
-import { ACT4_HAB_DOME, ACT4_HAB_GALLEY, ACT4_SISSY } from './ids';
+import { DIRECTION_VERB_IDS } from '../../../engine/move';
+import { V_ACT3_TYPE_PAD } from '../act3/ids';
+import { ACT4_HAB_DOME, ACT4_HAB_GALLEY, ACT4_LEAVE_HAB_SCRIPT, ACT4_SISSY } from './ids';
 // §29.2 — bare `LOG IN`/`TYPE`/`PRESS KEY` (`V_TYPE_TERMINAL`, bare `'V'`)
 // reach the hab terminal's own text via a ROOM-level handler, same idiom as
 // `act3/s6ArchiveHub.ts`'s own split (that file's own comment: "the room's
 // own bare `V_TYPE_TERMINAL` handler"). "USE TERMINAL" (dobj-bearing)
 // reaches the identical text via the object's own `USE_VERB_ID` handler
-// (`./objects/hab.ts`).
+// (`./objects/hab.ts`). Stage F1 — §29.2's own header also lists "TYPE
+// ADMIN": a distinct, S5-only global verb (`V_ACT3_TYPE_PAD`, `act3/ids.ts`)
+// that only S5's own room claimed a handler for; claimed here too, same
+// text, same idiom (a second room simply adding its own entry to that
+// verb's bare-invocation set — nothing about the verb itself changes).
 import { HAB_TERMINAL_TYPE_TEXT } from './objects/hab';
 
 // ---------------------------------------------------------------------------
@@ -58,7 +69,15 @@ const galleyHandlers: HandlerDef[] = [
   { verbs: [SMELL], effects: [{ say: GALLEY_SMELL_TEXT }] },
   { verbs: [LISTEN], effects: [{ say: GALLEY_LISTEN_TEXT }] },
   { verbs: [V_LOOK_UP], effects: [{ say: GALLEY_LOOK_UP_TEXT }] },
-  { verbs: [V_TYPE_TERMINAL], effects: [{ say: HAB_TERMINAL_TYPE_TEXT }] },
+  { verbs: [V_TYPE_TERMINAL, V_ACT3_TYPE_PAD], effects: [{ say: HAB_TERMINAL_TYPE_TEXT }] },
+  // Stage F1 — bare OUT/EXIT/LEAVE (all `DIRECTION_VERB_IDS.out`'s own
+  // words, `act1/verbs.ts`) reach the airlock's own leave-hab script
+  // through this room-level claim, now that `move.ts`'s `traverseDirection`
+  // actually consults it (this file's own header). `in` deliberately not
+  // claimed here — nothing in the doc gives the Galley a bare "IN" meaning,
+  // and the airlock object's own handler already answers "IN AIRLOCK"/
+  // "OPEN AIRLOCK"/"USE AIRLOCK" by name (`objects/hab.ts`).
+  { verbs: [DIRECTION_VERB_IDS.out], effects: [{ script: { id: ACT4_LEAVE_HAB_SCRIPT } }] },
 ];
 
 export const habGalleyRoom: RoomDefSlice = {

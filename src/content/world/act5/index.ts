@@ -20,6 +20,7 @@ import {
   ACT5_CREATE_SUBJECT_RESPOND_SCRIPT,
   ACT5_INITIALIZE_PROMPT_ID,
   ACT5_INITIALIZE_RESPOND_SCRIPT,
+  ACT5_LOCKER_CONTENTS_SCRIPT,
   ACT5_OPENING_LOGIN_OPEN_SCRIPT,
   ACT5_OPENING_LOGIN_PROMPT_ID,
   ACT5_OPENING_LOGIN_RESPOND_SCRIPT,
@@ -37,7 +38,7 @@ import {
 // letter/locker/door, `act5_ev_locker`, and the `CREATE SUBJECT`/
 // `INITIALIZE?` scripts (§20-§31, §42). ---
 import { act5BlankRoomRoom } from './blankRoom';
-import { ACT5_BLANK_ROOM_OBJECTS, ACT5_EV_LOCKER_EVENT } from './objects/blankRoom';
+import { ACT5_BLANK_ROOM_OBJECTS, ACT5_EV_LOCKER_EVENT, act5LockerContents } from './objects/blankRoom';
 import {
   ACT5_TASK_V_VERBS,
   act5CreateSubjectOpen,
@@ -66,6 +67,10 @@ import { ACT5_ROOT_ANTECHAMBER_MEMORIES, ACT5_ROOT_ANTECHAMBER_OBJECTS, rootAnte
 import { act5AnteLoginOpen, act5AnteLoginRespond } from './anteScripts';
 import { ACT5_EV_REACQUIRE_EVENT } from './reacquireEvent';
 import { ACT5_EV_DAD_DEFAULTS_EVENT } from '../act2/dad';
+
+// --- Stage F wave F0 — M21-M24, the replay fragments (`docs/superpowers/
+// specs/2026-09-21-stage-f0-prose.md` §2-§6). ---
+import { ACT5_REPLAY_MEMORIES } from './replayMemories';
 
 export const ACT5_SLICE: WorldSlice = {
   flags: {
@@ -101,6 +106,7 @@ export const ACT5_SLICE: WorldSlice = {
   memories: {
     // --- E3 builders append memories below this line ---
     ...ACT5_ROOT_ANTECHAMBER_MEMORIES,
+    ...ACT5_REPLAY_MEMORIES,
   },
   questions: {
     // --- E3 builders append questions below this line ---
@@ -133,6 +139,7 @@ export const ACT5_SLICE: WorldSlice = {
     [ACT5_CREATE_SUBJECT_RESPOND_SCRIPT]: act5CreateSubjectRespond,
     [ACT5_INITIALIZE_RESPOND_SCRIPT]: act5InitializeRespond,
     [ACT5_RECURSION_SCRIPT]: act5Recursion,
+    [ACT5_LOCKER_CONTENTS_SCRIPT]: act5LockerContents,
   },
 };
 

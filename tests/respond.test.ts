@@ -307,6 +307,12 @@ describe('respond — bare-verb miss (reason discriminator, coordinator fix-2)',
     expect(diagCodes(result.events)).toEqual(['defaultResponse']); // rung 2's bare-safe family, same code as the built-in bare case above
   });
 
+  it('the bareVerb family echoes the surface form the player typed (verbWord) over the canonical word (Stage F)', () => {
+    const outcome: InterpretOutcome = { kind: 'miss', raw: 'perambulate', verb: EXAMINE, knownNouns: [], reason: 'noPattern', verbWord: 'perambulate' };
+    const result = respond(WORLD, baseState(), vocab, outcome);
+    expect(lineText(result.events)).toBe(RESPONSES['bareVerb'][0]!.replace(/\{verb\}/g, 'perambulate'));
+  });
+
   it("interpreter.ts itself sets reason: 'noPattern' for a genuinely bare known verb", () => {
     const state = baseState();
     const outcome = new DeterministicParser().interpret('take', buildView(state));

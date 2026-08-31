@@ -67,6 +67,7 @@ import { V } from './ids';
 import { evaluate } from './cond';
 import type { Effect } from './effects';
 import { apply } from './effects';
+import { performAction } from './actions';
 import { objectState } from './resolve';
 import { render } from './prose';
 import { tick } from './tick';
@@ -263,10 +264,50 @@ export function traverseDirection(world: WorldDef, state: GameState, verb: VerbI
   const exit = (world.rooms?.[roomId]?.exits ?? []).find((e) => e.dir === dir);
 
   if (exit === undefined) {
+    // Stage F1 — the hab Galley's bare OUT (§56.4 of the E2 prose doc
+    // forbids giving this room an exit at all for it: "the hab's way out
+    // is an object, not an exit"). `respondToAction` (`respond.ts`) routes
+    // EVERY direction verb straight to `traverseDirection` before
+    // `performAction` — and so before any object/room handler — ever runs,
+    // so a room with no `ExitDefSlice` in this direction never got the
+    // chance to answer for itself the way `performAction`'s own bare-verb
+    // rung already lets it (§8 gap 3, `actions.ts`'s `findRoomHandler`).
+    // This is that one chance: a room that claims the bare direction verb
+    // in its own `handlers` (the sheriff-office idiom — a ROOM-level
+    // handler claiming a bare verb id, `act1/objects/sheriffOffice.ts`'s
+    // own `V_TYPE_TERMINAL`) gets first refusal, through the ordinary
+    // `performAction` dispatch (confirmed empirically: it *is* consulted
+    // once reached, `actions.ts`'s own `findRoomHandler` call site — the
+    // gap is only that direction verbs never reached it at all). Changes
+    // nothing for a room with no exit AND no handler either: `performAction`
+    // then falls through to the verb's own `default`, which for the twelve
+    // direction ids is `VERB_DEFAULTS.exit`/`.enter` etc — NOT
+    // `NO_EXIT_FAMILY` — so the room-handler check is done FIRST here, and
+    // `NO_EXIT_FAMILY` renders only when that also comes up empty, to keep
+    // the existing "no exit that way" wording for every other room
+    // unchanged.
+    if (roomClaimsBareVerb(world, state, verb)) {
+      const result = performAction(world, state, { verb });
+      return { state: result.state, events: result.events, class: result.class };
+    }
     const { state: s, events } = renderFamily(world, state, NO_EXIT_FAMILY);
     return { state: s, events, class: cls };
   }
   return traverseFoundExit(world, state, cls, roomId, exit, `room.${roomId}.exit.${dir}`);
+}
+
+/**
+ * Whether the player's current room's own `handlers` claim `verb` bare (no
+ * `dobj`/`iobj` gate beyond `when`) — the same `verbs`/`when` match
+ * `actions.ts`'s private `findRoomHandler` runs, duplicated here (rather
+ * than exported) because calling `performAction` unconditionally and
+ * checking its `ok` flag would still render SOME family (`fallbackToVerbDefault`
+ * never returns "nothing") — this has to be answered before deciding
+ * whether to call `performAction` at all, not after.
+ */
+function roomClaimsBareVerb(world: WorldDef, state: GameState, verb: VerbId): boolean {
+  const handlers = world.rooms?.[state.location]?.handlers ?? [];
+  return handlers.some((h) => h.verbs.includes(verb) && (h.when === undefined || evaluate(world, state, h.when)));
 }
 
 /**

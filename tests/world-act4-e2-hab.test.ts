@@ -121,6 +121,34 @@ describe('§25 — crossing the second frame', () => {
     expect(text(events)).toMatch(/The whistle, the air coming up, the suit going soft/);
     expect(text(events)).not.toMatch(/thin whistle somewhere above the helmet/);
   });
+
+  // Stage F1 — bare OUT (no object named) used to fall straight to the
+  // engine's generic "no exit that way" family: `respondToAction` routes
+  // every direction verb to `traverseDirection` before `performAction` (and
+  // any room/object handler) ever runs, and this room deliberately has no
+  // `out` exit of its own (§56.4 — the way out is the airlock object, not
+  // an exit). The room-level handler below (`../src/content/world/act4/
+  // hab.ts`) now gets first refusal when there is no exit at all.
+  it('bare OUT reaches the same leave-hab script as OPEN AIRLOCK', () => {
+    const store = new MemoryStore();
+    const { session } = enter(withState({ clock: { day: 1, minute: 500 } }), ACT4_HAB_GALLEY);
+    const { session: after, events } = say(session, 'out', store);
+    expect(text(events)).toMatch(/nothing, then a thin whistle somewhere above the helmet/);
+    expect(after.state.clock.minute).toBe(510);
+    expect(after.state.location).toBe(ACT3_S6_ARCHIVE_HUB);
+    expect(after.state.flags[ACT4_HAB_LEFT_ONCE]).toBe(true);
+  });
+
+  it('EXIT/LEAVE (the same direction verb, other words) also reach it', () => {
+    const store = new MemoryStore();
+    const { session: s1 } = enter(withState({}), ACT4_HAB_GALLEY);
+    const { events: e1 } = say(s1, 'exit', store);
+    expect(text(e1)).toMatch(/nothing, then a thin whistle somewhere above the helmet/);
+
+    const { session: s2 } = enter(withState({}), ACT4_HAB_GALLEY);
+    const { events: e2 } = say(s2, 'leave', store);
+    expect(text(e2)).toMatch(/nothing, then a thin whistle somewhere above the helmet/);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -187,6 +215,25 @@ describe('the Galley\'s objects', () => {
     const store = new MemoryStore();
     const { session } = enter(withState({}), ACT4_HAB_GALLEY);
     const { events } = say(session, 'use terminal', store);
+    expect(text(events)).toMatch(/The clock goes over\./);
+  });
+
+  // Stage F1 — §29.2's own header lists four phrasings (TYPE/USE TERMINAL/
+  // LOG IN/TYPE ADMIN); LOG IN already reaches it via `V_TYPE_TERMINAL`'s
+  // own words, but "TYPE ADMIN" is a distinct, S5-only global verb
+  // (`V_ACT3_TYPE_PAD`, `act3/ids.ts`) that only S5's own room claimed —
+  // the Galley never did.
+  it('LOG IN — already one of V_TYPE_TERMINAL\'s own words', () => {
+    const store = new MemoryStore();
+    const { session } = enter(withState({}), ACT4_HAB_GALLEY);
+    const { events } = say(session, 'log in', store);
+    expect(text(events)).toMatch(/The clock goes over\./);
+  });
+
+  it('TYPE ADMIN — reaches the identical §29.2 text', () => {
+    const store = new MemoryStore();
+    const { session } = enter(withState({}), ACT4_HAB_GALLEY);
+    const { events } = say(session, 'type admin', store);
     expect(text(events)).toMatch(/The clock goes over\./);
   });
 

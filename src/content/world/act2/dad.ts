@@ -249,6 +249,26 @@ const topics: TopicDef[] = [
     id: TOPIC_ROUNDS,
     words: ['rounds', 'custodian', 'the man', 'where is he', 'time'],
     response: [
+      // F2 prose §6 (register 151) — the present-case arm, prepended above
+      // the shipped five (none deleted). `topic_rounds`'s existing four
+      // npcAt-only rules answer correctly from an ADJACENT room ("next room
+      // along") but are wrong when the player is standing IN the room with
+      // the Custodian — this rule catches exactly that, room-agnostically,
+      // across all four co-location rooms (§8.4's own recommendation over
+      // four separate near-miss variants). `any:` of the four `{ all: [{
+      // at }, { npcAt }] }` pairs mirrors `act3/events.ts`'s own
+      // `ACT3_DAD_PUSH_S5_EVENT`/spotted-event `when` shape exactly.
+      {
+        when: {
+          any: [
+            { all: [{ at: ACT3_S6_MAINTENANCE_BAY }, { npcAt: [ACT2_CUSTODIAN, ACT3_S6_MAINTENANCE_BAY] }] },
+            { all: [{ at: ACT3_S6_ARCHIVE_HUB }, { npcAt: [ACT2_CUSTODIAN, ACT3_S6_ARCHIVE_HUB] }] },
+            { all: [{ at: ACT3_S5_REACTOR_INTERFACE }, { npcAt: [ACT2_CUSTODIAN, ACT3_S5_REACTOR_INTERFACE] }] },
+            { all: [{ at: ACT3_PIPE_CHASE }, { npcAt: [ACT2_CUSTODIAN, ACT3_PIPE_CHASE] }] },
+          ],
+        },
+        text: '"Close." Then nothing, for longer than he leaves gaps. "That\'s not a room\naway, kiddo. That\'s cloth on glass, and it\'s coming through this microphone\nlouder than you are."\n\nHe does not lower his voice. Nobody has told him there is a reason to.\n\n"I can tell you he\'s stopped. I can\'t tell you what he stopped for, or where\nhe\'s put his face. That part\'s yours."',
+      },
       { when: { npcAt: [ACT2_CUSTODIAN, ACT3_S6_MAINTENANCE_BAY] }, text: '"He\'s in the room with the chairs. Has been eleven minutes."\n\nNo drama in it at all — the voice he would use about a kettle.\n\n"I can\'t see him, kiddo, I can hear him, and a man doing a job makes a noise\nwith a shape to it. He has done that room twice tonight and both times it took\nhim about the same, and both times he went the same way after."' },
       { when: { npcAt: [ACT2_CUSTODIAN, ACT3_S6_ARCHIVE_HUB] }, text: '"Next room along. The one with the machine in it."\n\n"How do I know which? Because a door on a closer makes one noise and a door on\na latch makes another, and I have had a very quiet week."' },
       { when: { npcAt: [ACT2_CUSTODIAN, ACT3_S5_REACTOR_INTERFACE] }, text: '"He\'s up a floor. The room with the wall of dials — the one where the note\ncomes up through your boots."\n\n"He is not in a hurry. He has not been in a hurry once, and I have been\nlistening to him for hours."' },
@@ -258,7 +278,12 @@ const topics: TopicDef[] = [
   },
   {
     id: TOPIC_HOW_DO_YOU_KNOW,
-    words: ['listening', 'hearing', 'how do you know'],
+    // "hearing" removed (Stage F sweep — the word permanently shadowed
+    // `topic_hearing` below, §19.2's own Senate hearing, since `resolveTopic`
+    // takes the first array match and this topic has no `when` gate). Kept
+    // exclusively for `topic_hearing`'s own word list; "listening"/"how do
+    // you know" still reach this topic.
+    words: ['listening', 'how do you know'],
     response:
       '"Because there is nothing else to do." He is not complaining; he is explaining\na method. "You put a man in a building with no eyes and he will have the\nplumbing off by heart inside a day."\n\n"Every room down here has a noise. Every door has a different noise. A pump\nstarting is not a pump stopping. And a man walking on tile is not a man walking\non a grating, and I am not going to pretend that is clever, because it is\nnine-tenths of an engineer\'s job and always was."',
   },
@@ -536,9 +561,12 @@ export const act2DadBoot: ScriptFn = (world, state) => {
  * shape as `ACT2_Q_HOW_WAS_IT_HERE`'s own precedent (`act2/knowledge.ts`:
  * "No answerWhen in this build — Stage E answers it").
  */
-export const ACT2_Q_BOOT_USB_DEF: { text: string; openWhen?: Cond } = {
+export const ACT2_Q_BOOT_USB_DEF: { text: string; openWhen?: Cond; answerWhen?: Cond; answer?: string } = {
   text: 'A stick with a dead man on it, and one machine in the county old enough to trust it. How does it go in?',
   openWhen: { has: ACT2_USB },
+  // F0 (register 150) — settles at the boot; mirrors P12's own solvedWhen.
+  answerWhen: { flag: ACT2_DAD_BOOTED },
+  answer: 'Three obsolete parts out of the junk drawer under the general store\'s counter,\njoined end to end into the in-between that nothing has needed in a working\nlifetime. The stick on the end of that. The whole chain onto the back of the\nmachine by feel, which took two tries.\n\nThen a long enough nothing that I started composing what I was going to say\nabout it afterwards, and to whom. Then the screen counting its own memory in a\nunit that has not impressed anybody in decades, and bad sectors marked rather\nthan repaired.\n\nThen the speaker behind the grille — which had spent its entire working life\nmaking one noise — made several. He arrived mid-sentence, on the subject of\nhotels.',
 };
 
 export const ACT2_P12_BOOT_DAD_PUZZLE: PuzzleDef = {

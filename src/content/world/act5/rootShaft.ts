@@ -7,8 +7,9 @@
 // transcribed verbatim (hard rule 5).
 
 import type { EventDef, HandlerDef, ObjectDefSlice, OnEnterRule, RoomDefSlice } from '../../../engine/world';
+import type { Effect } from '../../../engine/effects';
 import type { ProseRule } from '../../../engine/prose';
-import { EXAMINE, LISTEN, OPEN, PRY, PUSH, READ, RUB, SLEEP, SMELL, TOUCH, YELL } from '../act1/verbs';
+import { CLIMB, EXAMINE, LISTEN, OPEN, PRY, PUSH, READ, RUB, SLEEP, SMELL, TOUCH, YELL } from '../act1/verbs';
 import { V_KNOCK } from '../act1/ids';
 import {
   V_ACT2_WAIT_UNTIL_AFTERNOON,
@@ -65,7 +66,7 @@ const yellText = 'It goes up and comes back off the boarding, and it goes down a
 
 const sleepWaitText = 'Halfway down a ladder in a hole under a county, with the light you brought and\nthe batteries you have got. No.';
 
-const roomHandlers: HandlerDef[] = [
+const senseAndWaitHandlers: HandlerDef[] = [
   { verbs: [LISTEN], effects: [{ say: listenText }] },
   { verbs: [SMELL], effects: [{ say: smellText }] },
   { verbs: [YELL], effects: [{ say: yellText }] },
@@ -86,6 +87,18 @@ const ladderExamineText =
 export const LADDER_CLIMB_DOWN_TEXT =
   'The rungs go on being rungs for longer than you were expecting, and the light\nyou have got throws your own shadow down the wall ahead of you the whole way,\nwhich is company of a sort.';
 
+/**
+ * Stage F1 sweep — "CLIMB LADDER"/bare "CLIMB" at the shaft used to fall to
+ * the generic `climb` family (`VERB_DEFAULTS.climb`, `objects/blankRoom.ts`
+ * has no counterpart here — the ladder object below only ever declared
+ * `EXAMINE`). Ruling: it descends — the exact one-hop `travelText`/`goto`
+ * the `down` exit itself performs (`applyExitTraversal`, `move.ts`), so a
+ * player who types `CLIMB LADDER` or bare `CLIMB` gets the same rung-by-rung
+ * beat and the same destination as `DOWN`/`CLIMB DOWN`, never a second,
+ * competing description of the same climb.
+ */
+const climbDownEffects: Effect[] = [{ say: LADDER_CLIMB_DOWN_TEXT }, { goto: ACT5_ROOT_ANTECHAMBER }];
+
 /** §5 — "CLIMB UP"/bare `UP`, the shaft's own `up` exit's default `travelText` arm (below §19's reconciliation arm). */
 export const LADDER_CLIMB_UP_TEXT =
   'Up past the lift landing, up past the stencil, up past the tide line, and out\nthrough a hatch into a mile of poured tube with rails in the floor of it.';
@@ -105,7 +118,12 @@ const ladder: ObjectDefSlice = {
   portable: false,
   reachableInDark: true,
   nouns: ['ladder', 'rungs', 'rung', 'bolts', 'plates', 'string'],
-  handlers: [{ verbs: [EXAMINE], effects: [{ say: ladderExamineText }] }],
+  handlers: [
+    { verbs: [EXAMINE], effects: [{ say: ladderExamineText }] },
+    // Stage F1 sweep — "CLIMB LADDER" (see `climbDownEffects`'s own note,
+    // above): it descends, same one hop as `DOWN`/`CLIMB DOWN`.
+    { verbs: [CLIMB], effects: climbDownEffects },
+  ],
 };
 
 // ---------------------------------------------------------------------------
@@ -231,6 +249,16 @@ export const ACT5_EV_START_EVENT: EventDef = {
 // ---------------------------------------------------------------------------
 // The room.
 // ---------------------------------------------------------------------------
+
+/**
+ * Stage F1 sweep — bare "CLIMB" (no dobj) at the shaft. `CLIMB`'s own
+ * pattern is `'V dobj'` only (`act1/verbs.ts`), so a bare invocation
+ * reaches `respond.ts`'s `respondToMiss` with `reason: 'noPattern'`; that
+ * function already checks `roomAnswersBare` before falling to the generic
+ * `bareVerb` family (the same v0.12.0 "FOLD at the poker table" rung), so
+ * declaring `CLIMB` here is enough — no engine change, no pattern edit.
+ */
+const roomHandlers: HandlerDef[] = [...senseAndWaitHandlers, { verbs: [CLIMB], effects: climbDownEffects }];
 
 export const rootShaftRoom: RoomDefSlice = {
   name: 'Root Shaft',

@@ -512,6 +512,10 @@ export const V_ACT3_BADGE = V('act3_badge');
 export const V_ACT3_CHECK_TIME = V('act3_check_time');
 /** "LOOK DOWN OPENING"/"LOOK DOWN SHAFT" (§9.6) — bare fixed phrases, same idiom as `V_LOOK_DOWN_AISLE` (`act3/ids.ts`, D3 task B): no bare "look down" verb exists to hang a dobj off, so this is its own literal phrase pair. */
 export const V_ACT3_LOOK_DOWN_SHAFT = V('act3_look_down_shaft');
+/** Stage F sweep — "LOOK DOWN WELL"/"LOOK INTO WELL" at the Archive Hub's root-door well, same bare fixed-phrase idiom as `V_ACT3_LOOK_DOWN_SHAFT` above (`V_LOOK_DOWN`'s own global pattern is bare-only, no dobj slot). */
+export const V_ACT3_LOOK_DOWN_WELL = V('act3_look_down_well');
+/** Stage F sweep — "JUMP TURNSTILE" at the Lobby, same bare fixed-phrase idiom (`JUMP`'s own global pattern is bare-only, no dobj slot) — routes to the turnstile's existing shipped refusal (`objects/lobby.ts`'s `PUSH_TURNSTILE_WITHOUT_BADGE_TEXT`), unconditionally: jumping it is never the correct method, badge or no badge. */
+export const V_ACT3_JUMP_TURNSTILE = V('act3_jump_turnstile');
 
 // --- Scripts (§10.3, §9.9) ---
 /** The interlock death: three `kind: 'beat'` events (§10.2's own Beat 1/2/3 headings), then the death paragraph, `{ die }`, `{ set: [act3_died_reactor, true] }` — the prologue's own idiom (`content/scenes/mvp-prologue.ts`). Wired into `world.scripts` under this exact id per the doc's own "Wires into" header. */

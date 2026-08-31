@@ -485,7 +485,9 @@ const sleepers: ObjectDefSlice = {
   location: HERE,
   name: 'sleepers',
   portable: false,
-  nouns: ['people', 'sleepers', 'townspeople', 'man', 'woman', 'them', 'everybody', 'crowd', 'bodies'],
+  // "sleeper" singular added (Stage F sweep — the object's own name is
+  // plural, "sleepers," and had no singular form).
+  nouns: ['people', 'sleepers', 'sleeper', 'townspeople', 'man', 'woman', 'them', 'everybody', 'crowd', 'bodies'],
   handlers: [
     { verbs: [EXAMINE], effects: [{ say: sleepersRules }] },
     { verbs: [TOUCH], when: NIGHT, effects: [{ say: sleepersTouchText }] },

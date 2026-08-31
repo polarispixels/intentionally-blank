@@ -22,6 +22,7 @@ import { ACT3_LOBBY, ACT3_S5_REACTOR_INTERFACE } from '../src/content/world/act3
 import {
   ACT4_LUKE,
   ACT4_LUKE_GONE,
+  ACT4_LUKE_GONE_MARKER,
   ACT4_S5_DOWN_GATE,
   ACT4_S6_DOOR_OPEN,
   ACT4_STAGING_AREA,
@@ -176,20 +177,36 @@ describe('Addendum §5 — FOLLOW, after act4_luke_gone (room-scoped)', () => {
     expect(text(events)).not.toMatch(/county man/);
   });
 
-  // KNOWN GAP, flagged in this task's report rather than silently patched:
-  // `FOLLOW LUKE` (by name) does not yet reach this handler. `resolve.ts`/
-  // `interpreter.ts` restrict npc noun resolution to `ScopeView.visible`
-  // (the current room only), so an offstage npc noun fails resolution
-  // before any room handler is ever consulted — confirmed empirically
-  // (`nounMiss.unseen`, not this room's text). Closing that gap is an
-  // engine change beyond this task's named files (`stagingArea.ts`/
-  // `lobby.ts`); this test documents current, expected behavior rather
-  // than silently asserting the addendum's literal phrasing works.
-  it('FOLLOW LUKE (by name) does not yet reach the room handler — documents the gap', () => {
+  // Stage F1 — closed: a hidden, room-scoped scenery object carrying the
+  // noun `luke` (`ACT4_LUKE_GONE_MARKER`, `objects/stagingArea.ts`) is
+  // `reveal`ed the instant `act4_luke_gone` is set (both places that set
+  // it — `events.ts`'s missed-window event and `luke.ts`'s
+  // `ACT4_LUKE_AT_ROOT_EFFECTS` — now also `reveal` it, the same
+  // "hidden-until-a-specific-effect" idiom every other `reveal`d object in
+  // this codebase already uses, e.g. `act2/rig.ts`), so `FOLLOW LUKE`
+  // resolves once he is genuinely offstage and reaches this same handler's
+  // text. Before that point the marker stays hidden (out of scope
+  // entirely), so it can never collide with the real npc noun while he is
+  // actually still standing here — see the no-regression test below. The
+  // `objects` overlay below mirrors exactly what the real `reveal` effect
+  // leaves behind (`act4_luke_gone` is never true, in play, without it).
+  it('FOLLOW LUKE (by name), once he is gone, now reaches the room handler', () => {
     const store = new MemoryStore();
-    const { session } = enter(withState({ flags: { [ACT4_LUKE_GONE]: true } }), ACT4_STAGING_AREA);
+    const { session } = enter(
+      withState({ flags: { [ACT4_LUKE_GONE]: true }, objects: { [ACT4_LUKE_GONE_MARKER]: { hidden: false } } }),
+      ACT4_STAGING_AREA,
+    );
     const { events } = say(session, 'follow luke', store);
-    expect(text(events)).not.toMatch(/county man/);
+    expect(text(events)).toMatch(/county man/);
+  });
+
+  it('FOLLOW LUKE, while he is still here, keeps resolving to him — no ambiguity from the new marker', () => {
+    const store = new MemoryStore();
+    const { session } = enter(withLukeAtStaging({ flags: { [ACT4_STARTED]: true } }), ACT4_STAGING_AREA);
+    const { events } = say(session, 'follow luke', store);
+    const rendered = text(events);
+    expect(rendered).not.toMatch(/county man/);
+    expect(rendered).not.toMatch(/which luke do you mean|which do you mean/i);
   });
 });
 

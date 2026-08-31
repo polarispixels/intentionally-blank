@@ -166,7 +166,22 @@ export type InterpretOutcome =
    * before this field existed the two were indistinguishable from the
    * outcome shape alone, and every bare verb rendered as a noun miss.
    */
-  | { kind: 'miss'; raw: string; verb?: VerbId; knownNouns: string[]; reason?: 'noPattern' | 'nounUnresolved' }
+  | {
+      kind: 'miss';
+      raw: string;
+      verb?: VerbId;
+      knownNouns: string[];
+      reason?: 'noPattern' | 'nounUnresolved';
+      /**
+       * The verb surface form the player actually typed ("sweep"), when the
+       * grammar knows it (`noPattern` carries the matched form) — so the
+       * `bareVerb` family can echo the player's own word instead of the
+       * verb's canonical `words[0]` ("feel around"). Optional and additive:
+       * absent on the older miss shapes, and `respond.ts` falls back to the
+       * canonical word without it (Stage F sweep).
+       */
+      verbWord?: string;
+    }
   /**
    * `GO TO` a room that isn't currently reachable through the visited
    * graph — either it was never visited at all, or it was visited but no
@@ -548,7 +563,7 @@ export class DeterministicParser implements IntentInterpreter {
       return { kind: 'miss', raw: input, knownNouns: knownNounsIn(view.vocabulary, tokens) };
     }
     if (result.kind === 'noPattern') {
-      return { kind: 'miss', raw: input, verb: result.verb, knownNouns: knownNounsIn(view.vocabulary, tokens), reason: 'noPattern' };
+      return { kind: 'miss', raw: input, verb: result.verb, verbWord: result.word, knownNouns: knownNounsIn(view.vocabulary, tokens), reason: 'noPattern' };
     }
 
     const { action } = result;

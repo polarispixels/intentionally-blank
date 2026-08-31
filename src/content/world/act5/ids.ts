@@ -81,6 +81,13 @@ export const ACT5_INITIALIZE_RESPOND_SCRIPT = S('act5_initialize_respond');
 export const ACT5_RECURSION_SCRIPT = S('act5_recursion');
 export const ACT5_OPENING_LOGIN_OPEN_SCRIPT = S('act5_opening_login_open');
 export const ACT5_OPENING_LOGIN_RESPOND_SCRIPT = S('act5_opening_login_respond');
+// Stage F1 — "LOOK IN LOCKER"/"SEARCH LOCKER" (`SEARCH`'s own words,
+// `act1/verbs.ts`) used to always render the generic search family, wrong
+// once the cache actually holds something (§26.7's own note: the locker is
+// "LOOK IN-able", canon 91/108). A script (not a static handler) because the
+// contents are dynamic — computed fresh each call from `objectLocation`,
+// `objects/blankRoom.ts`'s own `act5LockerContents`.
+export const ACT5_LOCKER_CONTENTS_SCRIPT = S('act5_locker_contents');
 
 /**
  * The ending id — the `{ end: ACT5_ENDING_ID }` the recursion script's last
@@ -167,3 +174,12 @@ export const V_ACT5_ANTE_LOGIN = V('act5_ante_type_admin');
 // Dad's §13.2 topic — "ASK DAD ABOUT PASSWORD"/"ABOUT DEFAULTS"/"ABOUT THE
 // LOGIN", amended onto `act2/dad.ts`.
 export const ACT5_DAD_TOPIC_PASSWORD = T('act5_dad_topic_password');
+
+// --- Stage F wave F0 (`docs/superpowers/specs/2026-09-21-stage-f0-prose.md`
+// §2-§5) — M21-M24, the replay fragments (the seeded stratum leaking,
+// register 148). No capability flags, no variants, no profile arms. Defs
+// in `./replayMemories.ts`. ---
+export const ACT5_MEM_M21 = M('act5_mem_m21');
+export const ACT5_MEM_M22 = M('act5_mem_m22');
+export const ACT5_MEM_M23 = M('act5_mem_m23');
+export const ACT5_MEM_M24 = M('act5_mem_m24');

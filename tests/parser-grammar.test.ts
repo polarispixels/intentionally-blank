@@ -219,7 +219,7 @@ describe('matchGrammar — patterns', () => {
   it('a verb known but no pattern fits reports noPattern with the recognized verb', () => {
     // ASK requires "about"; without it, no pattern matches.
     const result = matchGrammar(vocab, ['ask', 'guide'], 'ask guide');
-    expect(result).toEqual({ kind: 'noPattern', verb: ASK });
+    expect(result).toEqual({ kind: 'noPattern', verb: ASK, word: 'ask' });
   });
 
   it('"ask guide about" (nothing after "about") still matches, with an empty topic — front-desk-prose §14', () => {
@@ -485,5 +485,171 @@ describe('DeterministicParser — seam skeleton', () => {
 
   it('reports an empty-input miss with no known nouns', () => {
     expect(parser.interpret('   ', view())).toEqual({ kind: 'miss', raw: '   ', knownNouns: [] });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Trailing particles: "V dobj P" ≡ "V P dobj" (Stage F sweep)
+// ---------------------------------------------------------------------------
+
+describe('matchGrammar — trailing particle ("turn lamp on" ≡ "turn on lamp")', () => {
+  it('"turn lamp on" matches TURN_ON with dobj "lamp" — the particle never lands in the noun phrase', () => {
+    const result = matchGrammar(vocab, ['turn', 'lamp', 'on'], 'turn lamp on');
+    expect(result).toEqual({
+      kind: 'matched',
+      action: {
+        verb: BUILTIN_VERB_IDS.turnOn,
+        pattern: 'V dobj',
+        dobj: { words: ['lamp'], adjectives: [], noun: 'lamp' },
+        raw: 'turn lamp on',
+      },
+    });
+  });
+
+  it('"turn lamp off" matches TURN_OFF', () => {
+    const result = matchGrammar(vocab, ['turn', 'lamp', 'off'], 'turn lamp off');
+    expect(result.kind === 'matched' && result.action.verb).toBe(BUILTIN_VERB_IDS.turnOff);
+  });
+
+  it('"turn brass lamp on" keeps the multi-word noun phrase intact', () => {
+    const result = matchGrammar(vocab, ['turn', 'brass', 'lamp', 'on'], 'turn brass lamp on');
+    expect(result.kind === 'matched' && result.action.dobj).toEqual({
+      words: ['brass', 'lamp'],
+      adjectives: ['brass'],
+      noun: 'lamp',
+    });
+  });
+
+  it('fires only for a DECLARED two-word form: "break window over" (no "break over" declared) parses exactly as before', () => {
+    const result = matchGrammar(vocab, ['break', 'window', 'over'], 'break window over');
+    expect(result.kind === 'matched' && result.action.verb).toBe(BREAK);
+    expect(result.kind === 'matched' && result.action.dobj?.noun).toBe('over'); // untouched pre-Stage-F parse
+  });
+
+  it('end to end through the seam: "turn lamp on" resolves to TURN_ON LAMP', () => {
+    const parser = new DeterministicParser();
+    const outcome = parser.interpret('turn lamp on', {
+      vocabulary: vocab,
+      visible: [KEY, LAMP, HAT, CHEST],
+      parser: {},
+      portable: new Set(),
+      location: new Map(),
+      travel: { current: ROOM_A, passable: new Map() },
+    });
+    expect(outcome).toEqual({ kind: 'actions', actions: [{ verb: BUILTIN_VERB_IDS.turnOn, dobj: LAMP, raw: 'turn lamp on' }] });
+  });
+});
+
+describe('matchGrammar — trailing particle across the shipped phrasal families', () => {
+  // The shipped tables declare these two-word forms (act1 verbs.ts): TAKE
+  // "pick up", REMOVE "take off", DROP "put down", WEAR "put on", plus
+  // "turn over"-style analytical verbs. The fixture's own builtins don't,
+  // so this world layers them on — same shape as the collision fixtures
+  // above.
+  const TURN_OVER = V('fixture_turn_over');
+  const PACE = V('fixture_pace');
+  const LOOK_UP = V('fixture_look_up');
+  const SWEEP_V = V('fixture_sweep');
+  const PHRASAL_WORLD: WorldDef = {
+    ...FIXTURE_WORLD,
+    verbs: {
+      ...FIXTURE_WORLD.verbs,
+      [BUILTIN_VERB_IDS.take]: { ...FIXTURE_WORLD.verbs![BUILTIN_VERB_IDS.take]!, words: ['take', 'get', 'pick up'] },
+      [BUILTIN_VERB_IDS.remove]: { ...FIXTURE_WORLD.verbs![BUILTIN_VERB_IDS.remove]!, words: ['remove', 'take off'] },
+      [BUILTIN_VERB_IDS.drop]: { ...FIXTURE_WORLD.verbs![BUILTIN_VERB_IDS.drop]!, words: ['drop', 'put down'] },
+      [BUILTIN_VERB_IDS.wear]: { ...FIXTURE_WORLD.verbs![BUILTIN_VERB_IDS.wear]!, words: ['wear', 'put on'] },
+      [TURN_OVER]: { id: TURN_OVER, words: ['turn over'], patterns: ['V dobj'], class: 'analytical', default: 'Fixture: the other side.' },
+      [PACE]: { id: PACE, words: ['walk it off', 'walk off'], patterns: ['V'], class: null, default: 'Fixture: you pace.' },
+      [LOOK_UP]: { id: LOOK_UP, words: ['look up'], patterns: ['V'], class: null, default: 'Fixture: you look up.' },
+      [SWEEP_V]: { id: SWEEP_V, words: ['feel around', 'sweep'], patterns: ['V'], class: 'direct', default: 'Fixture: you sweep an arm around.' },
+    },
+  };
+  const phrasalVocab = compileVocabulary(PHRASAL_WORLD);
+
+  it('"pick hat up" is TAKE hat', () => {
+    const result = matchGrammar(phrasalVocab, ['pick', 'hat', 'up'], 'pick hat up');
+    expect(result.kind === 'matched' && result.action.verb).toBe(BUILTIN_VERB_IDS.take);
+    expect(result.kind === 'matched' && result.action.dobj?.noun).toBe('hat');
+  });
+
+  it('"take hat off" is REMOVE hat (never TAKE with a stray "off")', () => {
+    const result = matchGrammar(phrasalVocab, ['take', 'hat', 'off'], 'take hat off');
+    expect(result.kind === 'matched' && result.action.verb).toBe(BUILTIN_VERB_IDS.remove);
+    expect(result.kind === 'matched' && result.action.dobj?.noun).toBe('hat');
+  });
+
+  it('"put hat down" is DROP hat', () => {
+    const result = matchGrammar(phrasalVocab, ['put', 'hat', 'down'], 'put hat down');
+    expect(result.kind === 'matched' && result.action.verb).toBe(BUILTIN_VERB_IDS.drop);
+  });
+
+  it('"put hat on" (no iobj) is WEAR hat', () => {
+    const result = matchGrammar(phrasalVocab, ['put', 'hat', 'on'], 'put hat on');
+    expect(result.kind === 'matched' && result.action.verb).toBe(BUILTIN_VERB_IDS.wear);
+    expect(result.kind === 'matched' && result.action.dobj?.noun).toBe('hat');
+  });
+
+  it('"turn chest over" is TURN OVER chest', () => {
+    const result = matchGrammar(phrasalVocab, ['turn', 'chest', 'over'], 'turn chest over');
+    expect(result.kind === 'matched' && result.action.verb).toBe(TURN_OVER);
+    expect(result.kind === 'matched' && result.action.dobj?.noun).toBe('chest');
+  });
+
+  it('an input that IS a declared surface form verbatim is never rewritten — "walk it off" stays V_PACE bare', () => {
+    const result = matchGrammar(phrasalVocab, ['walk', 'it', 'off'], 'walk it off');
+    expect(result).toEqual({ kind: 'matched', action: { verb: PACE, pattern: 'V', raw: 'walk it off' } });
+  });
+
+  it('a rewrite that matches no pattern falls back to the original tokens untouched', () => {
+    // "look chest up": ['look','up','chest'] fails (LOOK UP is V-only), so
+    // the original parse — LOOK with dobj ['chest','up'] — stands, exactly
+    // as before the rewrite existed.
+    const result = matchGrammar(phrasalVocab, ['look', 'chest', 'up'], 'look chest up');
+    expect(result.kind === 'matched' && result.action.verb).toBe(LOOK);
+    expect(result.kind === 'matched' && result.action.dobj?.noun).toBe('up');
+  });
+
+  it('noPattern reports the surface form the player typed, not the canonical word', () => {
+    const result = matchGrammar(phrasalVocab, ['sweep', 'key'], 'sweep key');
+    expect(result).toEqual({ kind: 'noPattern', verb: SWEEP_V, word: 'sweep' });
+  });
+});
+
+describe('matchGrammar — trailing-particle regression net (prep-taking and topic patterns untouched)', () => {
+  it('"put key in chest" still parses as PUT_IN with prep/iobj', () => {
+    const result = matchGrammar(vocab, ['put', 'key', 'in', 'chest'], 'put key in chest');
+    expect(result.kind === 'matched' && result.action.pattern).toBe('V dobj prep iobj');
+    expect(result.kind === 'matched' && result.action.prep).toBe('in');
+    expect(result.kind === 'matched' && result.action.iobj?.noun).toBe('chest');
+  });
+
+  it('"unlock chest with key" still parses as UNLOCK with instrument', () => {
+    const result = matchGrammar(vocab, ['unlock', 'chest', 'with', 'key'], 'unlock chest with key');
+    expect(result.kind === 'matched' && result.action.pattern).toBe('V dobj prep iobj');
+    expect(result.kind === 'matched' && result.action.prep).toBe('with');
+  });
+
+  it('"throw chair at window" still parses with "at" as the preposition', () => {
+    const result = matchGrammar(vocab, ['throw', 'chair', 'at', 'window'], 'throw chair at window');
+    expect(result.kind === 'matched' && result.action.prep).toBe('at');
+  });
+
+  it('"ask guide for brother" still parses as V npc about topic', () => {
+    const result = matchGrammar(vocab, ['ask', 'guide', 'for', 'brother'], 'ask guide for brother');
+    expect(result.kind === 'matched' && result.action.pattern).toBe('V npc about topic');
+    expect(result.kind === 'matched' && result.action.topic).toBe('brother');
+  });
+
+  it('"ask guide for" (nothing after FOR) still reaches the empty-topic shape — "for" is not a movable particle', () => {
+    const result = matchGrammar(vocab, ['ask', 'guide', 'for'], 'ask guide for');
+    expect(result.kind === 'matched' && result.action.pattern).toBe('V npc about topic');
+    expect(result.kind === 'matched' && result.action.topic).toBe('');
+    expect(result.kind === 'matched' && result.action.npc?.noun).toBe('guide');
+  });
+
+  it('"turn on lamp" (prefix order) is unchanged', () => {
+    const result = matchGrammar(vocab, ['turn', 'on', 'lamp'], 'turn on lamp');
+    expect(result.kind === 'matched' && result.action.verb).toBe(BUILTIN_VERB_IDS.turnOn);
+    expect(result.kind === 'matched' && result.action.dobj?.noun).toBe('lamp');
   });
 });

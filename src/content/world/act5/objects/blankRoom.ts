@@ -16,8 +16,12 @@
 // that precedent, in case this module is ever imported twice.
 
 import type { Effect } from '../../../../engine/effects';
-import type { EventDef, ObjectDefSlice } from '../../../../engine/world';
-import { O } from '../../../../engine/ids';
+import type { EventDef, GameEvent, ObjectDefSlice, ScriptFn } from '../../../../engine/world';
+import { O, samePlace } from '../../../../engine/ids';
+import type { ObjectId } from '../../../../engine/ids';
+import { objectLocation } from '../../../../engine/resolve';
+import { render } from '../../../../engine/prose';
+import { VERB_DEFAULTS } from '../../../responses';
 import { CHAIR_LEG } from '../../act1/ids';
 import { BREAK, CLOSE, EXAMINE, HELLO, LISTEN, LOCK, LOOK_BEHIND, LOOK_UNDER, OPEN, PRY, PUT_IN, READ, SEARCH, TOUCH } from '../../act1/verbs';
 import { USE_VERB_ID } from '../../../../engine/move';
@@ -33,8 +37,10 @@ import {
   ACT5_CREATION_RECORD,
   ACT5_INDEX,
   ACT5_JULES_SNAPSHOT,
+  ACT5_JULES_WOKEN,
   ACT5_LETTER_TO_JACK,
   ACT5_LOCKER,
+  ACT5_LOCKER_CONTENTS_SCRIPT,
   ACT5_RECONCILIATION_RUNNING,
   ACT5_ROOT_TERMINAL,
   ACT5_TRAY,
@@ -44,6 +50,7 @@ import {
 import { ACT4_DEEP_INDEX } from '../../act4/ids';
 import { ACT2_Q_HOW_WAS_IT_HERE } from '../../act2/ids';
 import { ACT3_Q_WHAT_ARE_THESE_PEOPLE } from '../../act3/ids';
+import { SNAPSHOT_FIELD_LINE, WAKE_SECOND } from '../formScripts';
 
 // ---------------------------------------------------------------------------
 // §20 — room-level ambient sense/text constants, exported for `../blankRoom`
@@ -237,7 +244,15 @@ const julesSnapshot: ObjectDefSlice = {
   portable: false,
   hidden: false,
   nouns: ['snapshot', 'jules'],
-  handlers: [{ verbs: [OPEN, HELLO], effects: [{ script: { id: ACT5_WAKE_JULES_SCRIPT } }] }],
+  handlers: [
+    { verbs: [OPEN, HELLO], effects: [{ script: { id: ACT5_WAKE_JULES_SCRIPT } }] },
+    // Stage F1 sweep — "X SNAPSHOT" used to fall to a generic. Shipped
+    // text only, no new sentence: the ledger field line before
+    // `act5_jules_woken` (`../formScripts.ts`'s `SNAPSHOT_FIELD_LINE`),
+    // and §24.4's own repeat text after (`WAKE_SECOND`).
+    { verbs: [EXAMINE], when: { flag: ACT5_JULES_WOKEN }, effects: [{ say: WAKE_SECOND }] },
+    { verbs: [EXAMINE], effects: [{ say: SNAPSHOT_FIELD_LINE }] },
+  ],
 };
 
 // ---------------------------------------------------------------------------
@@ -339,7 +354,58 @@ const locker: ObjectDefSlice = {
   handlers: [
     { verbs: [EXAMINE], effects: [{ say: LOCKER_EXAMINE }, { grantClue: ACT5_CLUE_LOCKER }] },
     { verbs: [CLOSE, LOCK], effects: [{ say: LOCKER_CLOSE_LOCK }] },
+    // Stage F1 — `SEARCH`'s own words (`act1/verbs.ts`) already cover
+    // "LOOK IN LOCKER"/"LOOK THROUGH LOCKER"/"RUMMAGE LOCKER" as the same
+    // verb id, so one handler answers every phrasing the gap list names.
+    { verbs: [SEARCH], effects: [{ script: { id: ACT5_LOCKER_CONTENTS_SCRIPT } }] },
   ],
+};
+
+/**
+ * Stage F1 — `SEARCH`/`LOOK IN LOCKER`'s contents listing (§26.7's own
+ * note: "LOOK IN-able", canon 91/108 — nothing is a cache, nothing is
+ * consumed, everything re-findable). A script, not a static handler,
+ * because the contents are genuinely dynamic (`PUT <anything> IN LOCKER`
+ * accepts any portable object, `LOCKER_PUT_GENERAL` above, not just the six
+ * named cache items) — computed fresh from `objectLocation` every call, the
+ * same "in": container check `samePlace` exists for.
+ *
+ * Empty locker: renders the SAME shipped generic `search` family the
+ * fallback path already used before this task (no new sentence, per this
+ * task's own brief) — a genuine no-op for that case, not a new response.
+ *
+ * Non-empty: lists each contained object's display name, one per line, in
+ * the INVENTORY idiom's own mechanism (`respond.ts`'s `respondToInventory` —
+ * a plain `kind: 'system'` line per item), now preceded by one `kind:
+ * 'system'` chrome line, `IN THE CABINET:` (Stage F1 sweep — the
+ * knowledge-view idiom's own caps chrome, not narration, same register as
+ * the INVENTORY header/the ledger's own field listings; not new prose in
+ * the sense hard rule 5 guards against). Empty-locker behavior below is
+ * unchanged: there is no shipped line for "here is what a searched empty
+ * container holds" (the doc's own §26 never authors one, and canon 108
+ * explicitly refuses to call this a cache/plan/message), so inventing one
+ * would be new player-visible prose this task cannot write. Flagged in
+ * this task's report as a `narrative-writer` opportunity if Ryan wants a
+ * proper header there too.
+ */
+export const act5LockerContents: ScriptFn = (world, state) => {
+  const ids = Object.keys(world.objects ?? {}) as ObjectId[];
+  const items = ids
+    .filter((id) => samePlace(objectLocation(world, state, id), { in: ACT5_LOCKER }))
+    .map((id) => world.objects![id]!.name ?? id);
+
+  if (items.length === 0) {
+    const rendered = render(world, state, 'script.act5_locker_contents.empty', VERB_DEFAULTS.search, { name: 'locker', dobj: 'locker' });
+    return { state: rendered.state, events: [{ type: 'line', kind: 'prose', text: rendered.text }] };
+  }
+
+  return {
+    state,
+    events: [
+      { type: 'line', kind: 'system', text: 'IN THE CABINET:' },
+      ...items.map((name): GameEvent => ({ type: 'line', kind: 'system', text: name })),
+    ],
+  };
 };
 
 // `act5_ev_locker` (§2's flags table, §26): watches the four `objectAt`

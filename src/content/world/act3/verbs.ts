@@ -26,7 +26,9 @@ import { V_ACT3_LIGHT } from './ids';
 import {
   V_ACT3_BADGE,
   V_ACT3_CHECK_TIME,
+  V_ACT3_JUMP_TURNSTILE,
   V_ACT3_LOOK_DOWN_SHAFT,
+  V_ACT3_LOOK_DOWN_WELL,
   V_ACT3_TURN_TO_NORMAL,
   V_ACT3_TYPE_PAD,
 } from './ids';
@@ -79,7 +81,17 @@ export const ACT3_VERBS: Record<string, VerbDef> = {
     words: ['plug dad in', 'dock dad', 'put dad in terminal', 'plug in dad', 'connect dad'],
     patterns: ['V'],
     class: 'direct',
-    default: VERB_DEFAULTS.wait,
+    // Stage F sweep — was `VERB_DEFAULTS.wait` (WAIT's own text), reached
+    // whenever the Hub's own room handler (`s6ArchiveHub.ts`, gated `{
+    // flag: act2_dad_booted }`) doesn't fire — including the case this
+    // task's brief names, "no rig in scope" (the player has never booted
+    // Dad, or the rig isn't with them). `nounMiss.unseen` is the existing,
+    // un-templated family ("You look for it. Nothing in the room admits to
+    // being it," etc. — no `{name}` to fill, so it renders as-is rather
+    // than the bare-call auto-redirect a `{name}`-templated family like
+    // `nounMiss.seen` would trigger) that already answers "the thing you
+    // named isn't here" everywhere else in the game.
+    default: { ref: 'nounMiss.unseen' },
   },
   [V_LOOK_DOWN_AISLE]: {
     id: V_LOOK_DOWN_AISLE,
@@ -249,6 +261,28 @@ export const ACT3_VERBS: Record<string, VerbDef> = {
     words: ['look down opening', 'look down shaft'],
     patterns: ['V'],
     class: 'analytical',
+    default: VERB_DEFAULTS.touch,
+  },
+  // Stage F sweep — "LOOK DOWN WELL"/"LOOK INTO WELL," the Archive Hub's
+  // own well (`s6ArchiveHub.ts`'s room-level handler renders the shipped
+  // `ROOT_DOOR_WELL_TEXT`). Same bare fixed-phrase idiom as
+  // `V_ACT3_LOOK_DOWN_SHAFT` above.
+  [V_ACT3_LOOK_DOWN_WELL]: {
+    id: V_ACT3_LOOK_DOWN_WELL,
+    words: ['look down well', 'look into well'],
+    patterns: ['V'],
+    class: 'analytical',
+    default: VERB_DEFAULTS.touch,
+  },
+  // Stage F sweep — "JUMP TURNSTILE" at the Lobby. `JUMP`'s own global
+  // pattern is bare-only (`act1/verbs.ts`), same reasoning as
+  // `V_ACT3_LOOK_DOWN_WELL` above; routes to the turnstile's own shipped
+  // refusal (`lobby.ts`'s room-level handler), unconditionally.
+  [V_ACT3_JUMP_TURNSTILE]: {
+    id: V_ACT3_JUMP_TURNSTILE,
+    words: ['jump turnstile', 'hop turnstile', 'leap turnstile'],
+    patterns: ['V'],
+    class: 'direct',
     default: VERB_DEFAULTS.touch,
   },
 
@@ -455,10 +489,13 @@ export const ACT3_D5_TASK_F_VERBS: Record<string, VerbDef> = {
     class: 'analytical',
     default: VERB_DEFAULTS.touch,
   },
-  // §6.6 — "PUT BADGE BACK"/"HANG BADGE ON HOOK."
+  // §6.6 — "PUT BADGE BACK"/"HANG BADGE ON HOOK." "hang badge" added (Stage
+  // F sweep — bare, without "on hook," was falling to a generic "verb
+  // unrecognized" miss instead of the room's own shipped handler
+  // (`s6MaintenanceBay.ts`'s `V_ACT3_HANG_BADGE` entry).
   [V_ACT3_HANG_BADGE]: {
     id: V_ACT3_HANG_BADGE,
-    words: ['put badge back', 'hang badge on hook'],
+    words: ['put badge back', 'hang badge on hook', 'hang badge'],
     patterns: ['V'],
     class: 'direct',
     default: VERB_DEFAULTS.touch,
@@ -544,7 +581,12 @@ export const ACT3_D5_TASK_G_VERBS: Record<string, VerbDef> = {
     class: 'analytical',
     default: VERB_DEFAULTS.touch,
   },
-  // §23.5 — any other name the player knows.
+  // §23.5 — any other name the player knows. Stage F sweep — plausible
+  // numerals OTHER than I/IV (entry 105: "no other numeral answers") added
+  // here too, so "SEARCH LEDGER FOR III"/"FOR V"/"FOR 0" (and the other
+  // forms below) reach the ledger's own shipped no-result answer
+  // (`LEDGER_OTHER_EFFECTS`) instead of three different generic parser
+  // misses.
   [V_ACT3_LEDGER_OTHER]: {
     id: V_ACT3_LEDGER_OTHER,
     words: [
@@ -556,6 +598,18 @@ export const ACT3_D5_TASK_G_VERBS: Record<string, VerbDef> = {
       'search ledger for eli',
       'search ledger for luke',
       'search ledger for sissy',
+      'search ledger for ii',
+      'search ledger for iii',
+      'search ledger for v',
+      'search ledger for vi',
+      'search ledger for 0',
+      'search ledger for 2',
+      'search ledger for 3',
+      'search ledger for 5',
+      'search ledger for zero',
+      'search ledger for two',
+      'search ledger for three',
+      'search ledger for five',
     ],
     patterns: ['V'],
     class: 'analytical',

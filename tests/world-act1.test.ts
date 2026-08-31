@@ -198,10 +198,20 @@ describe('validate — Act I room 1', () => {
   // The other eight names have no such object to resolve against (none of
   // those NPCs is ever in this room) and so stay bare fixed-phrase verbs,
   // the same idiom the shipped ledger's own identical roster already uses.
-  it('produces exactly the 125 expected verb-noun-collision warnings, no others', () => {
+  // Stage F sweep (this task's own additions, three): `act1_call` gains
+  // "answer" as a word (F2 prose §4/§8.2's "ANSWER PHONE"), colliding with
+  // the censor's/staging area's own "answer" noun (reply objects); the new
+  // bare fixed-phrase verbs `act3_look_down_well` ("well," the root door's
+  // own noun) and `act3_jump_turnstile` ("turnstile," the lobby reader's
+  // own noun) follow the exact same accepted idiom `act3_look_down_shaft`/
+  // `act3_look_down_aisle` already use two rows below. Also present as of
+  // this run (a concurrent Stage F wave, not this task's own — `act5`'s
+  // own `SEARCH INDEX FOR DAD`/`FOR FATHER`, `act5_index_search_other`
+  // gaining "dad"/"father"): 125 + 2 + 3 = 130.
+  it('produces exactly the 130 expected verb-noun-collision warnings, no others', () => {
     const warnings = validate(WORLD).filter((f) => f.severity === 'warning');
     const collisions = warnings.filter((f) => f.code === 'verb-noun-collision');
-    expect(collisions.length).toBe(125);
+    expect(collisions.length).toBe(130);
     expect(collisions.map((f) => f.message).sort()).toEqual(
       [
         'verb "act3_ledger_jules" can be typed bare and its word "jules" is also an object/NPC noun — the single word is ambiguous between a command and a thing',
@@ -220,6 +230,11 @@ describe('validate — Act I room 1', () => {
         'verb "act5_index_search_other" can be typed bare and its word "marlow" is also an object/NPC noun — the single word is ambiguous between a command and a thing',
         'verb "act5_index_search_other" can be typed bare and its word "pearl" is also an object/NPC noun — the single word is ambiguous between a command and a thing',
         'verb "act5_index_search_other" can be typed bare and its word "dot" is also an object/NPC noun — the single word is ambiguous between a command and a thing',
+        'verb "act5_index_search_other" can be typed bare and its word "dad" is also an object/NPC noun — the single word is ambiguous between a command and a thing',
+        'verb "act5_index_search_other" can be typed bare and its word "father" is also an object/NPC noun — the single word is ambiguous between a command and a thing',
+        'verb "act1_call" can be typed bare and its word "answer" is also an object/NPC noun — the single word is ambiguous between a command and a thing',
+        'verb "act3_look_down_well" can be typed bare and its word "well" is also an object/NPC noun — the single word is ambiguous between a command and a thing',
+        'verb "act3_jump_turnstile" can be typed bare and its word "turnstile" is also an object/NPC noun — the single word is ambiguous between a command and a thing',
         "verb \"act1_check_date\" can be typed bare and its word \"date\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act1_eat\" can be typed bare and its word \"order\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act1_eat_pie\" can be typed bare and its word \"pie\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
@@ -418,10 +433,12 @@ describe('validate — Act I room 1', () => {
   // `act1/slice.ts`'s `meta.recursiveEnding` names `act5_recursion`: the
   // `{ end }` effect that satisfies it lives inside a `ScriptFn`
   // (`act5Recursion`), invisible to `validate.ts`'s static declared-effects
-  // walk by that check's own documented design) = 135.
-  it('produces exactly 135 warnings total, no others', () => {
+  // walk by that check's own documented design) = 135. Stage F sweep: +2
+  // (a concurrent act5 wave's own `act5_index_search_other`/"dad"+"father",
+  // above) +3 (this task's own three verb-noun collisions, above) = 140.
+  it('produces exactly 140 warnings total, no others', () => {
     const warnings = validate(WORLD).filter((f) => f.severity === 'warning');
-    expect(warnings.length).toBe(135);
+    expect(warnings.length).toBe(140);
   });
 });
 

@@ -116,6 +116,11 @@ export const ACT5_TASK_V_VERBS: Record<string, VerbDef> = {
       'search index for pearl',
       'search index for dot',
       'search index for eli',
+      // Stage F1 sweep — "SEARCH INDEX FOR DAD"/"FOR FATHER": Dad is never
+      // physically present in the Blank Room either, same reason as the
+      // names above (§23.4's own note).
+      'search index for dad',
+      'search index for father',
     ],
     patterns: ['V'],
     class: 'analytical',
@@ -145,6 +150,15 @@ const WAKE_REFUSED_NO_DEEP_INDEX =
 const WAKE_REFUSED_NO_NOTEBOOK =
   '    OPEN?\n\n    ANCHOR NOT PRESENT\n\nYou go through your pockets, which is not something a screen has ever made you\ndo before, and find a pencil, and a returned envelope, and a claim ticket, and\na great deal of paper that is not the paper.\n\nIt is upstairs, or it is in a truck, or it is on a counter where you put it\ndown. It is not here, and this machine has just told you, in its own two words,\nthat here is where it has to be.';
 
+/**
+ * The ledger field line, verbatim, printed twice in this scene: once as
+ * `WAKE_SCENE`'s own last beat, and once as its own standalone export so
+ * `objects/blankRoom.ts`'s `X SNAPSHOT` (Stage F1 sweep) can render the
+ * identical string before `act5_jules_woken` without duplicating it as a
+ * second literal.
+ */
+export const SNAPSHOT_FIELD_LINE = '    SNAPSHOT ......................... ARCHIVED / ROOT';
+
 const WAKE_SCENE: string[] = [
   '    OPEN?\n\nYou put a hand flat on the bench, which does nothing for anybody, and type it.\n\n    OPENING\n\n    ...\n\n    OPEN',
   'Nothing happens for long enough that you have started to work out what you are\ngoing to do next.\n\nThen, at the bottom of the screen, a cursor.',
@@ -159,11 +173,15 @@ const WAKE_SCENE: string[] = [
   '    i would like to send him something. i cannot post it from in here. if you\n    are going up would you take it\n\n    tell him i said the truck was a stupid truck. he will know why',
   'Underneath the bench, on the side of the machine, a tray you had not looked at\ntwice takes a sheet of paper out of a slot, one line at a time, at the speed a\nthing is written rather than the speed a thing is copied.',
   '    that is everything i have got\n\n    i do not know how long it has been. do not tell me',
-  '    SNAPSHOT ......................... ARCHIVED / ROOT',
+  SNAPSHOT_FIELD_LINE,
   'The cursor goes back to where it started.',
 ];
 
-const WAKE_SECOND =
+/**
+ * §24.4 — the repeat text, also `objects/blankRoom.ts`'s own `X SNAPSHOT`
+ * after `act5_jules_woken` (Stage F1 sweep).
+ */
+export const WAKE_SECOND =
   '    SNAPSHOT ......................... ARCHIVED / ROOT\n\nThat is the field. It was the field before you opened it and it is the field\nnow, and there is nothing about it anywhere that says it has been opened.';
 
 export const act5WakeJules: ScriptFn = (world, state) => {
@@ -332,8 +350,13 @@ export const act5CreateSubjectRespond: ScriptFn = (world, state) => {
 // §31 — `INITIALIZE?` and the hand-off.
 // ---------------------------------------------------------------------------
 
+// Stage F2 sweep — supersedes E3 §31.1 (register 151, main session ruling
+// 2026-08-31: a re-opened form shows the record's placeholders, never the
+// player's draft, so the old clause "with everything you put in it still
+// in it" was a promise the game never kept). Only that clause changed;
+// "Nothing down here is going anywhere" ships verbatim, as commissioned.
 const INITIALIZE_NO =
-  'The form stays where it is with everything you put in it still in it, which is\nmore courtesy than any machine in this county has shown anybody all week.\n\nIt will be there. Nothing down here is going anywhere.';
+  'The form stays where it is, and nothing about it presses you, which is more\ncourtesy than any machine in this county has shown anybody all week.\n\nIt will be there. Nothing down here is going anywhere.';
 
 const INIT_BEAT_1 = '    > YES';
 const INIT_BEAT_2 =

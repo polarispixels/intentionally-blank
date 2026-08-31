@@ -37,10 +37,11 @@ import {
   signRegisterText,
   SIT,
   TAKE,
+  telephoneCallText,
   telephoneText,
   TOUCH,
 } from '../verbs';
-import { V_DRINK, V_POUR, V_RING, V_SIGN, V_TILT, V_TURN_OVER } from '../ids';
+import { V_CALL, V_DRINK, V_POUR, V_RING, V_SIGN, V_TILT, V_TURN_OVER } from '../ids';
 import {
   CLUE_HOUSE_EMPTY,
   CLUE_PAGE_INDENTATION,
@@ -99,7 +100,16 @@ const telephone: ObjectDefSlice = {
   location: { on: FRONT_DESK_COUNTER },
   name: 'telephone',
   nouns: ['telephone', 'phone'],
-  handlers: [{ verbs: [EXAMINE, USE_VERB_ID], effects: [{ say: telephoneText }] }],
+  handlers: [
+    { verbs: [EXAMINE], effects: [{ say: telephoneText }] },
+    // F2 prose §4 (register 151) — a player *reaching* for the phone
+    // (USE PHONE, and CALL/ANSWER/HANG UP whenever "phone"/"telephone"
+    // itself resolves as the dobj), distinct from EXAMINE above. Bare
+    // CALL/HANG UP (no dobj) reach the same text via this room's own
+    // `V_CALL` room-level handler (`frontDesk.ts`) instead — this object's
+    // handlers are only ever consulted once a dobj has resolved here.
+    { verbs: [V_CALL, USE_VERB_ID], effects: [{ say: telephoneCallText }] },
+  ],
 };
 
 const coffeePot: ObjectDefSlice = {

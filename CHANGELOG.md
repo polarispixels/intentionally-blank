@@ -12,6 +12,63 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [1.0.0] - 2026-08-31
+
+**Stage F — polish. The game is done.** Plan:
+`docs/superpowers/specs/2026-09-21-stage-f-plan.md`; prose:
+`2026-09-21-stage-f0-prose.md` and `2026-09-21-stage-f2-prose.md`; canon
+register 148–151; ADR 0013.
+
+### Added
+
+- **M21–M24, the replay fragments** (*The Corner*, *Across A Desk*,
+  *Looking For A Rat*, *An Evening I Did Not Need*): the seeded stratum
+  leaking when the player uses knowledge the investigator never learned —
+  the opening terminal's LOCAL screen before Act II, the Hub login with no
+  credentials clue, the branch hatch before Act IV, root without the
+  ledger. First person, and none of them ever addresses the player
+  (registers 148–149).
+- **Seven QUESTIONS-ledger answers** for threads the fiction settled and
+  the ledger never closed — the notebook, Wall Drug, the shorthand, the
+  boot, the film-vs-terminal archive, the way into the plant (one pooled
+  answer for all five doors), and Nolan off duty, whose row had never once
+  opened in any player's game (register 150).
+- The sheriff's office pamphlet rack and chairs; the front-desk telephone's
+  teaching refusal; Dad's present-case arm when the Custodian is in the
+  room (register 151).
+- `IN THE CABINET:` — the cache locker lists its contents; a `playtester`
+  agent, which ran three sweeps (617 probes) that drove this release.
+
+### Changed
+
+- **Parser: trailing particles** (ADR 0013) — `turn lamp on`, `take fedora
+  off`, `pick X up` and kin now normalize to their declared phrasal forms,
+  game-wide, with a whitelist that provably cannot touch
+  instrument/target commands.
+- **READ never crashes again**: an engine-level fallback routes READ on a
+  text-less object through its EXAMINE chain instead of throwing (five
+  shipped objects were reachable crashes).
+- Bare `OUT` leaves the hab Galley; `FOLLOW LUKE` works by name after he
+  goes; leaving the Staging Area triggers the escort; `CLIMB LADDER`
+  descends the Root Shaft; `CLIMB UP` exists at all.
+- Misses now echo the verb the player typed, not its canonical synonym.
+
+### Fixed
+
+- ~30 sweep findings across all five acts: the county map and hab-terminal
+  READ crashes, the silent `PUSH TURNSTILE`, the badge-hook/keyring
+  collision, Dad's shadowed hearing topic and wrong-room rounds answer,
+  ledger/index searches for unlisted names and numerals, singular
+  `sleeper`, `x well`, the doubled article on the landing's doors, the
+  `INITIALIZE?` no-branch's false promise about the draft (superseded —
+  register 151), and more.
+
+### Known post-1.0 notes
+
+- `CALL <name>` dobj forms and `SISSY, HELLO` npc-address grammar need an
+  engine hook; a validator warning for READ-reachable text-less objects was
+  considered and declined. All logged on the BACKLOG.
+
 ## [0.19.0] - 2026-08-31
 
 **Stage E3 — root.** Act V entire, and the end of the build

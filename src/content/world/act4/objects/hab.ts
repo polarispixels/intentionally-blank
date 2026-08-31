@@ -16,18 +16,21 @@
 //
 // THE AIRLOCK — `act4_airlock_door`'s `OPEN`/`ENTER`/`EXIT`/`USE` (every
 // phrasing that NAMES the door) reaches `act4_leave_hab` (`../scripts.ts`)
-// via ordinary object-handler dispatch. Bare "OUT" (no object named) does
-// NOT reach it — a genuine, confirmed engine gap, not a mis-wiring: `move.
-// ts`'s `traverseDirection` (called from `respond.ts`'s `respondToAction`,
-// BEFORE `performAction` and BEFORE any object/room handler ever runs,
-// whenever a direction verb resolves with no `dobj`) renders the global
-// "no exit that way" family directly and returns, for any room with no
-// `ExitDefSlice` in that direction — and §56.4 explicitly forbids giving
-// the Galley one ("the hab's way out is an object, not an exit"). Flagged
-// in this task's report with the exact call sites; recommend either an
-// engine fix (letting that no-exit branch fall through to room-level
-// `handlers` first, mirroring the fallback `performAction` already gives
-// bare STAND/`V_TYPE_TERMINAL`) or relaxing the doc's own constraint.
+// via ordinary object-handler dispatch. Bare "OUT"/"EXIT"/"LEAVE" (no
+// object named) used not to reach it at all — a genuine, confirmed engine
+// gap, not a mis-wiring: `move.ts`'s `traverseDirection` (called from
+// `respond.ts`'s `respondToAction`, BEFORE `performAction` and BEFORE any
+// object/room handler ever runs, whenever a direction verb resolves with
+// no `dobj`) rendered the global "no exit that way" family directly and
+// returned, for any room with no `ExitDefSlice` in that direction — and
+// §56.4 explicitly forbids giving the Galley one ("the hab's way out is an
+// object, not an exit"). CLOSED, Stage F1: `traverseDirection` now checks
+// the room's own `handlers` for a bare match before falling to that global
+// family (the same rung `performAction` already gives bare STAND/
+// `V_TYPE_TERMINAL`, extended to the one verb shape `respond.ts` never let
+// reach it at all) — see that function's own doc comment. `../hab.ts`'s
+// `galleyHandlers` claims `DIRECTION_VERB_IDS.out` and runs this same
+// `ACT4_LEAVE_HAB_SCRIPT`.
 
 import type { ObjectDefSlice } from '../../../../engine/world';
 import { DIRECTION_VERB_IDS, USE_VERB_ID } from '../../../../engine/move';

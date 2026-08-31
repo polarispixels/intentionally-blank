@@ -18,7 +18,7 @@
 import type { Effect } from '../../../../engine/effects';
 import type { ObjectDefSlice } from '../../../../engine/world';
 import { EXAMINE, HELLO, OPEN, READ, RUB, SIT, TAKE } from '../../act1/verbs';
-import { V_ATTACK, V_DRINK, V_POUR } from '../../act1/ids';
+import { V_ATTACK, V_DRINK, V_FOLLOW, V_POUR } from '../../act1/ids';
 import { ACT3_LOBBY } from '../../act3/ids';
 import {
   ACT4_CLUE_DETAIL_REFUSES,
@@ -27,6 +27,7 @@ import {
   ACT4_CONFERENCE_TABLE,
   ACT4_DETAIL,
   ACT4_JACK_LETTERS,
+  ACT4_LUKE_GONE_MARKER,
   ACT4_LUKES_FOLDER,
   ACT4_REPLY_OFFICE,
   ACT4_STAGING_AREA,
@@ -244,6 +245,44 @@ export const SHOW_TO_DETAIL_TEXT =
 
 export const SHOW_TO_DETAIL_EFFECTS: Effect[] = [{ say: SHOW_TO_DETAIL_TEXT }, { grantClue: ACT4_CLUE_DETAIL_REFUSES }];
 
+// ---------------------------------------------------------------------------
+// E1 addendum §5 — `FOLLOW LUKE`, after §23: he is `'offstage'` by then and
+// the resolver cannot reach him (`resolve.ts`/`interpreter.ts` restrict npc
+// noun resolution to `ScopeView.visible`, i.e. the current room), so this is
+// room-scoped rather than NPC-scoped, per the addendum's own wiring note.
+// Lives here (not `../stagingArea.ts`, the room file) — Stage F1 — so that
+// this file's own `lukeGoneMarker`, below, can reuse it without a circular
+// import back into the room file, which already imports FROM this one
+// (`SHOW_TO_DETAIL_EFFECTS`, above); `../stagingArea.ts` and `act3/lobby.ts`
+// both now import it from here instead (hard rule 5 — one text, owned
+// once, just relocated to break the cycle).
+// ---------------------------------------------------------------------------
+
+export const FOLLOW_LUKE_GONE_TEXT =
+  'He left the way men like him leave, which is out of a door somebody else is\nholding, into a car somebody else is driving.\n\nWhat is in that lot now is tape on the asphalt, a coned lane nobody needs, and\na county man taking the cones up in no particular hurry.';
+
+// ---------------------------------------------------------------------------
+// Stage F1 — `FOLLOW LUKE` by name, once he is genuinely gone. See
+// `ACT4_LUKE_GONE_MARKER`'s own doc comment (`../ids.ts`) for why this is
+// safe: `hidden: true` by default, `reveal`ed only once `act4_luke_gone` is
+// set (`events.ts`, `luke.ts`), so it is never in scope while the real npc
+// still is. No `name`/`description` authored — this is routing scenery,
+// same idiom as `act1/ids.ts`'s `SHERIFF_OFFICE_FRONT` ("no examine prose"):
+// nothing in this task's own brief asks for one, and inventing prose for an
+// object that only exists to carry a noun would be new player-visible text
+// this task is not authorized to write.
+// ---------------------------------------------------------------------------
+
+const lukeGoneMarker: ObjectDefSlice = {
+  location: ACT4_STAGING_AREA,
+  portable: false,
+  hidden: true,
+  proper: true,
+  name: 'Luke',
+  nouns: ['luke'],
+  handlers: [{ verbs: [V_FOLLOW], effects: [{ say: FOLLOW_LUKE_GONE_TEXT }] }],
+};
+
 export const ACT4_L_STAGING_AREA_OBJECTS: Record<string, ObjectDefSlice> = {
   [ACT4_STAGING_WHITEBOARD]: whiteboard,
   [ACT4_CONFERENCE_TABLE]: table,
@@ -253,4 +292,5 @@ export const ACT4_L_STAGING_AREA_OBJECTS: Record<string, ObjectDefSlice> = {
   [ACT4_DETAIL]: detail,
   [ACT4_COFFEE_URN]: urn,
   [ACT4_REPLY_OFFICE]: officeReply,
+  [ACT4_LUKE_GONE_MARKER]: lukeGoneMarker,
 };

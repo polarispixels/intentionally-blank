@@ -476,13 +476,36 @@ function builtinRemove(world: WorldDef, state: GameState, input: ActionInput, ve
   return succeed(world, state, input, verbDef, [{ move: [id, 'inventory'] }], 'remove.success');
 }
 
-/** READ has no refusal family: every object is expected to declare `text` or `description` (§2.5); a missing pair is a content bug, thrown like other data-integrity reads in this codebase. */
+/**
+ * The verb id EXAMINE is declared under in content — same reserved-id
+ * convention as `BUILTIN_VERB_IDS` (and the same literal as `respond.ts`'s
+ * `EXAMINE_VERB_ID`, redeclared here because `respond.ts` imports this
+ * module — importing back would be a cycle). `builtinRead` falls back to it.
+ */
+const EXAMINE_FALLBACK_VERB_ID = V('examine');
+
+/**
+ * READ renders the object's `text`, else its `description` (§2.5). An
+ * object with NEITHER used to throw a raw error into the transcript (Stage
+ * F sweep: five shipped objects across three acts). Now it degrades the
+ * way a player would expect: reading a thing you can only look at reads as
+ * looking at it — the object's own EXAMINE handler chain if one matches,
+ * else EXAMINE's generic `{name}`-templated default family (exactly where
+ * EXAMINE itself lands on a description-less object), else — for a world
+ * that declares no EXAMINE verb at all (engine fixtures) — READ's own
+ * `default` family via the ordinary rung-2b fallback. Never a throw.
+ */
 function builtinRead(world: WorldDef, state: GameState, input: ActionInput, verbDef: VerbDef | undefined): ActionResult {
   const id = input.dobj!;
   const def = world.objects?.[id];
   const prose = def?.text ?? def?.description;
   if (prose === undefined) {
-    throw new Error(`actions: READ target "${id}" has neither "text" nor "description" to fall back to`);
+    const asExamine: ActionInput = { ...input, verb: EXAMINE_FALLBACK_VERB_ID };
+    const examineDef = world.verbs?.[EXAMINE_FALLBACK_VERB_ID];
+    const handler = findHandler(world, state, asExamine);
+    if (handler !== undefined) return applyHandler(world, state, asExamine, handler, examineDef ?? verbDef);
+    if (examineDef?.default != null) return fallbackToVerbDefault(world, state, asExamine, examineDef);
+    return fallbackToVerbDefault(world, state, input, verbDef);
   }
   const ctx = contextFor(world, input);
   const rendered = render(world, state, ctx.path!, prose, ctx);

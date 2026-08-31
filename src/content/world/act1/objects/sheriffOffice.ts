@@ -8,7 +8,7 @@ import type { Effect } from '../../../../engine/effects';
 import type { ObjectDefSlice } from '../../../../engine/world';
 import type { ProseRule } from '../../../../engine/prose';
 import { DIRECTION_VERB_IDS, USE_VERB_ID } from '../../../../engine/move';
-import { EXAMINE, LOOK_BEHIND, measureMapText, OPEN, PUT_IN, READ, SEARCH, TAKE, TOUCH, TURN } from '../verbs';
+import { EXAMINE, LOOK_BEHIND, measureMapText, OPEN, PUT_IN, READ, SEARCH, SIT, TAKE, TOUCH, TURN } from '../verbs';
 import {
   CLUE_MAP_ADDITION,
   COUNTY_MAP,
@@ -17,7 +17,9 @@ import {
   RECORDS_TERMINAL_SCREEN,
   SHERIFF_CELL,
   SHERIFF_OFFICE,
+  SHERIFF_OFFICE_CHAIRS,
   SHERIFF_OFFICE_NO_EXIT_GATE,
+  SHERIFF_OFFICE_PAMPHLET_RACK,
   V_DRINK,
   V_MEASURE,
   V_RIGHT,
@@ -43,6 +45,14 @@ const countyMap: ObjectDefSlice = {
   nouns: ['map', 'county map', 'wall map', 'chart', 'glass', 'scale', 'scale bar', 'sections', 'badlands', 'river', 'highway'],
   handlers: [
     { verbs: [EXAMINE], effects: [{ say: mapExamine }, { grantClue: CLUE_MAP_ADDITION }] },
+    // Sweep fix (Stage F wave A, item 4) — `READ MAP` was crashing
+    // (`[error] READ target "act1_county_map"`, no handler for the
+    // built-in READ verb). Routes to the shipped EXAMINE text — the same
+    // "READ falls back to EXAMINE for a thing that isn't text" idiom this
+    // file already uses on `whitlockDeskForm` (EXAMINE and READ sharing one
+    // handler below) — rather than inventing new prose for a map nobody has
+    // asked to read differently from looking at it.
+    { verbs: [READ], effects: [{ say: mapExamine }, { grantClue: CLUE_MAP_ADDITION }] },
     { verbs: [V_MEASURE], effects: [{ say: measureMapText }] },
     { verbs: [TAKE, V_RIGHT, LOOK_BEHIND], effects: [{ say: mapTakeText }] },
   ],
@@ -283,6 +293,69 @@ const sheriffCell: ObjectDefSlice = {
   ],
 };
 
+// ---------------------------------------------------------------------------
+// F2 prose §1–§3, §8.2, §8.3 — the public-side pamphlet rack and chairs, the
+// room's own first-sight prose has named since wave 2 with nothing behind
+// either noun (register 151: ships as authored). Two objects, per the
+// prose doc's own proposal — the rack is a thing you look at, the pamphlet
+// inside it a thing you open, so `EXAMINE`/`READ` stay two different texts
+// on the same object rather than one collapsed response.
+// ---------------------------------------------------------------------------
+
+// §1 — `EXAMINE RACK` / `EXAMINE PAMPHLETS`.
+const pamphletRackExamine =
+  'A wire rack of the kind that spins. This one does not: somebody has put a\nscrew through the base of it into the shelf, so that it faces the counter and\ngoes on facing it.\n\nCounty stock, the same buff paper as the forms on her desk, the pockets\nlabelled with tape and a marker in a hand that stopped bothering partway\nalong. Burn permits, which are nearly out. Livestock at large. What a well\ndoes after a wet spring. The edges that face the window have gone the colour\nof weak tea.\n\nThe pocket on the end says MISSING PERSONS, and the copy on top of that stack\nis exactly as yellow as the ones underneath it.';
+
+// §2 — `READ PAMPHLETS` / `READ PAMPHLET` / `READ RACK` (a player who types
+// the container means the contents, §8.2). Its own text, not shared with
+// EXAMINE.
+const pamphletRead =
+  'The one from the end pocket comes out stiff, the way paper does when it has\nsat in one position since it was printed.\n\n    WHEN SOMEBODY IS MISSING\n    WHAT THE COUNTY WILL NEED FROM YOU\n\nIt opens out flat into the plain patient type the county uses on anything it\nexpects to be read by somebody who is not at their best.\n\n    Before you telephone, have ready:\n\n        Full name\n        Date of birth\n        Last known address\n        A recent photograph\n\nThen a box for the name of the person making the report, and under the box, in\nthe same type, the sentence that a report cannot be opened without one.\n\nYou fold it back along its own creases and it does not want to go.';
+
+// §8.2 — `TAKE PAMPHLET`, drafted and commissioned alongside §1/§2. A flavor
+// response only (no inventory effect) — same idiom as this room's own
+// `mapTakeText`/`coffeeText`: a text-only TAKE for a thing the game does not
+// want to become a carried object.
+const pamphletTakeText = 'You take one. Nobody stops you; that is what the rack is for.';
+
+const pamphletRack: ObjectDefSlice = {
+  location: SHERIFF_OFFICE,
+  name: 'pamphlet rack',
+  portable: false,
+  nouns: ['rack', 'pamphlets', 'pamphlet', 'leaflets', 'leaflet', 'literature', 'brochure', 'brochures', 'stand', 'pocket', 'pockets', 'notices'],
+  handlers: [
+    { verbs: [EXAMINE], effects: [{ say: pamphletRackExamine }] },
+    { verbs: [READ], effects: [{ say: pamphletRead }] },
+    { verbs: [TAKE], effects: [{ say: pamphletTakeText }] },
+  ],
+};
+
+// §3 — `EXAMINE CHAIRS`. Collision accepted as recommended (§8.3): the
+// bare noun "chair" also answers for Whitlock's own desk chair, which has
+// no object of its own (only the Act II empty-office prose mentions it) —
+// §3's text reads fine either way, so the room's own gate is not touched.
+const chairsExamine =
+  'Steel frames and moulded seats in a brown chosen so that nothing would ever\nshow on it, all of them facing the counter and none of them facing each other.\nSomebody has folded a piece of card under one foot; the tile beside that foot\nis worn pale in a half circle, because a chair that rocks gets rocked.\n\nThe blind is an inch short of the sill above them, and the cold comes off the\nglass and down the backs of the seats. The one nearest the door has been sat\nin until the finish went off it. The others have not.';
+
+// §8.2 — `SIT` / `SIT ON CHAIRS`, drafted alongside §3. Must not reuse the
+// lobby's own SIT text (`frontDesk`'s ten-or-eleven chairs) — this is a
+// distinct string. Exported so `sheriffOffice.ts`'s own room-level handler
+// can render the identical text for bare `SIT` (no dobj — SIT's own
+// `patterns` is `'V dobj'`-only game-wide, same gap `cellSleepText` already
+// documents for bare SLEEP in this same room).
+export const chairsSitText = 'You sit where everybody sits. From down here the counter is exactly the right height to be on the wrong side of.';
+
+const sheriffOfficeChairs: ObjectDefSlice = {
+  location: SHERIFF_OFFICE,
+  name: 'chairs',
+  portable: false,
+  nouns: ['chairs', 'chair', 'seats', 'seat', 'row', 'bench'],
+  handlers: [
+    { verbs: [EXAMINE], effects: [{ say: chairsExamine }] },
+    { verbs: [SIT], effects: [{ say: chairsSitText }] },
+  ],
+};
+
 // §12.5's always-closed "every other direction" gate — mirrors `MAIN_STREET_BOUNDARY_GATE`.
 const sheriffOfficeNoExitGate: ObjectDefSlice = { location: SHERIFF_OFFICE };
 
@@ -294,6 +367,8 @@ export const SHERIFF_OFFICE_OBJECTS: Record<string, ObjectDefSlice> = {
   [WHITLOCK_DESK]: whitlockDesk,
   [WHITLOCK_DESK_FORM]: whitlockDeskForm,
   [SHERIFF_CELL]: sheriffCell,
+  [SHERIFF_OFFICE_PAMPHLET_RACK]: pamphletRack,
+  [SHERIFF_OFFICE_CHAIRS]: sheriffOfficeChairs,
   [SHERIFF_OFFICE_NO_EXIT_GATE]: sheriffOfficeNoExitGate,
 } satisfies Record<string, ObjectDefSlice>;
 

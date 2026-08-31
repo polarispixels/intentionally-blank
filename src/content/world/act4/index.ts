@@ -28,8 +28,14 @@ import { ACT4_EV_DAD_BREATH_EVENT } from '../act2/dad';
 // E1 task M — Luke, the escort, R16, and the boundary (§11, §12, §20-§23,
 // §29, §37, §38).
 import { ACT4_E1_TASK_M_CLUES, ACT4_E1_TASK_M_FLAGS } from './knowledge';
-import { ACT4_LUKE, ACT4_LUKE_DESCENDS_SCRIPT, ACT4_S5_DOWN_GATE, EVENT_ACT4_LUKE_GONE_MISSED } from './ids';
-import { act4LukeDescends, luke } from './luke';
+import {
+  ACT4_LUKE,
+  ACT4_LUKE_DESCENDS_SCRIPT,
+  ACT4_S5_DOWN_GATE,
+  EVENT_ACT4_EV_LUKE_ESCORT_LEAVES,
+  EVENT_ACT4_LUKE_GONE_MISSED,
+} from './ids';
+import { ACT4_EV_LUKE_ESCORT_LEAVES_EVENT, act4LukeDescends, luke } from './luke';
 import { ACT4_EV_LUKE_GONE_MISSED_EVENT } from './events';
 import { act4S5DownGate } from '../act3/objects/s5ReactorInterface';
 // E1 task N — R14's completion: Jack comes down (§24-§27, §33, §37).
@@ -156,6 +162,7 @@ export const ACT4_SLICE: WorldSlice = {
     [EVENT_ACT4_EV_CREWS_VISIBLE]: ACT4_EV_CREWS_VISIBLE_EVENT,
     [ACT4_EV_DAD_BREATH]: ACT4_EV_DAD_BREATH_EVENT,
     [EVENT_ACT4_LUKE_GONE_MISSED]: ACT4_EV_LUKE_GONE_MISSED_EVENT,
+    [EVENT_ACT4_EV_LUKE_ESCORT_LEAVES]: ACT4_EV_LUKE_ESCORT_LEAVES_EVENT,
     [EVENT_ACT4_EV_JACK_SEES]: ACT4_EV_JACK_SEES_EVENT,
     [EVENT_ACT4_EV_JACK_RETURNS]: ACT4_EV_JACK_RETURNS_EVENT,
     [EVENT_ACT4_EV_JACK_MORNING_SCENE]: ACT4_EV_JACK_MORNING_SCENE_EVENT,

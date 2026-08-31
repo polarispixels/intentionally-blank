@@ -441,7 +441,11 @@ const ROOT_DOOR_FORCE_TEXT =
 const ROOT_DOOR_LISTEN_TEXT =
   'Warm. Not hot — warm, on the face, at the height of your cheek, which is not\nwhat a door does.\n\nUnder the warmth, past it, a long way past it, water going through something at\na steady rate, and it is the only thing there is to hear, and it is the sound\nyou went to sleep to the first night you spent in this county with the window\nopen.';
 
-const ROOT_DOOR_WELL_TEXT =
+// Exported (Stage F sweep) so the room's own bare "LOOK DOWN WELL"
+// (`s6ArchiveHub.ts`'s room file — a bare fixed-phrase verb can only ever
+// reach a ROOM's own handlers, this file's own header) renders the
+// identical, already-shipped text rather than a new string.
+export const ROOT_DOOR_WELL_TEXT =
   'A drain in the bottom of a well at the foot of a door, in a room five floors\nunder the ground, in a building that has never once been flooded and does not\nsit on anything that could flood it.\n\nThe tiling in the well is newer than the tiling in the bay, and it is the same\ntile.';
 
 // E3 task W — §34's own note: this is the well's `down` exit `blockedText`

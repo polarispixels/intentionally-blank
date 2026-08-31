@@ -322,6 +322,34 @@ describe('the locker — §26', () => {
     const { events } = say(session, 'close locker', store);
     expect(text(events)).toMatch(/does not catch/);
   });
+
+  // Stage F1 — with items cached, SEARCH/LOOK IN LOCKER used to render the
+  // generic search family ("produces nothing"), which is simply wrong once
+  // the cache holds something (canon 91/108 — §26.7's own note: the locker
+  // is "LOOK IN-able", everything in it re-findable). The new handler lists
+  // current contents by display name, INVENTORY-idiom chrome (no new
+  // sentence — see this task's report on why there is no header line).
+  it('SEARCH LOCKER, with the notebook cached, lists it by name', () => {
+    const session = atBlankRoom({ objects: { [ACT2_NOTEBOOK]: { location: { in: ACT5_LOCKER } } } });
+    const store = new MemoryStore();
+    const { events } = say(session, 'search locker', store);
+    expect(text(events)).toMatch(/notebook/);
+    expect(text(events)).not.toMatch(/produces nothing/);
+  });
+
+  it('LOOK IN LOCKER — the same phrasing (SEARCH\'s own synonym), same listing', () => {
+    const session = atBlankRoom({ objects: { [ACT2_NOTEBOOK]: { location: { in: ACT5_LOCKER } } } });
+    const store = new MemoryStore();
+    const { events } = say(session, 'look in locker', store);
+    expect(text(events)).toMatch(/notebook/);
+  });
+
+  it('SEARCH LOCKER, empty, still gives the shipped generic (unchanged)', () => {
+    const session = atBlankRoom();
+    const store = new MemoryStore();
+    const { events } = say(session, 'search locker', store);
+    expect(text(events)).toMatch(/produces nothing|carefully|twice, the second time slower/);
+  });
 });
 
 describe('the way back — §27', () => {
@@ -401,7 +429,7 @@ describe('INITIALIZE? — §31 and the hand-off', () => {
     const session = atBlankRoom();
     const store = new MemoryStore();
     const result = respondToPrompt(TEST_WORLD, session, ACT5_INITIALIZE_RESPOND_SCRIPT, { answer: 'no' }, opts(store));
-    expect(text(result.events)).toMatch(/more courtesy than any machine/);
+    expect(text(result.events)).toMatch(/courtesy than any machine/);
     expect(result.session.state.flags[ACT5_INITIALIZED]).not.toBe(true);
     expect(result.handedOff).not.toBe(true);
   });

@@ -49,8 +49,14 @@ export type GrammarResult =
   | { kind: 'matched'; action: UnresolvedAction }
   /** No token sequence at the start of input matches any known verb surface form. */
   | { kind: 'noVerb' }
-  /** A verb was recognized, but the remaining tokens fit none of its declared patterns. */
-  | { kind: 'noPattern'; verb: VerbId };
+  /**
+   * A verb was recognized, but the remaining tokens fit none of its declared
+   * patterns. `word` is the surface form that actually matched the input
+   * (`CompiledVerb.words` joined — "sweep", not the verb's canonical
+   * "feel around"), so the `bareVerb` family downstream can echo what the
+   * player typed instead of a synonym they never used (Stage F sweep).
+   */
+  | { kind: 'noPattern'; verb: VerbId; word: string };
 
 /** Literal separator for the `V npc about topic` pattern (spec §2.9) — not a `VerbDef.preps` entry; "about" is the pattern's own grammar, the same way "V dobj prep iobj" bakes in the two-slot shape. */
 const ABOUT = 'about';
@@ -139,6 +145,47 @@ function patternsBySpecificity(patterns: readonly VerbPattern[]): VerbPattern[] 
 }
 
 /**
+ * The closed set of English phrasal-verb particles the trailing-particle
+ * rewrite (see `matchGrammar`) will move: "turn lamp ON" → "turn on lamp".
+ * Deliberately EXCLUDES every word that serves as a `V dobj prep iobj`
+ * preposition or a pattern separator in shipped content — `with`, `to`,
+ * `at`, `for`, `about`, `from`, `into`, `through`, `past` — so the rewrite
+ * can never eat the prep of a genuine two-slot parse ("unlock hatch with
+ * keyring", "give hat to marlow") or the separator of `V npc about topic`
+ * ("ask marlow for"). A particle here still only ever fires when the verb's
+ * OWN word table declares the exact two-word form ("turn on", "take off",
+ * "pick up") — the set gates which second words may be treated as movable,
+ * content gates which verbs actually move them.
+ */
+const PHRASAL_PARTICLES: ReadonlySet<string> = new Set(['on', 'off', 'up', 'down', 'over', 'out', 'in', 'together']);
+
+/** True when some declared verb surface form is exactly `words`. */
+function hasExactForm(vocab: CompiledVocabulary, words: string[]): boolean {
+  return vocab.verbForms.some((f) => f.words.length === words.length && f.words.every((w, i) => words[i] === w));
+}
+
+/**
+ * "V dobj P" → "V P dobj" (Stage F sweep): when the input starts with a
+ * verb word, ends with a phrasal particle, and the verb's own table
+ * declares the two-word form `[first, particle]` ("turn on", "take off",
+ * "pick up", "put down", "turn over", "put together"), return the tokens
+ * rewritten to the declared prefix order so ordinary longest-match handles
+ * it. `undefined` = not this shape; caller matches the original tokens.
+ *
+ * Guard: never rewrites input that IS a declared surface form verbatim
+ * ("walk it off", act3's V_PACE) — an exact form always means itself.
+ */
+function phrasalRewrite(vocab: CompiledVocabulary, tokens: string[]): string[] | undefined {
+  if (tokens.length < 3) return undefined;
+  const first = tokens[0]!;
+  const last = tokens[tokens.length - 1]!;
+  if (!PHRASAL_PARTICLES.has(last)) return undefined;
+  if (!hasExactForm(vocab, [first, last])) return undefined;
+  if (hasExactForm(vocab, tokens)) return undefined;
+  return [first, last, ...tokens.slice(1, -1)];
+}
+
+/**
  * Matches tokenized input against the compiled vocabulary's verbs and their
  * declared patterns (spec §3.2). Word length is tried longest-first — "turn
  * on lamp" tries `['turn','on']` before `['turn']`, so it never leaves a
@@ -153,8 +200,28 @@ function patternsBySpecificity(patterns: readonly VerbPattern[]): VerbPattern[] 
  * there. Only if every same-length candidate's patterns fail to fit does
  * this report `noPattern`, naming the first candidate (table order) as the
  * recognized verb for diagnostics.
+ *
+ * TRAILING PARTICLES (Stage F): "turn lamp on" is the same command as
+ * "turn on lamp" — a phrasal verb's particle floats to the far side of the
+ * object in ordinary English. `phrasalRewrite` (above) normalizes that
+ * word order to the declared two-word prefix form BEFORE ordinary matching
+ * — before, because the one-word verb would otherwise "succeed" at
+ * grammar level with the particle swallowed into the noun phrase (`turn
+ * lamp on` parsing as TURN with head noun "on"), a miss only surfacing at
+ * resolution. A rewrite that matches nothing falls back to the original
+ * tokens untouched, so no input that parses today can stop parsing.
  */
 export function matchGrammar(vocab: CompiledVocabulary, tokens: string[], raw: string): GrammarResult {
+  const rewritten = phrasalRewrite(vocab, tokens);
+  if (rewritten !== undefined) {
+    const viaParticle = matchTokens(vocab, rewritten, raw);
+    if (viaParticle.kind === 'matched') return viaParticle;
+  }
+  return matchTokens(vocab, tokens, raw);
+}
+
+/** One ordinary longest-match pass over `tokens` — `matchGrammar` without the trailing-particle rewrite. */
+function matchTokens(vocab: CompiledVocabulary, tokens: string[], raw: string): GrammarResult {
   let i = 0;
   while (i < vocab.verbForms.length) {
     const wordLen = vocab.verbForms[i]!.words.length;
@@ -169,7 +236,7 @@ export function matchGrammar(vocab: CompiledVocabulary, tokens: string[], raw: s
           if (action !== undefined) return { kind: 'matched', action };
         }
       }
-      return { kind: 'noPattern', verb: candidates[0]!.id };
+      return { kind: 'noPattern', verb: candidates[0]!.id, word: candidates[0]!.words.join(' ') };
     }
 
     // Advance past this whole word-length group (whether or not any of its

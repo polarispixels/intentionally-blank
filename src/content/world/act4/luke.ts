@@ -25,9 +25,10 @@
 // leading him anywhere afterward — including down through the Cooling
 // Plant's hatch to Sublevel 6, this game's only OTHER route there — brings
 // him along), then `goto` S5. The third trigger the section names —
-// "leaving the room with `act4_luke_will_escort`" — needs an `onExit`-style
-// hook on the Staging Area itself (task L's room); out of this module,
-// flagged in this task's report rather than guessed at.
+// "leaving the room with `act4_luke_will_escort`" — is CLOSED, Stage F1:
+// `ACT4_EV_LUKE_ESCORT_LEAVES_EVENT`, below (an ambient `EventDef`, not a
+// room-level hook — see that event's own doc comment for why, and for the
+// one known limitation it leaves flagged rather than hidden).
 //
 // R16 (§22/§23) — wired two ways, both idempotent on `act4_luke_at_root`:
 // the room's own `onEnter` (`act3/s6ArchiveHub.ts`, this task's own
@@ -48,13 +49,22 @@
 
 import type { Effect } from '../../../engine/effects';
 import { apply } from '../../../engine/effects';
-import type { NpcDefSlice, ScriptFn, ShowResponseDef, TopicDef } from '../../../engine/world';
+import type { EventDef, NpcDefSlice, ScriptFn, ShowResponseDef, TopicDef } from '../../../engine/world';
 import type { ProseRule } from '../../../engine/prose';
 import { T } from '../../../engine/ids';
 import { ACT2_NOTEBOOK, ACT2_RETURNED_LETTER } from '../act2/ids';
 import { FEDORA, INTACT_POLAROIDS, V_ATTACK, V_FOLLOW, V_HUG, V_KISS } from '../act1/ids';
 import { ACT3_CLUE_S6_DOOR_REFUSES, ACT3_S5_REACTOR_INTERFACE, ACT3_S6_ARCHIVE_HUB } from '../act3/ids';
-import { ACT4_LUKE, ACT4_LUKE_AT_ROOT, ACT4_LUKE_DESCENDS_SCRIPT, ACT4_LUKE_GONE, ACT4_LUKE_WILL_ESCORT, ACT4_VISIT_DAY } from './ids';
+import {
+  ACT4_LUKE,
+  ACT4_LUKE_AT_ROOT,
+  ACT4_LUKE_DESCENDS_SCRIPT,
+  ACT4_LUKE_GONE,
+  ACT4_LUKE_GONE_MARKER,
+  ACT4_LUKE_WILL_ESCORT,
+  ACT4_VISIT_DAY,
+  EVENT_ACT4_EV_LUKE_ESCORT_LEAVES,
+} from './ids';
 import { ACT4_CLUE_LUKES_REASON, ACT4_CLUE_LUKES_WORD, ACT4_CLUE_NOT_THE_USER, ACT4_CLUE_TWO_THING_DOOR } from './ids';
 import { ACT4_Q_WHO_OUTRANKS_IT } from './ids';
 // `ACT4_STAGING_AREA` — task L's room id. Imported here for Luke's own
@@ -333,6 +343,49 @@ export const act4LukeDescends: ScriptFn = (world, state) => {
 };
 
 // ---------------------------------------------------------------------------
+// Stage F1 — §20's own third trigger: "leaving the room with
+// `act4_luke_will_escort`" (this file's own header, top of file, previously
+// flagged as needing "an `onExit`-style hook... out of this module"). Wired
+// as an ambient `EventDef` rather than a room-level handler: the Staging
+// Area's `e`/`out` exits already exist unconditionally (`stagingArea.ts`),
+// so `traverseDirection` finds them and never falls to the room-handler
+// rung the hab Galley's exit-LESS bare OUT now uses (`move.ts`'s own
+// header) — an exit that already exists can't be overridden from content
+// alone without a broader engine change, out of this task's scope (see this
+// task's report).
+//
+// GUARD against double-firing alongside the ASK/FOLLOW triggers, which run
+// this exact scene synchronously inside `respond()` and so relocate Luke
+// (and the player) before this event's own tick even runs: `npcAt: [luke,
+// staging]` reads his CURRENT derived position (`cond.ts`'s `npcRoom`,
+// following > pin > schedule) — once either trigger sets `following: true`,
+// his derived position becomes wherever the player is, which is never
+// `act4_staging_area` again once they have left, so this cond goes false
+// and the event never re-fires. Before either trigger, with nobody moving
+// him, he is still there on schedule/pin while the player has already
+// walked out — exactly the "he did not come with you" case this closes.
+//
+// KNOWN LIMITATION (flagged, not hidden): `tick()` runs strictly after
+// `turn.ts`'s one arrival-render checkpoint (that file's own header), so
+// this event's own `goto` (inside `act4LukeDescends`) never gets an
+// immediate arrival render the way the ASK/FOLLOW triggers do — S5's own
+// Luke-present "arriving" paragraph (`act3/s5ReactorInterface.ts`) shows on
+// the player's next fresh look at the room, not this same turn. Nothing is
+// lost (that rule is `npcAt`-gated, not visited-gated) or broken; it is
+// simply not atomic with the other two triggers the way this task's report
+// discusses. A fully atomic version would need `respond()`'s own direction
+// dispatch to let a room handler override an already-existing exit — an
+// engine change this task did not make.
+// ---------------------------------------------------------------------------
+
+export const ACT4_EV_LUKE_ESCORT_LEAVES_EVENT: EventDef = {
+  id: EVENT_ACT4_EV_LUKE_ESCORT_LEAVES,
+  when: { all: [{ flag: ACT4_LUKE_WILL_ESCORT }, { not: { at: ACT4_STAGING_AREA } }, { npcAt: [ACT4_LUKE, ACT4_STAGING_AREA] }] },
+  once: true,
+  effects: [{ say: doorEscortText }, { script: { id: ACT4_LUKE_DESCENDS_SCRIPT } }],
+};
+
+// ---------------------------------------------------------------------------
 // §22/§23 — the reader at the bottom of the well (R16), then he goes up, in
 // the same script. Exported: wired from two places, both idempotent on
 // `act4_luke_at_root` — the Hub's own `onEnter` (`act3/s6ArchiveHub.ts`,
@@ -352,6 +405,10 @@ export const ACT4_LUKE_AT_ROOT_EFFECTS: Effect[] = [
   { setFollowing: [ACT4_LUKE, false] },
   { moveNpc: [ACT4_LUKE, 'offstage'] },
   { set: [ACT4_LUKE_GONE, true] },
+  // Stage F1 — the other place `act4_luke_gone` gets set (`events.ts`'s
+  // missed-window event is the first); see `ACT4_LUKE_GONE_MARKER`'s own
+  // doc comment (`ids.ts`) for why this stays safely hidden until now.
+  { reveal: ACT4_LUKE_GONE_MARKER },
 ];
 
 // §23's alternate arm — the visit ends without the player ever bringing him

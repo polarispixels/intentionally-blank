@@ -220,7 +220,11 @@ const ACT2_CENSOR_QUESTIONS: NonNullable<WorldSlice['questions']> = {
   [ACT2_Q_FILM_VS_DATABASE]: {
     text: "The library still keeps its own record of the plant's construction on film, while the county's own terminal insists there is nothing before 2036. Which one is the real archive?",
     openWhen: { clue: ACT2_CLUE_SERVICE_TUNNEL },
-    // No answerWhen in this build — Stage E, same ruling as ACT2_Q_HOW_WAS_IT_HERE.
+    // F0 (register 150) — the same clue opens and settles it: the row may
+    // arrive already closed, and that is accepted ("a question the player
+    // answers in the act of asking it is the library").
+    answerWhen: { clue: ACT2_CLUE_SERVICE_TUNNEL },
+    answer: 'The film, and it is not close.\n\nThe terminal has nothing before 2036 and no account of why. The drawer marked\n2028-2031 has a first sod turned in a cold wind, eleven people in coats, a\nsenator standing slightly apart with his hands behind his back, and a\nphotograph of the dedication plaque shot square on before it went up, every\nletter legible: THE BADLANDS FACILITY, COMMISSIONED 2030. And in the following\nwinter, a column about the works closing down mentions in passing that the\nconstruction adit is to be sealed rather than demolished.\n\nOne of those records can be reached from somewhere else. The other one is a tin\nof acetate in an unlocked drawer, in a room with nobody in it.',
   },
 };
 

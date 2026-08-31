@@ -59,10 +59,26 @@ import {
   ACT2_TELL_NOLAN,
   ACT2_TELL_WHITLOCK,
 } from './ids';
+import { ACT3_INSIDE, ACT3_PERIMETER_ROAD } from '../act3/ids';
 
 export const ACT2_D2C_QUESTIONS: NonNullable<WorldSlice['questions']> = {
-  [ACT2_Q_NOLAN_OFF_DUTY]: { text: 'Off duty, at a card table, is Nolan just a neighbor — or is there a way to learn what he would never say on the clock?' },
-  [ACT2_Q_INSIDE_THE_PLANT]: { text: 'Every route into that plant runs through a badge, a truck, or a lie. Which one actually gets you inside?' },
+  [ACT2_Q_NOLAN_OFF_DUTY]: {
+    text: 'Off duty, at a card table, is Nolan just a neighbor — or is there a way to learn what he would never say on the clock?',
+    // F0 §14 / register 150 — this row had no openWhen and had never once
+    // appeared in any player's ledger; P15's ladder was hanging on it.
+    openWhen: { met: ACT2_NOLAN },
+    answerWhen: { any: [{ flag: ACT2_BADGE_WON }, { flag: ACT2_HEARD_GATE_TALK }] },
+    answer: 'Both, and the second is easier than it looks.\n\nOn a Friday, under the low light, with the chairs down off the tables, he stops\ndealing between two hands and talks about his week: a convoy that clears the\napron of everybody including him, and a building he has run for eleven years\nand has never once been inside during the hours that belong to maintenance.\n\nHe is not being indiscreet. He is a man off duty, telling a card table about\nhis job. And if you ask him before you stand up, he will hand his badge across\nthe felt, because he does not mind where it says he has been.',
+  },
+  [ACT2_Q_INSIDE_THE_PLANT]: {
+    text: 'Every route into that plant runs through a badge, a truck, or a lie. Which one actually gets you inside?',
+    // F0 §13 / register 150 — one pooled, route-agnostic answer for all five
+    // doors; act3_inside also catches the service-tunnel route the two
+    // answerQuestion effects never covered.
+    openWhen: { visited: ACT3_PERIMETER_ROAD },
+    answerWhen: { flag: ACT3_INSIDE },
+    answer: 'Any of them, which is not the answer I went out there expecting. The gate is\nthe only part of that plant that behaves like a gate.\n\nWhatever I came through — a badge that told the county the man who runs the\nplace had arrived for work, a turnstile that turns for anybody standing close\nenough behind a man who holds doors, a vendor number in a box on a clipboard, a\nfence, or a mile of dark under the grazing land — nothing on the far side of it\nmoved, or sounded, or asked me anything at all.\n\nIt is not built to keep a man out. It is built for people who belong there, and\nit has no way whatever of telling the difference.',
+  },
 };
 
 // ---------------------------------------------------------------------------

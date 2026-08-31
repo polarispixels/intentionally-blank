@@ -35,6 +35,7 @@ import {
   V_ACT3_LEDGER_OTHER,
   V_ACT3_LEDGER_PRINT,
   V_ACT3_LEDGER_SELF,
+  V_ACT3_LOOK_DOWN_WELL,
   V_ACT3_QUEUE_EDIT,
   V_ACT3_QUEUE_SEARCH_JULES,
   V_ACT3_TO_BAY,
@@ -51,6 +52,7 @@ import {
   QUEUE_EDIT_REFUSED_TEXT,
   QUEUE_SEARCH_JULES_TEXT,
   ROOT_DOOR_DOWN_TEXT,
+  ROOT_DOOR_WELL_TEXT,
   TERMINAL_ALREADY_LOGGED_IN_TEXT,
 } from './objects/s6ArchiveHub';
 // E3 task W (§16, §34, §42.1, §42.4) — the boundary's deletion: the well's
@@ -249,6 +251,10 @@ export const s6ArchiveHubRoom: RoomDefSlice = {
     { verbs: [SMELL], effects: [{ say: HUB_SMELL_TEXT }] },
     { verbs: [WAIT], effects: [{ say: HUB_WAIT_TEXT }] },
     { verbs: [YELL, HELLO], effects: [{ say: HUB_SHOUT_TEXT }] },
+    // Stage F sweep — bare "LOOK DOWN WELL"/"LOOK INTO WELL," rendering the
+    // root door's own shipped well text (the same string SEARCH/LOOK UNDER
+    // already render on that object, `objects/s6ArchiveHub.ts`).
+    { verbs: [V_ACT3_LOOK_DOWN_WELL], effects: [{ say: ROOT_DOOR_WELL_TEXT }] },
   ],
 };
 

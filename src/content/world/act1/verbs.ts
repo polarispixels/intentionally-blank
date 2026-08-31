@@ -269,6 +269,21 @@ export const ringBellText =
 /** §4.1 "examine telephone"/"use telephone"/"call". */
 export const telephoneText = 'Black, heavy, bolted through the counter, with a dial. Marlow does not offer it and does not move it out of reach.';
 
+/**
+ * F2 prose §4 (`docs/superpowers/specs/2026-09-21-stage-f2-prose.md`,
+ * register 151) — the distinct response for a player *reaching* for the
+ * telephone (CALL/CALL <anybody>/USE PHONE/ANSWER PHONE/HANG UP), not
+ * looking at it: `telephoneText` above (the EXAMINE line) is untouched.
+ * Wired two ways (this task's report): a Front Desk room-level handler for
+ * bare `V_CALL` (`frontDesk.ts`), and the telephone object's own handler for
+ * `V_CALL`/`USE_VERB_ID` once "phone"/"telephone" resolves as the dobj
+ * (`objects/frontDesk.ts`) — both render this same text, never
+ * `V_CALL`'s own global `default` (`telephoneText`, left untouched per
+ * ruling).
+ */
+export const telephoneCallText =
+  'Black, heavy, bolted through the wood on the working side of the counter, with\na dial. A dial is a machine for somebody who already knows the number.\n\nYou do not know one, and you have no name to put in front of one, which is the\nsame problem wearing a different coat, and there is no book beside the phone to\nlook either of them up in. The one person in this county whose job is to answer\nat this hour keeps a radio for exactly that reason, and is up the street with\nher light on.\n\nYou leave the handset where it is. Nothing tonight is going to be settled by\ndialling.';
+
 /** §4.1 "pour coffee"/"drink coffee"/"take coffee". */
 export const coffeeText =
   'You pour a cup off the ring. It is terrible in an entirely familiar way, which is the first familiar thing that has happened to you tonight.';
@@ -560,8 +575,14 @@ export const ACT1_VERBS: Record<string, VerbDef> = {
   // Front Desk & Lobby (front-desk-prose §4, §6) — see this file's own
   // "shared-text" section above for the strings these `default`s reuse.
   [V_RING]: { id: V_RING, words: ['ring', 'press'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.push },
-  // Bare-only — one telephone in the game, no dobj needed (same idiom as V_TYPE_TERMINAL).
-  [V_CALL]: { id: V_CALL, words: ['call'], patterns: ['V'], class: 'social', default: telephoneText },
+  // Bare-only — one telephone in the game, no dobj needed (same idiom as
+  // V_TYPE_TERMINAL). `act3/verbs.ts` adds a `'V dobj'` pattern in place
+  // once Act III loads (CALL ELEVATOR) — see that file's own comment.
+  // "answer"/"hang up" added (Stage F sweep, F2 prose §4/§8.2's "ANSWER
+  // PHONE"/"HANG UP") — neither word is claimed elsewhere in this table
+  // ("pick up" already belongs to TAKE, so "PICK UP PHONE" is not covered
+  // here — out of this task's own named scope, see its report).
+  [V_CALL]: { id: V_CALL, words: ['call', 'answer', 'hang up'], patterns: ['V'], class: 'social', default: telephoneText },
   [V_POUR]: { id: V_POUR, words: ['pour'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.push },
   [V_DRINK]: { id: V_DRINK, words: ['drink'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.drink },
   [V_TILT]: { id: V_TILT, words: ['tilt'], patterns: ['V dobj'], class: 'analytical', default: VERB_DEFAULTS.move },
@@ -743,7 +764,9 @@ export const ACT1_VERBS: Record<string, VerbDef> = {
   [DIRECTION_VERB_IDS.nw]: { id: DIRECTION_VERB_IDS.nw, words: ['northwest', 'nw', 'go northwest'], patterns: ['V'], class: null, default: { ref: 'move.noExit' } },
   [DIRECTION_VERB_IDS.se]: { id: DIRECTION_VERB_IDS.se, words: ['southeast', 'se', 'go southeast'], patterns: ['V'], class: null, default: { ref: 'move.noExit' } },
   [DIRECTION_VERB_IDS.sw]: { id: DIRECTION_VERB_IDS.sw, words: ['southwest', 'sw', 'go southwest'], patterns: ['V'], class: null, default: { ref: 'move.noExit' } },
-  [DIRECTION_VERB_IDS.up]: { id: DIRECTION_VERB_IDS.up, words: ['up', 'u', 'upstairs', 'go up'], patterns: ['V'], class: null, default: { ref: 'move.noExit' } },
+  // "climb up" added (Stage F sweep — DOWN already carries "climb down"
+  // below; UP lacked the mirror, so "CLIMB UP" missed game-wide).
+  [DIRECTION_VERB_IDS.up]: { id: DIRECTION_VERB_IDS.up, words: ['up', 'u', 'upstairs', 'go up', 'climb up'], patterns: ['V'], class: null, default: { ref: 'move.noExit' } },
   // §15.2's fire list adds `descend`/`climb down` as synonyms for DOWN —
   // both reach the landing's own `down` exit (§15.1.6: neither is declared
   // on `your_room`, which has no `down` exit at all, so they fall to the
@@ -807,7 +830,12 @@ export const ACT1_VERBS: Record<string, VerbDef> = {
   // `use.default` needs a `narrative-writer` pass (see this task's
   // report); `render()` throws loudly rather than printing nothing if that
   // path is ever actually reached before it's authored.
-  [USE_VERB_ID]: { id: USE_VERB_ID, words: ['use'], patterns: ['V dobj'], class: 'direct', default: { ref: 'use.default' } },
+  // "swipe" added (Stage F sweep — "SWIPE BADGE" at Act III's Lobby) — a
+  // general USE synonym (the badge-swipe idiom), not badge-specific
+  // vocabulary; reaches whatever USE_VERB_ID handler the resolved dobj
+  // already has, room by room (`act2/nolan.ts`'s per-room `USE BADGE`
+  // amendments on the badge object itself).
+  [USE_VERB_ID]: { id: USE_VERB_ID, words: ['use', 'swipe'], patterns: ['V dobj'], class: 'direct', default: { ref: 'use.default' } },
 
   // Ryan's v0.3.2 playtest, fix 3: HELP/ABOUT, registered as meta verbs
   // (no turn, no clock, no profile tally — `VerbDef.meta: true`, the same

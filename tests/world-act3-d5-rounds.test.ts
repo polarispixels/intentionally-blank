@@ -208,14 +208,53 @@ describe('Dad on the rig (D5 §19)', () => {
     expect(text(second.events)).not.toMatch(/"Stop\."/);
   });
 
-  it('ASK DAD ABOUT ROUNDS renders the rule matching the Custodian\'s current room', () => {
+  // Stage F sweep — F2 prose §6 (register 151): the present-case arm.
+  // Player and Custodian in the SAME room now reaches the room-agnostic
+  // "cloth on glass" text (prepended above the shipped four), not the
+  // adjacent-room "Next room along" line, which was wrong from inside the
+  // room Dad was describing.
+  it('ASK DAD ABOUT ROUNDS renders the present-case arm when the Custodian is in the SAME room as the player', () => {
     const store = new MemoryStore();
     const session = enter(
       withState({ location: ACT3_S6_ARCHIVE_HUB, npcs: { [ACT2_DAD]: { following: true }, [ACT2_CUSTODIAN]: { room: ACT3_S6_ARCHIVE_HUB } } }),
       ACT3_S6_ARCHIVE_HUB,
     ).session;
     const result = say(session, 'ask dad about rounds', store);
+    expect(record(text(result.events))).toMatch(/That's cloth on glass/);
+    expect(text(result.events)).not.toMatch(/Next room along/);
+  });
+
+  // The shipped arm is unchanged and still fires when the Custodian is
+  // elsewhere — "next room along" reads correctly from the Bay while he is
+  // in the Hub.
+  it('ASK DAD ABOUT ROUNDS still renders the shipped "next room along" arm when the Custodian is in an ADJACENT room', () => {
+    const store = new MemoryStore();
+    const session = enter(
+      withState({ location: ACT3_S6_MAINTENANCE_BAY, npcs: { [ACT2_DAD]: { following: true }, [ACT2_CUSTODIAN]: { room: ACT3_S6_ARCHIVE_HUB } } }),
+      ACT3_S6_MAINTENANCE_BAY,
+    ).session;
+    const result = say(session, 'ask dad about rounds', store);
     expect(record(text(result.events))).toMatch(/Next room along\. The one with the machine in it/);
+  });
+
+  // Stage F sweep — `topic_how_do_you_know`'s word list used to include
+  // "hearing," which (declared first, no `when` gate) permanently shadowed
+  // `topic_hearing`'s own Senate-hearing topic for that exact word
+  // (`resolveTopic` takes the first array match). "hearing" now belongs to
+  // `topic_hearing` alone; "listening"/"how do you know" still reach the
+  // method topic.
+  it('ASK DAD ABOUT HEARING reaches the Senate-hearing topic, not shadowed by topic_how_do_you_know', () => {
+    const store = new MemoryStore();
+    const session = enter(withState({ npcs: { [ACT2_DAD]: { following: true } } }), ACT3_S6_MAINTENANCE_BAY).session;
+    const result = say(session, 'ask dad about hearing', store);
+    expect(record(text(result.events))).toMatch(/siting subcommittee/i);
+  });
+
+  it('ASK DAD ABOUT HOW DO YOU KNOW still reaches its own topic', () => {
+    const store = new MemoryStore();
+    const session = enter(withState({ npcs: { [ACT2_DAD]: { following: true } } }), ACT3_S6_MAINTENANCE_BAY).session;
+    const result = say(session, 'ask dad about how do you know', store);
+    expect(record(text(result.events))).toMatch(/You put a man in a building with no eyes/);
   });
 
   it('ASK DAD ABOUT THE CHAIRS only answers once act3_reached_s6 is set', () => {

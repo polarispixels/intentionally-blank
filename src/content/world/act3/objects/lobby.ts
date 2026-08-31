@@ -211,7 +211,15 @@ const lobbyReader: ObjectDefSlice = {
   handlers: [
     { verbs: [EXAMINE], effects: [{ say: readerExamineRules }] },
     { verbs: [PUSH], when: { not: READER_PASSABLE }, effects: [{ say: PUSH_TURNSTILE_WITHOUT_BADGE_TEXT }] },
-    { verbs: [PUSH], effects: [{ setState: [ACT3_LOBBY_READER, 'open', true] }] },
+    // Stage F sweep — this rule was `setState`-only and printed nothing at
+    // all once the player could pass (badge/tailgate/vendor). No dedicated
+    // "turnstile gives" line is shipped for this object (`routeABadgeText`,
+    // `objects/perimeterRoad.ts`, describes the OUTER gate's own turnstile,
+    // a different object) — the built-in OPEN verb's own global family
+    // (same one `builtinOpen`/`fedora.ts`'s WEAR handler render, `{ ref:
+    // 'open.success' }`) is the existing text this rule routes to instead
+    // of new prose.
+    { verbs: [PUSH], effects: [{ say: { ref: 'open.success' } }, { setState: [ACT3_LOBBY_READER, 'open', true] }] },
   ],
 };
 

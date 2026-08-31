@@ -123,7 +123,7 @@ export const ACT4_EV_JACK_MORNING_SCENE_EVENT: EventDef = {
 // exactly as §23 leaves him — offstage, `act4_luke_gone` set — just without
 // the scene. Gated on `act4_luke_met` (not `act4_started`) so a player who
 // never once walked into the Staging Area never trips this at all.
-import { ACT4_LUKE, ACT4_LUKE_GONE, ACT4_LUKE_MET, EVENT_ACT4_LUKE_GONE_MISSED } from './ids';
+import { ACT4_LUKE, ACT4_LUKE_GONE, ACT4_LUKE_GONE_MARKER, ACT4_LUKE_MET, EVENT_ACT4_LUKE_GONE_MISSED } from './ids';
 import { ACT4_VISIT_OVER_DAY } from './ids';
 
 export const ACT4_EV_LUKE_GONE_MISSED_EVENT: EventDef = {
@@ -132,7 +132,10 @@ export const ACT4_EV_LUKE_GONE_MISSED_EVENT: EventDef = {
   // while the player stands in front of him vanished him mid-conversation.
   when: { all: [{ onOrAfterDay: ACT4_VISIT_OVER_DAY }, { flag: ACT4_LUKE_MET }, { not: { flag: ACT4_LUKE_GONE } }, { not: { at: ACT4_STAGING_AREA } }] },
   once: true,
-  effects: [{ setFollowing: [ACT4_LUKE, false] }, { moveNpc: [ACT4_LUKE, 'offstage'] }, { set: [ACT4_LUKE_GONE, true] }],
+  // Stage F1 — `reveal`s the Staging Area's hidden `luke`-noun marker
+  // (`ids.ts`'s own `ACT4_LUKE_GONE_MARKER` doc comment) the same tick he
+  // actually leaves for good, so `FOLLOW LUKE` by name resolves from here on.
+  effects: [{ setFollowing: [ACT4_LUKE, false] }, { moveNpc: [ACT4_LUKE, 'offstage'] }, { set: [ACT4_LUKE_GONE, true] }, { reveal: ACT4_LUKE_GONE_MARKER }],
 };
 
 // --- E1 task L ---

@@ -7,8 +7,8 @@
 import type { Cond } from '../../../engine/cond';
 import type { HandlerDef, OnEnterRule, RoomDefSlice } from '../../../engine/world';
 import type { ProseRule } from '../../../engine/prose';
-import { LISTEN, WAIT, checkDateText, findNameText } from './verbs';
-import { CLUE_REGISTER_GAP, FLAG_MET_MARLOW, FLAG_REGISTER_GAP_SEEN, FRONT_DESK, LANDING, MAIN_STREET, MARLOW, STREET_DOOR, V_CHECK_DATE, V_FIND_MY_NAME, V_LOOK_OUTSIDE, V_WHOAMI } from './ids';
+import { LISTEN, WAIT, checkDateText, findNameText, telephoneCallText } from './verbs';
+import { CLUE_REGISTER_GAP, FLAG_MET_MARLOW, FLAG_REGISTER_GAP_SEEN, FRONT_DESK, LANDING, MAIN_STREET, MARLOW, STREET_DOOR, V_CALL, V_CHECK_DATE, V_FIND_MY_NAME, V_LOOK_OUTSIDE, V_WHOAMI } from './ids';
 import { ACT2_MEM_M15, ACT2_SEEN_DESK_EMPTY, ACT2_STARTED } from '../act2/ids';
 
 const FIRST_SIGHT = [
@@ -94,6 +94,12 @@ const roomHandlers: HandlerDef[] = [
     verbs: [V_FIND_MY_NAME],
     effects: [{ say: findNameText }, { set: [FLAG_REGISTER_GAP_SEEN, true] }, { grantClue: CLUE_REGISTER_GAP }],
   },
+  // F2 prose §4 (register 151) — bare CALL/HANG UP (no dobj) at the Front
+  // Desk, overriding `V_CALL`'s own global `default` (`telephoneText`,
+  // untouched per ruling) for this room only. The telephone object's own
+  // handler (`objects/frontDesk.ts`) covers the dobj-resolved forms
+  // (USE PHONE, CALL/ANSWER <phone/telephone>).
+  { verbs: [V_CALL], effects: [{ say: telephoneCallText }] },
 ];
 
 const onEnter: OnEnterRule[] = [

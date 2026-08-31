@@ -233,6 +233,28 @@ export const ACT4_LUKE_GONE = F('act4_luke_gone');
 // to Sublevel 5: `advanceClock: 20`, `moveNpc`, `setFollowing`, `goto`.
 export const ACT4_LUKE_DESCENDS_SCRIPT = S('act4_luke_descends');
 
+// Stage F1 — the E3 gap list's "`FOLLOW LUKE` by name" (`docs/superpowers/
+// specs/2026-09-21-stage-f-plan.md`'s own Findings §4, addendum §5): the
+// resolver only ever consults `ScopeView.visible` (the current room), so an
+// offstage npc's own noun never resolves at all, room handler or not. This
+// is a hidden, room-scoped scenery object (`objects/stagingArea.ts`, the
+// act1 routing-scenery idiom, `SHERIFF_OFFICE_FRONT`'s own header) carrying
+// the same `luke` noun, `reveal`ed the instant `act4_luke_gone` is set (both
+// places that set it — `events.ts`'s missed-window event, `luke.ts`'s
+// `ACT4_LUKE_AT_ROOT_EFFECTS` — also `reveal` it, in this same change), so
+// it is never in scope at the same time as the real npc (his own schedule
+// never places him here again once that flag holds) and can never make
+// `FOLLOW LUKE` ambiguous while he is actually still present.
+export const ACT4_LUKE_GONE_MARKER = O('act4_luke_gone_marker');
+// Stage F1 — E1 §20's third escort trigger ("leaving the room with
+// `act4_luke_will_escort`"): an ambient `EventDef` (`luke.ts`'s own
+// `ACT4_EV_LUKE_ESCORT_LEAVES_EVENT`), not a room-level handler — the
+// Staging Area's `e`/`out` exits already exist unconditionally, so
+// `traverseDirection` never reaches a room handler for them the way it now
+// does for the hab Galley's exit-less bare OUT (`ACT4_LEAVE_HAB_SCRIPT`,
+// below); see that event's own doc comment.
+export const EVENT_ACT4_EV_LUKE_ESCORT_LEAVES = 'act4_ev_luke_escort_leaves';
+
 // The stub gate behind S5's shipped `down` exit (§21.1/§37.2's own "stair"
 // row) — never player-facing (no `nouns`, same minimal-stub idiom
 // `act3/objects/s6ArchiveHub.ts`'s own `s6BoundaryGate` already uses).

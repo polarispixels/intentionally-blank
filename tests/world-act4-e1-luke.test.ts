@@ -272,6 +272,47 @@ describe('§20 — the escort', () => {
     const { events } = say(session, 'follow luke', store);
     expect(text(events)).toMatch(/I'm not going anywhere/);
   });
+
+  // Stage F1 — §20's own third trigger: "leaving the room with
+  // act4_luke_will_escort" (this file's own header, above, used to flag
+  // this as needing an onExit-style hook "out of this module"). Wired here
+  // as an ambient `EventDef` (tick-time, `not: { at: act4_staging_area }` +
+  // `npcAt` guard so it never double-fires alongside the ASK/FOLLOW
+  // triggers — see `act4EvLukeEscortLeavesEvent`'s own doc comment).
+  //
+  // KNOWN LIMITATION, flagged rather than hidden: because this fires from
+  // `tick()` (after the turn's one arrival-render checkpoint, per
+  // `turn.ts`'s header), S5's own Luke-present "arriving" paragraph does
+  // NOT render on this same turn the way it does for the ASK/FOLLOW
+  // triggers above — only on the player's next fresh look at the room.
+  // Nothing is lost or broken (canon 11 — "missing a window costs a cycle,
+  // never the game" — already covers exactly this shape of gap), but it is
+  // not fully atomic with the other two triggers; a fully atomic version
+  // would need `respond()`'s own direction-dispatch to consult a room
+  // handler ahead of an already-existing exit, an engine change out of this
+  // task's scope (flagged in this task's report).
+  it('leaving the Staging Area (bare OUT) once act4_luke_will_escort holds also fires the escort', () => {
+    const store = new MemoryStore();
+    const base = withLukeAtStaging({ flags: { [ACT4_STARTED]: true, [ACT4_LUKE_WILL_ESCORT]: true }, clock: { day: 1, minute: 500 } });
+    const { session } = enter(base, ACT4_STAGING_AREA);
+    const { session: after, events } = say(session, 'out', store);
+    const rendered = text(events);
+    expect(rendered).toMatch(/The leaves come together/);
+    expect(after.state.location).toBe(ACT3_S5_REACTOR_INTERFACE);
+    expect(after.state.npcs[ACT4_LUKE]?.following).toBe(true);
+    expect(after.state.clock.minute).toBeGreaterThanOrEqual(520);
+  });
+
+  it('does not double-fire the escort on the same turn FOLLOW LUKE already triggered it', () => {
+    const store = new MemoryStore();
+    const base = withLukeAtStaging({ flags: { [ACT4_STARTED]: true, [ACT4_LUKE_WILL_ESCORT]: true }, clock: { day: 1, minute: 500 } });
+    const { session } = enter(base, ACT4_STAGING_AREA);
+    const { session: after, events } = say(session, 'follow luke', store);
+    const rendered = text(events);
+    const occurrences = rendered.split('The leaves come together').length - 1;
+    expect(occurrences).toBe(1);
+    expect(after.state.clock.minute).toBe(520);
+  });
 });
 
 /** Luke pinned at S5, following (post-escort state), the door not yet open. */

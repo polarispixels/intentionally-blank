@@ -17,5 +17,6 @@ write a new ADR that supersedes it; do not edit history.
 | [0010](0010-session-layer-owns-persistence.md) | A pure session layer owns persistence, undo, and checkpoints | accepted |
 | [0011](0011-calendar-and-world-assembly.md) | The calendar, and one world assembled from act slices | accepted |
 | [0012](0012-the-ending-that-continues.md) | The recursive ending continues into the opening room; nothing crosses it | accepted |
+| [0013](0013-trailing-particles-normalize-to-phrasal-forms.md) | Trailing particles normalize to declared phrasal forms | accepted |
 
 Format: Context → Decision → Consequences. Keep each under a page.
