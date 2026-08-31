@@ -493,6 +493,7 @@ restart encounter
 look
 out
 look
+type credentials
 turn keyswitch to normal
 x interlock
 open shield door

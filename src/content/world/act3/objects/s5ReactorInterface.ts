@@ -97,6 +97,12 @@ import {
   ACT3_WALL_CLOCK,
   V_ACT3_BADGE,
 } from '../ids';
+// E1 task M — Luke, the escort, and the door with two things
+// (`docs/superpowers/specs/2026-09-18-stage-e1-prose.md` §11.6, §20, §21,
+// §21.1, §37.1, §37.2). `act4_luke`'s own npc id/flags are namespaced
+// `act4_*` per that file's own header rule.
+import { ACT4_LUKE, ACT4_S5_DOWN_GATE, ACT4_S6_DOOR_OPEN } from '../../act4/ids';
+import { ACT4_CLUE_TWO_THING_DOOR } from '../../act4/ids';
 
 // ---------------------------------------------------------------------------
 // §9.2 — the gauge wall.
@@ -234,11 +240,14 @@ const chaseBottomTouchReturnB = 'Warm. The same warm. Four floors below the room
 export const chaseBottomLookDownText =
   'Ladder, pipe, ladder, pipe, and then the point at which what you are looking at\nstops being a thing you can see and starts being a direction.';
 
-// Stage D addenda §4.2 — `LISTEN DOWN` / `LISTEN AT THE OPENING`. "down" is
+// Stage D addenda §4.2 — `LISTEN DOWN` / `LISTEN AT THE OPENING`. v0.17.0:
+// carried as a bare verb (room-level), NOT a bare "down" noun — the noun made
+// `go down` parse as GO-TO-a-thing and fall to a stale Act I boundary family.
+// Original note: "down" is
 // added to this object's own noun list (§9 item 2) so `LISTEN DOWN` (and
 // `EXAMINE DOWN`) resolve at all — D4 §9.6 listed it, and shipping dropped
 // it. Text transcribed verbatim (hard rule 5).
-const chaseBottomListenText =
+export const chaseBottomListenText =
   'You put your head into the opening and hold still.\n\nWarm air coming up. Water in Return B going the other way. Under both of them,\nfrom somewhere with no edges in it, a sound like a room being large.\n\nIt does not arrive from a distance. It is already there, the way the note in\nthis room is already there, and it stops the moment you notice you are\nlistening for the end of it.';
 
 // Stage D addenda §4.1 — `DROP <thing> DOWN THE SHAFT` / `THROW <thing>
@@ -258,7 +267,7 @@ const chaseBottom: ObjectDefSlice = {
   location: ACT3_S5_REACTOR_INTERFACE,
   name: 'chase bottom',
   portable: false,
-  nouns: ['opening', 'hole', 'ladder', 'shaft', 'chase', 'pipe chase', 'returns', 'return', 'pipes', 'bends', 'flange', 'valve', 'down'],
+  nouns: ['opening', 'hole', 'ladder', 'shaft', 'chase', 'pipe chase', 'returns', 'return', 'pipes', 'bends', 'flange', 'valve'],
   handlers: [
     { verbs: [EXAMINE], effects: [{ say: chaseBottomExamine }] },
     { verbs: [TOUCH], effects: [{ say: chaseBottomTouchReturnB }] },
@@ -271,8 +280,21 @@ const chaseBottom: ObjectDefSlice = {
 // §9.7 — the S6 door, and §9.8's two refusals.
 // ---------------------------------------------------------------------------
 
-const s6DoorExamine =
+const s6DoorExamineShippedText =
   'Steel, flush in the end wall, no window, no vision panel, no closer on it and\nno handle on this side.\n\nThe only legend is a strip of engraved plastic screwed on at eye height:\n\n    MECHANICAL — NO ADMITTANCE\n\nBeside it, on one plate: a reader of exactly the family fitted upstairs, and\nbelow the reader a rubber keypad with letters on it as well as numbers, and a\ntwo-line display above the keypad.\n\nA pad with letters on it is fitted when somebody expects a name to be typed\nand not just a number.\n\nEvery other door in this building has a reader. This one has a reader and a\npad.';
+
+// E1 addendum §6 — the S6 door, standing open. `EXAMINE` becomes a two-rule
+// `ProseRule[]`: this block once `act4_s6_door_open` holds, then the
+// shipped string above, unchanged, as the unconditional fallback (the
+// shipped block is untouched and not re-counted per the addendum's own
+// word count).
+const s6DoorExamineOpenText =
+  'The leaf stands in about a foot off its seal and stops there, and from this\nside you can see the whole depth of it and the rebate all round, machined\nrather than pressed, which is not how anybody builds a cupboard.\n\nThe strip of engraved plastic still says\n\n    MECHANICAL — NO ADMITTANCE\n\nto a corridor it is no longer keeping anybody out of.\n\nThe reader is dark. The pad has cleared its display and gone back to being a\nrubber pad with letters on it, waiting for the next name, of which there is not\na queue.\n\nCold comes round the edge of the leaf, steadily, off the poured steps behind\nit.';
+
+const s6DoorExamine: ProseRule[] = [
+  { when: { flag: ACT4_S6_DOOR_OPEN }, text: s6DoorExamineOpenText },
+  { text: s6DoorExamineShippedText },
+];
 
 const s6DoorPushText =
   'It does not move, and there is nothing on it to move it by, and it is hung so\nclose in its frame that you cannot get a fingernail into the gap, let alone\nanything with a handle on it.';
@@ -321,6 +343,54 @@ export const s6PadEffects: Effect[] = [
   },
 ];
 
+// ---------------------------------------------------------------------------
+// E1 task M, §21 — the door with two things, Luke present. Above the
+// shipped OPEN/PUSH refusal (first match wins): the shipped text still
+// answers alone whenever Luke isn't here. Sets `act4_s6_door_open`
+// (permanent), grants `act4_clue_two_thing_door`. `USE READER`/`USE DOOR`
+// reach this too — `USE_VERB_ID` has no handler of its own on this object
+// otherwise.
+// ---------------------------------------------------------------------------
+
+export const s6DoorLukeText =
+  'The door at the end wall wants two things and has never had more than one of\nthem off you.\n\nHe takes the visitor\'s badge off his lapel — the paper one, printed for him\nthis morning by the plant, in a plastic sleeve, with his name spelled correctly\non it — and puts it on the reader.\n\nThe reader goes green. That is not the surprise. The surprise is the pad.\n\nHe types on it without looking at it. It is short, and whatever it is, it is\nsomething he has known long enough that he does not have to go and find it.\n\nThe two-line display clears itself, and the leaf comes off its seal with the\nsoft heavy sound of a thing that is very well hung, and swings in about a foot\nand stops.\n\nBehind it there is a stair.';
+
+const s6DoorLukeEffects: Effect[] = [
+  { say: s6DoorLukeText },
+  { set: [ACT4_S6_DOOR_OPEN, true] },
+  { grantClue: ACT4_CLUE_TWO_THING_DOOR },
+  // Permanently closes the stub gate behind the shipped `down` exit (this
+  // file's own room-shell comment on `downExit`) — bare `GO DOWN` reaches
+  // §21.1 from here on, and never the Pipe Chase, exactly the exit-table
+  // check §37.2's own "stair" row asks for. The Cooling Plant's own hatch
+  // route into Sublevel 6 is untouched, so nothing reachable is lost.
+  { setState: [ACT4_S5_DOWN_GATE, 'open', false] },
+];
+
+// §21.1 — the stair itself, in-world text, not a boundary (this section's
+// own ruling, §37.1). Reached two ways: bare `GO DOWN` via the stub gate's
+// own `blockedText` (the room shell, `../s5ReactorInterface.ts`) once it is
+// closed, and a resolved `stair`/`steps` noun here (`ENTER STAIR`), both
+// reusing this exact string (hard rule 5 — one text, owned once). Exported
+// for the room shell's own `downExit`.
+const s6StairShippedText =
+  'Poured steps going down out of the light, no handrail, and a cold coming up\nthem that the rest of this floor has not got.\n\nYou have been in this building at night and underneath it in a pipe, and you\nknow by now the difference between a place you are not ready for and a place you\nhave not got a reason for yet.\n\nThis is the second one.';
+
+// E1 addendum §7 — `GO DOWN` at S5, second and later. `firstOnce` (the
+// `ProseRule.text` mechanism, `luke.ts`'s own `unknownTopic` idiom): the
+// shipped block plays once, then this short refusal from the second
+// attempt on. Not a build boundary (no `END OF BUILD`) — E1 §21.1's own
+// ruling holds.
+const s6StairAgainText =
+  'Same steps. Same cold coming up them. Same absence of a reason to be on them.\n\nYou will know when you have got one. You have not got one standing here.';
+
+export const s6StairText: ProseRule[] = [{ text: [s6StairShippedText, s6StairAgainText], firstOnce: true }];
+
+// The stub gate behind the shipped `down` exit (`../s5ReactorInterface.ts`'s
+// own `downExit`) — never player-facing, same minimal idiom
+// `s6ArchiveHub.ts`'s own `s6BoundaryGate` already uses. Defaults open.
+export const act4S5DownGate: ObjectDefSlice = { location: ACT3_S5_REACTOR_INTERFACE, container: { open: true } };
+
 const s6Door: ObjectDefSlice = {
   location: ACT3_S5_REACTOR_INTERFACE,
   name: 'S6 door',
@@ -333,10 +403,20 @@ const s6Door: ObjectDefSlice = {
   // interlock, which shares bare "door") is the qualifying word
   // registered below as an `adjectives` entry, checked by
   // `hasAdjective`'s full-match filter. "admittance" is registered bare
-  // so "NO ADMITTANCE" resolves at all.
-  nouns: ['door', 'pad', 'keypad', 'reader', 'plate', 'strip', 'display', 'admittance'],
+  // so "NO ADMITTANCE" resolves at all. "stair"/"steps" added, E1 task M
+  // (§21.1) — reachable in every state (harmless before the door opens:
+  // no handler below matches IN/DOWN until `act4_s6_door_open` holds, so an
+  // early `EXAMINE STAIR` just falls to this object's own EXAMINE, same as
+  // any other of its nouns).
+  nouns: ['door', 'pad', 'keypad', 'reader', 'plate', 'strip', 'display', 'admittance', 'stair', 'steps'],
   adjectives: ['second', 'steel', 'end', 'pad', 's6', 'no'],
   handlers: [
+    // E1 task M, §21 — above the shipped OPEN/PUSH/USE refusal.
+    { verbs: [OPEN, PUSH, USE_VERB_ID], when: { npcAt: [ACT4_LUKE, ACT3_S5_REACTOR_INTERFACE] }, effects: s6DoorLukeEffects },
+    // E1 task M, §21.1 — `GO DOWN`/`ENTER STAIR` with a resolved dobj (bare
+    // `GO DOWN` never reaches an object handler at all — see the room
+    // shell's own comment on why the stub gate carries that half instead).
+    { verbs: [DIRECTION_VERB_IDS.down, DIRECTION_VERB_IDS.in], when: { flag: ACT4_S6_DOOR_OPEN }, effects: [{ say: s6StairText }] },
     { verbs: [EXAMINE], effects: [{ say: s6DoorExamine }] },
     { verbs: [OPEN, PUSH, PULL, V_RING], effects: [{ say: s6DoorPushText }] },
     { verbs: [PRY], effects: [{ say: s6DoorPryText }] },

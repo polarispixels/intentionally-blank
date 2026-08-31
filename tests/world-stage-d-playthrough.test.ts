@@ -122,7 +122,7 @@ describe('Stage D — Sublevel 6 on a clean save', () => {
       .find((l) => l.startsWith('{'));
     expect(jsonLine).toBeDefined();
     const parsed = JSON.parse(jsonLine!);
-    expect(parsed.state.profile).toEqual({ analytical: 214, social: 84, direct: 118 });
+    expect(parsed.state.profile).toEqual({ analytical: 215, social: 84, direct: 118 });
     // The plan's own expectation for this route (§3.3): analytical leads direct.
     expect(parsed.state.profile.analytical).toBeGreaterThanOrEqual(parsed.state.profile.direct);
     // M3 (`world-act1-wave4-jack.test.ts`'s own `ask jack about tattoo`, line

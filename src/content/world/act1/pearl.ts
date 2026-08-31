@@ -19,12 +19,21 @@
 import { T } from '../../../engine/ids';
 import type { NpcDefSlice, ShowResponseDef, TopicDef } from '../../../engine/world';
 import type { ProseRule } from '../../../engine/prose';
-import { FLAG_MET_PEARL, FLAG_PEARL_NOTICED_YOU, FLAG_TOLD_PEARL_ABOUT_ROOM, MUG, PAGE_78, PEARL, PIE_BOX, SUNDOWN_DINER, V_ATTACK, V_FOLLOW, V_HUG, V_KISS } from './ids';
+import { FLAG_MET_PEARL, FLAG_PEARL_NOTICED_YOU, FLAG_TOLD_PEARL_ABOUT_ROOM, MUG, PAGE_78, PEARL, PIE_BOX, SELF_FOREARM, SUNDOWN_DINER, V_ATTACK, V_FOLLOW, V_HUG, V_KISS } from './ids';
 import { ACT2_CACHE_FOUND, ACT2_CLUE_REPAVING, ACT2_HORSE_BORROWED, ACT2_STARTED } from '../act2/ids';
 import { POKER_NIGHT } from '../act2/calendar';
 import { POKER_NIGHT_PEARL_GREETING } from '../act2/poker';
 // E0 task I (§6) — `topic_visit` rule 1, once the visit is announced.
 import { ACT4_CLUE_VISIT_COMING, ACT4_VISIT_ANNOUNCED } from '../act4/ids';
+// E1 task L (`docs/superpowers/specs/2026-09-18-stage-e1-prose.md` §14,
+// §18) — the hand-off (`giveResponses`, a new `NpcDefSlice` field this
+// task's own engine amendment adds — see `engine/world.ts`'s doc comment)
+// and `TELL PEARL ABOUT URN`, gated on Luke having been met.
+import { ACT2_LETTER_OUT } from '../act2/ids';
+import { ACT4_HAND_LETTER_SCRIPT, ACT4_LUKE_MET } from '../act4/ids';
+// E1 addendum §4.2 (integration builder) — the shared NPC-agnostic
+// `SHOW ARM TO <anybody>` text task N exported for this exact reuse.
+import { SHOW_ARM_GENERIC_TEXT } from './jack';
 
 // ---------------------------------------------------------------------------
 // §6.3 — unknownTopic
@@ -186,6 +195,9 @@ const topics: TopicDef[] = [
 // ---------------------------------------------------------------------------
 
 const TELL_ROOM = T('act1_pearl_tell_room');
+// E1 task L (§18) — TELL PEARL ABOUT URN / ABOUT COFFEE / ABOUT SPRAY,
+// gated on `act4_luke_met`. No effect, no flag, no clue (§18's own header).
+const TELL_URN = T('act1_pearl_tell_urn');
 
 const tellTopics: TopicDef[] = [
   {
@@ -194,6 +206,13 @@ const tellTopics: TopicDef[] = [
     response:
       'She stops with the pot in the air. "In your room. While you were in it."\n\nShe asks what time, and whether the door was forced, and what they took — and when you cannot name one thing that has gone, she puts the pot down.\n\n"Then they wanted a thing, not things." Back to the griddle, the rest said with her back to you. "That\'s a different sort of trouble. You\'d best find out what you had."',
     effects: [{ set: [FLAG_TOLD_PEARL_ABOUT_ROOM, true] }],
+  },
+  {
+    id: TELL_URN,
+    words: ['urn', 'coffee', 'spray'],
+    when: { flag: ACT4_LUKE_MET },
+    response:
+      '"They sent a boy out for the urn," she says, before you are anywhere near the\nend of it. "I know. He was very nice about it."\n\nThe cloth goes along the counter.\n\n"You\'ll want the rhubarb," she says. "There\'s a lot of it."',
   },
 ];
 
@@ -210,6 +229,14 @@ const showResponses: ShowResponseDef[] = [
     objects: [PAGE_78],
     response: '"That\'s your paper," she says agreeably, and puts it down beside your plate where it will not get wet.',
   },
+  // E1 addendum §4.2 — `SHOW ARM TO PEARL`, no gate. `SHOW_ARM_GENERIC_TEXT`
+  // (`act1/jack.ts`) is the shared, NPC-agnostic const the addendum's own
+  // wiring summary calls for ("one shared exported const, not five
+  // copies") — canon 33: no `{name}` token, no arm but the player's own.
+  {
+    objects: [SELF_FOREARM],
+    response: SHOW_ARM_GENERIC_TEXT,
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -219,6 +246,26 @@ const showResponses: ShowResponseDef[] = [
 const attackText = 'The thought gets as far as the plate in front of you and stops there.';
 const kissHugText = 'She allows about a second and a half of it and puts you back on the stool with one hand, which is where you were going anyway.';
 const followText = '"I\'m behind the counter." She is, in fact, in four places behind it. "You stay in front."';
+
+// ---------------------------------------------------------------------------
+// E1 task L (§14) — GIVE LETTER TO PEARL, the unconditional route to P22.
+// One text, whatever `familyVerdict` turns out to say — she cannot read
+// the fold and neither can the narrator; `act4_hand_letter` (the script,
+// `act4/scripts.ts`) is what actually branches on the verdict, after this
+// text renders (`npc.ts`'s `respondToGive`: say, then effects).
+// ---------------------------------------------------------------------------
+
+const GIVE_LETTER_TEXT =
+  'Pearl reads the outside of it, which is you, and not the inside of it, which is\nnone of her business.\n\n"The boy in the good coat\'s coming back for that urn himself," she says. "He\'d\nnot send anybody."\n\nShe puts it in her apron pocket, flat, with her hand over it, and goes back\ndown the counter and starts wiping a stretch of it that is already clean.\n\n"I have fed that family since before there was a plant out there. If this comes\nback to me unopened, you\'ll hear it from me and from nobody else."';
+
+const giveResponses: ShowResponseDef[] = [
+  {
+    objects: [ACT2_LETTER_OUT],
+    when: { all: [{ flag: ACT4_VISIT_ANNOUNCED }, { has: ACT2_LETTER_OUT }, { at: SUNDOWN_DINER }] },
+    response: GIVE_LETTER_TEXT,
+    effects: [{ script: { id: ACT4_HAND_LETTER_SCRIPT } }],
+  },
+];
 
 export const pearl: NpcDefSlice = {
   // §6's own header — "one post, all phases" (architecture §4 item 10).
@@ -231,6 +278,7 @@ export const pearl: NpcDefSlice = {
   topics,
   tellTopics,
   showResponses,
+  giveResponses,
   unknownTopic,
   greeting,
   handlers: [

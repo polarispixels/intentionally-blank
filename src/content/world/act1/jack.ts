@@ -60,10 +60,65 @@
 //
 // V_HUG — see `ids.ts`'s own comment on why "hug" moved off `V_KISS` (a
 // hard verb-word collision, `validate.ts`) and what that costs `pearl.ts`.
+//
+// E1 TASK N — R14, "Jack comes down" (`docs/superpowers/specs/2026-09-18-
+// stage-e1-prose.md` §24-§27, §33, §37; addendum §3, §4.1, §4.2). Prose
+// transcribed exactly (hard rule 5).
+//
+//   §24.1 — `act4_jack_topic_chairs`, declared ABOVE `topic_s6` (§37.1's
+//   own row: `topic_s6` claims bare "six"/"sublevel", and this topic's own
+//   "sublevel" trigger word must win once `act4_started` holds).
+//
+//   §24.2 — the tunnel mouth. The doc's own header gives `when: { flag:
+//   act4_jack_will_come }` alone; `{ at: ACT3_TUNNEL_MOUTH }` is a builder
+//   addition, the same call `act2/dad.ts`'s own `ACT4_EV_DAD_BREATH_EVENT`
+//   makes on its own header note (the literal cond never checks the
+//   player's own location, and this codebase's other ambient NPC-witnessed
+//   events all gate on player presence explicitly) — flagged in this
+//   task's report. Wired as an `EventDef` (a `ProseRule` — `greeting` —
+//   cannot carry the `setFollowing` effect this beat needs), exported here
+//   and registered in `act4/index.ts`'s `events` map, per this file's own
+//   established idiom for an Act-IV-flagged beat that lives with the
+//   character it belongs to (`ACT4_EV_DAD_BREATH_EVENT`'s own precedent).
+//   Its id, `ACT4_EV_JACK_TUNNEL`, is declared in `act4/ids.ts` alongside
+//   the two doc-named events (`act4_ev_jack_sees`, `act4_ev_jack_returns`)
+//   — a third id beyond what this task's brief enumerated, flagged in the
+//   report rather than silently added.
+//
+//   §26's block — originally wired here as a permanent greeting rule 1,
+//   gated `{ flag: act4_jack_saw_mark }`; SUPERSEDED (E1 addendum status
+//   line, main-session fix, integration builder). A `ProseRule` has no
+//   `once` ceiling, so the rule repeated the scene every visit to the
+//   counter. Moved to a `once` `EventDef` instead
+//   (`act4/events.ts`'s own `ACT4_EV_JACK_MORNING_SCENE_EVENT`) — see this
+//   file's own `greeting` array for the pointer left in its place.
+//
+//   §27 — `topic_nobody`/`topic_tattoo` each gain a rule 1, same id, same
+//   words, gated `{ flag: act4_jack_saw_mark }`, declared first — the same
+//   "same id, gated, declared first" idiom `topicDadV2`/`topicJulesV2`
+//   already use in this file.
+//
+//   Addendum §4.1/§4.2 — `SHOW ARM TO JACK` (gated `{ not: { flag:
+//   act4_jack_saw_mark } }`) and the NPC-agnostic fallback (`SHOW_ARM_
+//   GENERIC_TEXT`, exported for reuse by Pearl's/Whitlock's/Luke's own
+//   builders — not wired onto those NPCs here, out of this task's module).
+//
+//   Addendum §3 (`TELL JACK ABOUT LUKE`/`THE LETTERS`) — `topicAct4LukeLetters`,
+//   gated `{ clue: act4_clue_letters_from_jack }` (task L's own R15 id,
+//   landed in `act4/ids.ts` mid-task; grepped and confirmed present before
+//   wiring against it).
+//
+//   Addendum §8 (`GIVE LETTER TO JACK`) — wired by the E1 integration
+//   builder once task L's `giveResponses` surface landed (see
+//   `giveLetterToJackText`/`giveResponses`, below): the letter does not
+//   change hands (no `move`, no `act4_hand_letter`), same "not a third
+//   hand" ruling the addendum itself states. `npcAt` dropped from the
+//   addendum's own `when`, same call `whitlock.ts`'s own `giveResponses`
+//   comment already makes.
 
 import { T } from '../../../engine/ids';
 import type { Effect } from '../../../engine/effects';
-import type { NpcDefSlice, ShowResponseDef, TopicDef } from '../../../engine/world';
+import type { EventDef, NpcDefSlice, ShowResponseDef, TopicDef } from '../../../engine/world';
 import type { ProseRule } from '../../../engine/prose';
 import {
   CLAIM_TICKET,
@@ -88,6 +143,7 @@ import {
   MUG,
   PAGE_78,
   ROOM_KEY,
+  SELF_FOREARM,
   SUNDOWN_DINER,
   V_ATTACK,
   V_FOLLOW,
@@ -95,15 +151,15 @@ import {
   V_KISS,
   WORK_ORDER,
 } from './ids';
-import { ACT2_DAD_BOOTED, ACT2_HAS_AUDIT, ACT2_JACK_AWAY, ACT2_LUKE_REFERENCED, ACT2_NOTEBOOK, ACT2_REPLY_AUDIT, ACT2_RIG, ACT2_SHORTHAND_DECODED, ACT2_STARTED, ACT2_TRAVEL_SCRIPT } from '../act2/ids';
+import { ACT2_DAD_BOOTED, ACT2_HAS_AUDIT, ACT2_JACK_AWAY, ACT2_LETTER_OUT, ACT2_LUKE_REFERENCED, ACT2_NOTEBOOK, ACT2_REPLY_AUDIT, ACT2_RIG, ACT2_SHORTHAND_DECODED, ACT2_STARTED, ACT2_TRAVEL_SCRIPT } from '../act2/ids';
 // D3, task A — §4.10's "ASK JACK ABOUT FENCE" and §5.4's persuasion
 // (`SHOW NOTEBOOK/AUDIT TO JACK`). `act1/ids.ts` may not import a later
 // act's `ids.ts` (that rule governs `ids.ts`-to-`ids.ts` imports only —
 // see `act2/nolan.ts`'s own header note on the identical exception); this
 // room/NPC file importing an id constant from `act3/ids.ts` creates no
 // cycle either way.
-import { ACT3_JACK_TOPIC_FENCE, ACT3_JACK_WILL_RAM, ACT3_PERIMETER_ROAD } from '../act3/ids';
-import { ACT4_STARTED } from '../act4/ids';
+import { ACT3_JACK_TOPIC_FENCE, ACT3_JACK_WILL_RAM, ACT3_PERIMETER_ROAD, ACT3_TUNNEL_MOUTH } from '../act3/ids';
+import { ACT4_CLUE_LETTERS_FROM_JACK, ACT4_EV_JACK_TUNNEL, ACT4_JACK_SAW_MARK, ACT4_JACK_WILL_COME, ACT4_STARTED } from '../act4/ids';
 
 // ---------------------------------------------------------------------------
 // §6.3 — unknownTopic
@@ -127,6 +183,17 @@ const description =
 // ---------------------------------------------------------------------------
 
 const greeting: ProseRule[] = [
+  // E1 task N originally wired §26's block here as a permanent greeting
+  // rule 1, gated `{ flag: act4_jack_saw_mark, at: sundown_diner }`. Main-
+  // session fix (E1 addendum status line, integration builder): a
+  // `ProseRule` has no effect slot, so the rule had no `once` ceiling and
+  // repeated the scene every visit to the counter. Moved to a `once`
+  // `EventDef` instead (`act4/events.ts`'s own
+  // `ACT4_EV_JACK_MORNING_SCENE_EVENT`, registered `act4/index.ts`) — it
+  // renders exactly once, ambiently, the first time the player is at the
+  // counter with Jack there and the flag holds, independent of whether
+  // HELLO/TALK TO is ever typed. The D0 rule below is Jack's shipped
+  // greeting again from then on.
   // D0 amendment — the presence-and-passage prose document PART THREE §4,
   // transcribed exactly (hard rule 5). Prepended above every shipped rule
   // so it wins wherever Jack is actually at the counter (only reachable
@@ -300,6 +367,30 @@ const topicWallDrug: TopicDef = {
 };
 
 // ---------------------------------------------------------------------------
+// E1 addendum §3 — `TELL JACK ABOUT LUKE` / `TELL JACK ABOUT THE LETTERS`.
+// Declared first (ahead of `topicEli`, `topic_family` and `topic_letters` —
+// the addendum's own wiring note, §9: "Order matters in exactly one place").
+// `when: { clue: act4_clue_letters_from_jack }` keeps it harmless before the
+// clue (task L's own R15 folder scene); once held, shadows `topic_family`'s
+// bare "luke"/"president" and `topic_letters`'s bare "letters" — same
+// deliberate-shadowing idiom `topicEli`/`topicDadV2` already use. Carries
+// `{ set: [act2_luke_referenced, true] }` because it shadows the only other
+// place in the shipped game that sets M12's half-trigger (`topic_family`,
+// below) — addendum §10 q3's own ruling.
+// ---------------------------------------------------------------------------
+
+const TOPIC_ACT4_LUKE_LETTERS = T('act4_jack_topic_luke_letters');
+
+const topicAct4LukeLetters: TopicDef = {
+  id: TOPIC_ACT4_LUKE_LETTERS,
+  words: ['luke', 'letters', 'folder', 'president'],
+  when: { clue: ACT4_CLUE_LETTERS_FROM_JACK },
+  response:
+    'You tell him what is in that folder. Years of it, in his hand, on his paper,\nasking after everybody and wanting nothing.\n\nJack listens the whole way through without helping you along.\n\n"Asks after everybody," he says.\n\nThen he gets up and goes as far as the window and stands at it with his back to\nyou, and whatever is out there does not need looking at for that long.\n\nWhen he sits back down he has got hold of one end of it.\n\n"He was answering the letter he got." He turns his mug round on the table\nwithout picking it up. "Every time. Inside the week. Nice as you like."\n\n"He never had the question."\n\nHe does not ask you how you know it and he does not ask what else was in that\nroom. He sits with both hands flat on the table and does not do anything else\nwith it in front of you.',
+  effects: [{ set: [ACT2_LUKE_REFERENCED, true] }],
+};
+
+// ---------------------------------------------------------------------------
 // D2 amendment (task A) — five additions (D2 prose doc §9). Prose
 // transcribed verbatim (hard rule 5).
 // ---------------------------------------------------------------------------
@@ -388,7 +479,70 @@ const topicJulesV2: TopicDef = {
     '"Nothing\'s changed here." He says it fast, to get to the next part. "Luke\'s coming out. To the plant. Twenty years, and he\'s coming to this county, and it isn\'t for me."\n\nThe folder has been on the table the whole time you have been in this room and he has not opened it once.\n\n"I\'ll be at that road."',
 };
 
+// ---------------------------------------------------------------------------
+// E1 task N — §24.1. `TOPIC_ACT4_CHAIRS` is a new topic, declared ABOVE
+// `topic_s6` (this file's own header note, above, and §37.1's own row).
+// Reaches both ASK and TELL (the doc's own trigger list: "ASK JACK ABOUT
+// CHAIRS" / "TELL JACK ABOUT NOLAN'S CHAIR" / "TELL JACK ABOUT SUBLEVEL")
+// — same shared-`TopicDef` idiom `topicS6`/`topicTrash`/`topicWallDrug`
+// already use.
+// ---------------------------------------------------------------------------
+
+const TOPIC_ACT4_CHAIRS = T('act4_jack_topic_chairs');
+
+const jackChairsText =
+  'You tell him there is a room under that plant with chairs in it, in rows, and a\nrail of hooks along the wall with names under them, and that one of the names is\nNolan\'s.\n\nJack does not ask you any of the four questions you have got answers ready for.\n\n"Show me."\n\nHe is looking for his keys and they are in his hand.';
+
+const topicAct4Chairs: TopicDef = {
+  id: TOPIC_ACT4_CHAIRS,
+  words: ['chairs', 'sublevel', "nolan's chair", 'nolans chair', 'nolan chair'],
+  when: { flag: ACT4_STARTED },
+  response: jackChairsText,
+  effects: [{ set: [ACT4_JACK_WILL_COME, true] }],
+};
+
+// ---------------------------------------------------------------------------
+// E1 task N — §24.2, the tunnel mouth. See this file's own header note
+// above on why this is an `EventDef` (not a `ProseRule`) and on the
+// builder-added `{ at: ACT3_TUNNEL_MOUTH }` cond. Exported for registration
+// in `act4/index.ts`.
+// ---------------------------------------------------------------------------
+
+const jackTunnelMouthText =
+  'He stops at the mouth of it with the lamp in his hand and looks at how the\nconcrete is finished on the inside, and at the rebate round the frame where a\ndoor used to be shut.\n\n"Somebody built this to be used," he says.\n\nThen he goes in ahead of you, which he is not supposed to do and does anyway,\nand forty feet in he stands aside and lets you past.\n\nHe does not say anything else.';
+
+export const ACT4_EV_JACK_TUNNEL_EVENT: EventDef = {
+  id: ACT4_EV_JACK_TUNNEL,
+  when: { all: [{ flag: ACT4_JACK_WILL_COME }, { at: ACT3_TUNNEL_MOUTH }] },
+  once: true,
+  effects: [{ say: jackTunnelMouthText }, { setFollowing: [JACK, true] }],
+};
+
+// ---------------------------------------------------------------------------
+// E1 task N — §27. Two prepended topic rules, same id, same words as the
+// shipped entries below, gated `{ flag: act4_jack_saw_mark }`, declared
+// first — the `topicDadV2`/`topicJulesV2` idiom.
+// ---------------------------------------------------------------------------
+
+const topicNobodyV2: TopicDef = {
+  id: TOPIC_NOBODY,
+  words: ['remember', 'remembers', 'nobody', 'anybody', 'believe', 'crazy', 'delusional', 'proof', 'lying', 'alone', 'mad'],
+  when: { flag: ACT4_JACK_SAW_MARK },
+  response:
+    '"Nobody remembers him," he says, and then does not do the rest of it.\n\nHe has said the rest of it to everybody in this county for five weeks and he is\nnot going to say it to you.',
+};
+
+const topicTattooV2: TopicDef = {
+  id: TOPIC_TATTOO,
+  words: ['tattoo', 'tattoos', 'ink', 'arm', 'forearm', 'wrist', 'numeral', 'numerals', 'number', 'numbers', 'iv', 'four', 'roman', 'mark'],
+  when: { flag: ACT4_JACK_SAW_MARK },
+  response:
+    'He puts both hands round his cup and leaves them there.\n\n"I\'ve told you what I know about that," he says. "I\'m not going to improve on\nit by saying it again."',
+};
+
 const topics: TopicDef[] = [
+  // E1 addendum §3 — declared first: this file's own header note above.
+  topicAct4LukeLetters,
   // D3, task A — declared first; shadows `topicPlant`'s own bare "fence"
   // word while its own `when` holds (see `topicFence`'s own comment above).
   topicFence,
@@ -412,6 +566,10 @@ const topics: TopicDef[] = [
   // entirely regardless of word list. Each is `when`-gated, so declaring
   // them first costs nothing when the gate doesn't hold: `findTopic` just
   // keeps walking to `topic_job`/etc., exactly as before.
+  // E1 task N — §24.1, declared first for the same reason (this file's own
+  // header note, and §37.1's own row): `topic_s6`'s bare "sublevel" would
+  // otherwise shadow it.
+  topicAct4Chairs,
   topicS6,
   topicTrash,
   topicWallDrug,
@@ -435,6 +593,8 @@ const topics: TopicDef[] = [
       '"Jules." He spells it. He has got into the habit of spelling it. "My oldest brother. Facilities supervisor out at the plant, and five weeks ago he stopped being anywhere at all."\n\nHe does not use the word missing. He is careful about that word in a way that suggests somebody has used it at him.\n\n"He\'d got strange before it. Six months of strange — not answering, then answering too fast. I put it down to the job." A hand goes flat on the table and comes off again. "It wasn\'t the job."',
     effects: [{ grantClue: CLUE_JULES }],
   },
+  // E1 task N — §27.1, declared first: this file's own header note above.
+  topicNobodyV2,
   {
     id: TOPIC_NOBODY,
     words: ['remember', 'remembers', 'nobody', 'anybody', 'believe', 'crazy', 'delusional', 'proof', 'lying', 'alone', 'mad'],
@@ -458,6 +618,8 @@ const topics: TopicDef[] = [
     // hearing.
     effects: [{ set: [ACT2_LUKE_REFERENCED, true] }],
   },
+  // E1 task N — §27.2, declared first: this file's own header note above.
+  topicTattooV2,
   {
     id: TOPIC_TATTOO,
     words: ['tattoo', 'tattoos', 'ink', 'arm', 'forearm', 'wrist', 'numeral', 'numerals', 'number', 'numbers', 'iv', 'four', 'roman', 'mark'],
@@ -538,6 +700,12 @@ const TELL_ROOM = T('act1_jack_tell_room');
 const TELL_MEMORY = T('act1_jack_tell_memory');
 
 const tellTopics: TopicDef[] = [
+  // E1 addendum §3 — declared first: this file's own header note above.
+  topicAct4LukeLetters,
+  // E1 task N — §24.1's own TELL phrasing ("TELL JACK ABOUT NOLAN'S CHAIR" /
+  // "TELL JACK ABOUT SUBLEVEL"); same shared-`TopicDef` idiom as
+  // `topicTrash`/`topicWallDrug`, below.
+  topicAct4Chairs,
   {
     id: TELL_ROOM,
     words: ['room', 'attack', 'attacked', 'robbed', 'search', 'searched', 'break in', 'breakin', 'burglary', 'ransacked', 'crime', 'night'],
@@ -565,6 +733,22 @@ const tellTopics: TopicDef[] = [
 
 const persuadeJackText =
   'He reads it with the interior light on and the engine off, and he takes his\ntime, and he goes back up the page twice.\n\nThen he puts it on the seat between you and looks out through the windscreen\nat eight feet of somebody else\'s mesh.\n\n"Five weeks," he says. "Five weeks of being the crank. Sheriff\'s got a file\nwith my name on it and it\'s a file about *me*."\n\nHe turns the key. "Say the word and I\'ll put a hole in it. I\'d like that on\npaper somewhere, that it was me that said it."';
+
+// ---------------------------------------------------------------------------
+// E1 addendum §4.1/§4.2 — `SHOW ARM TO JACK`, and the NPC-agnostic
+// fallback. Canon 33: neither block mentions any arm but the player's own,
+// and neither contains the word "his" attached to an arm. `SHOW_ARM_
+// GENERIC_TEXT` is exported so Pearl's/Whitlock's/Luke's own builders can
+// reuse it verbatim (§4.2's own wiring-summary row: "one shared exported
+// const, not five copies") — not wired onto those NPCs here (out of this
+// task's module).
+// ---------------------------------------------------------------------------
+
+export const SHOW_ARM_GENERIC_TEXT =
+  'You push the sleeve back and hold the inside of the left forearm out to be\nlooked at.\n\nThere is a patch of skin there about the size of a postage stamp, slightly\nsmoother and slightly paler than what surrounds it. In a lit room that is the\nwhole of what there is to show anybody.\n\nIt is looked at, briefly, in the manner of a thing somebody has been asked to\nlook at, and then the conversation goes back to where it was.';
+
+const showArmToJackText =
+  'You push the sleeve back and hold the inside of the left forearm out where the\nlight can get at it.\n\nJack looks at it properly, which is more than most men would do, and takes\nabout as long over it as it deserves.\n\n"There\'s nothing there."\n\nHe is not humouring you. There is nothing there. There is a patch of skin about\nthe size of a postage stamp that is a little smoother and a little paler than\nwhat surrounds it, and in a lit room that is the entire content of what you\nhave just shown a man.\n\nThen he goes back to his mug, and about four seconds later, without looking up:\n\n"Was there meant to be?"';
 
 // ---------------------------------------------------------------------------
 // §6.7 — showResponses (four)
@@ -618,6 +802,39 @@ const showResponses: ShowResponseDef[] = [
     response: persuadeJackText,
     effects: [{ set: [ACT3_JACK_WILL_RAM, true] }],
   },
+  // E1 addendum §4.1/§4.2 — first rule pre-mark (Jack-specific), second
+  // rule the unconditional NPC-agnostic fallback once the gate closes.
+  {
+    objects: [SELF_FOREARM],
+    when: { not: { flag: ACT4_JACK_SAW_MARK } },
+    response: showArmToJackText,
+  },
+  {
+    objects: [SELF_FOREARM],
+    response: SHOW_ARM_GENERIC_TEXT,
+  },
+];
+
+// ---------------------------------------------------------------------------
+// E1 addendum §8 — `GIVE LETTER TO JACK`. The letter does NOT change hands
+// — no `move`, no verdict, no `act4_hand_letter`, no flag; P22's two hands
+// are Pearl and Whitlock and this is not a third. `npcAt: [act1_jack, here]`
+// from the addendum's own `when` is dropped, same builder call
+// `whitlock.ts`'s own `giveResponses` comment already makes for the
+// identical clause: GIVE can only ever resolve with Jack already in scope
+// as `iobj`, so the cond adds nothing a literal `Cond` can check that isn't
+// already structurally guaranteed.
+// ---------------------------------------------------------------------------
+
+const giveLetterToJackText =
+  'He takes it out of your hand, which he does with almost nothing, and turns it\nover once without opening it.\n\n"Who\'s it for?"\n\nYou tell him.\n\nJack puts it back down on the table between you and squares it up with two\nfingers until one edge of it is parallel with one edge of the table, and takes\nhis hand off it.\n\n"Not out of my hand it isn\'t." He says it flatly, the way a man reads back a\ntest result rather than a grievance. "Everything I have sent that man for five\nweeks has gone somewhere and come back polite. I\'m the wrong post box and I\'ve\nhad a long time to work that out."\n\nThen he pushes it an inch back towards you.\n\n"Find somebody nobody has ever had a reason to look twice at, and put it in\ntheir hand."';
+
+const giveResponses: ShowResponseDef[] = [
+  {
+    objects: [ACT2_LETTER_OUT],
+    when: { has: ACT2_LETTER_OUT },
+    response: giveLetterToJackText,
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -650,6 +867,7 @@ export const jack: NpcDefSlice = {
   topics,
   tellTopics,
   showResponses,
+  giveResponses,
   unknownTopic,
   greeting,
   handlers: [

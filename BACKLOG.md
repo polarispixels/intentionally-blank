@@ -21,7 +21,7 @@ Maintenance rules:
 | B | Engine v2 (world model, parser v2, save/undo/autosave, map + open-questions UI) + the opening room (M1) | 0.3.0 | ✅ **shipped v0.3.0** — 23 tasks, 729 tests; the live URL is now the real game |
 | C | Act I: town, client, missing sibling, notebook trail (M2–M4) | 0.4–0.9 | ✅ **shipped v0.9.0** — 12 rooms, 4 NPCs, P1–P8, R1–R3, M1/M3; clean-save playthrough fixture `tests/fixtures/playthrough-act1.txt` is the act's regression gate |
 | D | Acts II–III: data center, underground, Dad on the USB, contradictions | 0.10–0.15 | ✅ **v0.15.0** — D0 v0.10.0, D1 v0.11.0, D2 v0.12.0 (Dad, the censor, poker, Nolan), D3 v0.13.0 (the facility surface), D4 v0.14.0 (the descent), D5 v0.15.0 (Sublevel 6: the Bay, the Hub, R9–R12, M9/M16, the Act III boundary; addenda `2026-09-14-stage-d-addenda-prose.md`); plan: `docs/superpowers/specs/2026-09-07-stage-d-plan.md`; clean-save fixture `tests/fixtures/playthrough-d5.txt` |
-| E | Acts IV–V: reality travel, identity, the recursive ending | 0.16–0.19 | 🚧 in progress — E0 v0.16.0 (the engine hand-off ADR 0012, the identity thread R13/R14, the town before the visit); plan: `docs/superpowers/specs/2026-09-16-stage-e-plan.md`; E1 (the visit) next |
+| E | Acts IV–V: reality travel, identity, the recursive ending | 0.16–0.19 | 🚧 in progress — E0 v0.16.0 (ADR 0012, R13/R14, the town before the visit), E1 v0.17.0 (the visit: the Staging Area, Luke, the escort, R15/R16, Jack under the lamp); plan: `docs/superpowers/specs/2026-09-16-stage-e-plan.md`; E2 (the archive: the Chamber and the hab) next |
 | F | Hints, playtester sweeps, replay content, polish | 1.0.0 | queued |
 
 Each stage: spec → plan → build → deploy. Ryan plays the live URL at his

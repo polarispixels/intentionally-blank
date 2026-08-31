@@ -32,6 +32,7 @@ import {
   FLAG_WHITLOCK_ASKED_YEAR,
   FLAG_WHITLOCK_RAN_YOU,
   PAGE_78,
+  SELF_FOREARM,
   SHERIFF_OFFICE,
   SUNDOWN_DINER,
   V_ATTACK,
@@ -41,6 +42,14 @@ import {
 import { ACT2_CLUE_PAGE_FITS, ACT2_HAS_AUDIT, ACT2_NOTEBOOK, ACT2_REPLY_AUDIT, ACT2_STARTED } from '../act2/ids';
 import { POKER_NIGHT } from '../act2/calendar';
 import { ACT4_CASE_NOTES, ACT4_STARTED, ACT4_WHITLOCK_CONVINCED, ACT4_WHITLOCK_READER_TOLD } from '../act4/ids';
+// E1 task L (`docs/superpowers/specs/2026-09-18-stage-e1-prose.md` §15) —
+// GIVE LETTER TO WHITLOCK, once she has been shown paper she can hold.
+// Same script, same verdict handling, different hand (§15's own header).
+import { ACT2_LETTER_OUT } from '../act2/ids';
+import { ACT4_HAND_LETTER_SCRIPT } from '../act4/ids';
+// E1 addendum §4.2 (integration builder) — the shared NPC-agnostic
+// `SHOW ARM TO <anybody>` text task N exported for this exact reuse.
+import { SHOW_ARM_GENERIC_TEXT } from './jack';
 import { CAGE_OPENS_STATE_EFFECTS, CAGE_OPENS_TEXT } from './objects/sheriffOffice';
 
 // ---------------------------------------------------------------------------
@@ -317,6 +326,15 @@ const showResponses: ShowResponseDef[] = [
     objects: [PAGE_78],
     response: 'She reads it, turns it over, reads the other side, and hands it back. "Where\'d you get it?"',
   },
+  // E1 addendum §4.2 — `SHOW ARM TO WHITLOCK`, no gate. `SHOW_ARM_
+  // GENERIC_TEXT` (`act1/jack.ts`) is the shared, NPC-agnostic const the
+  // addendum's own wiring summary calls for ("one shared exported const,
+  // not five copies") — canon 33: no `{name}` token, no arm but the
+  // player's own.
+  {
+    objects: [SELF_FOREARM],
+    response: SHOW_ARM_GENERIC_TEXT,
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -329,6 +347,28 @@ const showResponses: ShowResponseDef[] = [
 // yet — has since been fixed).
 const attackText = 'She is armed, she is sitting down, and she has been doing this for eleven years. The thought does not get as far as your hands.';
 const followText = '"I\'m not going anywhere." She turns a page. "That\'s the job at this hour."';
+
+// ---------------------------------------------------------------------------
+// E1 task L (§15) — GIVE LETTER TO WHITLOCK, the reward route (gated on
+// E0's own `act4_whitlock_convinced`, the sheriff already having been shown
+// paper she can hold). `npcAt: [whitlock, here]` from the doc's own `when`
+// is dropped (a builder call, this task's own report): the interaction can
+// only ever fire with Whitlock already resolved as `iobj`, i.e. already in
+// scope/in the room, so the clause adds nothing a literal `Cond` can check
+// that isn't already structurally guaranteed.
+// ---------------------------------------------------------------------------
+
+const GIVE_LETTER_TEXT =
+  'She reads the outside of it, and then she reads you, which takes longer.\n\n"I\'m liaison," she says. "That means I stand in a lobby tomorrow next to a man\nwho won\'t give me his first name. It also means I walk in and out of that lobby\nwith a folder under my arm, and nobody has ever asked me what\'s in it."\n\nThe folder comes off the desk and the letter goes into it.\n\n"I\'m not carrying anything I\'d have to lie about. Is there anything in there\nI\'d have to lie about?"\n\nYou tell her no.\n\n"Right," she says, because she has never yet asked a man twice.';
+
+const giveResponses: ShowResponseDef[] = [
+  {
+    objects: [ACT2_LETTER_OUT],
+    when: { all: [{ flag: ACT4_WHITLOCK_CONVINCED }, { has: ACT2_LETTER_OUT }] },
+    response: GIVE_LETTER_TEXT,
+    effects: [{ script: { id: ACT4_HAND_LETTER_SCRIPT } }],
+  },
+];
 
 export const whitlock: NpcDefSlice = {
   // Canon register entry 28 — the night post, transcribed exactly from §12.6's own header.
@@ -350,6 +390,7 @@ export const whitlock: NpcDefSlice = {
   topics,
   tellTopics,
   showResponses,
+  giveResponses,
   unknownTopic,
   greeting,
   handlers: [

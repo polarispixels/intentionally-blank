@@ -426,7 +426,11 @@ export const ACT1_VERBS: Record<string, VerbDef> = {
   [SHAKE]: { id: SHAKE, words: ['shake', 'rattle', 'jiggle'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.shake },
   // "dust" dropped from the synonym list (validate.ts's verb-noun-collision
   // check against `DUST`'s own noun) — builder's word choice, not doc text.
-  [RUB]: { id: RUB, words: ['rub', 'clean', 'wipe', 'polish'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.rub },
+  // "erase" added (Stage E1 §4.2's own heading, "RUB / ERASE / WIPE BOARD
+  // / WRITE ON BOARD / TAKE MARKER") — a general RUB synonym, not
+  // whiteboard-specific vocabulary, same idiom as this verb's existing
+  // "clean"/"wipe"/"polish" entries.
+  [RUB]: { id: RUB, words: ['rub', 'clean', 'wipe', 'polish', 'erase'], patterns: ['V dobj'], class: 'direct', default: VERB_DEFAULTS.rub },
   // 'V dobj prep iobj' with prep 'with' added (wave 5, §10.2: "PRY DRAWER
   // WITH LEG") — `objects/closeOut.ts`'s drawer amendment gates on `{ has:
   // CHAIR_LEG }` rather than on the resolved `iobj`, so this pattern only
@@ -720,14 +724,14 @@ export const ACT1_VERBS: Record<string, VerbDef> = {
   // warnings (the dedup is per verb+word, and "n"/"north" is already
   // reported from the bare word above).
   [DIRECTION_VERB_IDS.n]: { id: DIRECTION_VERB_IDS.n, words: ['north', 'n', 'go north', 'walk north'], patterns: ['V'], class: null, default: { ref: 'move.noExit' } },
-  [DIRECTION_VERB_IDS.s]: { id: DIRECTION_VERB_IDS.s, words: ['south', 's'], patterns: ['V'], class: null, default: { ref: 'move.noExit' } },
+  [DIRECTION_VERB_IDS.s]: { id: DIRECTION_VERB_IDS.s, words: ['south', 's', 'go south'], patterns: ['V'], class: null, default: { ref: 'move.noExit' } },
   [DIRECTION_VERB_IDS.e]: { id: DIRECTION_VERB_IDS.e, words: ['east', 'e'], patterns: ['V'], class: null, default: { ref: 'move.noExit' } },
   [DIRECTION_VERB_IDS.w]: { id: DIRECTION_VERB_IDS.w, words: ['west', 'w'], patterns: ['V'], class: null, default: { ref: 'move.noExit' } },
-  [DIRECTION_VERB_IDS.ne]: { id: DIRECTION_VERB_IDS.ne, words: ['northeast', 'ne'], patterns: ['V'], class: null, default: { ref: 'move.noExit' } },
-  [DIRECTION_VERB_IDS.nw]: { id: DIRECTION_VERB_IDS.nw, words: ['northwest', 'nw'], patterns: ['V'], class: null, default: { ref: 'move.noExit' } },
-  [DIRECTION_VERB_IDS.se]: { id: DIRECTION_VERB_IDS.se, words: ['southeast', 'se'], patterns: ['V'], class: null, default: { ref: 'move.noExit' } },
-  [DIRECTION_VERB_IDS.sw]: { id: DIRECTION_VERB_IDS.sw, words: ['southwest', 'sw'], patterns: ['V'], class: null, default: { ref: 'move.noExit' } },
-  [DIRECTION_VERB_IDS.up]: { id: DIRECTION_VERB_IDS.up, words: ['up', 'u', 'upstairs'], patterns: ['V'], class: null, default: { ref: 'move.noExit' } },
+  [DIRECTION_VERB_IDS.ne]: { id: DIRECTION_VERB_IDS.ne, words: ['northeast', 'ne', 'go northeast'], patterns: ['V'], class: null, default: { ref: 'move.noExit' } },
+  [DIRECTION_VERB_IDS.nw]: { id: DIRECTION_VERB_IDS.nw, words: ['northwest', 'nw', 'go northwest'], patterns: ['V'], class: null, default: { ref: 'move.noExit' } },
+  [DIRECTION_VERB_IDS.se]: { id: DIRECTION_VERB_IDS.se, words: ['southeast', 'se', 'go southeast'], patterns: ['V'], class: null, default: { ref: 'move.noExit' } },
+  [DIRECTION_VERB_IDS.sw]: { id: DIRECTION_VERB_IDS.sw, words: ['southwest', 'sw', 'go southwest'], patterns: ['V'], class: null, default: { ref: 'move.noExit' } },
+  [DIRECTION_VERB_IDS.up]: { id: DIRECTION_VERB_IDS.up, words: ['up', 'u', 'upstairs', 'go up'], patterns: ['V'], class: null, default: { ref: 'move.noExit' } },
   // §15.2's fire list adds `descend`/`climb down` as synonyms for DOWN —
   // both reach the landing's own `down` exit (§15.1.6: neither is declared
   // on `your_room`, which has no `down` exit at all, so they fall to the
@@ -740,7 +744,7 @@ export const ACT1_VERBS: Record<string, VerbDef> = {
   // see this task's report.
   [DIRECTION_VERB_IDS.down]: {
     id: DIRECTION_VERB_IDS.down,
-    words: ['down', 'd', 'downstairs', 'descend', 'climb down'],
+    words: ['down', 'd', 'downstairs', 'descend', 'climb down', 'go down'],
     patterns: ['V'],
     class: null,
     default: { ref: 'move.noExit' },
@@ -767,7 +771,7 @@ export const ACT1_VERBS: Record<string, VerbDef> = {
   // "get in" added (wave-4's Arrowhead Motel §4.1 "GET IN TRUCK") — a general IN synonym, not truck-specific vocabulary.
   [DIRECTION_VERB_IDS.in]: {
     id: DIRECTION_VERB_IDS.in,
-    words: ['in', 'inside', 'enter', 'back', 'go through', 'get in'],
+    words: ['in', 'inside', 'enter', 'back', 'go through', 'get in', 'go in'],
     patterns: ['V', 'V dobj'],
     class: null,
     default: VERB_DEFAULTS.enter,
@@ -779,7 +783,7 @@ export const ACT1_VERBS: Record<string, VerbDef> = {
   // USE_VERB_ID both resolve through the same `traverseDoor` call).
   [DIRECTION_VERB_IDS.out]: {
     id: DIRECTION_VERB_IDS.out,
-    words: ['out', 'outside', 'leave', 'exit'],
+    words: ['out', 'outside', 'leave', 'exit', 'go out'],
     patterns: ['V', 'V dobj'],
     class: null,
     default: VERB_DEFAULTS.exit,

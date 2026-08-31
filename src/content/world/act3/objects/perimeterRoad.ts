@@ -194,7 +194,9 @@ const gatehouse: ObjectDefSlice = {
   portable: false,
   nouns: ['gatehouse', 'hut', 'guardhouse', 'guard house', 'cabin', 'window', 'shutter', 'sign', 'meridian', 'letters'],
   handlers: [
-    { verbs: [EXAMINE], effects: [{ say: gatehouseExamine }] },
+    // READ too (v0.17.0 playtest): its nouns include the sign's 'letters', and
+    // bare READ raised an engine [error] with no text fallback.
+    { verbs: [EXAMINE, READ], effects: [{ say: gatehouseExamine }] },
     { verbs: [V_KNOCK, OPEN, DIRECTION_VERB_IDS.in], effects: [{ say: gatehouseKnockOpenEnter }] },
     { verbs: [V_WATCH], effects: watchGateRhythmEffects },
   ],

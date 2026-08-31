@@ -22,6 +22,7 @@
 import type { Effect } from '../../../../engine/effects';
 import type { HandlerDef, ObjectDefSlice } from '../../../../engine/world';
 import type { ProseRule } from '../../../../engine/prose';
+import type { Cond } from '../../../../engine/cond';
 import { DIRECTION_VERB_IDS, USE_VERB_ID } from '../../../../engine/move';
 import {
   BREAK,
@@ -74,6 +75,11 @@ import {
 // `act4/ids.ts`'s own header rule even though its `ObjectDefSlice` lives
 // here (the plan's own note on the evidence bag applies identically).
 import { ACT4_CLUE_FILED_UNDER_ONE, ACT4_NUMERAL_SEARCHED, ACT4_PROFILE, ACT4_PROFILE_SCREEN_SCRIPT, ACT4_STARTED, V_ACT4_SELECT } from '../../act4/ids';
+// E1 task M (`docs/superpowers/specs/2026-09-18-stage-e1-prose.md` §22,
+// §29, §37.1) — R16, the reader at the bottom of the well, and the
+// boundary's third arm.
+import { ACT4_LUKE, ACT4_LUKE_AT_ROOT, ACT4_LUKE_MET } from '../../act4/ids';
+import { ACT4_LUKE_AT_ROOT_EFFECTS } from '../../act4/luke';
 
 // ---------------------------------------------------------------------------
 // §22 — the terminal. `portable: false`.
@@ -356,8 +362,20 @@ const SYSTEM_BOUNDARY_TEXT =
 const SYSTEM_BOUNDARY_TEXT_ACT4 =
   'END OF BUILD\n\nThe frames, and the door at the bottom of the well, are later versions. The\nstreet, the sheriff, the ledger and the man who is coming are this one.';
 
-/** Both entry points share this selection — the in-world sentence is unchanged; only the system line following it is gated `{ flag: act4_started }`. */
+// E1 task M — §29, the E1 line: a THIRD arm, above E0's, gated
+// `act4_luke_met`. Deleted with its gate in E3 (§29's own note).
+const SYSTEM_BOUNDARY_TEXT_ACT4_E1 =
+  'END OF BUILD\n\nThe frames, and the door at the bottom of the well, are later versions. The\nstair behind the door on Sublevel 5 is this one.';
+
+/**
+ * Both entry points share this selection — the in-world sentence is
+ * unchanged; only the system line following it is gated. Three arms, in
+ * order (§29, §37.1): `act4_luke_met` (E1), then `act4_started` (E0, still
+ * rendering for a player who has started Act IV and not yet met him), then
+ * canon 88's shipped Act III line.
+ */
 const boundaryRules = (inWorldText: string): ProseRule[] => [
+  { when: { flag: ACT4_LUKE_MET }, text: `${inWorldText}\n\n${SYSTEM_BOUNDARY_TEXT_ACT4_E1}` },
   { when: { flag: ACT4_STARTED }, text: `${inWorldText}\n\n${SYSTEM_BOUNDARY_TEXT_ACT4}` },
   { text: `${inWorldText}\n\n${SYSTEM_BOUNDARY_TEXT}` },
 ];
@@ -420,8 +438,16 @@ export const ROOT_DOOR_DOWN_BOUNDARY_TEXT: ProseRule[] = boundaryRules(ROOT_DOOR
 // (`grantClue` on an already-held clue is a no-op), so the exact order the
 // player tries them in doesn't matter; builder's own reading of "the door
 // refuses four ways" (§28's own header), flagged in this task's report.
+// E1 task M, §22 — R16, above the shipped OPEN/UNLOCK refusal. Idempotent
+// on `act4_luke_at_root` (also guarded by the Hub's own `onEnter`,
+// `../s6ArchiveHub.ts`, the room shell — whichever trigger fires first wins;
+// the other then finds the flag already set and falls through to the
+// shipped refusal below, unchanged).
+const lukeAtRootWhen: Cond = { all: [{ npcAt: [ACT4_LUKE, ACT3_S6_ARCHIVE_HUB] }, { not: { flag: ACT4_LUKE_AT_ROOT } }] };
+
 const rootDoorHandlers: HandlerDef[] = [
   { verbs: [EXAMINE], effects: [{ say: ROOT_DOOR_EXAMINE_TEXT }] },
+  { verbs: [OPEN, UNLOCK, USE_VERB_ID], when: lukeAtRootWhen, effects: ACT4_LUKE_AT_ROOT_EFFECTS },
   { verbs: [OPEN, UNLOCK], effects: [{ say: ROOT_DOOR_TERMINAL_ANSWERS_TEXT }, { grantClue: ACT3_CLUE_ROOT_REFUSES }] },
   { verbs: [V_KNOCK], effects: [{ say: ROOT_DOOR_KNOCK_TEXT }, { grantClue: ACT3_CLUE_ROOT_REFUSES }] },
   {

@@ -558,4 +558,307 @@ look
 ask dad about the seal
 ask dad about the rails
 ask dad about the interlock
+nw
+down
+north
+down
+down
+look
+down
+look
+x chairs
+x chair
+count chairs
+sit in chair
+look under chair
+x hooks
+x nolan hook
+x peeled hook
+read names
+x nolan's chair
+x straps
+x anchor
+x uv lamp
+turn on uv lamp
+examine arm under lamp
+roll up sleeve
+put notebook under lamp
+x clock
+read clock
+x cabinet
+pull lever
+eat tablet
+x drain
+x coveralls
+x wall
+listen
+x door
+east
+look
+x terminal
+x screen
+read ledger
+log in
+admin
+wrong
+log in
+admin
+admin-password
+x terminal
+read ledger
+search ledger for jules
+search ledger for nolan
+search ledger for me
+search ledger for jack
+print ledger
+read graph
+look at axis
+compare notebook with graph
+compare audit with graph
+read graph
+read queue
+read queue
+delete queue
+search queue for jules
+x frames
+touch gate
+read legends
+enter gate
+x root door
+knock on door
+use badge
+open root door
+listen at door
+down
+dock dad
+x bench
+listen
+x rig
+x usb
+dock dad
+west
+up
+out
+up
+south
+up
+out
+go to motel
+look
+wait until night
+look
+go to town edge
+nw
+down
+north
+press l
+x alarm
+pull alarm
+reset alarm
+down
+down
+look
+x sleepers
+x woman
+x nolan
+wake nolan
+wake nolan
+wake nolan
+wake nolan
+examine nolan under lamp
+take badge
+x nolan hook
+put badge back
+undo strap
+pull strap
+wear coveralls
+look
+east
+look
+west
+remove coveralls
+listen
+wait
+east
+x terminal
+read profile
+look
+read profile
+search ledger for i
+search ledger for iv
+search ledger
+ii
+x frames
+enter gate
+west
+up
+out
+up
+south
+up
+out
+go to motel
+sleep
+look
+go to main street
+look
+x crew
+talk to crew
+cross barrier
+count crew
+use machine
+x barrier
+go to post office
+read board
+x notice
+read closure notice
+go to diner
+ask pearl about visit
+ask jack about weeks
+ask jack about jules
+x window
+go to sheriff
+ask whitlock about reader
+ask whitlock about notebook
+ask whitlock about cage
+ask whitlock about visit
+show notebook to whitlock
+x cage
+open cage
+x cage
+x bag
+x tag
+open bag
+x cage
+read notes
+show notes to whitlock
+compare notes with notebook
+go to post office
+write letter
+luke
+come and see what he kept for you, kiddo
+fold letter
+go to diner
+give letter to pearl
+ask pearl about visit
+go to town edge
+nw
+down
+north
+press l
+south
+out
+west
+look
+x luke
+talk to luke
+ask luke about letters
+ask luke about noumena
+ask luke about jack
+tell luke about jack
+ask luke about jules
+tell luke about jules
+ask luke about tattoos
+ask luke about plant
+ask luke about sissy
+ask luke about detail
+show notebook to luke
+show polaroids to luke
+show fedora to luke
+x whiteboard
+x table
+sit at table
+x folder
+read letters
+x letters
+x window
+open window
+x detail
+talk to detail
+x urn
+take coffee
+ask luke about door
+ask luke about door
+look
+open s6 door
+x s6 door
+go down
+go down
+up
+press l
+south
+east
+down
+down
+east
+look
+west
+up
+out
+up
+south
+up
+out
+go to post office
+write letter
+eli
+why is there no one with a one tattooed on his arm and what were the numerals for
+post letter
+out
+wait until morning
+wait until morning
+wait until morning
+wait until morning
+go to post office
+open box 141
+read numerals reply
+x numerals reply
+go to main street
+look
+wait until evening
+look
+go to front desk
+ask marlow about register
+go to main street
+sleep
+go to main street
+look
+go to motel
+sleep
+go to diner
+tell pearl about urn
+ask jack about chairs
+go to town edge
+nw
+down
+north
+press l
+south
+east
+down
+down
+turn on uv lamp
+look
+wake jack
+up
+out
+up
+south
+up
+out
+go to motel
+sleep
+go to diner
+look
+talk to jack
+ask jack about nobody
+ask jack about tattoo
+show arm to jack
+show arm to pearl
+go to post office
+write letter
+jack
+you should read what he kept
+go to diner
+give letter to jack
 version

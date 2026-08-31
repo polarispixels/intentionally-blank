@@ -881,4 +881,7 @@ export const ACT3_STRAP_ANCHOR = O('act3_strap_anchor');
 /** v0.15.1 — `PUT USB IN TERMINAL` as a bare form, so §29.1 (Dad refusing the dock) answers while the stick is in the rig and the rig is wherever it is. */
 export const V_ACT3_DOCK_DAD = V('act3_dock_dad');
 
+/** v0.17.0 — LISTEN DOWN at the chase bottom as a bare form (see objects/s5ReactorInterface.ts §4.2 note). */
+export const V_ACT4_LISTEN_DOWN = V('act4_listen_down');
+
 // --- D5 builders append below this line (Edit tool only; one block per task, labelled) ---

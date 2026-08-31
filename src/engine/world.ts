@@ -471,6 +471,18 @@ export interface NpcDefSlice {
   /** SHOW <object> TO <npc>. */
   showResponses?: ShowResponseDef[];
   /**
+   * GIVE <object> TO <npc> (Stage E1, task L — the hand-off `GIVE LETTER TO
+   * PEARL`/`GIVE LETTER TO WHITLOCK`, P22). Same shape as `showResponses`
+   * (reusing `ShowResponseDef` rather than a parallel type) and matched the
+   * same way — `npc.ts`'s `respondToGive` mirrors `respondToShow` exactly.
+   * Absent or unmatched ⇒ `respond.ts` falls to GIVE's own generic rung-2
+   * default family, named for the npc (`respondToNpcIobjDefault`), exactly
+   * the behavior every NPC had before this field existed (v0.8's "GIVE KEY
+   * TO JACK" naming fix) — so declaring no `giveResponses` changes nothing
+   * for any existing NPC.
+   */
+  giveResponses?: ShowResponseDef[];
+  /**
    * Authored per NPC (§2.6: "the personality lives here") — what this NPC
    * says to a topic none of `topics`/`tellTopics` matched (word mismatch
    * or a real topic gated off by an unmet `when`; both look identical from

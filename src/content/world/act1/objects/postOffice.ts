@@ -43,6 +43,11 @@ import { ACT2_CACHE_FOUND, ACT2_ORIGAMI_RULER, ACT2_REPLY_AUDIT, ACT2_REPLY_BLAN
 // E0 task I (`docs/superpowers/specs/2026-09-17-stage-e0-prose.md` §5) —
 // the second, closure notice, once the visit is announced.
 import { ACT4_VISIT_ANNOUNCED, ACT4_VISIT_NOTICE } from '../../act4/ids';
+// E1 task L (`docs/superpowers/specs/2026-09-18-stage-e1-prose.md` §19) —
+// the office's form letter arrives the same way, same precedent
+// `ACT4_REPLY_ELI_NUMERALS` set (E0 task J's own comment above, "added at
+// integration").
+import { ACT4_REPLY_OFFICE } from '../../act4/ids';
 
 // ---------------------------------------------------------------------------
 // §4.1 — The boxes
@@ -65,6 +70,7 @@ const box141HasSomethingWaiting: Cond = {
     { objectAt: [ACT2_REPLY_BLANK, { in: PO_BOXES }] },
     { objectAt: [ACT2_REPLY_AUDIT, { in: PO_BOXES }] },
     { objectAt: [ACT4_REPLY_ELI_NUMERALS, { in: PO_BOXES }] },
+    { objectAt: [ACT4_REPLY_OFFICE, { in: PO_BOXES }] },
     { objectAt: [ACT2_ORIGAMI_RULER, { in: PO_BOXES }] },
   ],
 };
@@ -129,6 +135,8 @@ const boxesOpenEffects: Effect[] = [
   { if: { when: { all: [{ objectAt: [ACT2_REPLY_AUDIT, { in: PO_BOXES }] }, { has: KEYRING }] }, then: [{ move: [ACT2_REPLY_AUDIT, 'inventory'] }] } },
   // E0 (v0.16.0): the numerals reply arrives the same way — added at integration (task J flagged it; this is task I's file).
   { if: { when: { all: [{ objectAt: [ACT4_REPLY_ELI_NUMERALS, { in: PO_BOXES }] }, { has: KEYRING }] }, then: [{ move: [ACT4_REPLY_ELI_NUMERALS, 'inventory'] }] } },
+  // E1 task L (v0.17.0): the office's form letter arrives the same way.
+  { if: { when: { all: [{ objectAt: [ACT4_REPLY_OFFICE, { in: PO_BOXES }] }, { has: KEYRING }] }, then: [{ move: [ACT4_REPLY_OFFICE, 'inventory'] }] } },
   { if: { when: { all: [{ objectAt: [ACT2_ORIGAMI_RULER, { in: PO_BOXES }] }, { has: KEYRING }] }, then: [{ move: [ACT2_ORIGAMI_RULER, 'inventory'] }] } },
 ];
 

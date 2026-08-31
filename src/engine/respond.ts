@@ -83,7 +83,7 @@ import { GO_TO_VERB_ID } from './interpreter';
 import { DIRECTION_VERB_IDS, directionForVerb, executeGoTo, look, LOOK_VERB_ID, traverseDirection, traverseDoor, USE_VERB_ID } from './move';
 import type { CompiledVocabulary } from './parser';
 import { allEmptyFamilyKey, candidateName, isNpcId } from './parser';
-import { NPC_VERB_IDS, npcDisplayName, respondToAsk, respondToGreeting, respondToNoTopic, respondToShow, respondToTell } from './npc';
+import { NPC_VERB_IDS, npcDisplayName, respondToAsk, respondToGive, respondToGreeting, respondToNoTopic, respondToShow, respondToTell } from './npc';
 import { inventoryView } from './views';
 
 /**
@@ -211,16 +211,18 @@ function respondToActions(world: WorldDef, state: GameState, vocab: CompiledVoca
  * rung-2 default in that case (documented at `respondToGreeting`'s own
  * definition), rather than inventing a second fallback family.
  *
- * SHOW: unlike ASK/TELL, the *object* being shown is `dobj`
+ * SHOW/GIVE: unlike ASK/TELL, the *object* being shown/given is `dobj`
  * (`'V dobj prep iobj'`, prep "to") and the npc is `iobj` — the inverse of
- * every other npc-targeting shape here, so it needs its own guard rather
- * than reusing the `dobj`-is-npc check below. A miss (`respondToShow`
- * returns `undefined` — nothing in `showResponses` matched) falls to
- * `respondToNpcIobjDefault`, a SHOW-specific rung-2 default rather than
- * `respondToNpcTarget`: `performAction`'s ordinary rung-2 path would
- * template `{name}`/`{iobj}` from an object-only naming table, and it is
- * the *object*'s name that belongs in `{name}` here, the npc's in `{iobj}`
- * (response-families doc §0 note 3: SHOW is inherently person-facing).
+ * every other npc-targeting shape here, so this pair needs its own guard
+ * rather than reusing the `dobj`-is-npc check below. A miss (`respondToShow`/
+ * `respondToGive` returns `undefined` — nothing in `showResponses`/
+ * `giveResponses` matched) falls to `respondToNpcIobjDefault`, a shared
+ * rung-2 default rather than `respondToNpcTarget`: `performAction`'s
+ * ordinary rung-2 path would template `{name}`/`{iobj}` from an object-only
+ * naming table, and it is the *object*'s name that belongs in `{name}`
+ * here, the npc's in `{iobj}` (response-families doc §0 note 3: SHOW is
+ * inherently person-facing — GIVE, added Stage E1 task L, is the same
+ * shape).
  */
 function respondToAction(world: WorldDef, state: GameState, vocab: CompiledVocabulary, action: StructuredAction): RespondResult {
   const dobj = action.dobj;
@@ -281,6 +283,14 @@ function respondToAction(world: WorldDef, state: GameState, vocab: CompiledVocab
     if (action.verb === NPC_VERB_IDS.show) {
       const shown = respondToShow(world, state, vocab, dobj as ObjectId, iobj);
       if (shown !== undefined) return shown;
+    }
+    // Stage E1, task L addition: GIVE's own rung 1, parallel to SHOW's —
+    // see `giveResponses`'s doc comment (`world.ts`) and `respondToGive`
+    // (`npc.ts`). A miss falls to the same `respondToNpcIobjDefault` every
+    // other npc-targeted verb already falls to.
+    if (action.verb === NPC_VERB_IDS.give) {
+      const given = respondToGive(world, state, vocab, dobj as ObjectId, iobj);
+      if (given !== undefined) return given;
     }
     return respondToNpcIobjDefault(world, state, vocab, action.verb, dobj as ObjectId, iobj);
   }

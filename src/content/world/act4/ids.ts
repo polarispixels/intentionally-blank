@@ -9,7 +9,7 @@
 // ADD their own object/verb/topic/event/script ids below the anchor at the
 // end of this file, with the Edit tool, never Write.
 
-import { C, F, O, P, Q, S, V } from '../../../engine/ids';
+import { C, F, N, O, P, Q, R, S, V } from '../../../engine/ids';
 
 // Flags (§2)
 export const ACT4_STARTED = F('act4_started');
@@ -111,3 +111,159 @@ export const ACT4_REPLY_ELI_NUMERALS = O('act4_reply_eli_numerals');
 export const ACT4_EV_DAD_BREATH = 'act4_ev_dad_breath';
 
 // --- E0 builders append below this line (Edit tool only; one block per task, labelled) ---
+
+// --- E1 task M ---
+// Luke, the escort, R16, and the boundary (`docs/superpowers/specs/2026-09-
+// 18-stage-e1-prose.md` §11, §12, §20-§23, §29, §37, §38). `act4_luke`'s own
+// `NpcDefSlice` lives in `./luke.ts` (a new file, this task's own); topic ids
+// are declared locally there (sidecar style, matching `nolan.ts`/
+// `whitlock.ts`'s own convention) rather than here. `ACT4_STAGING_AREA` (the
+// room id) and the staging-side state are task L's — imported by id from
+// this same file once L's own labelled block lands (a transient "not
+// declared" error naming it belongs to that task, not this one).
+export const ACT4_LUKE = N('act4_luke');
+export const ACT4_LUKE_MET = F('act4_luke_met');
+export const ACT4_LUKE_WILL_ESCORT = F('act4_luke_will_escort');
+export const ACT4_S6_DOOR_OPEN = F('act4_s6_door_open');
+export const ACT4_LUKE_AT_ROOT = F('act4_luke_at_root');
+export const ACT4_LUKE_GONE = F('act4_luke_gone');
+
+// The escort (§20's own heading names this id, the same "section names its
+// script" convention `act4_set_visit_day` already follows) — the lift ride
+// to Sublevel 5: `advanceClock: 20`, `moveNpc`, `setFollowing`, `goto`.
+export const ACT4_LUKE_DESCENDS_SCRIPT = S('act4_luke_descends');
+
+// The stub gate behind S5's shipped `down` exit (§21.1/§37.2's own "stair"
+// row) — never player-facing (no `nouns`, same minimal-stub idiom
+// `act3/objects/s6ArchiveHub.ts`'s own `s6BoundaryGate` already uses).
+// Defaults open (the shipped Pipe Chase route, unaffected); closed for good
+// the instant the S6 door opens (§21's own effects), so bare `GO DOWN`
+// thereafter renders §21.1's stair text instead of the shipped exit — see
+// `act3/s5ReactorInterface.ts`'s own comment on why this, and not the exit's
+// `when`, is the mechanism (the alternate Cooling-Plant-hatch route into
+// Sublevel 6 stays open throughout, so nothing is actually lost).
+export const ACT4_S5_DOWN_GATE = O('act4_s5_down_gate');
+
+// Clues (§2; only this task's four — the other four in §2's list are other
+// E1 tasks' own).
+export const ACT4_CLUE_LUKES_WORD = C('act4_clue_lukes_word');
+export const ACT4_CLUE_LUKES_REASON = C('act4_clue_lukes_reason');
+export const ACT4_CLUE_TWO_THING_DOOR = C('act4_clue_two_thing_door');
+export const ACT4_CLUE_NOT_THE_USER = C('act4_clue_not_the_user');
+
+// The missed-window event (§2's own flag-table note: "Luke stays... however
+// many days that takes" — but once the visit's own days run out with the
+// message never having reached him, he still leaves; canon 11). Plain
+// string id, matching this file's own `EVENT_ACT4_*` convention.
+export const EVENT_ACT4_LUKE_GONE_MISSED = 'act4_ev_luke_gone_missed';
+
+// --- E1 task L ---
+// The Staging Area, the hand-offs, and the visit's machinery
+// (`docs/superpowers/specs/2026-09-18-stage-e1-prose.md` §2-§10, §13-§19,
+// §28, §37, §38). This block declares: the room itself; the six furniture
+// objects, the detail, the urn, the office reply; the clues this builder's
+// own sections grant; the question `act4_q_reach_luke`; the puzzle P22;
+// the hand-off script; the two events (the door opening, the office
+// reply); and two new bare verbs (WRITE ON BOARD, the detail's PUSH
+// PAST/RUN escape attempt). `act4_luke`/`act4_luke_met`/`act4_luke_gone`
+// are read here (the room's own `onEnter`, P22's `solvedWhen`, the room
+// description) but are task M's own declarations, above (RECONCILED on
+// conflict, per this wave's shared-file protocol — this block originally
+// declared its own copies before finding M's already on disk; removed in
+// favor of those, matching this codebase's own precedent for the identical
+// situation, `act1/ids.ts`'s `PIE_BOX` header comment). Grep checked before
+// every id below — none pre-existed.
+
+// Room (§3)
+export const ACT4_STAGING_AREA = R('act4_staging_area');
+
+export const ACT4_STAGING_OPEN = F('act4_staging_open');
+export const ACT4_MESSAGE_DELIVERED = F('act4_message_delivered');
+/** String — `'none' | 'family' | 'plain' | 'rewritten'` (§16). */
+export const ACT4_MESSAGE_VERDICT = F('act4_message_verdict');
+/** Numeric — the day the office's form letter is due (§16, §19). */
+export const ACT4_OFFICE_REPLY_DUE = F('act4_office_reply_due');
+
+// Objects (§4-§10, §19)
+export const ACT4_STAGING_WHITEBOARD = O('act4_staging_whiteboard');
+export const ACT4_CONFERENCE_TABLE = O('act4_conference_table');
+export const ACT4_LUKES_FOLDER = O('act4_lukes_folder');
+export const ACT4_JACK_LETTERS = O('act4_jack_letters');
+export const ACT4_STAGING_WINDOW = O('act4_staging_window');
+/** Scenery, not an NPC (§37.2's own collision note: "the detail are not NPCs and must not become them"). Present in the Staging Area and, as the antecedent of §17's blocked text, in the Lobby from `act4_visit_day`. */
+export const ACT4_DETAIL = O('act4_detail');
+export const ACT4_COFFEE_URN = O('act4_coffee_urn');
+/** §19 — the office's form letter. The fifth `reply`-noun object (§37.2). */
+export const ACT4_REPLY_OFFICE = O('act4_reply_office');
+
+// Clues this task's own sections grant (§2, §9.2, §16, §7.1)
+export const ACT4_CLUE_DETAIL_REFUSES = C('act4_clue_detail_refuses');
+export const ACT4_CLUE_MESSAGE_THROUGH = C('act4_clue_message_through');
+export const ACT4_CLUE_LETTERS_FROM_JACK = C('act4_clue_letters_from_jack');
+
+// Question (§2, P22's own anchor)
+export const ACT4_Q_REACH_LUKE = Q('act4_q_reach_luke');
+
+// Puzzle (§2) — P22
+export const ACT4_P22_LUKE = P('act4_p22_luke');
+
+// Script (§14, §15, §16) — the hand-off, shared by both GIVE responses.
+export const ACT4_HAND_LETTER_SCRIPT = S('act4_hand_letter');
+
+// Events (§17, §19) — plain string ids, matching this file's own
+// `EVENT_ACT4_EV_START` convention (not `S()` — events are addressed by
+// plain string id, scripts by branded `ScriptId`).
+export const EVENT_ACT4_EV_STAGING_OPENS = 'act4_ev_staging_opens';
+export const EVENT_ACT4_EV_OFFICE_REPLY = 'act4_ev_office_reply';
+/** §37.2's own "MEN/DETAIL... in the Lobby on and after `act4_visit_day`" ruling — a one-time reveal, not named in the prose doc's own §2 event list. */
+export const EVENT_ACT4_EV_DETAIL_ARRIVES = 'act4_ev_detail_arrives';
+
+// Verbs (§4.2, §9.4) — new bare (no-dobj-required) verbs this room's own
+// escape/vandalism attempts need; neither collides with an existing verb
+// word (checked: `write on`/`push past`/`run` claimed by nobody).
+/** "WRITE ON BOARD" (§4.2) — two-word bare form so it never collides with `act2_write`'s own bare "write" (`validate.ts`'s verb-word-collision check groups by exact phrase, not per-word). */
+export const V_ACT4_WRITE_ON = V('act4_write_on');
+/** "PUSH PAST"/"RUN"/etc. (§9.4) — bare, no dobj; the detail's escape-attempt refusal. */
+export const V_ACT4_PUSH_PAST = V('act4_push_past');
+
+// --- E1 task N ---
+// R14's completion: Jack comes down (`docs/superpowers/specs/2026-09-18-
+// stage-e1-prose.md` §24-§27, §33, §37). `act1_jack`'s own `NpcDefSlice`
+// lives in `../../act1/jack.ts`; the new topic's id is declared locally
+// there (sidecar style, matching `jack.ts`'s own established convention for
+// its other topic ids — not here). Grep checked before every id below —
+// none pre-existed.
+
+// Flags (§2)
+export const ACT4_JACK_WILL_COME = F('act4_jack_will_come');
+export const ACT4_JACK_SAW_MARK = F('act4_jack_saw_mark');
+
+// Clue (§2, §25 — R14)
+export const ACT4_CLUE_JACK_SAW = C('act4_clue_jack_saw');
+
+// Events (§25, §26) — plain string ids, matching this file's own
+// `EVENT_ACT4_EV_START` convention.
+export const EVENT_ACT4_EV_JACK_SEES = 'act4_ev_jack_sees';
+export const EVENT_ACT4_EV_JACK_RETURNS = 'act4_ev_jack_returns';
+/**
+ * §26's block, as a `once` `EventDef` (E1 integration builder fix, the
+ * addendum's own status-line ruling): task N originally wired this as a
+ * PERMANENT greeting rule, gated `{ flag: act4_jack_saw_mark, at:
+ * SUNDOWN_DINER }`, because a `ProseRule` has no effect slot to flip a
+ * fresh "unspoken-to" flag on the turn it renders (see `act1/jack.ts`'s own
+ * header note on that gap) — but a greeting rule has no `once` ceiling
+ * either, so the scene repeated every visit to the counter. An `EventDef`
+ * DOES carry `once` (§2.8), so the fix moves the block there instead: it
+ * renders exactly once, the first time the player finds Jack at the
+ * counter after that night, and Jack's shipped greeting resumes after.
+ */
+export const EVENT_ACT4_EV_JACK_MORNING_SCENE = 'act4_ev_jack_morning_scene';
+/**
+ * §24.2, the tunnel mouth — not named by the prose doc (only §25/§26 are),
+ * a third event id beyond this task's own brief. Its `EventDef` lives in
+ * `../../act1/jack.ts` (the character's own file, `act2/dad.ts`'s
+ * `ACT4_EV_DAD_BREATH` precedent for an Act-IV-flagged beat that belongs
+ * with a different act's NPC), registered in `act4/index.ts`. Flagged in
+ * this task's report rather than silently added.
+ */
+export const ACT4_EV_JACK_TUNNEL = 'act4_ev_jack_tunnel';

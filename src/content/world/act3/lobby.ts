@@ -27,10 +27,20 @@
 import type { ExitDefSlice, HandlerDef, RoomDefSlice } from '../../../engine/world';
 import type { ProseRule } from '../../../engine/prose';
 import { LISTEN, SLEEP, SMELL } from '../act1/verbs';
-import { V_LOOK_UP } from '../act1/ids';
+import { V_FOLLOW, V_LOOK_UP } from '../act1/ids';
 import { ACT2_NOLAN } from '../act2/ids';
 import { ACT3_ALERTNESS, ACT3_DATA_HALL_A, ACT3_LOBBY, ACT3_LOBBY_READER, ACT3_PERIMETER_ROAD } from './ids';
 import { PUSH_TURNSTILE_WITHOUT_BADGE_TEXT } from './objects/lobby';
+// E1 task L (§3, §34 q8, §37.1, §37.4) — the west exit to the Staging Area,
+// gated on the door actually being open; the room itself is that task's own
+// (`act4/stagingArea.ts`).
+import { ACT4_STAGING_AREA, ACT4_STAGING_OPEN } from '../act4/ids';
+// E1 addendum §5 (integration builder) — `FOLLOW LUKE`, after §23. Room-
+// scoped in both rooms the addendum names (see `stagingArea.ts`'s own
+// comment on this exact text and on why "FOLLOW LUKE" by name doesn't yet
+// reach it).
+import { ACT4_LUKE_GONE } from '../act4/ids';
+import { FOLLOW_LUKE_GONE_TEXT } from '../act4/stagingArea';
 
 // ---------------------------------------------------------------------------
 // §8.1 — the lobby with Nolan in it (inserted above §7.1's own rules)
@@ -87,6 +97,10 @@ const roomHandlers: HandlerDef[] = [
   // first match; task C's own, if it also targets this room, simply never
   // gets reached, causing no error).
   { verbs: [SLEEP], effects: [{ say: sleepText }] },
+  // E1 addendum §5 — see `act4/stagingArea.ts`'s own comment on this exact
+  // text (hard rule 5 — one text, owned once) and on the "FOLLOW LUKE" by
+  // name gap this handler does not close.
+  { verbs: [V_FOLLOW], when: { flag: ACT4_LUKE_GONE }, effects: [{ say: FOLLOW_LUKE_GONE_TEXT }] },
 ];
 
 // ---------------------------------------------------------------------------
@@ -102,6 +116,13 @@ const exits: ExitDefSlice[] = [
   { dir: 'out', to: ACT3_PERIMETER_ROAD },
   { dir: 'n', to: ACT3_DATA_HALL_A, door: ACT3_LOBBY_READER, blockedText: PUSH_TURNSTILE_WITHOUT_BADGE_TEXT },
   { dir: 'in', to: ACT3_DATA_HALL_A, door: ACT3_LOBBY_READER, blockedText: PUSH_TURNSTILE_WITHOUT_BADGE_TEXT },
+  // E1 task L (§3, §37.1, §37.4) — the staging doors, once the message has
+  // gotten through and the day has come. No `blockedText` of its own: the
+  // staging-door scenery object's own OPEN/PUSH handler
+  // (`STAGING_DOOR_BLOCKED_TEXT`) already answers a player who tries the
+  // doors without walking west, and this exit simply does not exist until
+  // the same flag holds.
+  { dir: 'w', to: ACT4_STAGING_AREA, when: { flag: ACT4_STAGING_OPEN } },
 ];
 
 export const lobbyRoom: RoomDefSlice = {

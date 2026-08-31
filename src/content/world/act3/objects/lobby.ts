@@ -48,6 +48,13 @@ import { ACT2_NOLAN_BADGE, V_FIT } from '../../act2/ids';
 // the staging doors gain one appended sentence once the visit is
 // announced. E1 opens these doors.
 import { ACT4_VISIT_ANNOUNCED } from '../../act4/ids';
+// E1 task L (`docs/superpowers/specs/2026-09-18-stage-e1-prose.md` §17,
+// §37.1) — two rules prepended above E0's own rule and the shipped text,
+// in this order: §17.2 (the door is now an exit), then §17.1 (the day has
+// come but the message has not gotten through yet). Both new rules and the
+// two kept underneath are transcribed exactly (hard rule 5); the shipped
+// two paragraphs are untouched and not recounted (§40's own note).
+import { ACT4_STAGING_OPEN, ACT4_VISIT_DAY } from '../../act4/ids';
 import {
   ACT3_BROCHURES,
   ACT3_CLUE_MODEL_SHORT,
@@ -256,7 +263,25 @@ const stagingDoorBlockedShipped =
 // prose doc's own §34, per that section's note).
 const stagingDoorBlockedAnnounced = `${stagingDoorBlockedShipped}\n\nThis time somebody on the far side of the wired glass looks up from a folding\ntable to check that they did not.`;
 
+// E1 task L (§17.1) — a man on the push bar, once the visit day has come
+// and the message has not gotten through yet.
+const stagingDoorBlockedVisitDay =
+  'There is a man in front of the push bar now, with his hands loose in front of\nhim, and he is not a large man, and it does not signify.\n\n"Sir."\n\nThat is all he says and all he is going to say. He has a short list in his head\nand does not have to look at it, and you are not going to get on it by\nexplaining yourself to him.\n\nBehind you, out in the lobby, the man who runs this plant is standing on the\nwrong side of his own building with a folder under one arm and nowhere to put\nit.';
+
+// E1 task L (§17.2) — the door is now an exit; what OPEN DOORS/PUSH DOORS
+// gives once `act4_staging_open` holds (in addition to the real exit
+// itself, gated the same way — `act3/lobby.ts`'s own amendment).
+const stagingDoorOpenNowText =
+  'The man in front of the bar puts a finger to his ear, listens to somebody on\nthe other side of the wall, and takes his hands apart.\n\n"Go ahead, sir."\n\nHe does not ask you anything, and that is the whole of what has changed.';
+
 export const STAGING_DOOR_BLOCKED_TEXT: ProseRule[] = [
+  { when: { flag: ACT4_STAGING_OPEN }, text: stagingDoorOpenNowText },
+  // `{ flag: ACT4_VISIT_ANNOUNCED }` guards `onOrAfterDay` against its own
+  // unset default (`act4_visit_day` defaults to `0`, and `state.clock.day`
+  // is never less than 1 — without this guard the rule would be true from
+  // turn one, before the day is ever actually set by `act4_set_visit_day`;
+  // found running this task's own test suite, not in the doc's own text).
+  { when: { all: [{ flag: ACT4_VISIT_ANNOUNCED }, { onOrAfterDay: ACT4_VISIT_DAY }, { not: { flag: ACT4_STAGING_OPEN } }] }, text: stagingDoorBlockedVisitDay },
   { when: { flag: ACT4_VISIT_ANNOUNCED }, text: stagingDoorBlockedAnnounced },
   { text: stagingDoorBlockedShipped },
 ];

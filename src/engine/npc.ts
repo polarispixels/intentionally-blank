@@ -68,6 +68,14 @@ export const NPC_VERB_IDS = {
   tell: V('tell'),
   show: V('show'),
   talk: V('talk'),
+  /**
+   * Stage E1, task L addition: GIVE gets the same authored-response rung
+   * `showResponses` already has (`giveResponses`, `world.ts`) — see
+   * `respondToGive` below and `respond.ts`'s dispatch. Content already
+   * declares `V('give')` under this exact string id (`act1/verbs.ts`'s
+   * `GIVE`), the same convention `show`/`talk` above rely on.
+   */
+  give: V('give'),
 } as const;
 
 export interface NpcResult {
@@ -279,6 +287,35 @@ export function respondToShow(world: WorldDef, state: GameState, vocab: Compiled
     proper: 'iobj',
   });
   return { state: markMet(newState, npc), events, class: world.verbs?.[NPC_VERB_IDS.show]?.class ?? null };
+}
+
+// ---------------------------------------------------------------------------
+// GIVE <object> TO <npc> (Stage E1, task L — P22's hand-off)
+// ---------------------------------------------------------------------------
+
+/**
+ * `giveResponses` — the GIVE-side twin of `respondToShow`, same matching
+ * rule (`matchesShow` reused as-is: "specific objects or `'any'`, gated by
+ * `when`, first match wins"). Returns `undefined` when nothing matches, so
+ * `respond.ts` falls to GIVE's own ordinary rung-2 NPC-target default in
+ * that case — `giveResponses` is this verb's rung 1, not a second ladder.
+ */
+export function respondToGive(world: WorldDef, state: GameState, vocab: CompiledVocabulary, object: ObjectId, npc: NpcId): NpcResult | undefined {
+  const def = requireNpc(world, npc);
+  const entry = (def.giveResponses ?? []).find((e) => matchesShow(e, object) && (e.when === undefined || evaluate(world, state, e.when)));
+  if (entry === undefined) return undefined;
+
+  const objectName = world.objects?.[object]?.name ?? object;
+  const npcName = npcDisplayName(world, vocab, npc);
+  const path = `npc.${npc}.give.${object}`;
+  const { state: newState, events } = apply(world, state, [{ say: entry.response }, ...(entry.effects ?? [])], {
+    name: objectName,
+    dobj: objectName,
+    iobj: npcName,
+    path,
+    proper: 'iobj',
+  });
+  return { state: markMet(newState, npc), events, class: world.verbs?.[NPC_VERB_IDS.give]?.class ?? null };
 }
 
 // ---------------------------------------------------------------------------

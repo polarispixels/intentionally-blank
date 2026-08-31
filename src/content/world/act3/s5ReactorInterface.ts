@@ -24,7 +24,12 @@ import {
   V_THROW,
 } from './ids';
 import { ACT3_READ_CLOCK_SCRIPT } from './ids';
-import { chaseBottomDropDownText, chaseBottomLookDownText, s6PadEffects, turnKeyswitchEffects } from './objects/s5ReactorInterface';
+import { chaseBottomDropDownText, chaseBottomLookDownText, s6PadEffects, s6StairText, turnKeyswitchEffects } from './objects/s5ReactorInterface';
+// E1 task M — Luke, the escort, and the door with two things (`docs/
+// superpowers/specs/2026-09-18-stage-e1-prose.md` §20, §21.1, §37.1, §37.2).
+import { ACT4_LUKE, ACT4_S5_DOWN_GATE } from '../act4/ids';
+import { V_ACT4_LISTEN_DOWN } from './ids';
+import { chaseBottomListenText } from './objects/s5ReactorInterface';
 
 // ---------------------------------------------------------------------------
 // §9.1 — description. Rule 1 is gated on `act3_s5_seen` (set by `onEnter`,
@@ -43,7 +48,19 @@ const nightVisit =
 const otherwiseVisit =
   'Gauges on the right, the shield door on the left, the pad door at the end, and\nthe opening in the floor beside it.\n\nStill nobody.';
 
+// E1 task M, §20 — the escort's own "arriving" paragraph ("He walks the
+// length of the gallery once...") is wired here, gated on Luke's presence,
+// rather than said by the escort script itself — the script's own `goto`
+// already re-renders this room's description on arrival (`turn.ts`'s
+// location-diff render), so saying it twice (once in the script, once here)
+// would either double it or leave the shipped "Still nobody" clause in
+// `otherwiseVisit`/`nightVisit` contradicting him standing right there.
+// Prepended above every other rule so it wins outright while he is here.
+export const lukeAtS5Text =
+  'He walks the length of the gallery once, slowly, hands behind his back, past a\nhundred round faces he has no way of reading, and stops at the end wall.';
+
 const description: ProseRule[] = [
+  { when: { npcAt: [ACT4_LUKE, ACT3_S5_REACTOR_INTERFACE] }, text: lukeAtS5Text },
   { when: { not: { flag: ACT3_S5_SEEN } }, text: firstSight },
   { when: { clockPhase: 'night' }, text: nightVisit },
   { text: otherwiseVisit },
@@ -66,10 +83,22 @@ const onEnter: OnEnterRule[] = [
 // Chase (1 min, §9.6). No travelText authored for either — the arrival is
 // the destination's own description, same convention the chase's own
 // `out`/`sideways` exit to this room uses (`pipeChase.ts`).
-// ---------------------------------------------------------------------------
-
+//
+// E1 task M, §21.1/§37.1/§37.2 — `door: ACT4_S5_DOWN_GATE` added to
+// `downExit`. The gate is a stub object (`objects/s5ReactorInterface.ts`)
+// that defaults open (this exit's shipped behavior, unaffected) and is
+// permanently closed by §21's own effects the instant the S6 door opens.
+// From then on, bare `GO DOWN` here renders `blockedText` (§21.1's own
+// stair paragraph) instead of moving to the Pipe Chase — **not** a new exit
+// for the stair (§37.1's own warning against shipping E3 early: "the stair
+// is §21.1's handler text and not an exit"), just the shipped exit gated
+// shut, exactly the "check the exit table before wiring the handler" §37.2
+// asks for. `ENTER CHASE`/`ENTER OPENING`/`ENTER LADDER` (the chase bottom
+// object's own dobj-resolved handler, below) are a separate mechanism and
+// stay reachable regardless — as does the Cooling Plant's own hatch route
+// into the same Sublevel 6, so nothing is actually lost by closing this one.
 const upExit: ExitDefSlice = { dir: 'up', to: ACT3_S1_MECHANICAL_GALLERY, minutes: 5 };
-const downExit: ExitDefSlice = { dir: 'down', to: ACT3_PIPE_CHASE, minutes: 1 };
+const downExit: ExitDefSlice = { dir: 'down', to: ACT3_PIPE_CHASE, minutes: 1, door: ACT4_S5_DOWN_GATE, blockedText: s6StairText };
 
 // ---------------------------------------------------------------------------
 // §9.10 — room-level senses with no dobj of their own.
@@ -91,6 +120,8 @@ export const s5ReactorInterfaceRoom: RoomDefSlice = {
   onEnter,
   exits: [upExit, downExit],
   handlers: [
+  // v0.17.0 — §4.2's LISTEN DOWN, room-answered (see objects file's note).
+  { verbs: [V_ACT4_LISTEN_DOWN], effects: [{ say: chaseBottomListenText }] },
     { verbs: [LISTEN], when: { at: ACT3_S5_REACTOR_INTERFACE }, effects: [{ say: listenText }] },
     { verbs: [SMELL], when: { at: ACT3_S5_REACTOR_INTERFACE }, effects: [{ say: smellText }] },
     { verbs: [YELL, HELLO], when: { at: ACT3_S5_REACTOR_INTERFACE }, effects: [{ say: shoutText }] },

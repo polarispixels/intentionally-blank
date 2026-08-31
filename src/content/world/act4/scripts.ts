@@ -23,6 +23,7 @@
 
 import { evaluate } from '../../../engine/cond';
 import type { Cond } from '../../../engine/cond';
+import type { Effect } from '../../../engine/effects';
 import { apply } from '../../../engine/effects';
 import type { GameState, ObjectOverlay, ScriptFn, WorldDef } from '../../../engine/world';
 import { ACT4_CREWS, ACT4_VISIT_ANNOUNCED, ACT4_VISIT_DAY, ACT4_VISIT_OVER_DAY } from './ids';
@@ -49,4 +50,41 @@ export const act4CrewsVisibility: ScriptFn = (world: WorldDef, state: GameState)
   const overlay: ObjectOverlay = { ...(state.objects[ACT4_CREWS] ?? {}), hidden };
   const nextState: GameState = { ...state, objects: { ...state.objects, [ACT4_CREWS]: overlay } };
   return { state: nextState, events: [] };
+};
+
+// --- E1 task L ---
+// P22's hand-off (`docs/superpowers/specs/2026-09-18-stage-e1-prose.md`
+// §13, §16). `act4HandLetter` — `act4_hand_letter` (already declared,
+// `ACT4_HAND_LETTER_SCRIPT`, `ids.ts`) — is the one script behind BOTH
+// `GIVE LETTER TO PEARL` (§14) and `GIVE LETTER TO WHITLOCK` (§15): "same
+// script, same verdict handling, different hand" (§15's own header). Reads
+// `act2_letter_out`'s `message`/`folded` props (same `prop()` idiom
+// `act2/objects/censor.ts`'s own `act2PostLetter` already uses), calls the
+// pure `familyVerdict` (`act2/censor.ts`, untouched `censorVerdict`
+// alongside it), and applies §16's table: `'family'` sets `act4_message_
+// delivered` and grants the clue; `'plain'`/`'rewritten'` both just set the
+// due day. `act4_message_verdict` is set to the real value in every branch
+// (§16's own column). The letter always moves to `nowhere` (§16: "letter →
+// nowhere", every row). No text of its own — §14/§15's own `response`
+// fields (via `giveResponses`) are what the player sees; this script is
+// pure effects, run after that `say` (`npc.ts`'s `respondToGive`: `[{ say:
+// entry.response }, ...(entry.effects ?? [])]`), matching §37.3's own
+// ordering note.
+import { prop } from '../../../engine/resolve';
+import { familyVerdict } from '../act2/censor';
+import { ACT2_LETTER_OUT } from '../act2/ids';
+import { ACT4_CLUE_MESSAGE_THROUGH, ACT4_HAND_LETTER_SCRIPT, ACT4_MESSAGE_DELIVERED, ACT4_MESSAGE_VERDICT, ACT4_OFFICE_REPLY_DUE } from './ids';
+
+export const act4HandLetter: ScriptFn = (world: WorldDef, state: GameState) => {
+  const message = String(prop(world, state, ACT2_LETTER_OUT, 'message') ?? '');
+  const folded = Boolean(prop(world, state, ACT2_LETTER_OUT, 'folded') ?? false);
+  const verdict = familyVerdict(message, folded);
+
+  const effects: Effect[] = [{ move: [ACT2_LETTER_OUT, 'nowhere'] }, { set: [ACT4_MESSAGE_VERDICT, verdict] }];
+  if (verdict === 'family') {
+    effects.push({ set: [ACT4_MESSAGE_DELIVERED, true] }, { grantClue: ACT4_CLUE_MESSAGE_THROUGH });
+  } else {
+    effects.push({ set: [ACT4_OFFICE_REPLY_DUE, state.clock.day + 1] });
+  }
+  return apply(world, state, effects, { path: `script.${ACT4_HAND_LETTER_SCRIPT}` });
 };

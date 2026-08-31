@@ -12,6 +12,57 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.17.0] - 2026-08-31
+
+**Stage E1 — the visit.** One new room, and the county rearranged around
+one man (`docs/superpowers/specs/2026-09-18-stage-e1-prose.md` and its
+addendum).
+
+### Added
+
+- **The Staging Area**, west of the Lobby: the folded tables down and
+  papered, the county's whiteboard with a stranger's dry-wipe hand in it
+  (no times, ever), the window, the urn on a card table, the detail at
+  both doors, and a coat over one chair.
+- **Luke.** Eight topics, four shows, two greetings; *lacuna* and
+  *provenance*, one use each; *There is no I and there was never an I. Our
+  father was I* — flatly contradicting Eli's letter, as ruled. Jack's
+  letters in his folder (R15: no crossings-out, one length, even
+  pressure), and *"He would not have put that in a letter."*
+- **The hand-off** (P22): the family verdict on a folded letter, Pearl's
+  apron pocket, the door that stops asking; the office's handwritten form
+  reply for a letter that reads as anyone's.
+- **The escort.** Silence from the leaves down (canon 104); the legend
+  strip with nothing on it; the two-thing door — the paper badge, and
+  something short typed without looking (never shown, register 121);
+  *Behind it there is a stair*, and the stair's own refusal until there
+  is a reason.
+- **R16.** Hand, badge, hand, once more, and a man standing a while at
+  the bottom of a tiled well. No sentence after it.
+- **R14 completed.** *"Show me."* — Jack through the tunnel, wordless from
+  its mouth, the wrist under the lamp, the chair his legs put him in and
+  took him out of, the lamp turned off; the second plate the next morning
+  and a held door. He is never shown reconciled.
+- The addendum's ten small answers, including `GIVE LETTER TO JACK`
+  (*"Not out of my hand it isn't."*) on the engine's new `giveResponses`.
+
+### Changed
+
+- Every direction verb now answers its `GO <direction>` form (`GO DOWN`
+  parsed as go-to-a-thing and fell to a stale boundary family); `go west`/
+  `go east` stay with Town Edge's overland refusal.
+- `LISTEN DOWN` became a bare form (the chase bottom's bare `down` noun
+  broke `GO DOWN` everywhere it was in scope); the gatehouse answers
+  `READ`; Luke slips away only unobserved; the D4 fixture re-types the
+  credentials after the death (the checkpoint had rolled the S6-door clue
+  back, which no test caught and the E1 gate found).
+
+### Decisions
+
+Canon register 119–125 (where the name may appear; the struck diner stop;
+the typed second thing; Luke's vocabulary; R16 wordless; the recognition
+wordless with *a numeral* said once; the morning line).
+
 ## [0.16.1] - 2026-08-31
 
 Test fix: the E0 completion test anchored two beats across the CLI's line

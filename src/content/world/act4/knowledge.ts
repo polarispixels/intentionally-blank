@@ -52,7 +52,13 @@ export const ACT4_E0_QUESTIONS: NonNullable<WorldSlice['questions']> = {
   [ACT4_Q_WHO_OUTRANKS_IT]: {
     text: 'Who outranks this building?',
     openWhen: { all: [{ flag: ACT4_STARTED }, { clue: ACT3_CLUE_ROOT_REFUSES }] },
-    // Answered in E1.
+    // E1 task M (§2, §22) — `answer` added here (this entry's own field, not
+    // a new one); `answerWhen` is left undefined, matching this file's own
+    // established idiom for a question whose only answer route is an
+    // explicit `{ answerQuestion }` effect rather than an ambient `Cond`
+    // (`act4LukeAtRoot`'s own effects, `./luke.ts`).
+    answer:
+      'Nobody who is alive. The building took his badge upstairs and opened a door for\nhim on Sublevel 5, and then it did nothing whatever at the bottom of the well,\nbecause the thing at the bottom of the well is not a door that refuses people.\nIt is a door nobody has ever switched the reader on for.',
   },
 };
 
@@ -159,3 +165,163 @@ export const ACT4_J_PUZZLES: NonNullable<WorldSlice['puzzles']> = {
 };
 
 // --- E0 builders append below this line (Edit tool only; one block per task, labelled) ---
+
+// --- E1 task L ---
+// The Staging Area, the hand-offs, and the visit's machinery
+// (`docs/superpowers/specs/2026-09-18-stage-e1-prose.md` §2, §9.2, §7.1,
+// §14-§16, §28). This task's own three clues (detail text §2's, verbatim),
+// the question `act4_q_reach_luke`, and P22 (`act4_p22_luke`) — `solvedWhen`/
+// `answerWhen` both key off `act4_luke_met` (task M's flag, imported by id;
+// §2's own state table: "read by P22's solvedWhen"). Two `social` solutions,
+// each with a `route` cond naming what it actually depends on
+// (`validate.ts`'s clock-free-solution rule; §2's own puzzle-table note:
+// "Both carry `onOrAfterDay`, so both take `missedRecovery`"); five hints,
+// §28's own ladder, verbatim.
+// `ACT4_VISIT_DAY`/`ACT4_WHITLOCK_CONVINCED` are already imported at the top
+// of this file (E0); `ACT4_LUKE_MET` is task M's own, imported below in that
+// task's own block — not re-imported here (module-scope names in one file
+// must be unique regardless of which task's block declares them; fixed
+// mechanically, no logic touched, per this wave's shared-file protocol).
+import {
+  ACT4_CLUE_DETAIL_REFUSES,
+  ACT4_CLUE_LETTERS_FROM_JACK,
+  ACT4_CLUE_MESSAGE_THROUGH,
+  ACT4_MESSAGE_DELIVERED,
+  ACT4_MESSAGE_VERDICT,
+  ACT4_OFFICE_REPLY_DUE,
+  ACT4_P22_LUKE,
+  ACT4_Q_REACH_LUKE,
+  ACT4_STAGING_OPEN,
+} from './ids';
+
+export const ACT4_L_FLAGS: WorldSlice['flags'] = {
+  [ACT4_STAGING_OPEN]: { default: false, doc: "set by act4_ev_staging_opens (§17); read by the Lobby's west exit and the staging door's blocked text" },
+  [ACT4_MESSAGE_DELIVERED]: { default: false, doc: "set by act4_hand_letter on a 'family' verdict (§16); read by act4_ev_staging_opens" },
+  [ACT4_MESSAGE_VERDICT]: { default: 'none', doc: "'none' | 'family' | 'plain' | 'rewritten' — set by act4_hand_letter, every verdict (§16); read by act4_ev_office_reply, hints" },
+  [ACT4_OFFICE_REPLY_DUE]: { default: 0, doc: 'numeric — set by act4_hand_letter (day + 1) on a non-family verdict; read by act4_ev_office_reply' },
+};
+
+export const ACT4_L_CLUES: NonNullable<WorldSlice['clues']> = {
+  [ACT4_CLUE_DETAIL_REFUSES]: {
+    title: 'Nothing I am carrying was issued to me',
+    detail:
+      'Two men stand on the doors of the staging area. They took the borrowed badge\nand read both sides of it and handed it back and did not move. Nothing I am\ncarrying was issued to me, because there is nobody for anything to be issued\nto.',
+  },
+  [ACT4_CLUE_MESSAGE_THROUGH]: {
+    title: 'The post office is where the censor lives',
+    detail:
+      "The letter went in folded the way Eli folds, with one of the family's own words\nin it and a numeral at the end of it where a signature goes, and it was handed\nacross a counter rather than posted. The post office is where the censor lives.",
+  },
+  [ACT4_CLUE_LETTERS_FROM_JACK]: {
+    title: 'Jack wrote none of them',
+    detail:
+      "There is a folder in that room with years of letters from Jack in it. Cheerful.\nAsking after everybody. Not one of them asking for anything, not one of them\ncrossed out, and every one of them the same length. Jack's hand and Jack's\nsignature. Jack wrote none of them.",
+  },
+};
+
+export const ACT4_L_QUESTIONS: NonNullable<WorldSlice['questions']> = {
+  [ACT4_Q_REACH_LUKE]: {
+    text: 'How do you reach the one man who outranks the detail?',
+    openWhen: { clue: ACT4_CLUE_DETAIL_REFUSES },
+    answerWhen: { flag: ACT4_LUKE_MET },
+    answer:
+      'Not with anything you own. With a sheet of post-office paper, folded the way a\nsix-year-old folded them at the back of a hearing, with a word in it that only\nfive people ever used and a numeral at the bottom where a name goes — handed\nover a counter to somebody nobody has ever thought to search.',
+  },
+};
+
+export const ACT4_L_PUZZLES: NonNullable<WorldSlice['puzzles']> = {
+  [ACT4_P22_LUKE]: {
+    id: ACT4_P22_LUKE,
+    name: 'the message',
+    question: ACT4_Q_REACH_LUKE,
+    solvedWhen: { flag: ACT4_LUKE_MET },
+    onSolved: [{ answerQuestion: ACT4_Q_REACH_LUKE }],
+    solutions: [
+      {
+        id: 'pearl',
+        class: 'social',
+        note: 'GIVE LETTER TO PEARL, at her counter, once the visit is announced. Write it at\nthe post office and fold it before you go — but do not post it. Two of three:\nthe fold, one of the family\'s own words, and a numeral last on the page.',
+        route: { onOrAfterDay: ACT4_VISIT_DAY },
+      },
+      {
+        id: 'whitlock',
+        class: 'social',
+        note: 'GIVE LETTER TO WHITLOCK, once she has been shown paper she can hold. She goes\nin and out of that lobby with a folder and nobody in this county has ever asked\nher what is in it. Two of three: the fold, the word, the numeral.',
+        route: { all: [{ flag: ACT4_WHITLOCK_CONVINCED }, { onOrAfterDay: ACT4_VISIT_DAY }] },
+      },
+    ],
+    hints: [
+      'There is one man alive who outranks the last door in that building, and the\ncounty has milled a road for him.',
+      'Two men stand between you and the room they are keeping him in, and they are\nthe only people in this county who have ever looked properly at what you are\ncarrying.',
+      'You cannot go through them and you cannot go round them. Something can, though.\nPaper has been reaching this family all week, and you know which kind reaches\nthem and which kind reaches somebody else first.',
+      'A letter that reads like everybody else\'s gets answered like everybody else\'s.\nThink about what is in a letter from his family that is not in a letter from a\nstranger: the way it is folded, a word only the five of them ever used,\nand what goes at the bottom where a name would.',
+      'Fold it the way you learned at the reader. Put one of the family\'s words in it.\nSign it with a numeral, last thing on the page. Then give it — do not post it,\nthe post office is where the other thing lives — to somebody nobody has ever\nthought to search: the woman at the counter, or the sheriff, if you have given\nher a reason.',
+    ],
+    missedRecovery:
+      'The visit, once announced, does not leave. He stays in that room until the\nmessage reaches him, and the room is still there the day after.',
+  },
+};
+
+// --- E1 task M ---
+// Luke, the escort, R16, and the boundary (`docs/superpowers/specs/2026-09-
+// 18-stage-e1-prose.md` §2, §11, §21, §22). Flags and this task's own four
+// clues (detail text is §2's, verbatim; titles composed from each granting
+// section's own line, hard rule 5 — the same "quote the section's own line,
+// sentence case" idiom `act3/knowledge.ts`/E0's own task K block use).
+import { ACT4_LUKE_AT_ROOT, ACT4_LUKE_GONE, ACT4_LUKE_MET, ACT4_LUKE_WILL_ESCORT, ACT4_S6_DOOR_OPEN } from './ids';
+import { ACT4_CLUE_LUKES_REASON, ACT4_CLUE_LUKES_WORD, ACT4_CLUE_NOT_THE_USER, ACT4_CLUE_TWO_THING_DOOR } from './ids';
+
+export const ACT4_E1_TASK_M_FLAGS: WorldSlice['flags'] = {
+  [ACT4_LUKE_MET]: { default: false, doc: 'set by act4_staging_area\'s onEnter with Luke present (task L); read by P22\'s solvedWhen, act4_luke_gone\'s missed-window event, and the boundary\'s third arm' },
+  [ACT4_LUKE_WILL_ESCORT]: { default: false, doc: 'set by ./luke.ts topic_door rule 1; read by the same topic\'s escort rule and Luke\'s own FOLLOW handler' },
+  [ACT4_S6_DOOR_OPEN]: { default: false, doc: 'set by §21 (act3/objects/s5ReactorInterface.ts), permanent; read by the S6 door\'s own text, the stair gate object, and E3\'s root leg (i)' },
+  [ACT4_LUKE_AT_ROOT]: { default: false, doc: 'set by §22/§23 (./luke.ts ACT4_LUKE_AT_ROOT_EFFECTS); guards that scene against firing twice' },
+  [ACT4_LUKE_GONE]: { default: false, doc: 'set by §23, or the missed-window event; read by Luke\'s own schedule, the Staging Area\'s after-visit description (task L), and the boundary' },
+};
+
+export const ACT4_E1_TASK_M_CLUES: NonNullable<WorldSlice['clues']> = {
+  [ACT4_CLUE_LUKES_WORD]: {
+    title: 'You spelled it right',
+    detail:
+      'Noumena. He used it at a dinner table until it was the family\'s joke, and it is\nin the margin of the work book, and it is one of the three things that got a\nfolded piece of paper read by the President of the United States.',
+  },
+  [ACT4_CLUE_LUKES_REASON]: {
+    title: 'There was never an I',
+    detail:
+      'He says there was never an I. He says their father was I: he paid for the\ntattoos, he sat in the chair first, and he put himself at the head of the row\nbecause he was the head of the row. He says Eli tells it differently, and that\nEli is wrong.',
+  },
+  [ACT4_CLUE_TWO_THING_DOOR]: {
+    title: 'Behind it there is a stair',
+    detail:
+      'The door at the end of the Sublevel 5 gallery takes a badge on the reader and\nthen a name on the pad. It took his. Behind it there is a stair, and the stair\ngoes down.',
+  },
+  [ACT4_CLUE_NOT_THE_USER]: {
+    title: 'There is nothing in it to refuse anybody with',
+    detail:
+      'The reader beside the door at the bottom of the well did nothing at all for the\nPresident of the United States. It did not refuse him. There is nothing in it\nto refuse anybody with.',
+  },
+};
+
+// --- E1 task N ---
+// R14's completion: Jack comes down (`docs/superpowers/specs/2026-09-18-
+// stage-e1-prose.md` §2, §24-§27, §33, §37). Detail text is §2's, verbatim.
+// Title composed from §25's own sentence (hard rule 5) — canon 33: no arm
+// comparison, no `his`/`his own`, matching the sentence the scene itself
+// uses to describe the reveal rather than the gesture.
+import { ACT4_CLUE_JACK_SAW, ACT4_JACK_SAW_MARK, ACT4_JACK_WILL_COME } from './ids';
+
+export const ACT4_E1_TASK_N_FLAGS: WorldSlice['flags'] = {
+  [ACT4_JACK_WILL_COME]: { default: false, doc: 'set by act4_jack_topic_chairs (§24.1, act1/jack.ts); read by the tunnel-mouth event (§24.2)' },
+  [ACT4_JACK_SAW_MARK]: {
+    default: false,
+    doc: "set by act4_ev_jack_sees (§25); read by Jack's greeting rule 1 (§26), topic_nobody/topic_tattoo's gated variants (§27), and SHOW ARM TO JACK's gate (addendum §4.1)",
+  },
+};
+
+export const ACT4_E1_TASK_N_CLUES: NonNullable<WorldSlice['clues']> = {
+  [ACT4_CLUE_JACK_SAW]: {
+    title: 'It has been a numeral since the first morning',
+    detail:
+      'Jack took my wrist under the inspection lamp in the maintenance bay and turned\nthe arm over and looked at what is under the skin there. He did not say\nanything. He has not said anything about it since.',
+  },
+};

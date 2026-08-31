@@ -18,6 +18,10 @@ import { ACT2_DAD_BOOTED } from '../act2/ids';
 import { V_ACT3_DOCK_DAD } from './ids';
 import { HELLO, LISTEN, SEARCH, SMELL, WAIT, YELL } from '../act1/verbs';
 import { V_TYPE_TERMINAL } from '../act1/ids';
+// E1 task M (`docs/superpowers/specs/2026-09-18-stage-e1-prose.md` §22) —
+// R16, "entering the Hub with him following."
+import { ACT4_LUKE, ACT4_LUKE_AT_ROOT } from '../act4/ids';
+import { ACT4_LUKE_AT_ROOT_EFFECTS } from '../act4/luke';
 import {
   ACT3_CLUE_ROOT_REFUSES,
   ACT3_HUB_LOGGED_IN,
@@ -74,7 +78,17 @@ const description: ProseRule[] = [
   { text: `${HUB_OTHERWISE_LEAD}${HUB_OTHERWISE_DESC}` },
 ];
 
-const onEnter: OnEnterRule[] = [{ effects: [{ set: [ACT3_HUB_SEEN, true] }] }];
+const onEnter: OnEnterRule[] = [
+  { effects: [{ set: [ACT3_HUB_SEEN, true] }] },
+  // E1 task M, §22 — "entering the Hub with him following." `once` (the
+  // default) keys off this rule's own array index, so it fires the first
+  // time the cond holds and never again, regardless of how many times the
+  // player re-enters — the same dedup `act4_luke_at_root` gives the root
+  // door's own verb-based handler (`objects/s6ArchiveHub.ts`), belt and
+  // suspenders: whichever trigger reaches him first wins, and the other
+  // then finds the flag already set.
+  { when: { all: [{ npcAt: [ACT4_LUKE, ACT3_S6_ARCHIVE_HUB] }, { not: { flag: ACT4_LUKE_AT_ROOT } }] }, effects: ACT4_LUKE_AT_ROOT_EFFECTS },
+];
 
 // ---------------------------------------------------------------------------
 // §30 — room-level senses and responses.

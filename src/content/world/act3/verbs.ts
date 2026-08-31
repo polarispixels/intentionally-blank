@@ -13,6 +13,7 @@
 
 import type { VerbDef } from '../../../engine/world';
 import { VERB_DEFAULTS } from '../../responses';
+import { V_ACT4_LISTEN_DOWN } from './ids';
 import { V_ACT3_DOCK_DAD } from './ids';
 import { ACT1_VERBS, DROP } from '../act1/verbs';
 import { V_CALL, V_MEASURE } from '../act1/ids';
@@ -62,6 +63,14 @@ if (!ACT1_VERBS[V_CALL]!.patterns.includes('V dobj')) {
 }
 
 export const ACT3_VERBS: Record<string, VerbDef> = {
+  // v0.17.0 — §4.2's LISTEN phrasings as a bare form (the S5 room answers it).
+  [V_ACT4_LISTEN_DOWN]: {
+    id: V_ACT4_LISTEN_DOWN,
+    words: ['listen down', 'listen at the opening', 'listen at opening', 'listen down the shaft'],
+    patterns: ['V'],
+    class: 'analytical',
+    default: VERB_DEFAULTS.wait,
+  },
   // v0.15.1 hygiene — the bare form of §29 (the Hub's own handler answers it).
   [V_ACT3_DOCK_DAD]: {
     id: V_ACT3_DOCK_DAD,
