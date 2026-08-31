@@ -56,17 +56,25 @@ describe('assemble', () => {
 // such gate is named `*_BOUNDARY_GATE`; `LANDING_BOUNDARY_GATE` is declared
 // but deliberately unreferenced (kept, not wired to any exit —
 // `frontDesk.ts`'s header), so counting *declared* gate objects would give
-// two. Counting exits that actually reference one gives the right answer:
-// exactly one, `TOWN_EDGE_BOUNDARY_GATE` on Town Edge's `north` exit.
+// three now, not two.
+//
+// UPDATED (Stage D1, task B — Wall Drug): the count is now exactly two, not
+// one. `TOWN_EDGE_BOUNDARY_GATE` is still the single declared object, but
+// two exits reference it: Town Edge's own `north` exit (unchanged since
+// v0.9.0) AND the Emporium's own `south` exit (`act2/wallDrugEmporium.ts`)
+// — the D1 plan/prose doc's own explicit ruling ("Emporium south → Town
+// Edge through the same permanently closed door object... with §7's own
+// blockedText"), so the highway is now one road blocked from both ends by
+// the same gate object, each side with its own authored `blockedText`.
 describe('system.buildBoundary', () => {
-  it('exactly one exit references a build-boundary gate', () => {
+  it('exactly two exits reference a build-boundary gate (Town Edge north, Emporium south — same gate object)', () => {
     let count = 0;
     for (const room of Object.values(WORLD.rooms ?? {})) {
       for (const exit of room.exits ?? []) {
         if (exit.door && /boundary_gate/i.test(exit.door)) count++;
       }
     }
-    expect(count).toBe(1);
+    expect(count).toBe(2);
   });
 });
 

@@ -57,9 +57,54 @@ import { townEdgeRoom } from '../act1/townEdge';
 import { jacksMotelRoom } from '../act1/jacksMotel';
 import { nolansYardRoom } from '../act1/nolansYard';
 import { SLEEP } from '../act1/verbs';
-import { ACT2_PASS_TIME_SCRIPT, ACT2_SLEEP_SCRIPT, ACT2_STARTED, ACT2_JACK_AWAY, ACT2_SEEN_DESK_EMPTY, ACT2_SEEN_OFFICE_EMPTY, ACT2_SLEPT_SINCE_BOOT, V_ACT2_WAIT_UNTIL_AFTERNOON, V_ACT2_WAIT_UNTIL_EVENING, V_ACT2_WAIT_UNTIL_MORNING, V_ACT2_WAIT_UNTIL_NIGHT } from './ids';
+import {
+  ACT2_PASS_TIME_SCRIPT,
+  ACT2_SLEEP_SCRIPT,
+  ACT2_STARTED,
+  ACT2_JACK_AWAY,
+  ACT2_SEEN_DESK_EMPTY,
+  ACT2_SEEN_OFFICE_EMPTY,
+  ACT2_SLEPT_SINCE_BOOT,
+  ACT2_RODE_NORTH,
+  ACT2_HORSE_BORROWED,
+  ACT2_SAW_CUSTODIAN_PAINTING,
+  ACT2_LUKE_REFERENCED,
+  ACT2_TRAVEL_SCRIPT,
+  ACT2_CUSTODIAN,
+  V_ACT2_WAIT_UNTIL_AFTERNOON,
+  V_ACT2_WAIT_UNTIL_EVENING,
+  V_ACT2_WAIT_UNTIL_MORNING,
+  V_ACT2_WAIT_UNTIL_NIGHT,
+} from './ids';
 import { ACT2_VERBS } from './verbs';
 import { ACT2_SLEEP_REFUSAL_TEXT, act2PassTime, act2Sleep } from './time';
+import { ACT2_TRAVEL_CLUES, act2Travel } from './travel';
+import { custodian } from './custodian';
+import { ACT2_D1_SCRIPTS } from './scripts';
+import { ACT2_M2_MEMORIES, ACT2_TRUCK_OBJECTS } from './objects/truck';
+import { ACT2_HORSE_OBJECTS } from './objects/horse';
+// Task B's own D1 knowledge/objects — authored but not yet wired into this
+// slice when this task's own edits landed (both tasks touch this shared
+// file; reconcile on merge if task B wires these independently — see this
+// task's report).
+import { ACT2_D1_CLUES, ACT2_D1_FLAGS, ACT2_D1_MEMORIES, ACT2_D1_PUZZLES, ACT2_D1_QUESTIONS } from './knowledge';
+import { ACT2_EMPORIUM_OBJECTS } from './objects/wallDrugEmporium';
+import { ACT2_BACK_CORRIDOR_OBJECTS } from './objects/wallDrugBackCorridor';
+import { ACT2_CACHE_OBJECTS } from './objects/cache';
+// `objects/usb.ts` (task A's own module) has no exports of its own — it
+// amends task B's `objects/cache.ts` `usb` object in place (a second
+// `PUT_IN`/`withInstrument` handler, Your Room's real terminal) — imported
+// here purely for its module-load side effect, same idiom as `act2/verbs.
+// ts`'s own `RUB`/`ACT1_VERBS` amendment. Must be imported AFTER
+// `ACT2_CACHE_OBJECTS` so `usb`'s handlers array exists before this mutates
+// it (both resolve to the same module instance either way — ES module
+// imports are singletons — but the ordering keeps the intent legible).
+import './objects/usb';
+import { ACT2_NOTEBOOK_OBJECTS } from './objects/notebook';
+import { wallDrugEmporiumRoom } from './wallDrugEmporium';
+import { wallDrugBackCorridorRoom } from './wallDrugBackCorridor';
+import { dot, ACT2_DOT_AGENDA_EVENT } from './dot';
+import { ACT2_DOT, ACT2_WALL_DRUG_BACK_CORRIDOR, ACT2_WALL_DRUG_EMPORIUM, EVENT_ACT2_DOT_AGENDA } from './ids';
 
 // ---------------------------------------------------------------------------
 // D0 — flags. (Only five so far; grows with each later wave's own knowledge.)
@@ -71,6 +116,11 @@ const ACT2_FLAGS: WorldSlice['flags'] = {
   [ACT2_SLEPT_SINCE_BOOT]: { default: false, doc: 'set by act2_sleep (either variant) — a flag D2 reads' },
   [ACT2_SEEN_DESK_EMPTY]: { default: false, doc: "set by front_desk's own onEnter the first time the desk is found empty — gates the long/short empty-desk description split" },
   [ACT2_SEEN_OFFICE_EMPTY]: { default: false, doc: "set by sheriff_office's own onEnter the first time the office is found empty — gates the long/short empty-office description split" },
+  // D1 — task A's own module (the travel script, the horse, the Custodian).
+  [ACT2_RODE_NORTH]: { default: false, doc: "set by the travel script's first ride north (either mode) — scene-variant selection and L10's clue" },
+  [ACT2_HORSE_BORROWED]: { default: false, doc: "set by asking Pearl/Marlow about the horses, or by UNTIE HORSE directly — read by the ride handlers" },
+  [ACT2_SAW_CUSTODIAN_PAINTING]: { default: false, doc: 'set by EXAMINE CUSTODIAN — read by nothing yet in D1; M15 (D5) should read it' },
+  [ACT2_LUKE_REFERENCED]: { default: false, doc: "set by jack.ts's topic_family effects (this task's own amendment) — M12's other half-trigger, alongside act2_read_notebook_margin (task B)" },
 };
 
 // ---------------------------------------------------------------------------
@@ -121,11 +171,43 @@ for (const entry of ROOMS) {
   entry.room.handlers = [...WAIT_UNTIL_HANDLERS, sleepHandlerFor(entry.sleep), ...(entry.room.handlers ?? [])];
 }
 
+// Act II's own rooms take the pass-time verbs too (the D1 playtest found
+// WAIT UNTIL MORNING at Wall Drug falling to the verb's text-only default,
+// so the morning never came). Their SLEEP lines are their own (D1 §7).
+for (const room of [wallDrugEmporiumRoom, wallDrugBackCorridorRoom]) {
+  room.handlers = [...WAIT_UNTIL_HANDLERS, ...(room.handlers ?? [])];
+}
+
 export const ACT2_SLICE: WorldSlice = {
-  flags: ACT2_FLAGS,
+  flags: { ...ACT2_FLAGS, ...ACT2_D1_FLAGS },
   verbs: ACT2_VERBS,
+  rooms: {
+    [ACT2_WALL_DRUG_EMPORIUM]: wallDrugEmporiumRoom,
+    [ACT2_WALL_DRUG_BACK_CORRIDOR]: wallDrugBackCorridorRoom,
+  },
+  objects: {
+    ...ACT2_TRUCK_OBJECTS,
+    ...ACT2_HORSE_OBJECTS,
+    ...ACT2_EMPORIUM_OBJECTS,
+    ...ACT2_BACK_CORRIDOR_OBJECTS,
+    ...ACT2_CACHE_OBJECTS,
+    ...ACT2_NOTEBOOK_OBJECTS,
+  },
+  npcs: {
+    [ACT2_CUSTODIAN]: custodian,
+    [ACT2_DOT]: dot,
+  },
+  events: {
+    [EVENT_ACT2_DOT_AGENDA]: ACT2_DOT_AGENDA_EVENT,
+  },
+  clues: { ...ACT2_TRAVEL_CLUES, ...ACT2_D1_CLUES },
+  memories: { ...ACT2_M2_MEMORIES, ...ACT2_D1_MEMORIES },
+  questions: ACT2_D1_QUESTIONS,
+  puzzles: ACT2_D1_PUZZLES,
   scripts: {
     [ACT2_PASS_TIME_SCRIPT]: act2PassTime,
     [ACT2_SLEEP_SCRIPT]: act2Sleep,
+    [ACT2_TRAVEL_SCRIPT]: act2Travel,
+    ...ACT2_D1_SCRIPTS,
   },
 };

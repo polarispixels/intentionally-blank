@@ -66,7 +66,7 @@ import {
   ROOM_KEY,
   MARLOW,
 } from './ids';
-import { ACT2_STARTED } from '../act2/ids';
+import { ACT2_HORSE_BORROWED, ACT2_STARTED } from '../act2/ids';
 import type { Cond } from '../../../engine/cond';
 
 // ---------------------------------------------------------------------------
@@ -146,6 +146,8 @@ const TOPIC_SHERIFF = T('act1_marlow_topic_sheriff');
 const TOPIC_HOUSE = T('act1_marlow_topic_house');
 const TOPIC_TOWN = T('act1_marlow_topic_town');
 const TOPIC_TIME = T('act1_marlow_topic_time');
+// D1 amendment (Stage D1 prose doc §17).
+const TOPIC_HORSES = T('act1_marlow_topic_horses');
 
 const visitorRule1Effects: Effect[] = [{ grantClue: CLUE_VISITOR_UNREMARKABLE }, { set: [FLAG_MARLOW_PRESSED, true] }];
 const registerRule1Effects: Effect[] = [{ set: [FLAG_MARLOW_KNOWS_YOU_KNOW, true] }];
@@ -255,6 +257,13 @@ const topics: TopicDef[] = [
     words: ['time', 'hour', 'clock', 'date', 'day', 'when', 'year', 'today'],
     response:
       '"Twenty past four." He does not check anything to say it.\n\nAsk the date and he looks at the book, which is where a date lives in a house like this. Then he tells you the day of the week and leaves it there.',
+  },
+  // D1 amendment (Stage D1 prose doc §17) — sets `act2_horse_borrowed`.
+  {
+    id: TOPIC_HORSES,
+    words: ['horse', 'horses', 'rail', 'hitching rail', 'whose horses', 'owner'],
+    response: 'Marlow looks at the ceiling for a moment. "They were there when I came."\n\nThen, because you are still standing there: "Nobody\'s ever said whose. And\nnobody\'s ever asked me before tonight."',
+    effects: [{ set: [ACT2_HORSE_BORROWED, true] }],
   },
 ];
 

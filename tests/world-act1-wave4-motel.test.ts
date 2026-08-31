@@ -183,7 +183,7 @@ describe('The Arrowhead Motel — objects and room responses (§4-§5)', () => {
     r = say(r.session, 'examine cab', store);
     expect(text(r.events)).toContain('A bench seat, a cup in the holder');
 
-    r = say(r.session, 'look through window', store);
+    r = say(r.session, 'look through windscreen', store);
     expect(text(r.events)).toContain('A bench seat, a cup in the holder');
 
     for (const cmd of ['drive truck', 'start truck', 'get in truck', 'take truck', 'open truck door']) {

@@ -28,10 +28,25 @@ describe('Act I — the whole act on a clean save', () => {
     expect(result.status).toBe(0);
   });
 
-  it('opens on the floor and ends at the truck door', () => {
+  it('opens on the floor and, since D1, drives on to Wall Drug instead of ending the build', () => {
+    // D1 amendment (Stage D1 prose doc §21; plan §2 D1's own "the boundary
+    // moves"): `jack.ts`'s `jackWallDrugEffects` no longer calls
+    // `END_OF_BUILD_SCRIPT` — "ASK JACK ABOUT WALL DRUG"/"SHOW TICKET TO
+    // JACK" now route to `act2_travel` instead, so this fixture's own last
+    // two commands ("show ticket to jack", "ask jack about wall drug") no
+    // longer end the build; they complete the first ride north. This
+    // assertion is therefore no longer `'ACT I ENDS HERE'` (a deliberate,
+    // reported deviation from this task's own "must pass unchanged"
+    // instruction — the two are in direct conflict once the boundary is
+    // moved, which this same task's brief separately, explicitly requires;
+    // see this task's report). Every other assertion in this file (the
+    // clues, the memories, the diagnostics check) is unaffected and still
+    // passes against the unedited fixture script.
     expect(stdout.startsWith('Darkness.')).toBe(true);
     expect(stdout).toContain('"Get in."');
-    expect(stdout).toContain('ACT I ENDS HERE');
+    expect(stdout).toContain('Wall Drug');
+    expect(stdout).toContain('Intentionally Blank v');
+    expect(stdout).not.toContain('ACT I ENDS HERE');
   });
 
   it('lands every reveal and both memories along the way', () => {

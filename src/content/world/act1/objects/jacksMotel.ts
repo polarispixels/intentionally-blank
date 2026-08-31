@@ -74,6 +74,7 @@ import {
   CLUE_POLAROID_FLARE,
   FLAG_JACK_GAVE_KEYS,
   FLAG_NOTICED_ODD_KEY,
+  FLAG_OFFERED_THE_RIDE,
   FLAG_READ_JACK_LETTERS,
   JACK_LETTERS,
   JACKS_MOTEL,
@@ -90,6 +91,7 @@ import {
   V_PLAY,
   V_TURN_OVER,
 } from '../ids';
+import { ACT2_TRAVEL_SCRIPT, ACT2_WALL_DRUG_EMPORIUM } from '../../act2/ids';
 
 // ---------------------------------------------------------------------------
 // §4.1 — The truck
@@ -105,6 +107,23 @@ const truckDoorLockedText =
   'The door is locked, the keys are in the pocket of a man four feet away, and it would take you two attempts to get up there anyway.\n\n"Where," says Jack, "and I\'ll take you." He means it, and he means now, and you have nowhere yet to tell him.';
 
 const truckDoorLockedEffects: Effect[] = [{ say: truckDoorLockedText }];
+
+// ---------------------------------------------------------------------------
+// D1 amendment (Stage D1 prose doc §3, §19) — two handlers **prepended**
+// above the shipped locked-door handler below: the return trip (the truck
+// is now wherever the travel script last parked it — checked by the
+// player's own location, `{ at: ACT2_WALL_DRUG_EMPORIUM }`, since the truck
+// object itself has no stable "home" `when` could read) and the first/
+// repeat outbound ride, gated on `act1_jack_ready_to_drive` — the real flag
+// of that name shipped as `FLAG_OFFERED_THE_RIDE` (`ids.ts`; the plan's own
+// expected-name caveat, §0.1). Text transcribed verbatim (hard rule 5).
+// ---------------------------------------------------------------------------
+
+const driveTruckEntryText =
+  'He is in it before you are. The engine comes up out of that lot like\nsomething being woken on purpose, and takes the quiet with it.';
+
+const returnTripEffects: Effect[] = [{ script: { id: ACT2_TRAVEL_SCRIPT, args: { mode: 'truck', to: 'town' } } }];
+const outboundRideEffects: Effect[] = [{ say: driveTruckEntryText }, { script: { id: ACT2_TRAVEL_SCRIPT, args: { mode: 'truck', to: 'wall_drug' } } }];
 
 const monsterTruck: ObjectDefSlice = {
   location: JACKS_MOTEL,
@@ -153,6 +172,12 @@ const monsterTruck: ObjectDefSlice = {
     { verbs: [EXAMINE], effects: [{ say: truckExamine }] },
     // "climb truck" (§4.1) shares the cab sub-part's own text.
     { verbs: [CLIMB], effects: [{ say: cabText }] },
+    // D1 amendment — prepended above the shipped locked-door handler
+    // (§19's own instruction): the return trip first (more specific — the
+    // player is standing at the Emporium with the truck), then the
+    // outbound ride once Jack has offered it.
+    { verbs: [V_DRIVE, DIRECTION_VERB_IDS.in], when: { at: ACT2_WALL_DRUG_EMPORIUM }, effects: returnTripEffects },
+    { verbs: [V_DRIVE, DIRECTION_VERB_IDS.in], when: { flag: FLAG_OFFERED_THE_RIDE }, effects: outboundRideEffects },
     // "drive truck"/"start truck"/"get in truck"/"take truck"/"open door"
     // (or "open truck door") (§4.1) all share the locked-door text.
     { verbs: [V_DRIVE, DIRECTION_VERB_IDS.in, TAKE, OPEN], effects: truckDoorLockedEffects },
@@ -163,7 +188,7 @@ const monsterTruckCab: ObjectDefSlice = {
   location: { on: MONSTER_TRUCK },
   name: 'cab',
   portable: false,
-  nouns: ['cab', 'window', 'windows', 'windscreen', 'windshield', 'glass'],
+  nouns: ['cab', 'windscreen', 'windshield', 'glass'], // 'window' dropped v0.11.0: the truck travels, and at Wall Drug it shadowed the claim window
   // "look in cab"/"examine cab"/"look through window" (§4.1) share the
   // truck's own parent CLIMB text.
   handlers: [{ verbs: [EXAMINE, SEARCH], effects: [{ say: cabText }] }],

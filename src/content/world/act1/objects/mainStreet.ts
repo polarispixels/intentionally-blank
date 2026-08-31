@@ -30,8 +30,10 @@
 
 import type { ObjectDefSlice } from '../../../../engine/world';
 import type { Effect } from '../../../../engine/effects';
+import type { ProseRule } from '../../../../engine/prose';
 import { DIRECTION_VERB_IDS } from '../../../../engine/move';
 import { crossStreetText, crouchText, EXAMINE, HELLO, OPEN, READ, SEARCH, SMELL, TAKE, TOUCH } from '../verbs';
+import { ACT2_HORSE } from '../../act2/ids';
 import {
   BILLBOARD,
   BOARDING_HOUSE,
@@ -88,8 +90,21 @@ export const MAIN_STREET_TO_FRONT_DESK_TEXT =
 // 4.1 — The horses
 // ---------------------------------------------------------------------------
 
-const horsesExamine =
+const horsesExamineShipped =
   'Three, at a rail put there for exactly this and worn pale along the top from it. Two are asleep on their feet, one hind hoof cocked, breathing slow enough to count. The third has its head up, looking down the street past you, and it goes on looking after you have finished looking at it.\n\nThey are saddled. The tack is worn, mended, and looked after.';
+
+/**
+ * D1 amendment (Stage D1 prose doc §15.1) — a new rule 1, prepended, for
+ * while `act2_horse` is out (the shipped string above becomes rule 2,
+ * unedited).
+ */
+const horsesExamine: ProseRule[] = [
+  {
+    when: { not: { objectAt: [ACT2_HORSE, MAIN_STREET] } },
+    text: 'Two, at a rail put there for three, and the gap in the middle of them has the\nshape of a horse in it that neither of them appears to find remarkable.\n\nThey are saddled. The tack is worn, mended, and looked after.',
+  },
+  { text: horsesExamineShipped },
+];
 
 const horsesTouch =
   'You put a hand on the near one\'s neck. It is warm through the winter coat, and it lets you, and then leans a little of its weight into the hand, which you had not offered.';
@@ -101,7 +116,13 @@ const horsesTake =
 
 const horsesSmell = 'Horse, and the leather and cold iron that come with one. The first smell tonight you have not had to think about.';
 
-const horsesCount = 'Three. You count them twice and get three both times.';
+const horsesCountShipped = 'Three. You count them twice and get three both times.';
+
+/** D1 amendment (§15.2) — a new rule 1, prepended, same gate as `horsesExamine` above; rule 2 is the shipped line, unedited. */
+const horsesCount: ProseRule[] = [
+  { when: { not: { objectAt: [ACT2_HORSE, MAIN_STREET] } }, text: 'Two, tonight.' },
+  { text: horsesCountShipped },
+];
 
 const horsesFeed = 'The horse investigates your hand thoroughly, establishes that it is a hand, and goes back to what it was doing.';
 
@@ -111,7 +132,18 @@ const horses: ObjectDefSlice = {
   location: MAIN_STREET,
   name: 'horses',
   portable: false,
-  nouns: ['horse', 'horses', 'mare', 'gelding', 'animal', 'animals', 'three horses', 'rail', 'hitching rail', 'hitch', 'rein', 'reins', 'tack', 'saddle', 'saddles', 'bridle'],
+  // D1 amendment — bare "horse" (singular) dropped from this scenery
+  // object's own noun list (a wave-2 synonym, never load-bearing in any
+  // shipped test) so that "UNTIE HORSE"/"TAKE HORSE"/"MOUNT HORSE"/"RIDE
+  // HORSE" resolve unambiguously to `act2_horse` (`objects/horse.ts`) once
+  // it exists in the same room, rather than clarifying against this plural
+  // group every time. Plural "horses"/"three horses" stay here, unedited.
+  // RESIDUAL COLLISION (reported, not fixed — see `objects/horse.ts`'s own
+  // header): "mare"/"animal"/"reins" are still shared by both objects
+  // (the D1 prose doc's own §16 noun list gives `act2_horse` those same
+  // words) and still clarify; only the one noun this task's acceptance
+  // test actually exercises (bare "horse") was resolved.
+  nouns: ['horses', 'mare', 'gelding', 'animal', 'animals', 'three horses', 'rail', 'hitching rail', 'hitch', 'rein', 'reins', 'tack', 'saddle', 'saddles', 'bridle'],
   handlers: [
     { verbs: [EXAMINE], effects: [{ say: horsesExamine }] },
     { verbs: [TOUCH], effects: [{ say: horsesTouch }, { set: [FLAG_HORSE_TOUCHED, true] }] },

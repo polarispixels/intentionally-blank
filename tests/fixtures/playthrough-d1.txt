@@ -1,0 +1,207 @@
+look
+pull chain
+look
+x fedora
+take fedora
+wear fedora
+search fedora
+take page
+read page
+x desk
+x drawer
+open drawer
+x chair
+take leg
+pry drawer with leg
+x envelope
+read matchbook
+x papers
+search papers
+x window
+x stain
+x terminal
+turn on terminal
+log in
+x me
+x forearm
+open door
+out
+look
+down
+look
+hello marlow
+ask marlow about name
+ask marlow about room
+ask marlow about visitor
+x register
+tilt register
+ask marlow about register
+ask marlow about key
+ask marlow about visitor
+open street door
+out
+look
+x billboard
+x glow
+west
+look
+x crock
+out
+south
+look
+x boxes
+x board
+out
+go to sheriff
+look
+hello whitlock
+ask whitlock about name
+ask whitlock about jules
+tell whitlock about room
+out
+go to diner
+look
+x mugs
+take mug
+hello pearl
+ask pearl about diner
+tell pearl about room
+ask pearl about jack
+ask pearl for pie
+out
+go to library
+x drawers
+search catalogue
+use terminal
+out
+north
+x billboard
+x sign
+x lights
+east
+look
+x dog
+x bin
+x house
+x footprints
+search trash
+wait
+wait
+wait
+give pie to dog
+search trash
+inventory
+x strips
+x cup
+x bottle
+x slip
+west
+south
+go to motel
+look
+hello jack
+ask jack about jules
+ask jack about job
+ask jack about tattoo
+ask jack about nolan
+tell jack about room
+assemble strips
+read work order
+show work order to jack
+x keys
+take keys
+x keyring
+out
+go to post office
+open box 141
+x polaroids
+x ticket
+read ticket
+out
+north
+north
+south
+go to motel
+show ticket to jack
+ask jack about wall drug
+look
+x dinosaur
+x signs
+x signs
+x merchandise
+x jackalope
+ride jackalope
+x water
+drink water
+x window
+read card
+x rail
+hello dot
+north
+look
+x shelving
+x stencils
+search shelving
+open box
+x box
+take all
+inventory
+x notebook
+read notebook
+x back cover
+x gap
+x doodle
+fit page in notebook
+rub page with pencil
+read notebook
+x usb
+x canister
+x letter
+x pencil
+x polaroid
+burn notebook
+x terminal
+turn on terminal
+pull cord
+out
+wait until morning
+look
+hello dot
+ask dot about hat
+show fedora to dot
+show polaroid to dot
+ask dot about ticket
+ask dot about man
+ask dot about road
+ask dot about plant
+show notebook to dot
+x custodian
+wait until afternoon
+look
+x custodian
+hello custodian
+ask custodian about rail
+x rail
+get in truck
+look
+go to motel
+open glovebox
+take deck
+x deck
+out
+x horses
+count horses
+untie horse
+count horses
+ride horse
+look
+ride horse
+look
+go to motel
+drive to plant
+out
+in
+up
+in
+put usb in terminal
+version

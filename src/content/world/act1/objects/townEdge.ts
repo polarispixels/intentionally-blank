@@ -26,7 +26,7 @@ import type { Effect } from '../../../../engine/effects';
 import type { ObjectDefSlice } from '../../../../engine/world';
 import { DIRECTION_VERB_IDS } from '../../../../engine/move';
 import { BREAK, CLIMB, EXAMINE, LOOK_BEHIND, OPEN, READ, TOUCH } from '../verbs';
-import { TOWN_EDGE_BOUNDARY_NORTH_TEXT } from '../townEdge';
+import { northBlockedText } from '../townEdge';
 import {
   BILLBOARD_BACK,
   BILLBOARD_CLOSE,
@@ -118,7 +118,7 @@ const billboardClose: ObjectDefSlice = {
     { verbs: [LOOK_BEHIND], effects: [{ say: billboardBackText }] },
     { verbs: [CLIMB], effects: [{ say: billboardClimbText }] },
     // "go to wall drug" (§13.3) — routes to the build boundary, north. No separate string.
-    { verbs: [V_APPROACH], effects: [{ say: TOWN_EDGE_BOUNDARY_NORTH_TEXT }] },
+    { verbs: [V_APPROACH], effects: [{ say: northBlockedText }] },
   ],
 };
 
@@ -199,7 +199,7 @@ const roadNorth: ObjectDefSlice = {
   handlers: [
     { verbs: [EXAMINE], effects: [{ say: roadNorthText }] },
     // "follow road" (§13.3) — routes to the build boundary, north. No separate string.
-    { verbs: [V_FOLLOW], effects: [{ say: TOWN_EDGE_BOUNDARY_NORTH_TEXT }] },
+    { verbs: [V_FOLLOW], effects: [{ say: northBlockedText }] },
   ],
 };
 

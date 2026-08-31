@@ -59,7 +59,11 @@ export const ACT1_SLICE: WorldDef = {
     phases: { morning: 420, afternoon: 720, evening: 1080, night: 1320 },
     weekLength: 7,
     startRoom: YOUR_ROOM,
-    minutesPerTurn: 1,
+    // v0.11.0 (ADR 0011 amended, register 65): ordinary turns do not move the
+    // clock. Act I is one night and ~200 commands long; at a minute a turn the
+    // first ride north arrived after sunrise. Time passes by passage only —
+    // rides, WAIT UNTIL <phase>, SLEEP, and explicit `advanceClock` effects.
+    minutesPerTurn: 0,
     // 04:20 — the fiction's actual opening hour (ADR 0011, Stage D E1);
     // every Act I NPC is single-posted and no Act I prose reads the clock,
     // so this only fixes what the clock itself reports, not anything

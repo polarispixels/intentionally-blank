@@ -130,12 +130,24 @@ describe('validate — Act I room 1', () => {
   // ever reports the first collision per verb, per this rule's own scan
   // order), and "wait until night" shares "night" with Marlow's own
   // adjective "night" (`marlow.ts`'s `adjectives`).
-  it('produces exactly the 33 expected verb-noun-collision warnings, no others', () => {
+  // Stage D1, task A (the ride north): three more, all `act2_drive_to_
+  // plant`'s own words ("drive"/"north"/"plant") — a bare, self-contained
+  // verb (same idiom as `act1_post_letter`/`act1_measure` above), colliding
+  // with `monster_truck`'s "drive" trigger word... no — with existing
+  // object nouns already declared elsewhere (`far_lights`'s own "plant",
+  // `horizon_glow`'s own "north", and `monster_truck`'s own vocabulary).
+  // Reviewed and accepted the same way every other bare-verb collision in
+  // this list already is: sentence position disambiguates "DRIVE TO PLANT"
+  // from "EXAMINE PLANT" in practice.
+  it('produces exactly the 36 expected verb-noun-collision warnings, no others', () => {
     const warnings = validate(WORLD).filter((f) => f.severity === 'warning');
     const collisions = warnings.filter((f) => f.code === 'verb-noun-collision');
-    expect(collisions.length).toBe(33);
+    expect(collisions.length).toBe(36);
     expect(collisions.map((f) => f.message).sort()).toEqual(
       [
+        "verb \"act2_drive_to_plant\" can be typed bare and its word \"drive\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act2_drive_to_plant\" can be typed bare and its word \"north\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
+        "verb \"act2_drive_to_plant\" can be typed bare and its word \"plant\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act2_wait_until_afternoon\" can be typed bare and its word \"till\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act2_wait_until_evening\" can be typed bare and its word \"till\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
         "verb \"act2_wait_until_morning\" can be typed bare and its word \"till\" is also an object/NPC noun — the single word is ambiguous between a command and a thing",
@@ -245,9 +257,10 @@ describe('validate — Act I room 1', () => {
   // (shed/KEYRING) + 28 (verb-noun) + 4 (object-noun) = 34 — see the two
   // room-description tests and the verb-noun test above for what each new
   // one is and who added it. Stage D0 adds 5 more verb-noun collisions
-  // (above): 34 + 5 = 39.
-  it('produces exactly thirty-nine warnings total, no others', () => {
+  // (above): 34 + 5 = 39. Stage D1, task A (the ride north) adds 3 more
+  // (`act2_drive_to_plant`'s own three words, above): 39 + 3 = 42.
+  it('produces exactly forty-two warnings total, no others', () => {
     const warnings = validate(WORLD).filter((f) => f.severity === 'warning');
-    expect(warnings.length).toBe(39);
+    expect(warnings.length).toBe(42);
   });
 });

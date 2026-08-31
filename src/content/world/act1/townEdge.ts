@@ -21,7 +21,9 @@
 import type { ExitDefSlice, HandlerDef, RoomDefSlice } from '../../../engine/world';
 import type { ProseRule } from '../../../engine/prose';
 import { HELLO, LISTEN, SMELL, WAIT, YELL } from './verbs';
-import { CLAIM_TICKET, FLAG_VISITED_TOWN_EDGE, MAIN_STREET, NOLANS_YARD, TOWN_EDGE, TOWN_EDGE_BOUNDARY_GATE, TOWN_EDGE_NO_EXIT_GATE, V_LOOK_UP } from './ids';
+import { CLAIM_TICKET, FLAG_VISITED_TOWN_EDGE, MAIN_STREET, MONSTER_TRUCK, NOLANS_YARD, TOWN_EDGE, TOWN_EDGE_BOUNDARY_GATE, TOWN_EDGE_NO_EXIT_GATE, V_LOOK_UP } from './ids';
+import { ACT2_STARTED, ACT2_WALL_DRUG_EMPORIUM, V_ACT2_DRIVE_TO_PLANT } from '../act2/ids';
+import { ACT2_DRIVE_TO_PLANT_EFFECTS } from '../act2/scripts';
 
 // ---------------------------------------------------------------------------
 // §12.1 — description (§13.1/§13.2 amend both rules, wave 5)
@@ -70,6 +72,8 @@ const roomHandlers: HandlerDef[] = [
   { verbs: [WAIT], effects: [{ say: waitText }] },
   // "SHOUT"/"YELL"/"CALL OUT"/"HELLO" (to the street, no target) — overrides other rooms' own bare HELLO/YELL while in this room (same idiom as Main Street's own shoutText).
   { verbs: [YELL, HELLO], effects: [{ say: shoutText }] },
+  // D1 amendment — the boundary's second route (§21), with the truck present. Never reachable in D1 (the travel script never parks the truck here) — wired per the ruling's own text, forward-compatible with a later wave.
+  { verbs: [V_ACT2_DRIVE_TO_PLANT], when: { objectAt: [MONSTER_TRUCK, TOWN_EDGE] }, effects: ACT2_DRIVE_TO_PLANT_EFFECTS },
 ];
 
 const onEnter: RoomDefSlice['onEnter'] = [{ effects: [{ set: [FLAG_VISITED_TOWN_EDGE, true] }] }];
@@ -85,12 +89,41 @@ export const TOWN_EDGE_BOUNDARY_NORTH_TEXT =
 /**
  * §13.4's rule 1 (wave 5) — the in-world redirect once the player holds the
  * claim ticket (granted by the concurrent Close-out task's own §9.5). Rule
- * 2 is `TOWN_EDGE_BOUNDARY_NORTH_TEXT`, unedited.
+ * 2 (below) is `TOWN_EDGE_BOUNDARY_NORTH_TEXT`, unedited — kept as this
+ * exit's final unconditional fallback (see this file's own D1 comment on
+ * why, immediately below).
  */
 const NORTH_REDIRECT_WITH_TICKET_TEXT =
   'Thirty-two miles of it, in the dark, on a county road, with a card in your pocket that says HOLD FOR PICKUP and no hour of the day printed on it anywhere.\n\nThe truck is in the motel lot, and the man who owns it has asked you twice where.';
 
-const northBlockedText: ProseRule[] = [
+/**
+ * D1 amendment (Stage D1 prose doc §18, rule 1) — "replaces wave 5 §13.4's
+ * redirect entirely" once `act2_started`. Text transcribed verbatim (hard
+ * rule 5).
+ */
+const NORTH_STARTED_TEXT =
+  'Thirty-two miles of county road, on foot, at whatever hour this now is.\n\nThere is a truck. Failing the truck there is a rail on Main Street with a knot\nin it that a child could get out of. Failing both of those there is standing\nhere, which you have now done.';
+
+/**
+ * D1 amendment — three rules, not the doc's own two. §18's own text says
+ * "`TOWN_EDGE_BOUNDARY_NORTH_TEXT` leaves this exit," but the doc only
+ * supplies conditional rules for `act2_started` and `has: CLAIM_TICKET` —
+ * with neither true (the ordinary start of the game, before the player has
+ * ever picked up the ticket or ridden anywhere), no rule would match at all,
+ * and `prose.render` throws rather than rendering nothing ("no rule ...
+ * matched, and none is unconditional" — confirmed against `prose.ts`;
+ * `validate.ts`'s own `checkRoomExits` does not check `blockedText` for a
+ * missing fallback, so this would only surface as a runtime crash on `GO
+ * NORTH` from a fresh game, not a `validate(WORLD)` finding). Kept as an
+ * unconditional third rule instead of deleted outright: it reproduces
+ * exactly the shipped v0.9.0 behavior for that one remaining state (neither
+ * flag holds), so no player-visible regression, and it genuinely does
+ * "leave this exit" for every state D1 actually changes (once `act2_started`
+ * or the ticket is held). See this task's report.
+ */
+/** Exported so `objects/townEdge.ts`'s own `billboardClose`/`roadNorth` handlers can reach the same act2_started-aware text instead of the stale shipped one (this task's own consistency call — see that file's own comment). */
+export const northBlockedText: ProseRule[] = [
+  { when: { flag: ACT2_STARTED }, text: NORTH_STARTED_TEXT },
   { when: { has: CLAIM_TICKET }, text: NORTH_REDIRECT_WITH_TICKET_TEXT },
   { text: TOWN_EDGE_BOUNDARY_NORTH_TEXT },
 ];
@@ -139,7 +172,15 @@ export const townEdgeRoom: RoomDefSlice = {
     { dir: 's', to: MAIN_STREET, travelText: travelTextOut },
     { dir: 'out', to: MAIN_STREET, travelText: travelTextOut },
     { dir: 'in', to: MAIN_STREET, travelText: travelTextOut },
-    { dir: 'n', to: TOWN_EDGE, door: TOWN_EDGE_BOUNDARY_GATE, blockedText: northBlockedText },
+    // D1 amendment — `to` now points at the real Emporium (`ACT2_WALL_DRUG_
+    // EMPORIUM`), not a self-loop, so the map draws the highway link (D1
+    // prose doc §18's own note). The door never opens (`TOWN_EDGE_BOUNDARY_
+    // GATE` has no `container` declared, so its own `open` state defaults
+    // false — see that id's own comment), and `cli/scope.ts`'s `travelGraph`
+    // only ever routes `GO TO` through already-*visited* rooms with an
+    // *open* door — so this change is inert for pathfinding until the doors
+    // actually open (never, in this build) and purely cosmetic for the map.
+    { dir: 'n', to: ACT2_WALL_DRUG_EMPORIUM, door: TOWN_EDGE_BOUNDARY_GATE, blockedText: northBlockedText },
     // §13.3 (wave 5) — the real east exit, Nolan's Yard.
     { dir: 'e', to: NOLANS_YARD, travelText: travelTextToYard },
     ...otherDirections,

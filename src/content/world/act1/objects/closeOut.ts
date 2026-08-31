@@ -126,7 +126,7 @@ const claimTicket: ObjectDefSlice = {
   location: 'nowhere', // granted by the boxes' own OPEN/TURN/UNLOCK rule 1
   name: 'claim ticket',
   portable: true,
-  nouns: ['ticket', 'claim ticket', 'stub', 'card', 'receipt', 'docket', 'wall drug', 'walldrug'],
+  nouns: ['ticket', 'claim ticket', 'stub', 'receipt', 'docket', 'wall drug', 'walldrug'],
   handlers: [
     {
       verbs: [EXAMINE, READ],

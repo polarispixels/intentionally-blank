@@ -52,6 +52,7 @@ import {
   WORK_ORDER,
   YOUR_ROOM,
 } from '../src/content/world/act1/ids';
+import { ACT2_RODE_NORTH, ACT2_STARTED } from '../src/content/world/act2/ids';
 
 const TEST_WORLD: WorldDef = WORLD;
 const vocab = compileVocabulary(TEST_WORLD);
@@ -302,16 +303,28 @@ describe('P8 — opening box 141', () => {
 // ---------------------------------------------------------------------------
 
 describe('The Act I boundary — the ride to Wall Drug', () => {
-  it('fires the END OF BUILD system line exactly once, on the first ask', () => {
+  // D1 amendment (Stage D1 prose doc §21; plan §2 D1's own "the boundary
+  // moves"): `jack.ts`'s `jackWallDrugEffects` no longer calls
+  // `END_OF_BUILD_SCRIPT` — the ride now exists, so this topic no longer
+  // ends the build. It routes to `act2_travel` instead (§3's own ruling):
+  // the first ask sets `offered_the_ride` and renders the first-ride north
+  // scene (8 beats, `act2_rode_north`/`act2_started` set); a second ask
+  // renders the shorter repeat scene (2 beats). Neither ever emits a
+  // system line. This test is a deliberate, reported rewrite of a wave-5
+  // assertion this task's own change makes false — see this task's report.
+  it('routes to the travel script instead of firing END OF BUILD', () => {
     const store = new MemoryStore();
     const { session: motel } = teleport(JACKS_MOTEL);
     const withTicket = carry(motel, CLAIM_TICKET);
 
     const first = say(withTicket, 'ask jack about wall drug', store);
     expect(text(first.events)).toContain('Get in.');
-    expect(systemLines(first.events).join('\n')).toContain('END OF BUILD');
+    expect(text(first.events)).toContain('cattle guard'); // the first-ride scene's own beat 1
+    expect(systemLines(first.events)).toEqual([]);
     let session = first.session;
     expect(session.state.flags[FLAG_OFFERED_THE_RIDE]).toBe(true);
+    expect(session.state.flags[ACT2_RODE_NORTH]).toBe(true);
+    expect(session.state.flags[ACT2_STARTED]).toBe(true);
 
     const second = say(session, 'ask jack about wall drug', store);
     expect(text(second.events)).toContain('Get in.');

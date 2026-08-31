@@ -12,6 +12,61 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [0.11.0] - 2026-08-31
+
+**Act II begins.** Stage D1 — the ride north, and Wall Drug.
+
+### Added
+
+- **The ride** (`docs/superpowers/specs/2026-09-09-stage-d1-prose.md`):
+  Jack drives; the signs all say thirty-two and so does his zeroed trip
+  wheel; the road bends wide around the plant; his one line about the
+  camera at the county line. Return trips by night and day; the horse —
+  untied from the rail, nobody's as far as anyone can say — four hours over
+  the country, past a line of cedar posts with no wire on them, off the
+  road and off the camera. The deck of cards in the glovebox (M2, three
+  tellings).
+- **Wall Drug — the Emporium**: the T-rex nobody remembers installing, the
+  sign forest, the jackalope, free ice water, the claim window's dead
+  numbering card (bay E), and Dot — who kept the hat and lost the face;
+  the Custodian on the porch rail, afternoons, painting.
+- **The Back Corridor and the cache**: two thousand tagged boxes and one
+  shoe box under a ticket; the notebook (three readings — opaque, half
+  remembered, decoded), its back cover, the gap the page fits (R4), the
+  NOUMENA doodle; the USB (`DAD / DO NOT FORMAT`), Sissy's film, Jules's
+  pencil, Jack's returned letter, and a Polaroid of a stranger in this
+  hat. The dead terminal — the same machine, and a plug that fits nothing.
+- **Six memories**: the shorthand, the garage, through the door, noumena,
+  four hands ×3, nine symbols.
+
+### Changed
+
+- **Ordinary turns no longer move the clock** (register 65, ADR 0011
+  amended): Act I is two hundred commands long and the first ride north
+  was arriving after sunrise. Time passes by passage only — rides, `WAIT
+  UNTIL`, `SLEEP`, and explicit effects.
+- The Act I boundary is retired: `ASK JACK ABOUT WALL DRUG` now drives.
+  The build boundary is Your Room's terminal with the USB, and `DRIVE TO
+  PLANT`.
+- Town Edge's `north` is a highway door to the Emporium (the map draws
+  it); `GO TO WALL DRUG` walks to the edge and says a vehicle is wanted.
+
+### Fixed (from the D1 playtest)
+
+- `WAIT UNTIL` did nothing inside Wall Drug (handlers were Act I-only).
+- Dot's ticket and hat responses printed twice.
+- The porch-rail sentence appeared without the Custodian; `read card`,
+  `x window`, `x rail`, `x box`, `pull cord` clarified against the wrong
+  things.
+
+### Decisions
+
+Register **56–65** (bay E; the hat is recognized on the cache Polaroid;
+D2's rulings 58–64 recorded ahead; the clock). D2 and D3 prose are written
+and reviewed; D2's wiring is next.
+
+1132 tests (from 1087).
+
 ## [0.10.0] - 2026-08-31
 
 **Stage D begins.** D0 — the calendar, world assembly, and the town learning

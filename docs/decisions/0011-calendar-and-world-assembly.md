@@ -36,6 +36,11 @@ without one act's builders editing another's files.
    narrower than a phase (a sleep jumps over it). Every timed route has a
    clock-free sibling or a `missedRecovery`. Pass-time verbs (`WAIT UNTIL
    <phase>`, `SLEEP`) are content scripts over `advanceClock`.
+   **Amended v0.11.0:** ordinary turns do not advance the clock
+   (`minutesPerTurn: 0`). Act I is one night and two hundred commands; at
+   a minute a turn the first ride north arrived after sunrise. Time moves
+   by passage only — rides, `WAIT UNTIL`, `SLEEP`, exits with `minutes`,
+   and explicit `advanceClock` effects.
 5. **Every Act II schedule and presence rule is gated on `act2_started`**,
    set by the first ride north. Before it, every Act I NPC stands exactly
    where v0.9.0 put them at every phase; a v0.9 save loads into v0.10 with

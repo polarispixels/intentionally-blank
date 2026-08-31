@@ -10,8 +10,20 @@ import type { Effect } from '../../../../engine/effects';
 import type { ObjectDefSlice } from '../../../../engine/world';
 import type { ProseRule } from '../../../../engine/prose';
 import { CLUE_PAGE_INDENTATION, FEDORA, FLAG_LAMP_RIGHTED, FLOOR_LAMP, PAGE_78 } from '../ids';
-import { CUT, EXAMINE, READ, RUB, SMELL, TAKE } from '../verbs';
+import { CUT, EXAMINE, PUT_IN, READ, RUB, SMELL, TAKE } from '../verbs';
 import { V_HOLD_TO_LAMP, V_TURN_OVER } from '../ids';
+// D1 mirror handlers (Stage D plan §2; prose doc §13.6, §27) — the loose
+// page's own two-object commands. `ACT2_NOTEBOOK_FIT_EFFECTS`'s primary
+// declaration is `act2/objects/notebook.ts` (dobj=notebook, iobj=page,
+// reversed phrasing); this file's copy answers the natural phrasing
+// ("FIT PAGE IN NOTEBOOK" / "PUT PAGE IN NOTEBOOK" / "COMPARE PAGE WITH
+// NOTEBOOK", dobj=page, iobj=notebook — `findHandler`, `actions.ts`,
+// dispatches on the resolved DOBJ only). `RUB PAGE WITH PENCIL` has no
+// natural reversed form at all (nobody rubs a bound notebook with a loose
+// page), so this is its *only* declaration, not a mirror of one on the
+// notebook — see `objects/notebook.ts`'s own header note.
+import { NOTEBOOK_FIT_EFFECTS } from '../../act2/objects/notebook';
+import { ACT2_CLUE_INDENTED_CREDENTIALS, ACT2_NOTEBOOK, ACT2_PAGE_RUBBED, ACT2_PENCIL, V_FIT } from '../../act2/ids';
 
 const RAKING_LIGHT_TEXT = [
   'A single sheet, torn along one edge where it left whatever it was part of, folded and unfolded enough times to have gone soft at the creases.',
@@ -59,6 +71,27 @@ const page78: ObjectDefSlice = {
     { verbs: [EXAMINE, READ], effects: examineEffects },
     { verbs: [V_TURN_OVER], effects: [{ say: 'You turn it over. Page 8 declines to be any different from page 7.' }] },
     { verbs: [V_HOLD_TO_LAMP], withInstrument: [FLOOR_LAMP], effects: [{ say: holdToLamp }] },
+    // D1 mirror (§13.6) — "FIT PAGE IN NOTEBOOK" / "PUT PAGE IN NOTEBOOK" /
+    // "COMPARE PAGE WITH NOTEBOOK" (dobj=page, iobj=notebook). Primary copy
+    // (reversed phrasing) is `act2/objects/notebook.ts`.
+    { verbs: [V_FIT, PUT_IN], withInstrument: [ACT2_NOTEBOOK], effects: NOTEBOOK_FIT_EFFECTS },
+    // "RUB PAGE WITH PENCIL" (§13.6, R4's rubbing) — checked before the
+    // bare/no-instrument RUB refusal below, since that handler's own
+    // `withInstrument` is `undefined` ("don't care") and would otherwise
+    // win first regardless of `iobj` (`actions.ts`'s `findHandler` takes
+    // the first array match).
+    {
+      verbs: [RUB],
+      withInstrument: [ACT2_PENCIL],
+      effects: [
+        {
+          say:
+            'You put the sheet flat on the edge of the shelf, which is the flattest thing in this corridor, and take the pencil out from under the band, and lay the lead over on its side, and go at the page the way a child goes at a coin.\n\nThe valleys come up white out of the grey. Not all of it. Enough of it:\n\n    admin\n    admin-password\n\n    W.D. — hold — 4417\n\nBelow that, three more lines that the graphite finds and cannot make into words, and one that is not words at all: a short row of small marks, evenly spaced, that were made by a person doing something deliberate.',
+        },
+        { set: [ACT2_PAGE_RUBBED, true] },
+        { grantClue: ACT2_CLUE_INDENTED_CREDENTIALS },
+      ],
+    },
     {
       verbs: [RUB],
       effects: [

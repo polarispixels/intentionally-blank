@@ -89,12 +89,12 @@ describe('SLEEP — the two routes and the fallback', () => {
     expect(text(events)).toContain('The floor, then.');
   });
 
-  it('on Main Street, after act2_started, is refused and costs exactly one minute', () => {
+  it('on Main Street, after act2_started, is refused and costs no time (register 65: ordinary turns do not move the clock)', () => {
     const store = new MemoryStore();
     const base = withState({ clock: { day: 1, minute: 500 }, flags: { [ACT2_STARTED]: true } });
     const { session: entered } = enter(base, MAIN_STREET);
     const { session: after, events } = say(entered, 'sleep', store);
-    expect(after.state.clock).toEqual({ day: 1, minute: 501 });
+    expect(after.state.clock).toEqual({ day: 1, minute: 500 });
     expect(text(events)).toContain('Two places in this town have been offered to you');
   });
 

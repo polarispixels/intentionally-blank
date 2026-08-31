@@ -344,7 +344,7 @@ const poBoxSlip: ObjectDefSlice = {
   name: 'rent notice',
   portable: true,
   // No bare "141" here: the Act I playthrough found OPEN BOX 141 resolving to this slip in hand (the held tie-break) instead of the box.
-  nouns: ['slip', 'notice', 'card', 'rent notice', 'post office slip', 'stationery', 'form', 'paper'],
+  nouns: ['slip', 'notice', 'rent notice', 'post office slip', 'stationery', 'form', 'paper'],
   handlers: [{ verbs: [EXAMINE, READ], effects: poBoxSlipEffects }],
 };
 

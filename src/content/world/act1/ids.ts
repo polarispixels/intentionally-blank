@@ -652,7 +652,21 @@ export const PADDOCK = O('act1_paddock');
 export const PADDOCK_TROUGH = O('act1_paddock_trough');
 export const FAR_LIGHTS = O('act1_far_lights');
 export const OPEN_COUNTRY = O('act1_open_country');
-/** §14's build boundary — always-closed door target for `north`, mirroring `MAIN_STREET_BOUNDARY_GATE` (no `nouns`: never resolvable, never described). This is now the boundary's north edge; Main Street's own `north` variant is deleted by a separate task (§15's own ruling — see this task's report). */
+/**
+ * §14's build boundary — always-closed door target for `north`, mirroring
+ * `MAIN_STREET_BOUNDARY_GATE` (no `nouns`: never resolvable, never
+ * described). D1 amendment (Stage D1 prose doc §18/§21): this same object
+ * is now also the highway door on the Emporium's own `south` exit
+ * (`act2/wallDrugEmporium.ts`, task B's module) — one physical door,
+ * blocked from both ends, each side with its own authored `blockedText`.
+ * `ids.ts`'s own ruling 5 offered a rename (dropping "_boundary_gate" from
+ * this id, since the highway is now a permanent in-fiction obstruction
+ * rather than "the edge of built content") as an alternative; task B's own
+ * concurrent edit to `tests/world-game.test.ts` had already landed and
+ * tested the simpler "two exits, one shared gate object" reading first, so
+ * this task kept the shipped name rather than overwrite that integrated
+ * work — see this task's report.
+ */
 export const TOWN_EDGE_BOUNDARY_GATE = O('act1_town_edge_boundary_gate');
 /** §14's "every other direction — in-world, not the build boundary" gate — mirrors `POST_OFFICE_NO_EXIT_GATE`/`SHERIFF_OFFICE_NO_EXIT_GATE`. */
 export const TOWN_EDGE_NO_EXIT_GATE = O('act1_town_edge_no_exit_gate');

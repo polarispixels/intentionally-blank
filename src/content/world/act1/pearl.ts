@@ -20,6 +20,7 @@ import { T } from '../../../engine/ids';
 import type { NpcDefSlice, ShowResponseDef, TopicDef } from '../../../engine/world';
 import type { ProseRule } from '../../../engine/prose';
 import { FLAG_MET_PEARL, FLAG_PEARL_NOTICED_YOU, FLAG_TOLD_PEARL_ABOUT_ROOM, MUG, PAGE_78, PEARL, PIE_BOX, SUNDOWN_DINER, V_ATTACK, V_FOLLOW, V_HUG, V_KISS } from './ids';
+import { ACT2_HORSE_BORROWED } from '../act2/ids';
 
 // ---------------------------------------------------------------------------
 // §6.3 — unknownTopic
@@ -74,6 +75,8 @@ const TOPIC_WHITLOCK = T('act1_pearl_topic_whitlock');
 const TOPIC_JACK = T('act1_pearl_topic_jack');
 // Wave 5 (§12) — the ninth entry, appended after `topic_jack`.
 const TOPIC_PIE_TO_GO = T('act1_pearl_topic_pie_to_go');
+// D1 amendment (Stage D1 prose doc §17).
+const TOPIC_HORSES = T('act1_pearl_topic_horses');
 
 const topics: TopicDef[] = [
   {
@@ -138,6 +141,13 @@ const topics: TopicDef[] = [
     ] satisfies ProseRule[],
     // Grants once — a second ask while already carrying one just gets rule 2's text (§12's own instruction).
     effects: [{ if: { when: { not: { has: PIE_BOX } }, then: [{ move: [PIE_BOX, 'inventory'] }] } }],
+  },
+  // D1 amendment (Stage D1 prose doc §17) — sets `act2_horse_borrowed`.
+  {
+    id: TOPIC_HORSES,
+    words: ['horse', 'horses', 'rail', 'hitching rail', 'whose horses', 'owner'],
+    response: '"Whose?" She thinks about it while doing three other things. "They\'re at the\nrail. They\'ve been at the rail since I\'ve been looking at that rail." A pan\ncomes off the heat. "Somebody feeds them, because they\'re fed."',
+    effects: [{ set: [ACT2_HORSE_BORROWED, true] }],
   },
 ];
 

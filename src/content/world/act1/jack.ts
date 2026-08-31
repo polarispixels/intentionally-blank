@@ -65,7 +65,6 @@ import { T } from '../../../engine/ids';
 import type { Effect } from '../../../engine/effects';
 import type { NpcDefSlice, ShowResponseDef, TopicDef } from '../../../engine/world';
 import type { ProseRule } from '../../../engine/prose';
-import { END_OF_BUILD_SCRIPT } from './scripts';
 import {
   CLAIM_TICKET,
   CLUE_JULES,
@@ -95,7 +94,7 @@ import {
   V_KISS,
   WORK_ORDER,
 } from './ids';
-import { ACT2_JACK_AWAY, ACT2_STARTED } from '../act2/ids';
+import { ACT2_JACK_AWAY, ACT2_LUKE_REFERENCED, ACT2_STARTED, ACT2_TRAVEL_SCRIPT } from '../act2/ids';
 
 // ---------------------------------------------------------------------------
 // §6.3 — unknownTopic
@@ -231,17 +230,18 @@ const jackWallDrugText =
   'He takes it, holds it out at arm\'s length, and reads all four words of it.\n\n"Wall Drug." He says it the way you say a place you have driven past nine hundred times. "He put something in at Wall Drug, and he kept the stub, and the stub was in a box only he could open."\n\nHe puts it back in your hand and goes and finds his boots.\n\n"Thirty-two miles. An hour, the way I drive it, and tonight I am going to drive it worse than that." The screen door goes off its spring behind him. "Get in."\n\nHe is at the driver\'s door with the keys in his fist, and the engine has not started yet.';
 
 /**
- * §16.2 — the END OF BUILD system line, gated so it fires only the first
- * time `offered_the_ride` goes true (a repeat ask gets `jackWallDrugText`
- * again with no notice, per the doc's own instruction).
+ * §16.2 (wave 5) / D1 prose doc §21's own note — the shipped END OF BUILD
+ * call is superseded: the ride now exists, so this no longer ends the
+ * build. Sets `offered_the_ride` on the first ask (as before) and then
+ * always routes to the travel script (§3's own ruling: "ASK JACK ABOUT WALL
+ * DRUG / TELL JACK ABOUT TICKET ... routes to the same script with no
+ * additional line" — the script's own variant selection, not this effect
+ * list, decides whether that is the first ride's 8 beats or a shorter
+ * repeat).
  */
 const jackWallDrugEffects: Effect[] = [
-  {
-    if: {
-      when: { not: { flag: FLAG_OFFERED_THE_RIDE } },
-      then: [{ script: { id: END_OF_BUILD_SCRIPT } }, { set: [FLAG_OFFERED_THE_RIDE, true] }],
-    },
-  },
+  { if: { when: { not: { flag: FLAG_OFFERED_THE_RIDE } }, then: [{ set: [FLAG_OFFERED_THE_RIDE, true] }] } },
+  { script: { id: ACT2_TRAVEL_SCRIPT, args: { mode: 'truck', to: 'wall_drug' } } },
 ];
 
 // Wave 5's own three additions, declared as named `TopicDef`s so the SAME
@@ -330,6 +330,11 @@ const topics: TopicDef[] = [
     words: ['family', 'brothers', 'sister', 'siblings', 'luke', 'eli', 'sissy', 'president', 'astronaut', 'mars', 'famous'],
     response:
       '"There\'s four of us that anybody\'s heard of." He says it with no edge on it, which is worse. "Luke\'s the President. Eli does energy, whatever that means, and sleeps eleven hours a day. Sissy\'s on Mars, which I still can\'t say out loud without it sounding like a lie."\n\n"And me. I drive a truck over other trucks." He is not fishing; it is the family\'s own joke and he has told it a thousand times. "Somebody had to stay where he was. I wrote to Luke about Jules. More than once."',
+    // D1 amendment (Stage D1 prose doc §20; ids.ts's own ACT2_LUKE_REFERENCED
+    // comment) — no prose change. M12's other half-trigger: this is the only
+    // place in the shipped game where Luke is mentioned in the player's
+    // hearing.
+    effects: [{ set: [ACT2_LUKE_REFERENCED, true] }],
   },
   {
     id: TOPIC_TATTOO,

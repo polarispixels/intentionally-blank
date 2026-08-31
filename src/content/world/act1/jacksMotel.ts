@@ -10,7 +10,8 @@ import type { ExitDefSlice, HandlerDef, RoomDefSlice } from '../../../engine/wor
 import type { ProseRule } from '../../../engine/prose';
 import { LISTEN, SLEEP, SMELL, WAIT } from './verbs';
 import { CLUE_HIRED, FLAG_MET_JACK, FLAG_VISITED_MOTEL, JACK, JACKS_MOTEL, JACKS_MOTEL_NO_EXIT_GATE, MAIN_STREET, MONSTER_TRUCK, V_LOOK_UP } from './ids';
-import { ACT2_STARTED } from '../act2/ids';
+import { ACT2_STARTED, V_ACT2_DRIVE_TO_PLANT } from '../act2/ids';
+import { ACT2_DRIVE_TO_PLANT_EFFECTS } from '../act2/scripts';
 
 // ---------------------------------------------------------------------------
 // §3.1 — description
@@ -93,6 +94,8 @@ const roomHandlers: HandlerDef[] = [
   { verbs: [V_LOOK_UP], effects: [{ say: lookUp }] },
   { verbs: [WAIT], effects: [{ say: waitText }] },
   { verbs: [SLEEP], effects: [{ say: sleepText }] },
+  // D1 amendment — the boundary's second route (§21), with the truck present.
+  { verbs: [V_ACT2_DRIVE_TO_PLANT], when: { objectAt: [MONSTER_TRUCK, JACKS_MOTEL] }, effects: ACT2_DRIVE_TO_PLANT_EFFECTS },
 ];
 
 const onEnter: RoomDefSlice['onEnter'] = [
