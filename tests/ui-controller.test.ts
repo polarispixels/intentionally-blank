@@ -23,9 +23,13 @@ import { DeterministicParser } from '../src/engine/interpreter';
 import { R, S, V } from '../src/engine/ids';
 import type { ScriptId } from '../src/engine/ids';
 import { compileVocabulary } from '../src/engine/parser';
-import type { WorldDef } from '../src/engine/world';
+import type { GameState, WorldDef } from '../src/engine/world';
 import { MemoryStore } from '../src/session/store';
 import { WORLD as ACT1_WORLD } from '../src/content/world/act1';
+import { WORLD as GAME_WORLD } from '../src/content/world/game';
+import { JACKS_MOTEL, MAIN_STREET } from '../src/content/world/act1/ids';
+import { ACT2_HORSE_BORROWED } from '../src/content/world/act2/ids';
+import { createSession } from '../src/session/session';
 import { WORLD as PROLOGUE_WORLD, PROMPT_SCRIPTS } from '../src/content/scenes/mvp-prologue';
 import { CREDENTIALS } from '../src/content/scenes/mvp-prologue-prompt';
 import { RESTART_PROMPT_SCRIPTS } from '../src/session/session';
@@ -124,19 +128,10 @@ describe('browser-facing path: a real act1 playthrough slice', () => {
     expect(ui.session.state.turn).toBe(before);
   });
 
-  it('flushOneBeat reveals exactly one queued line at a time; flushAllBeats reveals the rest', () => {
-    const store = new MemoryStore();
-    const o = opts(ACT1_WORLD, store);
-    let ui: UiState = createUiState(o);
-    ui = submitCommand(ui, 'pull chain', o);
-    const queued = ui.pending.length;
-    if (queued > 0) {
-      ui = flushOneBeat(ui);
-      expect(ui.pending.length).toBe(queued - 1);
-      ui = flushAllBeats(ui);
-      expect(ui.pending).toEqual([]);
-    }
-  });
+  // flushOneBeat/flushAllBeats' actual reveal-through-the-next-beat
+  // semantics are covered by the "scripted-travel event ordering" describe
+  // block below, against a command that genuinely queues beats — ACT1_WORLD
+  // + 'pull chain' queues none, which made a same-named test here vacuous.
 
   it('resuming from an existing "auto" save continues the same session (browser-reload continuity) and re-describes the current room instead of rendering a blank screen', () => {
     const store = new MemoryStore();
@@ -397,6 +392,88 @@ describe('the recursive ending hand-off through the browser prompt round-trip (A
     expect(store.get('undo')).toBeUndefined();
     expect(store.get('checkpoint')).toBeUndefined();
     expect(store.get('auto')).toBeDefined();
+  });
+});
+
+describe('scripted-travel event ordering (v1.0.2 — RIDE HORSE rendered its destination before the journey)', () => {
+  // The engine's event array for a travel turn is already correctly ordered
+  // (`turn.ts`: respond's events — entry line, beats, clue — then
+  // `renderArrival`'s — description, listing, onEnter questions), and the CLI
+  // renders it strictly in order. The bug was this shell's alone: beats went
+  // into the timer-paced `pending` queue while every later event kind was
+  // pushed straight into `lines`, so the destination's "clue noted"/"question
+  // opened"/description overtook the overland narration. These tests drive
+  // the real shipped world through the same `submitCommand` the browser runs.
+
+  function travelUi(patch: Partial<GameState>): { ui: UiState; o: ControllerOpts } {
+    const store = new MemoryStore();
+    const o = opts(GAME_WORLD, store);
+    const fresh = createSession(GAME_WORLD);
+    const ui: UiState = { session: { ...fresh, state: { ...fresh.state, ...patch } }, lines: [], pending: [] };
+    return { ui, o };
+  }
+
+  function orderOf(ui: UiState, needles: string[]): number[] {
+    return needles.map((n) => ui.lines.findIndex((l) => l.text.includes(n)));
+  }
+
+  it('RIDE HORSE to Wall Drug: entry line immediately; beats, clue, arrival description, and questions all wait their turn and reveal in event order', () => {
+    const { ui: start, o } = travelUi({ location: MAIN_STREET, flags: { [ACT2_HORSE_BORROWED]: true } });
+    let ui = submitCommand(start, 'ride horse', o);
+
+    // The entry line precedes the first beat in the event stream, so it
+    // renders immediately…
+    expect(ui.lines.some((l) => l.text.startsWith('Getting up is the whole difficulty'))).toBe(true);
+    // …but nothing that FOLLOWS the beats jumps the queue: no clue, no
+    // question, no Wall Drug description in the revealed transcript yet.
+    expect(ui.lines.some((l) => l.kind === 'clue' || l.kind === 'question')).toBe(false);
+    expect(ui.lines.some((l) => l.text.includes('Somewhere past the fourth doorway'))).toBe(false);
+
+    ui = flushAllBeats(ui);
+    const [firstBeat = -1, lastBeat = -1, clue = -1, arrival = -1] = orderOf(ui, [
+      'Nobody watches you go', // horse first-ride beat 1
+      'at the back of the lot', // horse first-ride beat 6
+      'clue noted: The signs on the county road',
+      'Somewhere past the fourth doorway', // Wall Drug Emporium description
+    ]);
+    const question = ui.lines.findIndex((l) => l.kind === 'question');
+    expect(firstBeat).toBeGreaterThan(-1);
+    expect(lastBeat).toBeGreaterThan(firstBeat);
+    expect(clue).toBeGreaterThan(lastBeat);
+    expect(arrival).toBeGreaterThan(clue);
+    expect(question).toBeGreaterThan(arrival);
+  });
+
+  it('flushOneBeat paces one beat per tick, then reveals the trailing arrival lines together on the tick after the last beat (the CLI sleeps only after beats)', () => {
+    const { ui: start, o } = travelUi({ location: MAIN_STREET, flags: { [ACT2_HORSE_BORROWED]: true } });
+    let ui = submitCommand(start, 'ride horse', o);
+
+    for (let i = 0; i < 6; i += 1) ui = flushOneBeat(ui); // the six overland beats, one per timer tick
+    // After the sixth beat the clue/description/questions are still queued —
+    // they land after the last beat's own pause, not interleaved with it.
+    expect(ui.lines.some((l) => l.kind === 'question')).toBe(false);
+    expect(ui.pending.length).toBeGreaterThan(0);
+
+    ui = flushOneBeat(ui); // the seventh tick: no beat left, so everything trailing reveals at once
+    expect(ui.pending).toEqual([]);
+    expect(ui.lines.some((l) => l.kind === 'clue')).toBe(true);
+    expect(ui.lines.some((l) => l.kind === 'question')).toBe(true);
+  });
+
+  it("DRIVE TO PLANT (truck to the perimeter) keeps its beats ahead of the Perimeter Road's first-sight description", () => {
+    const { ui: start, o } = travelUi({ location: JACKS_MOTEL });
+    let ui = submitCommand(start, 'drive to plant', o);
+    expect(ui.lines.some((l) => l.text.includes('The made road runs out at a gate'))).toBe(false); // arrival not yet revealed
+
+    ui = flushAllBeats(ui);
+    const [firstBeat = -1, lastBeat = -1, arrival = -1] = orderOf(ui, [
+      'Out over the cattle guard and north', // perimeter truck beat 1
+      "I'll be here", // perimeter truck beat 3
+      'The made road runs out at a gate', // Perimeter Road first-sight description
+    ]);
+    expect(firstBeat).toBeGreaterThan(-1);
+    expect(lastBeat).toBeGreaterThan(firstBeat);
+    expect(arrival).toBeGreaterThan(lastBeat);
   });
 });
 

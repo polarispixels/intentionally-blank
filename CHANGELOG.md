@@ -12,6 +12,32 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [1.0.2] - 2026-08-31
+
+### Fixed
+
+- **Scripted travel scenes (RIDE HORSE and others) rendered the destination
+  before the journey in the browser shell.** `RIDE HORSE` from Town Edge to
+  Wall Drug showed the clue notification and question-opened lines, and
+  eventually the destination room's own description, ahead of the paced
+  overland travel narration that's supposed to print first (found by Ryan,
+  playing the live game). The engine's event ordering was always correct —
+  and the CLI, which renders events strictly in order, never showed the
+  bug — but the Vue shell's `applyOneEvent` only routed `beat`-kind events
+  into the timer-paced reveal queue; every other event kind (clue, question,
+  non-beat prose, the arrival description) was pushed straight into the
+  visible transcript, jumping ahead of any beats still queued from earlier
+  in the same turn. `src/ui/controller.ts`'s `pending` queue is now a
+  strict in-order reveal queue (`{ line, beat }`) — any event that arrives
+  while something is still pending queues behind it, in order; consecutive
+  non-beat lines reveal together on the same tick, matching the CLI's own
+  "sleep only after a beat" convention. Fixes every scripted travel scene
+  built on the same beats-then-effects pattern (truck, horse, and the
+  perimeter legs in `act2/travel.ts`), plus at least one unrelated scene
+  that shared the bug silently (`act3InterlockDeath`'s beats-then-death
+  sequence). Regression coverage: `tests/ui-controller.test.ts`'s
+  "scripted-travel event ordering" suite, driving the real shipped world.
+
 ## [1.0.1] - 2026-08-31
 
 ### Fixed

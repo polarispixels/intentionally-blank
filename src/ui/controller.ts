@@ -64,12 +64,24 @@ export interface PendingPrompt {
   error?: string;
 }
 
+/**
+ * One not-yet-revealed transcript line. `beat: true` marks a paced beat (the
+ * shell waits `BEAT_MS` after revealing it); `beat: false` is an ordinary
+ * line that merely arrived *after* a beat in the same turn's event stream and
+ * must therefore wait its turn in the queue rather than jump ahead of the
+ * narration (the v1.0.2 travel-scene ordering fix — see `applyOneEvent`).
+ */
+export interface PendingLine {
+  line: Line;
+  beat: boolean;
+}
+
 export interface UiState {
   session: SessionState;
   /** Already-revealed transcript lines. */
   lines: Line[];
-  /** Beat-paced lines not yet revealed — the shell pops one at a time (`flushOneBeat`) or all at once (`flushAllBeats`, mirroring the old shell's "a command flushes whatever is still pending"). */
-  pending: Line[];
+  /** Not-yet-revealed lines, in event order — the shell reveals through the next beat per timer tick (`flushOneBeat`) or everything at once (`flushAllBeats`, mirroring the old shell's "a command flushes whatever is still pending"). */
+  pending: PendingLine[];
   prompt?: PendingPrompt;
 }
 
@@ -128,25 +140,61 @@ function freshUi(session: SessionState): UiState {
   return { session, lines: [], pending: [] };
 }
 
+/**
+ * Appends one line to the transcript **in event order**: while anything is
+ * still queued in `pending`, the new line queues behind it (as a non-beat
+ * entry) instead of jumping straight into `lines`. Without this, any event
+ * that follows beats inside one turn's event array — a travel script's
+ * arrival description, a `clue`/`question` fired by the destination's
+ * `onEnter` — rendered *before* the narration it chronologically follows
+ * (the v1.0.2 RIDE HORSE bug: "clue noted" and the Wall Drug description
+ * ahead of the overland beats). The CLI never had this bug because it
+ * renders the same array strictly in order (`repl.ts`'s `renderEvents`).
+ *
+ * One event kind is NOT covered: a `prompt` (`openPrompt`, below) opens the
+ * modal immediately without consulting `pending`, so a script emitting
+ * beats followed by a prompt in the same event array would pop the modal
+ * over still-pacing narration — the same bug class this function fixes.
+ * Not reachable in the shipped world as of v1.0.2 (every prompt emitter
+ * sends `[prompt]` alone or `[promptClosed, ...say, prompt]`, never
+ * `[...beats, prompt]`), but a future script that combines them would hit
+ * it; route `openPrompt` through the pending queue too if that changes.
+ */
 function pushLine(ui: UiState, line: Line): UiState {
+  if (ui.pending.length > 0) return { ...ui, pending: [...ui.pending, { line, beat: false }] };
   return { ...ui, lines: [...ui.lines, line] };
 }
 
 function pushLines(ui: UiState, lines: Line[]): UiState {
-  return lines.length === 0 ? ui : { ...ui, lines: [...ui.lines, ...lines] };
+  if (lines.length === 0) return ui;
+  if (ui.pending.length > 0) return { ...ui, pending: [...ui.pending, ...lines.map((line): PendingLine => ({ line, beat: false }))] };
+  return { ...ui, lines: [...ui.lines, ...lines] };
 }
 
-/** Reveals every still-queued beat at once (a command typed mid-sequence flushes rather than interleaving — same rule the old shell and the CLI both apply). */
+/** Reveals everything still queued at once (a command typed mid-sequence flushes rather than interleaving — same rule the old shell and the CLI both apply). */
 export function flushAllBeats(ui: UiState): UiState {
   if (ui.pending.length === 0) return ui;
-  return { ...ui, lines: [...ui.lines, ...ui.pending], pending: [] };
+  return { ...ui, lines: [...ui.lines, ...ui.pending.map((p) => p.line)], pending: [] };
 }
 
-/** Reveals exactly one queued beat — what a beat-pacing timer calls. */
+/**
+ * Reveals queued lines up to and including the next beat — what a
+ * beat-pacing timer calls. Consecutive non-beat lines (an arrival
+ * description, a "clue noted") reveal together with no extra delay between
+ * them, mirroring the CLI's own convention of sleeping only *after* a beat
+ * (`repl.ts`'s `renderEvents`); the pause always lands on the beat itself.
+ */
 export function flushOneBeat(ui: UiState): UiState {
   if (ui.pending.length === 0) return ui;
-  const [head, ...rest] = ui.pending;
-  return { ...ui, lines: [...ui.lines, head!], pending: rest };
+  let i = 0;
+  const revealed: Line[] = [];
+  while (i < ui.pending.length) {
+    const entry = ui.pending[i]!;
+    revealed.push(entry.line);
+    i += 1;
+    if (entry.beat) break;
+  }
+  return { ...ui, lines: [...ui.lines, ...revealed], pending: ui.pending.slice(i) };
 }
 
 function openPrompt(ui: UiState, e: Extract<GameEvent, { type: 'prompt' }>, opts: ControllerOpts, error?: string): UiState {
@@ -163,7 +211,7 @@ function applyOneEvent(ui: UiState, e: Exclude<GameEvent, { type: 'diag' }>, opt
     case 'echo':
       return ui; // never emitted by v2 — see this file's header
     case 'line':
-      if (e.kind === 'beat') return { ...ui, pending: [...ui.pending, { kind: 'prose', text: e.text }] };
+      if (e.kind === 'beat') return { ...ui, pending: [...ui.pending, { line: { kind: 'prose', text: e.text }, beat: true }] };
       return pushLine(ui, { kind: e.kind === 'system' ? 'system' : 'prose', text: e.text });
     case 'memory':
       return pushLines(ui, [{ kind: 'memory', text: 'MEMORY RECOVERED' }, ...e.lines.map((text): Line => ({ kind: 'memory', text }))]);
