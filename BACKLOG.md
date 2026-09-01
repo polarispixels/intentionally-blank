@@ -134,6 +134,26 @@ a browser profile holding an autosave from a previous run took the resume
 branch and rendered nothing. A first-time player sees the opening
 correctly; confirmed on a clean profile.
 
+## Open: the opening bedroom has no authored room name
+
+Found in the `LOOK` room-name header work (post-1.0.2): `act1_your_room`
+(`src/content/world/act1/room.ts`) — the player's own rented room, the very
+first room the game shows — has no `RoomDefSlice.name`, so it's the one room
+that never gets the new header on `LOOK`. Not a regression, and not just a
+`LOOK` gap: `views.ts`'s `mapView` already does `name: def.name ?? id`, so
+`MAP` has been leaking the raw internal id (`act1_your_room`, next to every
+other room's real name) to the player since the MAP command shipped — the
+new `LOOK` header deliberately does *not* fall back to the id (skips the
+header outright instead), so the tree now holds two different conventions
+for a missing name and both should be reconciled once this is fixed. The
+file's own header comment already flags the underlying gap — `name` is a
+plain string, but the room wants a *state-dependent* title ("In the Dark"
+before the lamp, "A Rented Room" after, or similar), which the schema
+doesn't support yet, and no candidate text has ever been confirmed as
+canon. Fixing it needs either a `Prose`-typed room name (schema change, `game-architect`
+territory) or a `narrative-writer` pass to settle the state-dependent
+strings once the schema supports them — not a mechanical content fix.
+
 ## Open: the pen has no listing line
 
 `PEN` (`src/content/world/act1/objects/misc.ts`) is portable, sits in the

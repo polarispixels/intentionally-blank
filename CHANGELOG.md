@@ -12,6 +12,28 @@ documentation. **Every merge to `main` is a release**: it bumps
 line of any spec doc it changed, and gets a git tag `vX.Y.Z`. A test
 enforces that the version strings agree. (ADR 0005)
 
+## [1.1.0] - 2026-08-31
+
+### Added
+
+- **`LOOK` prints a room-name header.** The room's existing authored name
+  (e.g. `UPSTAIRS LANDING`, `SUNDOWN DINER`) now renders as its own
+  uppercase line ahead of the description, on `LOOK` and `GO TO`'s
+  already-there case (requested by Ryan). Deliberately scoped to `LOOK`
+  only — room arrival (walking in, first visit, travel-scene arrivals)
+  still renders exactly as before, no header. No player-state suffix
+  (e.g. "(Sitting)") — the engine has no unified posture concept to hang
+  one on yet; deferred as its own follow-up if it turns out to matter.
+  `act1_your_room` (the player's own starting bedroom) has no authored
+  name and is the one room that gets no header — a pre-existing,
+  documented gap, tracked in `BACKLOG.md` along with the `MAP` command's
+  matching id-leak for the same room.
+
+### Fixed
+
+- `.ib-saves/` (the CLI's local save files) was tracked in git by
+  accident since v0.3.3; untracked and added to `.gitignore`.
+
 ## [1.0.2] - 2026-08-31
 
 ### Fixed

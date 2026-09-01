@@ -103,7 +103,7 @@ describe('Sundown Diner — a real playthrough', () => {
     let { session } = enterDiner();
     const result = say(session, 'look', store);
     session = result.session;
-    expect(text(result.events)).toBe('Warm, and the griddle up, and the chairs still stacked over the tables at the dark end. The counter, the mugs, the pie case, the photographs. Pearl, doing four things.');
+    expect(text(result.events)).toBe('SUNDOWN DINER\nWarm, and the griddle up, and the chairs still stacked over the tables at the dark end. The counter, the mugs, the pie case, the photographs. Pearl, doing four things.');
   });
 
   it('SMELL, LISTEN and LOOK UP render the room\'s own senses', () => {

@@ -105,7 +105,7 @@ describe('County Library — a real playthrough', () => {
     const result = say(session, 'look', store);
     session = result.session;
     expect(text(result.events)).toBe(
-      'The cold, the drawer bank, the oak cabinet, the terminal, and the reader with its page still up on the screen. The steps to the street behind you.',
+      'COUNTY LIBRARY — RECORDS ANNEX\nThe cold, the drawer bank, the oak cabinet, the terminal, and the reader with its page still up on the screen. The steps to the street behind you.',
     );
   });
 

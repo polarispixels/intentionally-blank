@@ -388,16 +388,43 @@ function renderRoomListing(world: WorldDef, state: GameState, roomId: RoomId): {
   return { state: current, events };
 }
 
-/** `description`, then the room listing (§2.5) — shared by `look` and `executeGoTo`'s empty-route ("already there") case. Never `firstVisit`/`onEnter`. */
+/**
+ * `description`, then the room listing (§2.5) — shared by `look` and
+ * `executeGoTo`'s empty-route ("already there") case. Never
+ * `firstVisit`/`onEnter`.
+ *
+ * LOOK-only header (this seam never touches arrival rendering): the room's
+ * own authored `name`, uppercased, as its own line ahead of the
+ * description — `kind: 'system'` (not `'prose'`), matching this codebase's
+ * existing precedent for short label-like lines (`respond.ts`'s per-item
+ * inventory lines, `views.ts`'s hint text) and picking up the Vue shell's
+ * bold/letter-spaced `.system` styling for free; both shells already treat
+ * `line.kind` generically, so this needed no shell changes.
+ *
+ * Skipped, not id-fallback, when `name` is unset: this is genuinely
+ * exercised by real content, not just a defensive case — Act I's very
+ * first room (`act1/ids.ts`'s `YOUR_ROOM`, `act1/room.ts`'s own header
+ * comment) leaves `name` unset on purpose, a documented schema gap
+ * (`RoomDefSlice.name` is a plain `string`; the design wants a
+ * state-dependent "In the Dark"/"A Rented Room" `Prose`, which the field
+ * can't express yet, and the actual name text is unconfirmed narrative
+ * content besides). Printing the raw room id (`ACT1_YOUR_ROOM`) there would
+ * leak an internal id into the player's very first LOOK, which is worse
+ * than no header at all.
+ */
 function renderDescription(world: WorldDef, state: GameState): { state: GameState; events: GameEvent[] } {
   const roomId = state.location;
   const def = world.rooms?.[roomId];
   if (def?.description === undefined) {
     throw new Error(`move: room "${roomId}" has no description to render`);
   }
+  const header: GameEvent[] = def.name ? [{ type: 'line', kind: 'system', text: def.name.toUpperCase() }] : [];
   const rendered = render(world, state, `room.${roomId}.description`, def.description);
   const listing = renderRoomListing(world, rendered.state, roomId);
-  return { state: listing.state, events: [{ type: 'line', kind: 'prose', text: rendered.text }, ...listing.events] };
+  return {
+    state: listing.state,
+    events: [...header, { type: 'line', kind: 'prose', text: rendered.text }, ...listing.events],
+  };
 }
 
 /** `LOOK` (§8 task 20b): re-renders `description` only — never `firstVisit`, which fires once, ever, on genuine first entry (`renderArrival`). Not `onEnter` either: that's an entry hook, and LOOK doesn't re-enter anything. */

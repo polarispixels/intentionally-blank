@@ -215,7 +215,13 @@ describe('look', () => {
   it('renders the current room\'s description', () => {
     const state = baseState();
     const result = look(WORLD, state, LOOK_VERB_ID);
-    expect(lineTexts(result.events)).toEqual([WORLD.rooms![ROOM_A]!.description]);
+    expect(lineTexts(result.events)).toEqual([WORLD.rooms![ROOM_A]!.name!.toUpperCase(), WORLD.rooms![ROOM_A]!.description]);
+  });
+
+  it('prints the room name header, uppercased, as its own line ahead of the description', () => {
+    const state = baseState();
+    const result = look(WORLD, state, LOOK_VERB_ID);
+    expect(result.events[0]).toMatchObject({ type: 'line', kind: 'system', text: 'FIXTURE ROOM ALPHA' });
   });
 
   it('never renders firstVisit, even for a room the state has not (yet) marked visited', () => {
@@ -224,7 +230,7 @@ describe('look', () => {
     // LOOK reads only `description`, never `firstVisit`, unconditionally.
     const state = baseState({ location: ROOM_B, visited: { [ROOM_A]: 0 } });
     const result = look(WORLD, state, LOOK_VERB_ID);
-    expect(lineTexts(result.events)).toEqual([WORLD.rooms![ROOM_B]!.description]);
+    expect(lineTexts(result.events)).toEqual([WORLD.rooms![ROOM_B]!.name!.toUpperCase(), WORLD.rooms![ROOM_B]!.description]);
     expect(result.state.visited[ROOM_B]).toBeUndefined(); // LOOK does not mark visited either
   });
 
@@ -232,6 +238,13 @@ describe('look', () => {
     const state = baseState({ location: ROOM_B, visited: { [ROOM_A]: 0, [ROOM_B]: 1 } });
     const result = look(WORLD, state, LOOK_VERB_ID);
     expect(flag(WORLD, result.state, FLAG_ONENTER_ONCE)).toBe(false);
+  });
+
+  it('skips the header entirely — not an id fallback — when the room has no authored name (a real, deliberate case: Act I\'s starting room)', () => {
+    const unnamed: WorldDef = { ...WORLD, rooms: { ...WORLD.rooms, [ROOM_A]: { ...WORLD.rooms![ROOM_A]!, name: undefined } } };
+    const state = { ...initialState(unnamed) };
+    const result = look(unnamed, state, LOOK_VERB_ID);
+    expect(lineTexts(result.events)).toEqual([unnamed.rooms![ROOM_A]!.description]);
   });
 
   it('throws if the room has no authored description (a content bug, per this codebase\'s convention)', () => {
@@ -277,6 +290,7 @@ describe('room listing (§2.5 listedAs)', () => {
     const result = look(WORLD_WITH_LISTING, stateInRoomB(), LOOK_VERB_ID);
     // LETTER has no listedAs in this override — only HAT's line and the room's own description appear.
     expect(lineTexts(result.events)).toEqual([
+      WORLD_WITH_LISTING.rooms![ROOM_B]!.name!.toUpperCase(),
       WORLD_WITH_LISTING.rooms![ROOM_B]!.description,
       'fixture listedAs: a grey wool hat lies folded near the door.',
     ]);
@@ -303,11 +317,12 @@ describe('room listing (§2.5 listedAs)', () => {
   });
 
   it('an object carried in inventory or worn is not listed at all', () => {
+    const header = WORLD_WITH_LISTING.rooms![ROOM_B]!.name!.toUpperCase();
     const inInventory = stateInRoomB({ objects: { [HAT]: { location: 'inventory' } } });
-    expect(lineTexts(look(WORLD_WITH_LISTING, inInventory, LOOK_VERB_ID).events)).toEqual([WORLD_WITH_LISTING.rooms![ROOM_B]!.description]);
+    expect(lineTexts(look(WORLD_WITH_LISTING, inInventory, LOOK_VERB_ID).events)).toEqual([header, WORLD_WITH_LISTING.rooms![ROOM_B]!.description]);
 
     const worn = stateInRoomB({ objects: { [HAT]: { location: 'worn' } } });
-    expect(lineTexts(look(WORLD_WITH_LISTING, worn, LOOK_VERB_ID).events)).toEqual([WORLD_WITH_LISTING.rooms![ROOM_B]!.description]);
+    expect(lineTexts(look(WORLD_WITH_LISTING, worn, LOOK_VERB_ID).events)).toEqual([header, WORLD_WITH_LISTING.rooms![ROOM_B]!.description]);
   });
 
   it('scenery (not portable) is never listed, whatever its own state', () => {
@@ -322,10 +337,10 @@ describe('room listing (§2.5 listedAs)', () => {
     const darkWorld: WorldDef = { ...WORLD_WITH_LISTING, objects: { ...WORLD_WITH_LISTING.objects, [HAT]: { ...WORLD_WITH_LISTING.objects![HAT]!, location: ROOM_A } } };
     const state = { ...initialState(darkWorld) }; // ROOM_A
     const result = look(darkWorld, state, LOOK_VERB_ID);
-    expect(lineTexts(result.events)).toEqual([darkWorld.rooms![ROOM_A]!.description]);
+    expect(lineTexts(result.events)).toEqual([darkWorld.rooms![ROOM_A]!.name!.toUpperCase(), darkWorld.rooms![ROOM_A]!.description]);
   });
 
-  it('the same listing renders on renderArrival, right after description, not just on LOOK', () => {
+  it('the same listing renders on renderArrival, right after description, not just on LOOK — but renderArrival gets no room-name header (LOOK-only, per this task)', () => {
     const state = { ...initialState(WORLD_WITH_LISTING), visited: { [ROOM_A]: 0, [ROOM_B]: 1 }, location: ROOM_B };
     const result = renderArrival(WORLD_WITH_LISTING, state);
     expect(lineTexts(result.events)).toEqual([
@@ -450,6 +465,12 @@ describe('renderArrival', () => {
     const result = renderArrival(WORLD, state);
     expect(lineTexts(result.events)).toContain(WORLD.rooms![ROOM_A]!.description);
   });
+
+  it('never prints a room-name header — that is LOOK-only (renderDescription), not arrival rendering', () => {
+    const state = baseState({ location: ROOM_B }); // fresh arrival, firstVisit fires
+    const result = renderArrival(WORLD, state);
+    expect(lineTexts(result.events)).not.toContain(WORLD.rooms![ROOM_B]!.name!.toUpperCase());
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -457,10 +478,10 @@ describe('renderArrival', () => {
 // ---------------------------------------------------------------------------
 
 describe('executeGoTo', () => {
-  it('an empty route ("already there") just re-renders the current room, like LOOK', () => {
+  it('an empty route ("already there") just re-renders the current room, like LOOK — header included, since it shares renderDescription with look()', () => {
     const state = baseState();
     const result = executeGoTo(WORLD, state, []);
-    expect(lineTexts(result.events)).toEqual([WORLD.rooms![ROOM_A]!.description]);
+    expect(lineTexts(result.events)).toEqual([WORLD.rooms![ROOM_A]!.name!.toUpperCase(), WORLD.rooms![ROOM_A]!.description]);
     expect(result.state.location).toBe(ROOM_A);
     expect(result.class).toBeNull();
   });
@@ -556,7 +577,7 @@ describe('step() — full turn loop, real parser', () => {
   it('LOOK ("l") through the real parser re-describes without moving or re-ticking onEnter', () => {
     const state = initialState(WORLD);
     const result = step(WORLD, state, vocab, outcome('l', state));
-    expect(lineTexts(result.events)).toEqual([WORLD.rooms![ROOM_A]!.description]);
+    expect(lineTexts(result.events)).toEqual([WORLD.rooms![ROOM_A]!.name!.toUpperCase(), WORLD.rooms![ROOM_A]!.description]);
     expect(result.state.location).toBe(ROOM_A);
   });
 

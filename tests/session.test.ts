@@ -418,7 +418,7 @@ describe('resumeSession', () => {
     expect(resumed).toBeDefined();
     const roomC = WORLD.rooms![ROOM_C]!;
     const lineTexts = resumed!.events.filter((e): e is Extract<GameEvent, { type: 'line' }> => e.type === 'line').map((e) => e.text);
-    expect(lineTexts).toEqual([roomC.description]); // description only — never firstVisit's text
+    expect(lineTexts).toEqual([roomC.name!.toUpperCase(), roomC.description]); // header, then description only — never firstVisit's text
     expect(lineTexts).not.toContain(roomC.firstVisit);
 
     expect(resumed!.session.state.turn).toBe(5); // no turn consumed
